@@ -43,7 +43,7 @@ import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRole
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110a_AB2023_Limburg, eml110b_single, eml230b_AB2023_Limburg } from "e2e-tests/test-data/eml-files";
-import { dataEntryAB2023_LimburgCSO } from "e2e-tests/test-data/request-response-templates";
+import { dataEntryAB2023_LimburgDSO } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
 import { test } from "../../fixtures";
 
@@ -139,7 +139,7 @@ test.describe("full flow WS GSB CSO", () => {
     await countingMethodPage.checkHeaderContainsName("Gennep");
     await expect(countingMethodPage.cso).not.toBeChecked();
     await expect(countingMethodPage.dso).not.toBeChecked();
-    await countingMethodPage.cso.check();
+    await countingMethodPage.dso.check();
     await countingMethodPage.next.click();
 
     const numberOfVotersPage = new NumberOfVotersPgObj(page);
@@ -334,7 +334,7 @@ test.describe("full flow WS GSB CSO", () => {
       await expect(dataEntryHomePage.feedback).toContainText(station.name);
       await dataEntryHomePage.start.click();
 
-      await fillDataEntryPagesAndSave(page, dataEntryAB2023_LimburgCSO);
+      await fillDataEntryPagesAndSave(page, dataEntryAB2023_LimburgDSO);
       await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
       await logout(page);
@@ -357,7 +357,7 @@ test.describe("full flow WS GSB CSO", () => {
       await expect(dataEntryHomePage.feedback).toContainText(station.name);
       await dataEntryHomePage.start.click();
 
-      await fillDataEntryPagesAndSave(page, dataEntryAB2023_LimburgCSO);
+      await fillDataEntryPagesAndSave(page, dataEntryAB2023_LimburgDSO);
       await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
       await logout(page);
@@ -417,7 +417,7 @@ test.describe("full flow WS GSB CSO", () => {
     await logout(page);
   });
 
-  test("download Na 31-2 inlegvel", async ({ page }) => {
+  test("download Na 31-1 inlegvel", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
@@ -431,10 +431,10 @@ test.describe("full flow WS GSB CSO", () => {
     await expect(electionHomePage.header).toHaveText("Waterschap Limburg 2023");
 
     const downloadPromise = page.waitForEvent("download");
-    await electionHomePage.downloadNa31_2Inlegvel.click();
+    await electionHomePage.downloadNa31_1Inlegvel.click();
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toBe("Model_Na_31_2_Inlegvel.pdf");
+    expect(download.suggestedFilename()).toBe("Model_Na_31_1_Inlegvel.pdf");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 
     await logout(page);
@@ -487,9 +487,17 @@ test.describe("full flow WS GSB CSO", () => {
       await overviewPage.findElectionRowById(electionId!).click();
 
       const electionHome = new ElectionHome(page);
+      await expect(electionHome.header).toHaveText("Waterschap Limburg 2023");
+      await expect(electionHome.getCommitteeSessionCard(2)).toContainText("Tweede zitting");
+      await electionHome.detailsButton.click();
+
+      const electionDetails = new ElectionDetailsPgObj(page);
+      await expect(electionDetails.header).toHaveText("Gemeentelijk stembureau Gennep");
+      await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
+
       await electionHome.investigationsOverviewButton.click();
 
-      await createInvestigation(page, station.name, station.reason, "CSO");
+      await createInvestigation(page, station.name, station.reason, "DSO");
       const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
       await expect(investigationsOverviewPage.alert).toHaveText(
         `Onderzoek voor stembureau ${station.number} (${station.name}) toegevoegd`,
@@ -585,7 +593,7 @@ test.describe("full flow WS GSB CSO", () => {
       await firstCandidatesPage.fillCandidate(3, 0);
       await firstCandidatesPage.next.click();
 
-      for (let i = 1; i < dataEntryAB2023_LimburgCSO.political_group_votes.length; i++) {
+      for (let i = 1; i < dataEntryAB2023_LimburgDSO.political_group_votes.length; i++) {
         const candidatesPage = new CandidatesListPage(page, i, listNames[i]!);
         await expect(candidatesPage.fieldset).toBeVisible();
         await page.keyboard.press("Shift+Enter");
@@ -621,15 +629,15 @@ test.describe("full flow WS GSB CSO", () => {
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       await votersAndVotesPage.fillInPageAndClickNext(
-        dataEntryAB2023_LimburgCSO.voters_counts,
-        dataEntryAB2023_LimburgCSO.votes_counts,
+        dataEntryAB2023_LimburgDSO.voters_counts,
+        dataEntryAB2023_LimburgDSO.votes_counts,
       );
 
       const differencesPage = new DifferencesPage(page);
       await expect(differencesPage.fieldset).toBeVisible();
-      await differencesPage.fillInPageAndClickNext(dataEntryAB2023_LimburgCSO.differences_counts);
+      await differencesPage.fillInPageAndClickNext(dataEntryAB2023_LimburgDSO.differences_counts);
 
-      await fillCandidatesListPages(page, dataEntryAB2023_LimburgCSO);
+      await fillCandidatesListPages(page, dataEntryAB2023_LimburgDSO);
 
       const checkAndSavePage = new CheckAndSavePage(page);
       await checkAndSavePage.save.click();
@@ -661,13 +669,6 @@ test.describe("full flow WS GSB CSO", () => {
 
     const finishDataEntryPage = new FinishDataEntry(page);
     await finishDataEntryPage.finishDataEntry.click();
-
-    const electionDetails = new ElectionDetailsPgObj(page);
-    await expect(electionDetails.header).toHaveText("Gemeentelijk stembureau Gennep");
-    await electionDetails.locationInput.fill("Pannerdam");
-    await electionDetails.dateInput.fill("18-03-2026");
-    await electionDetails.timeInput.fill("21:34");
-    await electionDetails.toCertifiedResults.click();
 
     const electionHomePage = new ElectionReport(page);
     await expect(electionHomePage.header).toContainText("Tweede zitting gemeentelijk stembureau");

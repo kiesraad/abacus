@@ -187,16 +187,7 @@ export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: 
   ...structuredClone(commonDataEntry),
 };
 
-export const dataEntryAB2023_Limburg: CSOFirstSessionResults & { model: "CSOFirstSession" } = {
-  model: "CSOFirstSession",
-  extra_investigation: {
-    extra_investigation_other_reason: { yes: false, no: true },
-    ballots_recounted_extra_investigation: { yes: false, no: true },
-  },
-  counting_differences_polling_station: {
-    difference_ballots_voters_completely_accounted_for: { yes: true, no: false },
-    difference_ballots_per_list: { yes: false, no: true },
-  },
+export const commonDataEntryAB2023_Limburg: CommonPollingStationResults = {
   voters_counts: {
     poll_card_count: 6960,
     proxy_certificate_count: 803,
@@ -729,6 +720,19 @@ export const dataEntryAB2023_Limburg: CSOFirstSessionResults & { model: "CSOFirs
   ],
 };
 
+export const dataEntryAB2023_LimburgCSO: CSOFirstSessionResults & { model: "CSOFirstSession" } = {
+  model: "CSOFirstSession",
+  extra_investigation: {
+    extra_investigation_other_reason: { yes: false, no: true },
+    ballots_recounted_extra_investigation: { yes: false, no: true },
+  },
+  counting_differences_polling_station: {
+    difference_ballots_voters_completely_accounted_for: { yes: true, no: false },
+    difference_ballots_per_list: { yes: false, no: true },
+  },
+  ...structuredClone(commonDataEntryAB2023_Limburg),
+};
+
 export const checksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & {
   model: "DSOFirstSession";
 } = {
@@ -757,6 +761,22 @@ export const noChecksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & { mode
     corrected_results_csb_request: { yes: false, no: false },
   },
   ...structuredClone(commonDataEntry),
+};
+
+export const dataEntryAB2023_LimburgDSO: DSOFirstSessionResults & {
+  model: "DSOFirstSession";
+} = {
+  model: "DSOFirstSession",
+  about_report: {
+    corrigendum_present: "TwoDocuments",
+    checks_and_corrections_present: "PagePresent",
+  },
+  checks_and_corrections: {
+    reason_investigation_own_initiative: { unaccounted_difference: true, other_error: true },
+    corrected_results_own_initiative: { yes: true, no: false },
+    corrected_results_csb_request: { yes: false, no: false },
+  },
+  ...structuredClone(commonDataEntryAB2023_Limburg),
 };
 
 export const noRecountNoDifferencesDataEntryGSB: GSBResults & { model: "GSB" } = {

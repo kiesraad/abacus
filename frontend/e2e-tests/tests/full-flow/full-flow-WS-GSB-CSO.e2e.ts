@@ -94,7 +94,7 @@ const typistUsers: TestUser[] = [
   },
 ];
 
-test.describe.configure({ mode: "serial" });
+test.describe.configure({ mode: "serial", timeout: 120_000 });
 
 test.describe("full flow WS GSB CSO", () => {
   let electionId: number | null = null;

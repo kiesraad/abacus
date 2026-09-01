@@ -32,6 +32,7 @@ pub struct Election {
     pub name: String,
     /// See [`ElectionWithPoliticalGroups::eml_name`]
     #[serde(skip_serializing)]
+    #[serde(default)]
     pub eml_name: String,
     /// See [`ElectionWithPoliticalGroups::committee_category`]
     pub committee_category: CommitteeCategory,
@@ -89,6 +90,7 @@ pub struct ElectionWithPoliticalGroups {
     pub name: String,
     /// Name of the election, as defined in the EML_NL election definition.
     #[serde(skip_serializing)]
+    #[serde(default)]
     pub eml_name: String,
     /// The category (e.g. CSB) of the committee that this struct represents
     pub committee_category: CommitteeCategory,
@@ -258,6 +260,7 @@ pub struct NewElection {
     pub name: String,
     /// See [`ElectionWithPoliticalGroups::eml_name`]
     #[serde(skip_serializing)]
+    #[serde(default)]
     pub eml_name: String,
     /// See [`ElectionWithPoliticalGroups::committee_category`]
     pub committee_category: CommitteeCategory,

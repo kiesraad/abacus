@@ -2,7 +2,6 @@
   "election": {
     "id": 2,
     "name": "Test Election >= 19 seats",
-    "eml_name": "Gemeenteraad Juinen 2026",
     "committee_category": "CSB",
     "election_id": "GR2026_Juinen",
     "location": "Juinen",

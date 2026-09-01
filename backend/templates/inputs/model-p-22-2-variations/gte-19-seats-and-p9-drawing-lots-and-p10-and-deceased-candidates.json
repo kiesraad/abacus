@@ -76,7 +76,6 @@
   "election": {
     "id": 11,
     "name": "Drawing lots >= 19 seats, AbsoluteMajority & List Exhaustion and Deceased Candidates",
-    "eml_name": "Gemeenteraad Juinen 2026",
     "committee_category": "CSB",
     "election_id": "GR2026_Juinen",
     "location": "Juinen",

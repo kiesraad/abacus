@@ -2,7 +2,6 @@
   "election": {
     "id": 2,
     "name": "Provinciale Staten Oost-Holland 2035",
-    "eml_name": "Provinciale Staten Oost-Holland 2035",
     "committee_category": "GSB",
     "counting_method": "DSO",
     "election_id": "PS2035_Juinen",

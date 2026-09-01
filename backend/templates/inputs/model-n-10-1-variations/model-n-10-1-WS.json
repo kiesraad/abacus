@@ -2,7 +2,6 @@
   "election": {
     "id": 2,
     "name": "Waterschap Rivier en Polder 2035",
-    "eml_name": "Algemeen bestuur van het waterschap Rivier en Polder 2035",
     "committee_category": "GSB",
     "counting_method": "DSO",
     "election_id": "WS2035_Juinen",

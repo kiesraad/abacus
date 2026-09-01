@@ -707,7 +707,7 @@ pub mod tests {
             number_of_seats,
             number_of_voters: 1000,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
-            nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
+            nomination_date: NaiveDate::from_ymd_opt(2023, 9, 1).unwrap(),
             political_groups: political_groups_with_candidates(political_groups_candidates),
         }
     }

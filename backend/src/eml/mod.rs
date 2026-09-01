@@ -506,7 +506,7 @@ impl ElectionWithPoliticalGroups {
     ) -> Result<eml_nl::documents::ElectionIdentifierBuilder, EMLError> {
         let mut builder = eml_nl::documents::ElectionIdentifierBuilder::new()
             .id(ElectionId::new(&self.election_id)?)
-            .name(self.name.clone())
+            .name(self.eml_name.clone())
             .election_date(self.election_date)
             .nomination_date(self.nomination_date)
             .category(self.get_eml_category())
@@ -1246,6 +1246,20 @@ mod tests {
         assert_eq!(election.location, "Venlo");
         assert_eq!(election.authority_id, "0983");
         assert_eq!(election.district.region_details().unwrap().name, "Venlo");
+    }
+
+    #[test]
+    fn test_get_eml_election_identifier_builder_election_name() {
+        let mut election = election_fixture(
+            ElectionCategory::WaterAuthority,
+            CommitteeCategory::GSB,
+            &[0],
+        );
+        election.eml_name = "Algemeen bestuur van het waterschap Juinen 2023".to_string();
+        election.name = "Waterschap Juinen 2023".to_string();
+        let builder = election.get_eml_election_identifier_builder().unwrap();
+        let election_definition = builder.build_for_definition().unwrap();
+        assert_eq!(election_definition.name.to_string(), election.eml_name);
     }
 
     #[test]

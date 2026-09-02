@@ -215,6 +215,14 @@ The following dependencies (crates) are used:
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 
+The `eml_signature` crate (see [its README](eml_signature/README.md)) additionally uses:
+
+- `const-oid`: OID constants for reading the certificate subject and key algorithm.
+- `der`: ASN.1 DER primitives and PEM encoding.
+- `rcgen`: RSA key generation and X.509 certificate building (`aws-lc-rs` backend).
+- `x509-cert`: parsing certificates.
+- `zeroize`: wiping private key bytes on drop.
+
 For TLS (HTTPS) support, when the `tls` feature is enabled, the following dependencies are used:
 - `rcgen`: X.509 certificate/DER generation (`aws-lc-rs` backend)
 - `rustls-pki-types`: shared certificate and private-key types, and PEM decoding.

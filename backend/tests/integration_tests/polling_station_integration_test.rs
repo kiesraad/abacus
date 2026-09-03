@@ -1359,45 +1359,10 @@ async fn test_import_creates_empty_data_entries_for_first_session(pool: SqlitePo
     }
 }
 
-#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
-async fn test_export_municipality(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
-    let election_id = 2;
-
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/export");
-    let prefix =
-        "\"abacus-exporteren_stemgebieden-gemeenteraad_heemdamseburg_2024-eml_110b_stembureaus-";
-
-    let bytes = download_zip_assert(&coordinator_cookie, &url, prefix).await;
-
-    let archive = ZipFileReader::new(bytes).await.unwrap();
-    assert_eq!(archive.file().entries().len(), 1);
-
-    let entry = read_zip_entry(
-        &archive,
-        0,
-        "Stembureaus_GR2024_Heemdamseburg_Heemdamseburg.eml.xml",
-    )
-    .await;
-
-    let xml = String::from_utf8(entry).unwrap();
-    let polling_stations = polling_stations_from_eml_str(&xml).unwrap();
-    assert_eq!(polling_stations.len(), 2);
-    assert!(polling_stations.iter().any(|ps| ps.name == "Op Rolletjes"));
-    assert!(polling_stations.iter().any(|ps| ps.name == "Testplek"));
-    // EML requires at least one digit for `number_of_voters` (fixture has NULL -> check for default value 0).
-    let ps = polling_stations
-        .iter()
-        .find(|ps| ps.name == "Op Rolletjes")
-        .unwrap();
-    assert_eq!(ps.number_of_voters, Some(0));
-}
-
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso", "users"))))]
-async fn test_export_water_authority(pool: SqlitePool) {
+async fn test_export_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = login(&addr, Admin).await;
+    let cookie = login(&addr, CoordinatorGSB).await;
     let election_id = 11;
 
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/export");
@@ -1417,6 +1382,15 @@ async fn test_export_water_authority(pool: SqlitePool) {
 
     let polling_stations = polling_stations_from_eml_str(&xml).unwrap();
     assert_eq!(polling_stations.len(), 2);
+    assert!(polling_stations.iter().any(|ps| ps.name == "Op Rolletjes"));
+    assert!(polling_stations.iter().any(|ps| ps.name == "Testplek"));
+
+    // EML requires at least one digit for `number_of_voters` (fixture has NULL -> check for default value 0).
+    let ps = polling_stations
+        .iter()
+        .find(|ps| ps.name == "Op Rolletjes")
+        .unwrap();
+    assert_eq!(ps.number_of_voters, Some(0));
 }
 
 #[test(sqlx::test(fixtures(

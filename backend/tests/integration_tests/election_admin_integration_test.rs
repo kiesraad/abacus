@@ -139,7 +139,7 @@ async fn test_csb_election_validate_with_candidates(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
-async fn test_csb_election_import_save(pool: SqlitePool) {
+async fn test_csb_municipal_election_import_save(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
@@ -188,7 +188,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
-async fn test_csb_election_import_only_municipal_election_supported(pool: SqlitePool) {
+async fn test_csb_water_authority_election_import_save(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
@@ -199,19 +199,70 @@ async fn test_csb_election_import_only_municipal_election_supported(pool: Sqlite
         .json(&serde_json::json!({
             "committee_category": "CSB",
             "election_hash": [
-                "4fd2", "2e51", "1566", "d059",
-                "e2a3", "6862", "56fe", "d4eb",
-                "7d47", "8a74", "7be5", "8f92",
-                "b127", "2f55", "540b", "5aa4"
+                "8ca6", "b30d", "f37e", "5b8d",
+                "b3e3", "b027", "7776", "7166",
+                "d058", "92ce", "9202", "a90e",
+                "acd9", "3e30", "a925", "44c2"
             ],
-            "election_data": include_str!("../../src/eml/tests/eml110a_test_AB.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/definitions/Verkiezingsdefinitie_AB2023_Limburg.eml.xml"),
             "candidate_hash": [
-                "146d", "3784", "efa2", "93b5",
-                "721a", "7578", "a43f", "0636",
-                "7281", "66a0", "acf1", "55d3",
-                "ab25", "083c", "c000", "7096"
+                "dbac", "871e", "4e26", "8ddf",
+                "5127", "bbd3", "d744", "cd86",
+                "f353", "3158", "fbbb", "92ac",
+                "3a08", "f2ff", "c4df", "6510"
             ],
-            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/definitions/Kandidatenlijsten_AB2023_Limburg.eml.xml"),
+        }))
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::CREATED);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["committee_category"], "CSB");
+    assert!(body["counting_method"].is_null());
+    let election_details = get_election_details(
+        &addr,
+        &admin_cookie,
+        u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
+    )
+    .await;
+    assert_eq!(election_details["election"]["committee_category"], "CSB");
+    assert!(election_details["election"]["counting_method"].is_null());
+    assert_eq!(election_details["election"]["number_of_voters"], 1);
+    assert_eq!(
+        election_details["current_committee_session"]["status"],
+        "in_preparation"
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
+async fn test_csb_election_import_only_municipal_and_water_authority_elections_supported(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/import");
+    let admin_cookie = login(&addr, Admin).await;
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", &admin_cookie)
+        .json(&serde_json::json!({
+            "committee_category": "CSB",
+            "election_hash": [
+                "e8e0", "b931", "623b", "cd14",
+                "4a77", "35a4", "3012", "fef2",
+                "a7e1", "ab0b", "d1dd", "4080",
+                "b72c", "84e6", "1697", "8ff3"
+            ],
+            "election_data": include_str!("../../src/eml/tests/definitions/Verkiezingsdefinitie_PS2023_Drenthe.eml.xml"),
+            "candidate_hash": [
+                "fa92", "0b2b", "55e4", "086d",
+                "cb23", "b346", "b475", "91f5",
+                "a0d0", "6391", "bc76", "0610",
+                "ca8d", "359c", "5f4d", "f349"
+            ],
+            "candidate_data": include_str!("../../src/eml/tests/definitions/Kandidatenlijsten_PS2023_Drenthe.eml.xml"),
         }))
         .send()
         .await

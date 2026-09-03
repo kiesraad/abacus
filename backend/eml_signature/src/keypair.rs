@@ -10,7 +10,7 @@ use rcgen::{
 };
 use zeroize::Zeroizing;
 
-use crate::{Certificate, CertificateSubject, EmlSignatureError, RSA_KEY_BITS};
+use crate::{Certificate, CertificateSubject, EmlSignatureError};
 
 /// How long the certificate remains valid after the election date.
 const CERTIFICATE_VALIDITY_MONTHS: u32 = 3;
@@ -85,9 +85,9 @@ impl SigningKeyPair {
     }
 }
 
-/// Generate a fresh RSA-4096 keypair ([`RSA_KEY_BITS`]).
+/// Generate a fresh RSA-4096 keypair ([`crate::RSA_KEY_BITS`]).
 fn generate_key_pair() -> Result<Zeroizing<KeyPair>, EmlSignatureError> {
-    // Key size needs to match [`RSA_KEY_BITS`], validated by [`Certificate::from_der`].
+    // Key size needs to match [`crate::RSA_KEY_BITS`], validated by [`Certificate::from_der`].
     KeyPair::generate_rsa_for(&PKCS_RSA_SHA256, RsaKeySize::_4096)
         .map(Zeroizing::new)
         .map_err(|e| EmlSignatureError::KeyGeneration(e.to_string()))

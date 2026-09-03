@@ -73,6 +73,28 @@ describe("UploadCandidatesDefinition component", () => {
     expect(dispatch).not.toHaveBeenCalled();
   });
 
+  test("Shows an error when uploading wrong candidates list file for district of GSB", async () => {
+    const state = { election, numberOfVoters: 0, electionDefinitionData: "mocked" };
+    const dispatch = vi.fn();
+    vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+    overrideOnce("post", "/api/elections/import/validate", 400, {
+      error: "EML import error: Invalid district",
+      fatal: false,
+      reference: "EmlImportError",
+    });
+
+    await renderPage();
+    await uploadFile(file);
+
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
+    expect(screen.getByRole("alert")).toHaveTextContent("Verkeerde kandidatenlijsten");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Het bestand foo.txt bevat kandidatenlijsten voor een andere kieskring. Kies een bestand met de kandidatenlijsten voor de juiste kieskring.",
+    );
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
   test("Shows error when frontend determines candidates list file is too large", async () => {
     const state = { election, numberOfVoters: 0, electionDefinitionData: "mocked" };
     const dispatch = vi.fn();

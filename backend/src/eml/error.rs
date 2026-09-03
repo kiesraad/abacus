@@ -12,6 +12,7 @@ pub enum EMLImportError {
     EMLError(eml_nl::EMLError),
     InvalidCandidate,
     InvalidDateFormat,
+    InvalidDistrict,
     InvalidPollingStation,
     InvalidVotingMethod,
     LimitedElectionsSupported,
@@ -21,6 +22,7 @@ pub enum EMLImportError {
     MismatchElectionDomain,
     MismatchNumberOfSeats,
     MismatchPreferenceThreshold,
+    MissingCommitteeNumber,
     MissingElectionDomain,
     MissingFileName,
     MissingManagingAuthority,
@@ -42,8 +44,6 @@ pub enum EMLImportError {
     TooManyPoliticalGroups,
     UnknownCommittee,
     UnsupportedDistrictElection,
-    InvalidDistrict,
-    MissingCommitteeNumber,
 }
 
 impl From<eml_nl::EMLError> for EMLImportError {

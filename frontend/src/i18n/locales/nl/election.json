@@ -106,5 +106,9 @@
     "DSO_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
     "title": "Type stemopneming in"
   },
+  "wrong_candidates_definition": {
+    "description": "Het bestand <file>filename</file> bevat kandidatenlijsten voor een andere kieskring. Kies een bestand met de kandidatenlijsten voor de juiste kieskring.",
+    "title": "Verkeerde kandidatenlijsten"
+  },
   "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."
 }

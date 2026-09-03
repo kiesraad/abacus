@@ -502,7 +502,7 @@ export interface ElectionImportValidateMockOptions {
   gsbSelected?: RegionKey;
 }
 
-/// Get a mock response for election import validaton
+/// Get a mock response for election import validation
 /// Defaults to GSB GR
 export function electionImportValidateMockResponse({
   election,

@@ -30,7 +30,13 @@ import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { screen, setupTestRouter, waitFor } from "@/testing/test-utils";
-import type { CommitteeCategory, Election, RegionDetails, VoteCountingMethod } from "@/types/generated/openapi";
+import type {
+  CommitteeCategory,
+  Election,
+  RegionDetails,
+  RegionKey,
+  VoteCountingMethod,
+} from "@/types/generated/openapi";
 import { electionCreateRoutes } from "../routes";
 
 const Providers = ({
@@ -130,8 +136,8 @@ async function setCommitteeCategory(election: Election = electionMockData) {
   await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
-async function uploadCandidateDefinition(file: File, election: Election = electionMockData) {
-  mockValidateResponse({ election });
+async function uploadCandidateDefinition(file: File, election: Election = electionMockData, gsbSelected?: RegionKey) {
+  mockValidateResponse({ election, gsbSelected: gsbSelected });
 
   // Wait for the candidate page to be loaded
   expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
@@ -139,17 +145,25 @@ async function uploadCandidateDefinition(file: File, election: Election = electi
   expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
 }
 
-async function inputCandidateHash(election: Election = electionMockData) {
-  mockValidateResponse({ election });
+async function inputCandidateHash(election: Election = electionMockData, gsbSelected?: RegionKey) {
+  mockValidateResponse({ election, gsbSelected: gsbSelected });
   await inputHash();
 }
 
-async function importDefinitions(router: Router, file: File, election: Election = electionMockData) {
+async function importDefinitions(
+  router: Router,
+  file: File,
+  election: Election = electionMockData,
+  gsbSelected?: RegionDetails,
+) {
   await uploadElectionDefinition(router, file, election);
   await inputElectionHash(election);
   await setCommitteeCategory(election);
-  await uploadCandidateDefinition(file, election);
-  await inputCandidateHash(election);
+  if (gsbSelected) {
+    await selectGSB(election, gsbSelected);
+  }
+  await uploadCandidateDefinition(file, election, gsbSelected?.key);
+  await inputCandidateHash(election, gsbSelected?.key);
 }
 
 async function selectGSB(election: Election, gsb: RegionDetails) {
@@ -522,11 +536,8 @@ describe("Election create pages", () => {
       server.use(importHandler);
       const router = renderWithRouter();
       const user = userEvent.setup();
-      await importDefinitions(router, file, election);
+      await importDefinitions(router, file, election, gsbSelected);
 
-      if (gsbSelected) {
-        await selectGSB(election, gsbSelected);
-      }
       const location = gsbSelected?.name ?? election.location;
 
       // polling stations

@@ -1,12 +1,16 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
-import { csbElectionMockData, electionImportValidateMockResponse } from "@/testing/api-mocks/ElectionMockData";
+import {
+  csbElectionMockData,
+  electionImportValidateMockResponse,
+  electionMockData,
+} from "@/testing/api-mocks/ElectionMockData";
 import { overrideOnce } from "@/testing/server";
 import { renderReturningRouter, screen } from "@/testing/test-utils";
-import type { CommitteeCategory as CommitteeCategoryType, NewElection } from "@/types/generated/openapi";
+import type { CommitteeCategory, ElectionCategory, NewElection } from "@/types/generated/openapi";
 import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
-import { CommitteeCategory } from "./CommitteeCategory";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
+import { SelectCommitteeCategory } from "./SelectCommitteeCategory";
 
 const election = { name: "Naam", location: "Plek", committee_category: "GSB" } as NewElection;
 
@@ -15,26 +19,32 @@ describe("CommitteeCategory component", () => {
     const state = {};
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    const router = renderReturningRouter(<CommitteeCategory />);
+    const router = renderReturningRouter(<SelectCommitteeCategory />);
 
     expect(router.state.location.pathname).toEqual("/elections/create");
   });
 
-  test("GSB: Navigates to candidate list upload page", async () => {
-    const state = { election, committeeCategory: "GSB" as CommitteeCategoryType };
+  test.each<[string, CommitteeCategory, ElectionCategory, string]>([
+    ["GSB for a municipal election", "GSB", "Municipal", "/elections/create/list-of-candidates"],
+    ["GSB for a provincial election", "GSB", "Provincial", "/elections/create/select-gsb"],
+    ["GSB for a water authority election", "GSB", "WaterAuthority", "/elections/create/select-gsb"],
+  ])("%s", async (_, committeeCategory, electionCategory, expected) => {
+    const state = { election: { ...election, category: electionCategory }, committeeCategory: committeeCategory };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
     overrideOnce(
       "post",
       "/api/elections/import/validate",
       200,
-      electionImportValidateMockResponse({ matchingElection: false, numberOfVoters: 2000 }),
+      electionImportValidateMockResponse({
+        election: committeeCategory === "CSB" ? csbElectionMockData : electionMockData,
+      }),
     );
     const user = userEvent.setup();
 
     const router = renderReturningRouter(
       <ElectionCreateContextProvider>
-        <CommitteeCategory />
+        <SelectCommitteeCategory />
       </ElectionCreateContextProvider>,
     );
 
@@ -42,7 +52,11 @@ describe("CommitteeCategory component", () => {
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
     const optionCsb = screen.getByRole("radio", { name: "Centraal stembureau (CSB)" });
     expect(optionCsb).not.toBeChecked();
-    expect(optionCsb).not.toBeDisabled();
+    if (electionCategory === "Provincial") {
+      expect(optionCsb).toBeDisabled();
+    } else {
+      expect(optionCsb).not.toBeDisabled();
+    }
 
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
@@ -51,35 +65,11 @@ describe("CommitteeCategory component", () => {
       committeeCategory: "GSB",
     });
 
-    expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
-  });
-
-  test("CSB option is disabled for provincial elections", async () => {
-    const state = { election: { ...election, category: "Provincial" } as NewElection };
-    const dispatch = vi.fn();
-    vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    const user = userEvent.setup();
-
-    const router = renderReturningRouter(
-      <ElectionCreateContextProvider>
-        <CommitteeCategory />
-      </ElectionCreateContextProvider>,
-    );
-
-    expect(await screen.findByRole("heading", { name: "Type stembureau" })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
-    expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).toBeDisabled();
-    await user.click(screen.getByRole("button", { name: "Volgende" }));
-
-    expect(dispatch).toHaveBeenCalledWith({
-      type: "SET_COMMITTEE_CATEGORY",
-      committeeCategory: "GSB",
-    });
-    expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
+    expect(router.state.location.pathname).toEqual(expected);
   });
 
   test("CSB: Navigates to candidate list upload page", async () => {
-    const state = { election, committeeCategory: "CSB" as CommitteeCategoryType };
+    const state = { election, committeeCategory: "CSB" as CommitteeCategory };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
     overrideOnce(
@@ -92,7 +82,7 @@ describe("CommitteeCategory component", () => {
 
     const router = renderReturningRouter(
       <ElectionCreateContextProvider>
-        <CommitteeCategory />
+        <SelectCommitteeCategory />
       </ElectionCreateContextProvider>,
     );
 

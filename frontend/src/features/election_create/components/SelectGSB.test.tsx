@@ -51,7 +51,7 @@ describe("SelectGSB component", () => {
     ]);
   });
 
-  test("Selecting a GSB validates and navigates to polling stations", async () => {
+  test("Selecting a GSB validates and navigates to upload candidate lists", async () => {
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
     const user = userEvent.setup();
@@ -87,7 +87,7 @@ describe("SelectGSB component", () => {
       });
     });
     expect(fetchSpy).toHaveBeenCalledOnce();
-    expect(router.state.location.pathname).toEqual("/elections/create/polling-stations");
+    expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
   });
 
   test("Shows an error if validation fails", async () => {

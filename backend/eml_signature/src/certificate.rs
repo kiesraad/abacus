@@ -4,7 +4,9 @@
 use chrono::{DateTime, Utc};
 use const_oid::db::{rfc4519, rfc5912};
 use der::{
-    Decode, DecodePem, Encode, EncodePem, Sequence, Tag, Tagged, asn1::UintRef, pem::LineEnding,
+    Decode, Encode, Sequence, Tag, Tagged,
+    asn1::UintRef,
+    pem::{self, LineEnding, PemLabel},
 };
 use x509_cert::{
     Certificate as X509Certificate, attr::AttributeTypeAndValue, name::Name,
@@ -34,35 +36,27 @@ impl Certificate {
     pub fn from_der(der: &[u8]) -> Result<Self, EmlSignatureError> {
         let certificate = X509Certificate::from_der(der).map_err(invalid_certificate)?;
         let tbs = certificate.tbs_certificate();
-        let spki_der = tbs
-            .subject_public_key_info()
-            .to_der()
-            .map_err(invalid_certificate)?;
         Ok(Self {
             der: der.to_vec(),
             subject: subject_attributes(tbs.subject())?,
             not_before: instant(tbs.validity().not_before)?,
             not_after: instant(tbs.validity().not_after)?,
-            public_key: PublicKey::from_der(&spki_der)?,
+            public_key: PublicKey::from_spki(tbs.subject_public_key_info())?,
         })
     }
 
     /// Read a certificate from PEM, the format of the `.crt` file that
     /// OSV2020-U exports.
     pub fn from_pem(pem: &[u8]) -> Result<Self, EmlSignatureError> {
-        let der = X509Certificate::from_pem(pem)
-            .map_err(invalid_certificate)?
-            .to_der()
-            .map_err(invalid_certificate)?;
+        let (label, der) = pem::decode_vec(pem).map_err(|e| invalid_certificate(e.into()))?;
+        X509Certificate::validate_pem_label(label).map_err(|e| invalid_certificate(e.into()))?;
         Self::from_der(&der)
     }
 
     /// The certificate as PEM (the same format as the `.crt` file from OSV2020-U).
     pub fn to_pem(&self) -> String {
-        X509Certificate::from_der(&self.der)
-            .expect("the held DER was validated in from_der")
-            .to_pem(LineEnding::LF)
-            .expect("PEM encoding a valid certificate does not fail")
+        pem::encode_string(X509Certificate::PEM_LABEL, LineEnding::LF, &self.der)
+            .expect("PEM encoding valid DER does not fail")
     }
 
     /// The certificate as X.509 DER, e.g. for storage.
@@ -108,6 +102,11 @@ impl PublicKey {
         let spki = SubjectPublicKeyInfoOwned::from_der(spki_der).map_err(|e| {
             EmlSignatureError::InvalidPublicKey(format!("not a SubjectPublicKeyInfo: {e}"))
         })?;
+        Self::from_spki(&spki)
+    }
+
+    /// Validate an already parsed `SubjectPublicKeyInfo` and keep its DER.
+    pub(crate) fn from_spki(spki: &SubjectPublicKeyInfoOwned) -> Result<Self, EmlSignatureError> {
         if spki.algorithm.oid != rfc5912::RSA_ENCRYPTION {
             return Err(EmlSignatureError::InvalidPublicKey(format!(
                 "key algorithm is {}, not rsaEncryption",
@@ -311,6 +310,16 @@ mod tests {
         assert!(matches!(
             PublicKey::from_der(&[0xff; 8]),
             Err(EmlSignatureError::InvalidPublicKey(_))
+        ));
+    }
+
+    #[test]
+    fn rejects_pem_with_wrong_label() {
+        let pem = include_str!("../tests/fixtures/osv2020_nieuwstrand.crt")
+            .replace("CERTIFICATE", "PRIVATE KEY");
+        assert!(matches!(
+            Certificate::from_pem(pem.as_bytes()),
+            Err(EmlSignatureError::InvalidCertificate(_))
         ));
     }
 

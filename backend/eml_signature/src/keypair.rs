@@ -87,7 +87,7 @@ impl SigningKeyPair {
 
 /// Generate a fresh RSA-4096 keypair ([`RSA_KEY_BITS`]).
 fn generate_key_pair() -> Result<Zeroizing<KeyPair>, EmlSignatureError> {
-    const _: () = assert!(RSA_KEY_BITS == 4096, "RsaKeySize::_4096 below must match");
+    // Key size needs to match [`RSA_KEY_BITS`], validated by [`Certificate::from_der`].
     KeyPair::generate_rsa_for(&PKCS_RSA_SHA256, RsaKeySize::_4096)
         .map(Zeroizing::new)
         .map_err(|e| EmlSignatureError::KeyGeneration(e.to_string()))

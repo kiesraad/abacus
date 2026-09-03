@@ -18,7 +18,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Sigrid CI
-        uses: Software-Improvement-Group/sigridci@49ea84c5a1f67cd72c8f61533f7b00e0a5f9bee8 # main
+        uses: Software-Improvement-Group/sigridci@af53cad301d0057e9f39842203c724b1c5162144 # main
         continue-on-error: true
         with:
           customer: kiesraad

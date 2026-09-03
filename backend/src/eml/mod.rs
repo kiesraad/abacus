@@ -1513,7 +1513,7 @@ mod tests {
         // The polling station id is the polling station number, not the database id (1)
         assert_eq!(first.polling_station.id.raw(), "31");
 
-        // `numer_of_voters: None` results in "0" (optional in Abacus, not in EML, so we expect the default value).
+        // `number_of_voters: None` results in "0" (optional in Abacus, not in EML, so we expect the default value).
         assert_eq!(&first.polling_station.data[..], "0");
 
         let second = &eml.election_event.election.contests[0].polling_places[1].physical_location;

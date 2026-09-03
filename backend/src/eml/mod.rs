@@ -41,13 +41,14 @@ pub use hash::{EmlHash, RedactedEmlHash};
 use crate::{
     domain::{
         committee_session::CommitteeSession,
+        data_entry::DataEntrySourceNumber,
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
             ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
             RegisteredPoliticalGroup,
         },
-        results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
-        tabulation::{CommitteeSpecificTotals, ElectionTotals},
+        results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
+        tabulation::{CommitteeSpecificTotals, ElectionTotals, GSBTotals},
     },
     eml::committees::ElectionTreeDetails,
 };
@@ -711,11 +712,20 @@ impl ElectionWithPoliticalGroups {
 
         // GSB elections include reporting unit votes in the count
         let builder = if self.committee_category == CommitteeCategory::GSB {
+            let CommitteeSpecificTotals::GSB(ref gsb_totals) = totals.committee_specific else {
+                unreachable!();
+            };
+
             builder.reporting_unit_votes(
                 results
                     .iter()
                     .map(|(data_source, ps_res)| {
-                        self.as_eml_reporting_unit_votes(committee_session, data_source, ps_res)
+                        self.as_eml_reporting_unit_votes(
+                            committee_session,
+                            data_source,
+                            ps_res,
+                            gsb_totals,
+                        )
                     })
                     .collect::<Result<Vec<_>, EMLError>>()?,
             )
@@ -772,6 +782,7 @@ impl ElectionWithPoliticalGroups {
         committee_session: &CommitteeSession,
         data_source: &crate::domain::data_entry::DataEntrySource,
         results: &crate::domain::results::Results,
+        gsb_totals: &crate::domain::tabulation::GSBTotals,
     ) -> Result<ReportingUnitVotes, EMLError> {
         let mut builder = ReportingUnitVotes::builder()
             .identifier(ReportingUnitIdentifier::new(
@@ -826,7 +837,9 @@ impl ElectionWithPoliticalGroups {
                 UncountedVotesReason::FewerBallotsCounted,
                 *results.differences_counts().fewer_ballots_count,
             );
-        builder = add_reporting_unit_investigations(builder, committee_session, results);
+
+        builder =
+            add_reporting_unit_investigations(builder, committee_session, data_source, gsb_totals);
         builder.build()
     }
 
@@ -963,67 +976,44 @@ fn build_candidate_result(
 fn add_reporting_unit_investigations(
     mut builder: ReportingUnitVotesBuilder,
     committee_session: &CommitteeSession,
-    results: &crate::domain::results::Results,
+    data_source: &crate::domain::data_entry::DataEntrySource,
+    gsb_totals: &crate::domain::tabulation::GSBTotals,
 ) -> ReportingUnitVotesBuilder {
     if !committee_session.is_next_session() {
-        match results {
-            Results::DSOFirstSession(dso_first_session_result) => {
-                builder = builder.investigation(
-                    InvestigationReason::UnexplainedDifference,
-                    dso_first_session_result
-                        .checks_and_corrections
-                        .reason_investigation_own_initiative
-                        .unaccounted_difference,
-                );
-
-                builder = builder.investigation(
-                    InvestigationReason::OtherError,
-                    dso_first_session_result
-                        .checks_and_corrections
-                        .reason_investigation_own_initiative
-                        .other_error,
-                );
-
-                if let Some(corrected_results_own_initiative) = dso_first_session_result
-                    .checks_and_corrections
-                    .corrected_results_own_initiative
-                    .as_bool()
-                {
-                    builder = builder.investigation(
+        let DataEntrySourceNumber::PollingStation(ref number) = data_source.number() else {
+            unreachable!()
+        };
+        match gsb_totals {
+            GSBTotals::DSO(investigations) => {
+                builder = builder
+                    .investigation(
+                        InvestigationReason::UnexplainedDifference,
+                        investigations.unaccounted_difference.contains(number),
+                    )
+                    .investigation(
+                        InvestigationReason::OtherError,
+                        investigations.other_error.contains(number),
+                    )
+                    .investigation(
                         InvestigationReason::ResultCorrected,
-                        corrected_results_own_initiative,
-                    );
-                }
+                        investigations.corrected_results.contains(number),
+                    )
             }
-            Results::CSOFirstSession(cso_first_session_result) => {
-                if let Some(extra_investigation_other_reason) = cso_first_session_result
-                    .extra_investigation
-                    .extra_investigation_other_reason
-                    .as_bool()
-                {
-                    builder = builder.investigation(
+            GSBTotals::CSO(investigations) => {
+                builder = builder
+                    .investigation(
                         InvestigationReason::OtherReason,
-                        extra_investigation_other_reason,
-                    );
-                }
-
-                if let Some(ballots_recounted_extra_investigation) = cso_first_session_result
-                    .extra_investigation
-                    .ballots_recounted_extra_investigation
-                    .as_bool()
-                {
-                    builder = builder.investigation(
+                        investigations.investigated_other_reason.contains(number),
+                    )
+                    .investigation(
                         InvestigationReason::PartiallyRecountedBallots,
-                        ballots_recounted_extra_investigation,
-                    );
-                }
-
-                builder = builder.investigation(
-                    InvestigationReason::AdmittedVotersReestablished,
-                    cso_first_session_result.admitted_voters_have_been_recounted(),
-                );
+                        investigations.ballots_recounted.contains(number),
+                    )
+                    .investigation(
+                        InvestigationReason::AdmittedVotersReestablished,
+                        investigations.admitted_voters_recounted.contains(number),
+                    )
             }
-            Results::DSONextSession(_) | Results::CSONextSession(_) | Results::GSB(_) => {}
         }
     };
 

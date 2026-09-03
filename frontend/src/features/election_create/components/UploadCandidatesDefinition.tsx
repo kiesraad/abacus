@@ -13,7 +13,6 @@ import type {
   ElectionDefinitionValidateResponse,
 } from "@/types/generated/openapi";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
-
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { CheckHash } from "./CheckHash";
 
@@ -21,10 +20,11 @@ import { CheckHash } from "./CheckHash";
 export function UploadCandidatesDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
-  const [error, setError] = useState<ReactNode | undefined>();
+  const [error, setError] = useState<{ title: string; message: ReactNode } | undefined>();
   const [file, setFile] = useState<File | undefined>();
   const createPath: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const { create } = useCrud<ElectionDefinitionValidateResponse>({ createPath });
+  const defaultErrorTitle = t("election.invalid_candidates_definition.title");
 
   // if no election data was stored, navigate back to beginning
   if (!state.electionDefinitionData) {
@@ -36,7 +36,7 @@ export function UploadCandidatesDefinition() {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
       if (await isFileTooLarge(currentFile)) {
-        setError(fileTooLargeError(currentFile));
+        setError({ title: defaultErrorTitle, message: fileTooLargeError(currentFile) });
         return;
       }
 
@@ -61,13 +61,21 @@ export function UploadCandidatesDefinition() {
       } else if (isError(response)) {
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
-          setError(fileTooLargeError(currentFile));
-        } else {
-          setError(
-            tx("election.invalid_candidates_definition.description", {
+          setError({ title: defaultErrorTitle, message: fileTooLargeError(currentFile) });
+        } else if (response instanceof ApiError && response.message.includes("EML import error: Invalid district")) {
+          setError({
+            title: t("election.wrong_candidates_definition.title"),
+            message: tx("election.wrong_candidates_definition.description", {
               file: () => <strong>{currentFile.name}</strong>,
             }),
-          );
+          });
+        } else {
+          setError({
+            title: defaultErrorTitle,
+            message: tx("election.invalid_candidates_definition.description", {
+              file: () => <strong>{currentFile.name}</strong>,
+            }),
+          });
         }
       }
     } else {
@@ -102,7 +110,7 @@ export function UploadCandidatesDefinition() {
           await navigate("/elections/create/polling-stations");
         }
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
-        setError(response.message);
+        setError({ title: defaultErrorTitle, message: response.message });
       }
     }
 
@@ -120,7 +128,7 @@ export function UploadCandidatesDefinition() {
           },
         })}
         redactedHash={state.candidateDefinitionRedactedHash}
-        error={error}
+        error={error ? error.message : undefined}
         onSubmit={(chunks) => void onSubmit(chunks)}
       />
     );
@@ -132,8 +140,8 @@ export function UploadCandidatesDefinition() {
         <FormLayout>
           <FormLayout.Section>
             {error && (
-              <Alert type="error" title={t("election.invalid_candidates_definition.title")} inline>
-                <p>{error}</p>
+              <Alert type="error" title={error.title} inline>
+                <p>{error.message}</p>
               </Alert>
             )}
 

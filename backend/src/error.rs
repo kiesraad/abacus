@@ -268,9 +268,13 @@ impl APIError {
             }
             APIError::EmlImportError(err) => {
                 error!("Error importing EML file: {:?}", err);
+                let mut message = "EML import error".to_string();
+                if matches!(err, EMLImportError::InvalidDistrict) {
+                    message = format!("{message}: Invalid district")
+                }
                 (
                     StatusCode::BAD_REQUEST,
-                    ErrorResponse::new("EML import error", ErrorReference::EmlImportError, false),
+                    ErrorResponse::new(message, ErrorReference::EmlImportError, false),
                 )
             }
             APIError::EmlError(err) => {

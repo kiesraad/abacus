@@ -11,7 +11,7 @@ import { StringFormData } from "@/utils/stringFormData";
 import { isOneOf } from "@/utils/typeChecks";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
-export function CommitteeCategory() {
+export function SelectCommitteeCategory() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
   const [error] = useState<ReactNode | undefined>();
@@ -36,7 +36,13 @@ export function CommitteeCategory() {
       type: "SET_COMMITTEE_CATEGORY",
       committeeCategory,
     });
-    await navigate("/elections/create/list-of-candidates");
+    if (committeeCategory === "CSB" || state.election?.category === "Municipal") {
+      // Go to upload candidate lists directly
+      await navigate("/elections/create/list-of-candidates");
+    } else {
+      // PS/WS elections need a GSB to be selected first
+      await navigate("/elections/create/select-gsb");
+    }
   }
 
   return (

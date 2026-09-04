@@ -47,6 +47,7 @@ export function UploadCandidatesDefinition() {
         candidate_data: data,
         election_hash: state.electionDefinitionHash,
         election_data: state.electionDefinitionData,
+        selected_region: state.gsbSelected,
       });
 
       if (isSuccess(response)) {
@@ -88,6 +89,7 @@ export function UploadCandidatesDefinition() {
         election_hash: state.electionDefinitionHash,
         election_data: state.electionDefinitionData,
         candidate_hash: chunks,
+        selected_region: state.gsbSelected,
       });
       if (isSuccess(response)) {
         dispatch({
@@ -96,13 +98,8 @@ export function UploadCandidatesDefinition() {
         });
         if (state.committeeCategory === "CSB") {
           await navigate("/elections/create/check-and-save");
-        } else if (state.election?.category === "Municipal") {
-          // GR elections have the GSB defined in the election definition
-          // so we can go directly to the polling stations step
-          await navigate("/elections/create/polling-stations");
         } else {
-          // PS/WS elections need a GSB to be selected
-          await navigate("/elections/create/select-gsb");
+          await navigate("/elections/create/polling-stations");
         }
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
         setError(response.message);

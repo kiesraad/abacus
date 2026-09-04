@@ -1,13 +1,15 @@
 #![cfg(test)]
 
-use std::net::SocketAddr;
-
+use abacus::eml::polling_stations_from_eml_str;
+use async_zip::base::read::mem::ZipFileReader;
 use axum::http::{HeaderValue, StatusCode};
 use reqwest::Response;
 use sqlx::SqlitePool;
+use std::net::SocketAddr;
 use test_log::test;
 
 use crate::{
+    integration_tests::report_integration_test::{download_zip_assert, read_zip_entry},
     shared::{
         FixtureUser::*, change_status_committee_session, claim_data_entry, create_cso_result,
         create_investigation, create_polling_station, example_cso_data_entry,
@@ -100,6 +102,20 @@ async fn delete_polling_station(
         format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
     reqwest::Client::new()
         .delete(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap()
+}
+
+async fn export_polling_stations(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+) -> Response {
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/export");
+    reqwest::Client::new()
+        .get(&url)
         .header("cookie", cookie)
         .send()
         .await
@@ -1341,4 +1357,66 @@ async fn test_import_creates_empty_data_entries_for_first_session(pool: SqlitePo
             "data_entry_id should be set for all first-session imported polling stations"
         );
     }
+}
+
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso", "users"))))]
+async fn test_export_works(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = login(&addr, CoordinatorGSB).await;
+    let election_id = 11;
+
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/export");
+    let prefix = "\"abacus-exporteren_stemgebieden-algemeen_bestuur_van_het_waterschap_rivier_en_polder_2026-eml_110b_stembureaus-";
+
+    let bytes = download_zip_assert(&cookie, &url, prefix).await;
+    let archive = ZipFileReader::new(bytes).await.unwrap();
+    assert_eq!(archive.file().entries().len(), 1);
+
+    let entry = read_zip_entry(
+        &archive,
+        0,
+        "Stembureaus_AB2026_RivierenPolder_Heemdamseburg.eml.xml",
+    )
+    .await;
+    let xml = String::from_utf8(entry).unwrap();
+
+    let polling_stations = polling_stations_from_eml_str(&xml).unwrap();
+    assert_eq!(polling_stations.len(), 2);
+    assert!(polling_stations.iter().any(|ps| ps.name == "Op Rolletjes"));
+    assert!(polling_stations.iter().any(|ps| ps.name == "Testplek"));
+
+    // EML requires at least one digit for `number_of_voters` (fixture has NULL -> check for default value 0).
+    let ps = polling_stations
+        .iter()
+        .find(|ps| ps.name == "Op Rolletjes")
+        .unwrap();
+    assert_eq!(ps.number_of_voters, Some(0));
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
+async fn test_export_without_polling_stations_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let election_id = 6;
+
+    // The frontend does not display an export button to the user when there are no polling stations.
+    let response = export_polling_stations(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
+async fn test_export_not_allowed_for_typist(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let typist_cookie = login(&addr, TypistGSB).await;
+    let election_id = 2;
+
+    let response = export_polling_stations(&addr, &typist_cookie, election_id).await;
+    assert_eq!(
+        response.status(),
+        StatusCode::FORBIDDEN,
+        "Unexpected response status"
+    );
 }

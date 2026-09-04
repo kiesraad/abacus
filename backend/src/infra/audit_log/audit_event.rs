@@ -130,6 +130,7 @@ pub enum AuditEventType {
     PollingStationUpdated,
     PollingStationDeleted,
     PollingStationsImported,
+    PollingStationsExported,
     // data entry events
     DataEntryStarted,
     DataEntrySaved,

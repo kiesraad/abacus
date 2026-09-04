@@ -1,0 +1,17 @@
+[package]
+name = "eml_signature"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+chrono.workspace = true
+const-oid.workspace = true
+der.workspace = true
+rcgen.workspace = true
+x509-cert.workspace = true
+zeroize.workspace = true

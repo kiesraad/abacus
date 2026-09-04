@@ -3,6 +3,7 @@ resolver = "3"
 members = [
     ".",
     "apportionment",
+    "eml_signature",
     "pdf_gen/types",
     "pdf_gen/impl",
     "pdf_gen/wrapper",
@@ -15,6 +16,7 @@ license = "EUPL-1.2"
 rust-version = "1.95"
 
 [workspace.dependencies]
+eml_signature = { path = "./eml_signature" }
 pdf_gen = { path = "./pdf_gen/wrapper" }
 pdf_gen_impl = { path = "./pdf_gen/impl" }
 pdf_gen_types = { path = "./pdf_gen/types" }
@@ -33,7 +35,11 @@ strum = { version = "0.28", features = ["derive"] }
 test-log = "0.2.19"
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1.44"
-rcgen = { version = "0.14", default-features = false, features = ["aws_lc_rs", "pem", "x509-parser"] }
+rcgen = { version = "0.14", default-features = false, features = ["aws_lc_rs", "pem", "x509-parser", "zeroize"] }
+const-oid = { version = "0.10", features = ["db"] }
+der = { version = "0.8", features = ["alloc", "derive", "oid", "pem", "std"] }
+x509-cert = { version = "0.3", default-features = false, features = ["std", "pem"] }
+zeroize = "1"
 rustls-pki-types = "1"
 if-addrs = "0.15"
 rustls = "0.23"

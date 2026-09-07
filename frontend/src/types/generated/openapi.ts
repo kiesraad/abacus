@@ -281,6 +281,12 @@ export interface POLLING_STATION_CREATE_REQUEST_PARAMS {
 export type POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${ElectionId}/polling_stations`;
 export type POLLING_STATION_CREATE_REQUEST_BODY = PollingStationRequest;
 
+// /api/elections/{election_id}/polling_stations/export
+export interface POLLING_STATION_EXPORT_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type POLLING_STATION_EXPORT_REQUEST_PATH = `/api/elections/${ElectionId}/polling_stations/export`;
+
 // /api/elections/{election_id}/polling_stations/import
 export interface POLLING_STATION_IMPORT_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -507,6 +513,7 @@ export const auditEventTypeValues = [
   "PollingStationUpdated",
   "PollingStationDeleted",
   "PollingStationsImported",
+  "PollingStationsExported",
   "DataEntryStarted",
   "DataEntrySaved",
   "DataEntryResumed",

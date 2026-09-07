@@ -642,11 +642,16 @@ impl ElectionWithPoliticalGroups {
                         .map(|ps| {
                             PollingPlace::builder()
                                 .channel(VotingChannelType::Polling)
-                                .locality_name(&ps.locality[..])
+                                // Use polling station name (not ps.locality which contains the physical location).
+                                .locality_name(&ps.name[..])
                                 .postal_code(&ps.postal_code[..])
-                                .polling_station_id(ps.id.as_internal_u32() as u64)
-                                .polling_station_data_option(
-                                    ps.number_of_voters.map(|n| n.to_string()),
+                                .polling_station_id(u64::from(ps.number))
+                                // In Abacus number_of_voters on PollingStation is optional,
+                                // but EML requires at least one digit, hence the default value.
+                                .polling_station_data(
+                                    ps.number_of_voters
+                                        .map(|n| n.to_string())
+                                        .unwrap_or_else(|| "0".to_string()),
                                 )
                                 .build()
                         })
@@ -1486,5 +1491,37 @@ mod tests {
             )),
             u32::MAX
         );
+    }
+
+    #[test]
+    fn test_as_polling_stations_eml() {
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
+        let mut polling_stations = polling_stations_fixture(&[1000, 2000]);
+
+        // Override first ps: in Abacus the number of voters is optional, in EML it is not.
+        polling_stations[0].number_of_voters = None;
+
+        let eml = election
+            .as_polling_stations_eml(&polling_stations, None, None)
+            .unwrap();
+
+        let first = &eml.election_event.election.contests[0].polling_places[0].physical_location;
+
+        // Locality name is the polling station name, not the physical location (Testdorp).
+        assert_eq!(&first.address.locality.locality_name.name[..], "Testplek 1");
+
+        // The polling station id is the polling station number, not the database id (1)
+        assert_eq!(first.polling_station.id.raw(), "31");
+
+        // `number_of_voters: None` results in "0" (optional in Abacus, not in EML, so we expect the default value).
+        assert_eq!(&first.polling_station.data[..], "0");
+
+        let second = &eml.election_event.election.contests[0].polling_places[1].physical_location;
+        assert_eq!(
+            &second.address.locality.locality_name.name[..],
+            "Testplek 2"
+        );
+        assert_eq!(second.polling_station.id.raw(), "32");
+        assert_eq!(&second.polling_station.data[..], "2000");
     }
 }

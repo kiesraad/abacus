@@ -1,0 +1,13 @@
+{
+  "certificate": "Publieke sleutel",
+  "common_name": "Algemene naam",
+  "details": "Bekijken en downloaden",
+  "download_file": "Download crt-bestand",
+  "election_identifier": "Organisatie",
+  "explanation": "Abacus ondertekent officiële bestanden met een digitale (RSA) handtekening. De handtekening wordt gezet met een private sleutel. Die is geheim en blijft op deze computer. Met de bijbehorende publieke sleutel kan iedereen controleren dat bestanden echt op deze computer zijn gemaakt en niet zijn gewijzigd.",
+  "not_after": "Geldig tot en met",
+  "not_before": "Geldig vanaf",
+  "organizational_unit": "Organisatorische eenheid",
+  "signature_algorithm": "Handtekeningalgoritme",
+  "subtitle": "Publieke sleutel Abacus-instantie {committee}"
+}

@@ -29,11 +29,11 @@
   margin-bottom: var(--space-md);
 }
 
-main.reportMain {
-  background-color: var(--blue-50);
+main.backgroundBlue {
+  background-color: var(--blue-100);
 
   article {
-    background-color: var(--blue-50);
+    background-color: var(--blue-100);
     display: flex;
     gap: 2rem;
   }

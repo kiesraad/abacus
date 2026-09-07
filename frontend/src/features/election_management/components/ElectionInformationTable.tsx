@@ -1,6 +1,6 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { CommitteeSession, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import type { CommitteeSession, ElectionWithPoliticalGroups, Role } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/number";
 
@@ -10,6 +10,7 @@ interface ElectionInformationTableProps {
   election: ElectionWithPoliticalGroups;
   committeeSession: CommitteeSession;
   numberOfPollingStations: number;
+  role?: Role;
 }
 
 function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
@@ -27,6 +28,7 @@ export function ElectionInformationTable({
   election,
   committeeSession,
   numberOfPollingStations,
+  role,
 }: ElectionInformationTableProps) {
   const rowLink =
     committeeSession.number === 1 &&
@@ -77,6 +79,14 @@ export function ElectionInformationTable({
         </Table.Row>
         {election.committee_category === "GSB" && (
           <>
+            {role === "administrator" && (
+              <Table.Row to="certificate">
+                <Table.HeaderCell scope="row" className="normal">
+                  {t("election_certificate.certificate")}
+                </Table.HeaderCell>
+                <Table.Cell className="underlined">{t("election_certificate.details")}</Table.Cell>
+              </Table.Row>
+            )}
             <Table.Row key={election.id} to="polling-stations">
               <Table.HeaderCell scope="row" className="normal">
                 {t("polling_station.title.plural")}

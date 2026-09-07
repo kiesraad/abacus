@@ -15,6 +15,7 @@ import data_entry_home from "./data_entry_home.json";
 import differences_counts from "./differences_counts.json";
 import election from "./election.json";
 import election_category from "./election_category.json";
+import election_certificate from "./election_certificate.json";
 import election_management from "./election_management.json";
 import election_report from "./election_report.json";
 import election_status from "./election_status.json";
@@ -55,6 +56,7 @@ const nl = {
   differences_counts,
   election,
   election_category,
+  election_certificate,
   election_management,
   extra_investigation,
   election_report,

@@ -17,6 +17,9 @@ import type {
   AUDIT_LOG_LIST_USERS_REQUEST_PARAMS,
   AUDIT_LOG_LIST_USERS_REQUEST_PATH,
   AuditLogListResponse,
+  CERTIFICATE_DETAILS_REQUEST_PARAMS,
+  CERTIFICATE_DETAILS_REQUEST_PATH,
+  CertificateDetailsResponse,
   ClaimDataEntryResponse,
   COMMITTEE_SESSION_CREATE_REQUEST_PARAMS,
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
@@ -326,6 +329,22 @@ export const ElectionRequestHandler = http.get<
 >("/api/elections/1" satisfies ELECTION_DETAILS_REQUEST_PATH, () =>
   HttpResponse.json(electionDetailsMockResponse, { status: 200 }),
 );
+
+export const ElectionCertificateDetailsRequestHandler = http.get<
+  ParamsToString<CERTIFICATE_DETAILS_REQUEST_PARAMS>,
+  null,
+  CertificateDetailsResponse
+>("/api/elections/1/certificate_details" satisfies CERTIFICATE_DETAILS_REQUEST_PATH, () => {
+  const response: CertificateDetailsResponse = {
+    election_identifier: "AB2027_Aardenboezem",
+    organizational_unit: "Abacus 1.2.0",
+    common_name: "Gemeente Juinen",
+    signature_algorithm: "SHA256withRSA",
+    not_before: "2026-01-01T00:00:00Z",
+    not_after: "2026-04-01T00:00:00Z",
+  };
+  return HttpResponse.json(response, { status: 200 });
+});
 
 // get election details handler
 export const CSBElectionRequestHandler = http.get<
@@ -672,6 +691,7 @@ export const handlers: HttpHandler[] = [
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  ElectionCertificateDetailsRequestHandler,
   CSBElectionStatusRequestHandler,
   GSBABElectionImportRequestHandler,
   GSBGRElectionImportRequestHandler,

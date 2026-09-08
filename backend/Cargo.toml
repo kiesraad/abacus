@@ -113,6 +113,7 @@ rustls-pki-types = { workspace = true, optional = true }
 if-addrs = { workspace = true, optional = true }
 rustls = { workspace = true, optional = true }
 axum-server = { workspace = true, optional = true }
+zeroize.workspace = true
 
 [dev-dependencies]
 async_zip.workspace = true

@@ -116,3 +116,10 @@
 .w-full {
   width: 100%;
 }
+
+/* Flex */
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}

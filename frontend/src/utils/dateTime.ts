@@ -31,6 +31,14 @@ export function formatDateFull(date: Date) {
   }).format(date);
 }
 
+export function formatDateFullWithoutWeekday(date: Date) {
+  return new Intl.DateTimeFormat(t("date_locale"), {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 export function formatDateTimeFull(date: Date) {
   return date.toLocaleTimeString(t("date_locale"), {
     hour: "numeric",

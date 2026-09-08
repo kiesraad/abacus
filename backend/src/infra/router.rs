@@ -2,6 +2,8 @@ use axum::{
     Router, extract::DefaultBodyLimit, http::StatusCode, middleware, response::IntoResponse,
     routing::any,
 };
+#[cfg(feature = "tls")]
+use axum::{body::Bytes, routing::get};
 use hyper::http::{HeaderName, HeaderValue, header};
 use sqlx::SqlitePool;
 use tower_http::{
@@ -27,8 +29,6 @@ use crate::{
     error,
     infra::{audit_log, backup::BackupConfig},
 };
-#[cfg(feature = "tls")]
-use axum::{body::Bytes, routing::get};
 
 pub fn openapi_router() -> OpenApiRouter<AppState> {
     #[derive(utoipa::OpenApi)]
@@ -70,7 +70,8 @@ fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
         .merge(api::report::router())
         .merge(api::document::router())
         .merge(api::investigation::router())
-        .merge(api::backup::router());
+        .merge(api::backup::router())
+        .merge(api::signing::router());
 
     #[cfg(feature = "dev-database")]
     let router = router.merge(test_data_gen::router());

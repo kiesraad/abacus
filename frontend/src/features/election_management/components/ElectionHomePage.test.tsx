@@ -181,6 +181,7 @@ describe("ElectionHomePage", () => {
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
+        ["Publieke sleutel", "Bekijken en downloaden"],
         ["Stembureaus", "8 stembureaus"],
         ["Type stemopneming", "Centrale stemopneming"],
       ]);

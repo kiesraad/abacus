@@ -193,7 +193,7 @@ export function ElectionHomePage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, committeeSessions, election, investigations, pollingStations, refetch } =
     useElection();
-  const { isCoordinator } = useUserRole();
+  const { isCoordinator, role } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const createPath: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${election.id}/committee_sessions`;
   const removePath: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
@@ -356,6 +356,7 @@ export function ElectionHomePage() {
               election={election}
               committeeSession={currentCommitteeSession}
               numberOfPollingStations={pollingStations.length}
+              role={role}
             />
           </div>
           {election.committee_category === "GSB" &&

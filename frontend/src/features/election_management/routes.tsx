@@ -1,8 +1,8 @@
 import type { RouteObject } from "react-router";
 
 import { NotAvailableInMock } from "@/components/error/NotAvailableInMock";
+import { ElectionCertificatePage } from "@/features/election_management/components/ElectionCertificatePage";
 import { t } from "@/i18n/translate";
-
 import { ElectionHomePage } from "./components/ElectionHomePage";
 import { ElectionReportPage } from "./components/report/ElectionReportPage";
 import { FinishDataEntryPage } from "./components/report/FinishDataEntryPage";
@@ -21,6 +21,11 @@ export const electionManagementRoutes: RouteObject[] = [
     handle: { roles: ["coordinator_csb", "coordinator_gsb"] },
   },
   { path: "number-of-voters", Component: NumberOfVotersPage, handle: { roles: ["administrator", "coordinator_gsb"] } },
+  {
+    path: "certificate",
+    Component: ElectionCertificatePage,
+    handle: { roles: ["administrator"] },
+  },
   {
     path: "report",
     children: [

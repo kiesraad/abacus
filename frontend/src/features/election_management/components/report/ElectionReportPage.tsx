@@ -56,7 +56,7 @@ export function ElectionReportPage() {
           <h1>{pageTitle}</h1>
         </section>
       </header>
-      <main className={cls.reportMain}>
+      <main className={cls.backgroundBlue}>
         <article>
           <div>
             <Icon size="lg" color="default" icon={<IconCheckVerified />} />

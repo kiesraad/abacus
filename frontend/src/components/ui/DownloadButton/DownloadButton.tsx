@@ -1,4 +1,4 @@
-import type { AnchorHTMLAttributes, ReactNode } from "react";
+import { type AnchorHTMLAttributes, type ReactNode, useId } from "react";
 import { IconDownload, IconFile } from "@/components/generated/icons";
 import cls from "./DownloadButton.module.css";
 
@@ -23,11 +23,18 @@ export function DownloadButton({
   ...htmlAnchorProps
 }: DownloadButtonProps) {
   const Icon = icon === "file" ? IconFile : IconDownload;
+  const id = useId();
 
   return (
     <div className={cls.downloadButton}>
-      {children && <div>{children}</div>}
-      <a href={href} className={isDisabled || isLoading ? cls.disabled : undefined} title={title} {...htmlAnchorProps}>
+      {children && <div id={id}>{children}</div>}
+      <a
+        href={href}
+        className={isDisabled || isLoading ? cls.disabled : undefined}
+        title={title}
+        aria-describedby={children ? id : undefined}
+        {...htmlAnchorProps}
+      >
         <Icon />
         <span>
           <span className={cls.title}>{title}</span>

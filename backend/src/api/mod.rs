@@ -11,6 +11,7 @@ pub mod middleware;
 pub mod polling_station;
 pub mod providers;
 pub mod report;
+pub mod signing;
 
 #[cfg(test)]
 pub mod tests;

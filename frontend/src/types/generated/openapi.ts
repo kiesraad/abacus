@@ -158,6 +158,18 @@ export interface GET_APPORTIONMENT_STATE_REQUEST_PARAMS {
 }
 export type GET_APPORTIONMENT_STATE_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/state`;
 
+// /api/elections/{election_id}/certificate
+export interface CERTIFICATE_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type CERTIFICATE_REQUEST_PATH = `/api/elections/${ElectionId}/certificate`;
+
+// /api/elections/{election_id}/certificate_details
+export interface CERTIFICATE_DETAILS_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type CERTIFICATE_DETAILS_REQUEST_PATH = `/api/elections/${ElectionId}/certificate_details`;
+
 // /api/elections/{election_id}/committee_sessions
 export interface COMMITTEE_SESSION_CREATE_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -700,6 +712,15 @@ export type CandidateNumber = number;
 export interface CandidateVotes {
   number: number;
   votes: number;
+}
+
+export interface CertificateDetailsResponse {
+  common_name: string;
+  election_identifier: string;
+  not_after: string;
+  not_before: string;
+  organizational_unit: string;
+  signature_algorithm: string;
 }
 
 /**

@@ -47,7 +47,7 @@ export function SelectGSB() {
         response: response.data,
         gsbSelected: gsb.key,
       });
-      await navigate("/elections/create/polling-stations");
+      await navigate("/elections/create/list-of-candidates");
     } else if (isError(response)) {
       setError(response.message);
     }

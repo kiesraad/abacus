@@ -114,15 +114,13 @@ describe("UploadCandidatesDefinition component", () => {
       await user.click(screen.getByRole("button", { name: "Volgende" }));
     }
 
-    test.each<[string, CommitteeCategory, ElectionCategory, string]>([
-      ["CSB", "CSB", "Municipal", "/elections/create/check-and-save"],
-      ["GSB for a municipal election", "GSB", "Municipal", "/elections/create/polling-stations"],
-      ["GSB for a provincial election", "GSB", "Provincial", "/elections/create/select-gsb"],
-      ["GSB for a water authority election", "GSB", "WaterAuthority", "/elections/create/select-gsb"],
-    ])("%s", async (_, committeeCategory, electionCategory, expected) => {
+    test.each<[CommitteeCategory, string]>([
+      ["CSB", "/elections/create/check-and-save"],
+      ["GSB", "/elections/create/polling-stations"],
+    ])("%s", async (committeeCategory, expected) => {
       const state = {
         ...hashState,
-        election: { ...election, category: electionCategory },
+        election: { ...election, category: "Municipal" as ElectionCategory },
         committeeCategory,
       };
 

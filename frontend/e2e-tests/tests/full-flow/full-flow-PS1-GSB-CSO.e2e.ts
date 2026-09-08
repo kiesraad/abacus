@@ -126,12 +126,12 @@ test.describe("full flow PS1 GSB CSO", () => {
     await expect(committeeCategoryPage.gsb).toBeChecked();
     await committeeCategoryPage.next.click();
 
-    await uploadCandidatesAndInputHash(page, eml230b_PS2023_Drenthe);
-
     const selectGSBPage = new SelectGSBPgObj(page);
     await expect(selectGSBPage.header).toBeVisible();
     await expect(selectGSBPage.regions).toHaveCount(12);
     await selectGSBPage.clickRegionFromList("1680");
+
+    await uploadCandidatesAndInputHash(page, eml230b_PS2023_Drenthe);
 
     await uploadPollingStations(page, eml110b_single);
 

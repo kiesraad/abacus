@@ -1149,15 +1149,15 @@ mod tests {
         test_data_gen::RandomRange,
     };
 
-    fn municipal(
+    fn election(
         committee_category: CommitteeCategory,
+        election_category: ElectionCategory,
         counting_method: Option<VoteCountingMethod>,
     ) -> GenerateElectionArgs {
         GenerateElectionArgs {
             custom_name: None,
             committee_category,
             counting_method,
-            election_category: ElectionCategory::Municipal,
             election_category,
             political_groups: RandomRange(3..4),
             candidates_per_group: RandomRange(3..10),
@@ -1179,12 +1179,18 @@ mod tests {
     #[sqlx::test]
     async fn test_create_test_election(pool: SqlitePool) {
         use CommitteeCategory::*;
+        use ElectionCategory::*;
         use VoteCountingMethod::*;
 
         let creation_results = [
-            create_test_election(&municipal(GSB, Some(CSO)), &pool, None).await,
-            create_test_election(&municipal(GSB, Some(DSO)), &pool, None).await,
-            create_test_election(&municipal(CSB, None), &pool, None).await,
+            create_test_election(&election(GSB, Municipal, Some(CSO)), &pool, None).await,
+            create_test_election(&election(GSB, Municipal, Some(DSO)), &pool, None).await,
+            create_test_election(&election(CSB, Municipal, None), &pool, None).await,
+            create_test_election(&election(CSB, Municipal, None), &pool, None).await,
+            create_test_election(&election(GSB, WaterAuthority, Some(CSO)), &pool, None).await,
+            create_test_election(&election(GSB, WaterAuthority, Some(DSO)), &pool, None).await,
+            create_test_election(&election(CSB, WaterAuthority, None), &pool, None).await,
+            create_test_election(&election(CSB, WaterAuthority, None), &pool, None).await,
         ];
 
         let mut conn = pool.acquire().await.unwrap();

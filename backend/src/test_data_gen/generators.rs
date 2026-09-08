@@ -50,7 +50,7 @@ use crate::{
         user_repo::UserId,
     },
     service::create_sub_committee,
-    test_data_gen::{GenerateElectionArgs, RandomRange},
+    test_data_gen::{GenerateElectionArgs, RandomRange, data::locality},
 };
 
 #[derive(Debug)]
@@ -160,34 +160,77 @@ async fn generate_csb_election_data(
     election: &ElectionWithPoliticalGroups,
     votes: Option<Vec<Vec<u32>>>,
 ) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
-    let data_entry_complete = if election.category == ElectionCategory::Municipal {
-        let number = election
-            .domain
-            .as_ref()
-            .expect("Municipal elections should have a domain")
-            .id
-            .as_ref()
-            .expect("Municipal elections should have a domain id")
-            .parse()
-            .expect("domain_id should be numeric");
-        let sub_committee_first_session = create_sub_committee(
-            tx,
-            committee_session.id,
-            number,
-            &election.location,
-            CommitteeCategory::GSB,
-        )
-        .await
-        .map_err(|e| format!("{e:?}"))?;
+    let data_entry_complete = match election.category {
+        ElectionCategory::Municipal => {
+            let number = election
+                .domain
+                .as_ref()
+                .expect("Municipal elections should have a domain")
+                .id
+                .as_ref()
+                .expect("Municipal elections should have a domain id")
+                .parse()
+                .expect("domain_id should be numeric");
+            let sub_committee_first_session = create_sub_committee(
+                tx,
+                committee_session.id,
+                number,
+                &election.location,
+                CommitteeCategory::GSB,
+            )
+            .await
+            .map_err(|e| format!("{e:?}"))?;
 
-        if args.with_data_entry {
-            generate_csb_data_entries(tx, rng, args, sub_committee_first_session, election, votes)
+            if args.with_data_entry {
+                generate_csb_data_entries(
+                    tx,
+                    rng,
+                    args,
+                    sub_committee_first_session,
+                    election,
+                    votes,
+                )
                 .await?
-        } else {
-            false
+            } else {
+                false
+            }
         }
-    } else {
-        false
+        ElectionCategory::Provincial => {
+            todo!()
+        }
+        ElectionCategory::WaterAuthority => {
+            let mut data_entry_completes = Vec::new();
+            for i in 0..2 {
+                let number = i;
+                let sub_committee_first_session = create_sub_committee(
+                    tx,
+                    committee_session.id,
+                    number,
+                    &locality(rng),
+                    CommitteeCategory::GSB,
+                )
+                .await
+                .map_err(|e| format!("{e:?}"))?;
+
+                if args.with_data_entry {
+                    data_entry_completes.push(
+                        generate_csb_data_entries(
+                            tx,
+                            rng,
+                            args,
+                            sub_committee_first_session,
+                            election,
+                            votes.clone(),
+                        )
+                        .await?,
+                    )
+                } else {
+                    data_entry_completes.push(false);
+                };
+            }
+
+            !data_entry_completes.contains(&false)
+        }
     };
 
     let new_status = match (args.with_data_entry, data_entry_complete) {

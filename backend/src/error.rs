@@ -62,6 +62,7 @@ pub enum ErrorReference {
     InvalidApportionmentState,
     InvalidCommitteeSessionStatus,
     InvalidData,
+    InvalidDistrict,
     InvalidHash,
     InvalidJson,
     InvalidPassword,
@@ -266,11 +267,26 @@ impl APIError {
                     ),
                 )
             }
+            APIError::EmlImportError(EMLImportError::InvalidDistrict) => {
+                error!("Error importing EML file: Invalid district");
+                (
+                    StatusCode::BAD_REQUEST,
+                    ErrorResponse::new(
+                        "EML import error".to_string(),
+                        ErrorReference::InvalidDistrict,
+                        false,
+                    ),
+                )
+            }
             APIError::EmlImportError(err) => {
                 error!("Error importing EML file: {:?}", err);
                 (
                     StatusCode::BAD_REQUEST,
-                    ErrorResponse::new("EML import error", ErrorReference::EmlImportError, false),
+                    ErrorResponse::new(
+                        "EML import error".to_string(),
+                        ErrorReference::EmlImportError,
+                        false,
+                    ),
                 )
             }
             APIError::EmlError(err) => {

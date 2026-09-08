@@ -8260,6 +8260,7 @@
           "InvalidApportionmentState",
           "InvalidCommitteeSessionStatus",
           "InvalidData",
+          "InvalidDistrict",
           "InvalidHash",
           "InvalidJson",
           "InvalidPassword",

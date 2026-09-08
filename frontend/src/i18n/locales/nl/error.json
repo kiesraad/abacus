@@ -28,6 +28,7 @@
     "InvalidApportionmentState": "De zetelverdeling is niet in de juiste status voor deze actie",
     "InvalidCommitteeSessionStatus": "De zitting is niet in de juiste status voor deze actie",
     "InvalidData": "De invoer is niet geldig",
+    "InvalidDistrict": "De kieskring in het EML-bestand correspondeert niet met de kieskring van het gekozen stembureau",
     "InvalidHash": "De hash is niet geldig",
     "InvalidJson": "De JSON is niet geldig",
     "InvalidPassword": "Het opgegeven wachtwoord is onjuist",

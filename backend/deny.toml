@@ -35,6 +35,7 @@ deny = [
 multiple-versions = "allow"
 
 [advisories]
+yanked = "deny"
 ignore = [
     { id = "RUSTSEC-2024-0320", reason = "yaml-rust is transitively used by Typst, see https://github.com/trishume/syntect/issues/537" },
     { id = "RUSTSEC-2024-0436", reason = "paste is transitively used by Typst (biblatex, https://github.com/typst/biblatex/issues/87) and by utoipa-axum; unmaintained but no vulnerability" },

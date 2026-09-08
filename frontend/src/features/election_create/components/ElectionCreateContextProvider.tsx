@@ -150,7 +150,7 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
     case "SET_COUNTING_METHOD_TYPE":
       return { ...state, countingMethod: action.countingMethod };
     case "SET_COMMITTEE_CATEGORY":
-      return { ...state, committeeCategory: action.committeeCategory };
+      return { ...state, committeeCategory: action.committeeCategory, gsbSelected: undefined };
     case "SET_NUMBER_OF_VOTERS":
       return {
         ...state,

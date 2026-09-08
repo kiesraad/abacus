@@ -25,6 +25,8 @@ describe("CommitteeCategory component", () => {
   });
 
   test.each<[string, CommitteeCategory, ElectionCategory, string]>([
+    ["CSB for a municipal election", "CSB", "Municipal", "/elections/create/list-of-candidates"],
+    ["CSB for a water authority election", "CSB", "WaterAuthority", "/elections/create/list-of-candidates"],
     ["GSB for a municipal election", "GSB", "Municipal", "/elections/create/list-of-candidates"],
     ["GSB for a provincial election", "GSB", "Provincial", "/elections/create/select-gsb"],
     ["GSB for a water authority election", "GSB", "WaterAuthority", "/elections/create/select-gsb"],
@@ -49,9 +51,15 @@ describe("CommitteeCategory component", () => {
     );
 
     expect(await screen.findByRole("heading", { name: "Type stembureau" })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
+    const optionGsb = screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" });
     const optionCsb = screen.getByRole("radio", { name: "Centraal stembureau (CSB)" });
-    expect(optionCsb).not.toBeChecked();
+    if (committeeCategory === "CSB") {
+      expect(optionGsb).not.toBeChecked();
+      expect(optionCsb).toBeChecked();
+    } else {
+      expect(optionGsb).toBeChecked();
+      expect(optionCsb).not.toBeChecked();
+    }
     if (electionCategory === "Provincial") {
       expect(optionCsb).toBeDisabled();
     } else {
@@ -62,40 +70,9 @@ describe("CommitteeCategory component", () => {
 
     expect(dispatch).toHaveBeenCalledWith({
       type: "SET_COMMITTEE_CATEGORY",
-      committeeCategory: "GSB",
+      committeeCategory: committeeCategory,
     });
 
     expect(router.state.location.pathname).toEqual(expected);
-  });
-
-  test("CSB: Navigates to candidate list upload page", async () => {
-    const state = { election, committeeCategory: "CSB" as CommitteeCategory };
-    const dispatch = vi.fn();
-    vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    overrideOnce(
-      "post",
-      "/api/elections/import/validate",
-      200,
-      electionImportValidateMockResponse({ election: csbElectionMockData }),
-    );
-    const user = userEvent.setup();
-
-    const router = renderReturningRouter(
-      <ElectionCreateContextProvider>
-        <SelectCommitteeCategory />
-      </ElectionCreateContextProvider>,
-    );
-
-    expect(await screen.findByRole("heading", { name: "Type stembureau" })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).not.toBeChecked();
-    expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).toBeChecked();
-    await user.click(screen.getByRole("button", { name: "Volgende" }));
-
-    expect(dispatch).toHaveBeenCalledWith({
-      type: "SET_COMMITTEE_CATEGORY",
-      committeeCategory: "CSB",
-    });
-
-    expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
   });
 });

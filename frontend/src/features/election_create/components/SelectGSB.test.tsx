@@ -110,6 +110,6 @@ describe("SelectGSB component", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Gemeentelijk stembureau kan niet worden geselecteerd");
     expect(dispatch).not.toHaveBeenCalled();
-    expect(router.state.location.pathname).not.toEqual("/elections/create/polling-stations");
+    expect(router.state.location.pathname).toEqual("/");
   });
 });

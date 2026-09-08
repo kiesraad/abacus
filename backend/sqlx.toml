@@ -78,3 +78,6 @@
 [macros.table-overrides.'apportionment']
 'committee_session_id' = "crate::domain::committee_session::CommitteeSessionId"
 'state' = "sqlx::types::Json<crate::domain::apportionment_state::ApportionmentState>"
+
+[macros.table-overrides.'signing_keypair']
+'show_reminder' = "bool"

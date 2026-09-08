@@ -62,7 +62,7 @@ export function UploadCandidatesDefinition() {
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
           setError({ title: defaultErrorTitle, message: fileTooLargeError(currentFile) });
-        } else if (response instanceof ApiError && response.message.includes("EML import error: Invalid district")) {
+        } else if (response instanceof ApiError && response.reference === "InvalidDistrict") {
           setError({
             title: t("election.wrong_candidates_definition.title"),
             message: tx("election.wrong_candidates_definition.description", {

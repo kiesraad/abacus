@@ -78,9 +78,9 @@ describe("UploadCandidatesDefinition component", () => {
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
     overrideOnce("post", "/api/elections/import/validate", 400, {
-      error: "EML import error: Invalid district",
+      error: "EML import error",
       fatal: false,
-      reference: "EmlImportError",
+      reference: "InvalidDistrict",
     });
 
     await renderPage();

@@ -95,7 +95,7 @@ describe("SelectGSB component", () => {
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
     const user = userEvent.setup();
     overrideOnce("post", "/api/elections/import/validate", 400, {
-      error: "Invalid district",
+      error: "Eml import error",
       fatal: false,
       reference: "EmlImportError",
     });

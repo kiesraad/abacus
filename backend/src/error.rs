@@ -62,6 +62,7 @@ pub enum ErrorReference {
     InvalidApportionmentState,
     InvalidCommitteeSessionStatus,
     InvalidData,
+    InvalidDistrict,
     InvalidHash,
     InvalidJson,
     InvalidPassword,
@@ -271,8 +272,8 @@ impl APIError {
                 (
                     StatusCode::BAD_REQUEST,
                     ErrorResponse::new(
-                        "EML import error: Invalid district".to_string(),
-                        ErrorReference::EmlImportError,
+                        "EML import error".to_string(),
+                        ErrorReference::InvalidDistrict,
                         false,
                     ),
                 )

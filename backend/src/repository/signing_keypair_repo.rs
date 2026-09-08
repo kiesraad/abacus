@@ -5,7 +5,7 @@ use crate::domain::election::ElectionId;
 
 pub async fn get_certificate(
     conn: &mut SqliteConnection,
-    election_id: &ElectionId,
+    election_id: ElectionId,
 ) -> Result<Option<String>, sqlx::Error> {
     sqlx::query_scalar!(
         r#"SELECT certificate FROM signing_keypair WHERE election_id = $1"#,
@@ -17,7 +17,7 @@ pub async fn get_certificate(
 
 pub async fn get_private_key(
     conn: &mut SqliteConnection,
-    election_id: &ElectionId,
+    election_id: ElectionId,
 ) -> Result<Option<Zeroizing<Vec<u8>>>, sqlx::Error> {
     if let Some(key) = sqlx::query_scalar!(
         r#"SELECT private_key FROM signing_keypair WHERE election_id = $1"#,
@@ -34,7 +34,7 @@ pub async fn get_private_key(
 
 pub async fn get_show_reminder(
     conn: &mut SqliteConnection,
-    election_id: &ElectionId,
+    election_id: ElectionId,
 ) -> Result<Option<bool>, sqlx::Error> {
     sqlx::query_scalar!(
         r#"SELECT show_reminder FROM signing_keypair WHERE election_id = $1"#,
@@ -46,7 +46,7 @@ pub async fn get_show_reminder(
 
 pub async fn create(
     conn: &mut SqliteConnection,
-    election_id: &ElectionId,
+    election_id: ElectionId,
     certificate: String,
     private_key: Zeroizing<Vec<u8>>,
 ) -> Result<(), sqlx::Error> {
@@ -75,16 +75,10 @@ mod tests {
     async fn test_get_before_create(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let election_id = ElectionId::from(1);
+        assert_eq!(get_certificate(&mut conn, election_id).await.unwrap(), None);
+        assert_eq!(get_private_key(&mut conn, election_id).await.unwrap(), None);
         assert_eq!(
-            get_certificate(&mut conn, &election_id).await.unwrap(),
-            None
-        );
-        assert_eq!(
-            get_private_key(&mut conn, &election_id).await.unwrap(),
-            None
-        );
-        assert_eq!(
-            get_show_reminder(&mut conn, &election_id).await.unwrap(),
+            get_show_reminder(&mut conn, election_id).await.unwrap(),
             None
         );
     }
@@ -99,7 +93,7 @@ mod tests {
 
         create(
             &mut conn,
-            &election_id,
+            election_id,
             certificate.clone(),
             private_key.clone(),
         )
@@ -107,15 +101,15 @@ mod tests {
         .unwrap();
 
         assert_eq!(
-            get_certificate(&mut conn, &election_id).await.unwrap(),
+            get_certificate(&mut conn, election_id).await.unwrap(),
             Some(certificate)
         );
         assert_eq!(
-            get_private_key(&mut conn, &election_id).await.unwrap(),
+            get_private_key(&mut conn, election_id).await.unwrap(),
             Some(private_key)
         );
         assert_eq!(
-            get_show_reminder(&mut conn, &election_id).await.unwrap(),
+            get_show_reminder(&mut conn, election_id).await.unwrap(),
             Some(true)
         );
     }

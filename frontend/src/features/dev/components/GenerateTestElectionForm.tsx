@@ -199,7 +199,10 @@ export function GenerateTestElectionForm() {
             </ChoiceList>
             {RANGE_FIELDS.map((field) => {
               // Skip GSB's field when only one GSB is ever generated
-              if (field.key === "gsbs" && (formState.committee_category === "GSB" || formState.election_category === "Municipal")) {
+              if (
+                field.key === "gsbs" &&
+                (formState.committee_category === "GSB" || formState.election_category === "Municipal")
+              ) {
                 return null;
               }
 

@@ -1,14 +1,14 @@
 use std::error::Error;
 
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
-use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
+use rand::{RngExt, SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::{SqliteConnection, SqlitePool};
 use tracing::{info, warn};
 
 use crate::{
     SqlitePoolExt,
     domain::{
-        committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+        committee_session::{CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
             DataEntryId, DataEntrySource, DataEntryStatus, Definitive, FirstEntryFinalised,
@@ -40,7 +40,7 @@ use crate::{
             votes_counts::VotesCounts,
             yes_no::YesNo,
         },
-        sub_committee::SubCommitteeFirstSession,
+        sub_committee::{SubCommitteeFirstSession, SubCommitteeNumber},
         validate::Validate,
     },
     repository::{
@@ -111,6 +111,42 @@ async fn generate_csb_data_entries(
     Ok(second_entries > 0)
 }
 
+#[expect(clippy::too_many_arguments)]
+async fn generate_csb_sub_committee(
+    conn: &mut SqliteConnection,
+    rng: &mut StdRng,
+    args: &GenerateElectionArgs,
+    committee_session_id: CommitteeSessionId,
+    number: SubCommitteeNumber,
+    name: &str,
+    election: &ElectionWithPoliticalGroups,
+    votes: Option<Vec<Vec<u32>>>,
+) -> Result<bool, Box<dyn Error>> {
+    let sub_committee_first_session = create_sub_committee(
+        conn,
+        committee_session_id,
+        number,
+        name,
+        CommitteeCategory::GSB,
+    )
+    .await
+    .map_err(|e| format!("{e:?}"))?;
+
+    if args.with_data_entry {
+        generate_csb_data_entries(
+            conn,
+            rng,
+            args,
+            sub_committee_first_session,
+            election,
+            votes,
+        )
+        .await
+    } else {
+        Ok(false)
+    }
+}
+
 /// Generate polling stations and data entries for a GSB election
 async fn generate_gsb_election_data(
     rng: &mut StdRng,
@@ -171,65 +207,41 @@ async fn generate_csb_election_data(
                 .expect("Municipal elections should have a domain id")
                 .parse()
                 .expect("domain_id should be numeric");
-            let sub_committee_first_session = create_sub_committee(
+            generate_csb_sub_committee(
                 tx,
+                rng,
+                args,
                 committee_session.id,
                 number,
                 &election.location,
-                CommitteeCategory::GSB,
+                election,
+                votes,
             )
-            .await
-            .map_err(|e| format!("{e:?}"))?;
-
-            if args.with_data_entry {
-                generate_csb_data_entries(
-                    tx,
-                    rng,
-                    args,
-                    sub_committee_first_session,
-                    election,
-                    votes,
-                )
-                .await?
-            } else {
-                false
-            }
-        }
-        ElectionCategory::Provincial => {
-            todo!()
+            .await?
         }
         ElectionCategory::WaterAuthority => {
-            let mut data_entry_completes = Vec::new();
-            for i in 0..2 {
-                let number = i;
-                let sub_committee_first_session = create_sub_committee(
-                    tx,
-                    committee_session.id,
-                    number,
-                    &locality(rng),
-                    CommitteeCategory::GSB,
-                )
-                .await
-                .map_err(|e| format!("{e:?}"))?;
-
-                if args.with_data_entry {
-                    data_entry_completes.push(
-                        generate_csb_data_entries(
-                            tx,
-                            rng,
-                            args,
-                            sub_committee_first_session,
-                            election,
-                            votes.clone(),
-                        )
-                        .await?,
+            // We need at least one GSB
+            let gsbs = rng.random_range(args.gsbs.clone()).max(1);
+            let mut data_entry_complete = args.with_data_entry;
+            for number in 1..=gsbs {
+                let name = locality(rng);
+                data_entry_complete = data_entry_complete
+                    && generate_csb_sub_committee(
+                        tx,
+                        rng,
+                        args,
+                        committee_session.id,
+                        number,
+                        name,
+                        election,
+                        votes.clone(),
                     )
-                } else {
-                    data_entry_completes.push(false);
-                };
+                    .await?;
             }
-
-            !data_entry_completes.contains(&false)
+            data_entry_complete
+        }
+        ElectionCategory::Provincial => {
+            todo!("Provincial CSB election generation not supported")
         }
     };
 
@@ -1146,6 +1158,7 @@ mod tests {
             committee_category,
             counting_method,
             election_category: ElectionCategory::Municipal,
+            election_category,
             political_groups: RandomRange(3..4),
             candidates_per_group: RandomRange(3..10),
             polling_stations: RandomRange(3..4),
@@ -1159,6 +1172,7 @@ mod tests {
             turnout: RandomRange(60..85),
             candidate_distribution_slope: RandomRange(1100..1101),
             political_group_distribution_slope: RandomRange(1100..1101),
+            gsbs: RandomRange(5..10),
         }
     }
 

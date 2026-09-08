@@ -136,7 +136,7 @@ test.describe("full flow PS2 GSB DSO", () => {
     await uploadPollingStations(page, eml110b_single);
 
     const countingMethodPage = new CountingMethodTypePgObj(page);
-    await countingMethodPage.checkHeaderContainsName("Valkenburg aan de Geul");
+    await expect(countingMethodPage.getHeader("Valkenburg aan de Geul")).toBeVisible();
     await expect(countingMethodPage.cso).not.toBeChecked();
     await expect(countingMethodPage.dso).not.toBeChecked();
     await countingMethodPage.dso.check();

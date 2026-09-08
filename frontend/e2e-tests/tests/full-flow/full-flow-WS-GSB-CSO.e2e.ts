@@ -136,7 +136,7 @@ test.describe("full flow WS GSB CSO", () => {
     await uploadPollingStations(page, eml110b_single);
 
     const countingMethodPage = new CountingMethodTypePgObj(page);
-    await countingMethodPage.checkHeaderContainsName("Gennep");
+    await expect(countingMethodPage.getHeader("Gennep")).toBeVisible();
     await expect(countingMethodPage.cso).not.toBeChecked();
     await expect(countingMethodPage.dso).not.toBeChecked();
     await countingMethodPage.cso.check();

@@ -19,7 +19,7 @@ default-features = false
 features = []
 
 [[bin]]
-name = "data-entry-status"
+name = "data_entry_status"
 path = "fuzz_targets/data_entry_status.rs"
 test = false
 doc = false

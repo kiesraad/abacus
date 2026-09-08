@@ -20,14 +20,14 @@ tracing-subscriber = { version = "0.3.23", default-features = false, features = 
 path = ".."
 
 [[bin]]
-name = "simple-apportionment"
+name = "simple_apportionment"
 path = "fuzz_targets/simple_apportionment.rs"
 test = false
 doc = false
 bench = false
 
 [[bin]]
-name = "differential-osv2020"
+name = "differential_osv2020"
 path = "fuzz_targets/differential_osv2020.rs"
 test = false
 doc = false
@@ -55,14 +55,14 @@ doc = false
 bench = false
 
 [[bin]]
-name = "house-monotonicity"
+name = "house_monotonicity"
 path = "fuzz_targets/house_monotonicity.rs"
 test = false
 doc = false
 bench = false
 
 [[bin]]
-name = "population-monotonicity"
+name = "population_monotonicity"
 path = "fuzz_targets/population_monotonicity.rs"
 test = false
 doc = false

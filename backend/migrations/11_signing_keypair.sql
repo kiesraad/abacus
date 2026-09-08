@@ -5,6 +5,5 @@ CREATE TABLE signing_keypair
     private_key   BLOB                NOT NULL,              -- DER-encoded private key
     show_reminder INTEGER             NOT NULL DEFAULT TRUE, -- show upload reminder
 
-    FOREIGN KEY (election_id) REFERENCES elections (id),
-    CONSTRAINT election UNIQUE (election_id)
+    FOREIGN KEY (election_id) REFERENCES elections (id)
 ) STRICT;

@@ -517,6 +517,7 @@ export const auditEventTypeValues = [
   "UserDeleted",
   "ElectionCreated",
   "ElectionUpdated",
+  "PublicKeyUploadReminderDismissed",
   "CommitteeSessionCreated",
   "CommitteeSessionDeleted",
   "CommitteeSessionUpdated",

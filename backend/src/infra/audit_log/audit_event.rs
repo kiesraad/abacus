@@ -110,6 +110,8 @@ pub enum AuditEventType {
     // election events
     ElectionCreated,
     ElectionUpdated,
+    // signing events
+    PublicKeyUploadReminderDismissed,
     // committee session events
     CommitteeSessionCreated,
     CommitteeSessionDeleted,

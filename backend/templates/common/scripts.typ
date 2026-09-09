@@ -8,7 +8,7 @@
   category == "Municipal"
 ) { local } else { other }
 
-#let get_district_number = (district) => if (district.district == "Specific") { 
+#let get_district_number = (district) => if (district.district == "Specific") {
   if ("number" in district.key) {
     if (district.roman_numerals) { numbering("I", district.key.number) } else { district.key.number }
   } else { "" }
@@ -134,29 +134,44 @@
   ))
 }
 
-/// Display a checkbox, optionally already checked when the `checked` parameter is set to `true`
+/// Display a checkbox, optionally already checked when the `checked` parameter is set to `true`.
+/// Checkboxes with multiline labels are vertically aligned with the first line of the label.
 #let checkbox(checked: none, small: false, content) = {
-  let has_content = content != none and content != ""
-  let size = if checked == true or checked == none and not small { 14pt } else { 10pt }
+  let box_size = if checked == true or (checked == none and not small) { 14pt } else { 10pt }
+  let column_width = 14pt
+  let gutter = 6pt
+
+  let le_box = box(
+    width: box_size,
+    height: box_size,
+    inset: 2.5pt,
+    stroke: if checked == none or checked == true { 0.5pt + black } else {
+      (thickness: 0.4pt, dash: "densely-dotted", cap: "square")
+    },
+    clip: true,
+    fill: if checked == true { black } else { white },
+    if checked == true { checkmark() },
+  )
 
   block(width: 75%,
-    grid(
-      columns: if has_content { (14pt, 6pt, auto) } else { (size) },
-      align: horizon + center,
-      box(
-        width: size,
-        height: size,
-        inset: 2.5pt,
-        stroke: if checked == none or checked == true { 0.5pt + black } else {
-          (thickness: 0.4pt, dash: "densely-dotted", cap: "square")
-        },
-        clip: true,
-        fill: if checked == true { black } else { white },
-        if checked == true { checkmark() },
-      ),
-      if has_content { " " },
-      if has_content { align(left, content) },
-    )
+    layout(block_size => context { // `layout` is needed to give `block` a measurable width
+      let label_width = block_size.width - column_width - gutter
+      let line_height = measure([A]).height
+      let rendered_height = measure(content, width: label_width).height
+      let multiline = rendered_height >= (line_height * 2)
+
+      grid(
+        columns: (column_width, gutter, auto),
+        align: horizon + center,
+        grid.cell(
+          align: if multiline { top + center } else { horizon + center },
+          // From `top` we use half of the difference to move the box up.
+          if multiline { move(dy: (line_height - box_size) / 2, le_box) } else { le_box },
+        ),
+        " ",
+        align(left, content),
+      )
+    })
   )
 }
 

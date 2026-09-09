@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
+import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { MissingCommitteeSessionDetailsModal } from "@/components/committee_session/MissingCommitteeSessionDetailsModal";
 import { Footer } from "@/components/footer/Footer";
 import { IconTrash } from "@/components/generated/icons";
+import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -13,11 +15,12 @@ import { Modal } from "@/components/ui/Modal/Modal";
 import { Table } from "@/components/ui/Table/Table";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
-import { t } from "@/i18n/translate";
+import { t, tx } from "@/i18n/translate";
 import type {
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   CommitteeSession,
+  DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PATH,
   Election,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
@@ -191,13 +194,25 @@ function DSONextSessionDownloadSection({ election }: DownloadSectionProps) {
 export function ElectionHomePage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentCommitteeSession, committeeSessions, election, investigations, pollingStations, refetch } =
-    useElection();
+  const {
+    currentCommitteeSession,
+    committeeSessions,
+    election,
+    investigations,
+    pollingStations,
+    showKeypairReminder,
+    refetch,
+  } = useElection();
   const { isCoordinator, role } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const createPath: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${election.id}/committee_sessions`;
   const removePath: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
   const { create, remove } = useCrud({ createPath, removePath, throwAllErrors: true });
+  const dismissReminderPath: DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PATH = `/api/elections/${election.id}/dismiss_public_key_upload_reminder`;
+  const { update: dismissReminder, isLoading: isUpdatingReminder } = useCrud({
+    updatePath: dismissReminderPath,
+    throwAllErrors: true,
+  });
   const showDeleteModal = hasBooleanProperty(location.state, "showDeleteModal") && location.state.showDeleteModal;
 
   // re-fetch election when component mounts
@@ -237,6 +252,7 @@ export function ElectionHomePage() {
           <h1>{election.name}</h1>
         </section>
       </header>
+      <Messages />
       {showAddCommitteeSessionModal && (
         <Modal title={t("election_management.investigation_ordered_by_csb")} onClose={toggleAddCommitteeSessionModal}>
           <p>{t("election_management.only_add_if_ordered")}</p>
@@ -310,6 +326,35 @@ export function ElectionHomePage() {
           </nav>
         </Modal>
       )}
+      {role === "administrator" && election.committee_category === "GSB" && showKeypairReminder && (
+        <Alert type="notify">
+          <strong className="heading-md">{t("election_management.alert_register.title")}</strong>
+          <p>
+            {tx("election_management.alert_register.explanation", undefined, {
+              committee: t(`committee_category.${election.committee_category}.short`).toLowerCase(),
+            })}
+          </p>
+          <nav className={cls.alertActions}>
+            <Button.Link to="certificate" size="md">
+              {t("election_management.alert_register.register")}
+            </Button.Link>
+            <Button
+              variant="secondary"
+              size="md"
+              disabled={isUpdatingReminder}
+              onClick={() => {
+                void dismissReminder({}).then((result) => {
+                  if (isSuccess(result)) {
+                    void refetch();
+                  }
+                });
+              }}
+            >
+              {t("election_management.alert_register.register_already_done")}
+            </Button>
+          </nav>
+        </Alert>
+      )}
       {election.committee_category === "GSB" && pollingStations.length === 0 && (
         <Alert type="warning">
           <strong className="heading-md" id="noPollingStationsWarningAlertTitle">
@@ -357,6 +402,7 @@ export function ElectionHomePage() {
               committeeSession={currentCommitteeSession}
               numberOfPollingStations={pollingStations.length}
               role={role}
+              publicKeyRegistered={!showKeypairReminder}
             />
           </div>
           {election.committee_category === "GSB" &&

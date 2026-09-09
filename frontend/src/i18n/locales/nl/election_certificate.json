@@ -7,7 +7,20 @@
   "explanation": "Abacus ondertekent officiële bestanden met een digitale (RSA) handtekening. De handtekening wordt gezet met een private sleutel. Die is geheim en blijft op deze computer. Met de bijbehorende publieke sleutel kan iedereen controleren dat bestanden echt op deze computer zijn gemaakt en niet zijn gewijzigd.",
   "not_after": "Geldig tot en met",
   "not_before": "Geldig vanaf",
+  "not_yet_registered": "Nog niet geregistreerd",
   "organizational_unit": "Organisatorische eenheid",
   "signature_algorithm": "Handtekeningalgoritme",
-  "subtitle": "Publieke sleutel Abacus-instantie {committee}"
+  "subtitle": {
+    "before_upload": "Registreer Abacus-instantie {committee} bij de Kiesraad",
+    "after_upload": "Publieke sleutel Abacus-instantie {committee}"
+  },
+  "upload": {
+    "title": "Upload het crt-bestand naar het overdrachtsplatform",
+    "explanation": "Doe dit uiterlijk twee dagen voor de dag van stemming.",
+    "done": "Ik heb dit gedaan",
+    "message": {
+      "title": "Publieke sleutel geregistreerd",
+      "text": "Let op: Upload de publieke sleutel zelf naar het overdrachtsplatform van de Kiesraad."
+    }
+  }
 }

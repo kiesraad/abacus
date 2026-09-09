@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE signing_keypair\n            SET show_reminder = $1\n            WHERE election_id = $2\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "e988f3341c3474bee3630d26f816dd50543a37cff2b708a201874f24b59e773d"
+}

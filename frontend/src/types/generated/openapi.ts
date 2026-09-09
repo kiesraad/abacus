@@ -240,6 +240,13 @@ export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/status`;
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
 
+// /api/elections/{election_id}/dismiss_public_key_upload_reminder
+export interface DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PATH =
+  `/api/elections/${ElectionId}/dismiss_public_key_upload_reminder`;
+
 // /api/elections/{election_id}/download_n_10_1
 export interface ELECTION_DOWNLOAD_N_10_1_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -1120,6 +1127,7 @@ export interface ElectionDetailsResponse {
   election: ElectionWithPoliticalGroups;
   investigations: PollingStationInvestigation[];
   polling_stations: PollingStation[];
+  show_keypair_reminder?: boolean;
 }
 
 /**

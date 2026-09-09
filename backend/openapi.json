@@ -3220,6 +3220,65 @@
         ]
       }
     },
+    "/api/elections/{election_id}/dismiss_public_key_upload_reminder": {
+      "put": {
+        "summary": "administrator",
+        "operationId": "dismiss_public_key_upload_reminder",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Public key upload reminder dismissed"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/download_n_10_1": {
       "get": {
         "summary": "administrator, coordinator_gsb",
@@ -7949,6 +8008,9 @@
             "items": {
               "$ref": "#/components/schemas/PollingStation"
             }
+          },
+          "show_keypair_reminder": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

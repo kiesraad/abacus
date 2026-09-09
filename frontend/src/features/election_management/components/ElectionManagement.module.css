@@ -20,6 +20,11 @@
   }
 }
 
+.alertActions {
+  display: flex;
+  gap: 1rem;
+}
+
 .electionInformationTable {
   width: 58.5rem;
 }

@@ -358,7 +358,7 @@ export const getElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
   investigations: PollingStationInvestigation[] = mockInvestigations,
-): Required<ElectionDetailsResponse> => {
+): ElectionDetailsResponse => {
   const updatedCommitteeSession = getCommitteeSessionMockData(committeeSession);
 
   // If committee session number > 1, add prev_data_entry_id to polling stations
@@ -386,7 +386,7 @@ export const getElectionMockData = (
 export const getCSBElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
-): Required<ElectionDetailsResponse> => {
+): ElectionDetailsResponse => {
   const updatedCommitteeSession = getCSBCommitteeSessionMockData(committeeSession);
 
   return {
@@ -403,8 +403,8 @@ export const getCSBElectionMockData = (
 };
 
 export const investigationListMockResponse: InvestigationListResponse = { investigations: mockInvestigations };
-export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
-export const csbElectionDetailsMockResponse: Required<ElectionDetailsResponse> = getCSBElectionMockData();
+export const electionDetailsMockResponse = getElectionMockData();
+export const csbElectionDetailsMockResponse = getCSBElectionMockData();
 
 export const electionMockData = electionDetailsMockResponse.election;
 export const provincialElectionMockData = getElectionMockData(electionListMockResponse.elections[4]).election;

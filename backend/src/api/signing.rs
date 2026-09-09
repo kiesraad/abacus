@@ -1,6 +1,7 @@
 use axum::{
     Json,
     extract::{Path, State},
+    http::StatusCode,
     response::IntoResponse,
 };
 use axum_extra::response::Attachment;
@@ -18,7 +19,7 @@ use crate::{
         role::Role,
     },
     error::ErrorReference,
-    repository::election_repo,
+    repository::{election_repo, signing_keypair_repo},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -27,6 +28,36 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(certificate).authorize(ADMIN))
         .routes(routes!(certificate_details).authorize(ADMIN))
+        .routes(routes!(dismiss_public_key_upload_reminder).authorize(ADMIN))
+}
+
+#[utoipa::path(
+    put,
+    path = "/api/elections/{election_id}/dismiss_public_key_upload_reminder",
+    responses(
+        (status = 204, description = "Public key upload reminder dismissed"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "Not Found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+    ),
+)]
+pub async fn dismiss_public_key_upload_reminder(
+    State(pool): State<SqlitePool>,
+    Path(election_id): Path<ElectionId>,
+) -> Result<StatusCode, APIError> {
+    let mut conn = pool.acquire().await?;
+    let updated = signing_keypair_repo::set_show_reminder(&mut conn, election_id, false).await?;
+    if !updated {
+        return Err(APIError::NotFound(
+            "No signing keypair found for this election".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
+
+    Ok(StatusCode::NO_CONTENT)
 }
 
 #[derive(Serialize, ToSchema, Debug)]

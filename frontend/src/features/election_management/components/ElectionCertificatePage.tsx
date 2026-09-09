@@ -11,7 +11,7 @@ import { Icon } from "@/components/ui/Icon/Icon";
 import cls from "@/features/election_management/components/ElectionManagement.module.css";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
-import { t } from "@/i18n/translate";
+import { t, tx } from "@/i18n/translate";
 import type {
   CERTIFICATE_DETAILS_REQUEST_PATH,
   CERTIFICATE_REQUEST_PATH,
@@ -41,7 +41,7 @@ export function ElectionCertificatePage() {
     if (isSuccess(result)) {
       pushMessage({
         title: t("election_certificate.upload.message.title"),
-        text: t("election_certificate.upload.message.text"),
+        text: tx("election_certificate.upload.message.text"),
       });
       void navigate(`/elections/${election.id}`);
     }

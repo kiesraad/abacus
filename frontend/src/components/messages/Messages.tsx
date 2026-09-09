@@ -34,13 +34,15 @@ export function Messages() {
       {message.title && <strong className="heading-md">{message.title}</strong>}
       {message.text && (
         <p>
-          {message.text.split("\n").map((line, lineIndex) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
-            <Fragment key={lineIndex}>
-              {line}
-              <br />
-            </Fragment>
-          ))}
+          {typeof message.text === "string"
+            ? message.text.split("\n").map((line, lineIndex) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
+                <Fragment key={lineIndex}>
+                  {line}
+                  <br />
+                </Fragment>
+              ))
+            : message.text}
         </p>
       )}
     </Alert>

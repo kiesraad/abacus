@@ -64,6 +64,11 @@ impl Certificate {
         self.der.clone()
     }
 
+    /// The certificate as X.509 DER (borrowed).
+    pub(crate) fn der(&self) -> &[u8] {
+        &self.der
+    }
+
     /// The subject the certificate carries.
     pub fn subject(&self) -> &CertificateSubject {
         &self.subject
@@ -133,6 +138,11 @@ impl PublicKey {
     /// stores when a `.crt` is imported.
     pub fn to_der(&self) -> Vec<u8> {
         self.spki_der.clone()
+    }
+
+    /// The key as `SubjectPublicKeyInfo` DER (borrowed).
+    pub(crate) fn der(&self) -> &[u8] {
+        &self.spki_der
     }
 
     /// The contents of the SPKI BIT STRING, an RFC 8017 `RSAPublicKey`. This

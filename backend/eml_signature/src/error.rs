@@ -1,7 +1,7 @@
 use std::fmt;
 
 /// Everything that can go wrong while generating a keypair and certificate,
-/// or reading a certificate back.
+/// reading a certificate back, or signing and verifying EML documents.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum EmlSignatureError {
     /// RSA key generation failed.
@@ -22,6 +22,10 @@ pub enum EmlSignatureError {
     /// The certificate subject is invalid: a required attribute is missing or
     /// duplicated, or the `UID` names an unsupported committee.
     InvalidSubject(String),
+    /// The `.signature` file cannot be parsed.
+    InvalidSignatureFile(String),
+    /// The RSA signature does not match the EML document bytes under the given key.
+    SignatureInvalid,
 }
 
 impl fmt::Display for EmlSignatureError {
@@ -37,6 +41,10 @@ impl fmt::Display for EmlSignatureError {
             Self::InvalidCertificate(e) => write!(f, "invalid X.509 certificate: {e}"),
             Self::InvalidPublicKey(e) => write!(f, "invalid RSA public key: {e}"),
             Self::InvalidSubject(e) => write!(f, "invalid certificate subject: {e}"),
+            Self::InvalidSignatureFile(e) => write!(f, "invalid .signature file: {e}"),
+            Self::SignatureInvalid => {
+                write!(f, "the signature does not match the document and key")
+            }
         }
     }
 }

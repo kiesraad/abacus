@@ -23,7 +23,7 @@ import { formatDateFullWithoutWeekday } from "@/utils/dateTime";
 const formatDate = (date: string) => formatDateFullWithoutWeekday(new Date(date));
 
 export function ElectionCertificatePage() {
-  const { election, showKeypairReminder } = useElection();
+  const { election, showKeypairReminder, refetch } = useElection();
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
 
@@ -43,6 +43,7 @@ export function ElectionCertificatePage() {
         title: t("election_certificate.upload.message.title"),
         text: tx("election_certificate.upload.message.text"),
       });
+      await refetch();
       void navigate(`/elections/${election.id}`);
     }
   }

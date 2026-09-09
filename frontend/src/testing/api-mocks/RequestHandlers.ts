@@ -64,6 +64,8 @@ import type {
   DELETE_DECEASED_CANDIDATE_REQUEST_BODY,
   DELETE_DECEASED_CANDIDATE_REQUEST_PARAMS,
   DELETE_DECEASED_CANDIDATE_REQUEST_PATH,
+  DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PARAMS,
+  DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PARAMS,
   ELECTION_DETAILS_REQUEST_PATH,
   ELECTION_IMPORT_REQUEST_BODY,
@@ -345,6 +347,13 @@ export const ElectionCertificateDetailsRequestHandler = http.get<
   };
   return HttpResponse.json(response, { status: 200 });
 });
+
+export const DismissPublicKeyUploadReminderRequestHandler = http.put<
+  ParamsToString<DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PARAMS>
+>(
+  "/api/elections/1/dismiss_public_key_upload_reminder" satisfies DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 204 }),
+);
 
 // get election details handler
 export const CSBElectionRequestHandler = http.get<
@@ -692,6 +701,7 @@ export const handlers: HttpHandler[] = [
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   ElectionCertificateDetailsRequestHandler,
+  DismissPublicKeyUploadReminderRequestHandler,
   CSBElectionStatusRequestHandler,
   GSBABElectionImportRequestHandler,
   GSBGRElectionImportRequestHandler,

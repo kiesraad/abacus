@@ -40,6 +40,11 @@ const-oid = { version = "0.10", features = ["db"] }
 der = { version = "0.8", features = ["alloc", "derive", "oid", "pem", "std"] }
 x509-cert = { version = "0.3", default-features = false, features = ["std", "pem"] }
 zeroize = "1"
+aws-lc-rs = "1"
+# No stable `cms` release supports der 0.8 / x509-cert 0.3 yet, see
+# https://github.com/RustCrypto/formats/pull/2393. Keep `builder` off: it signs
+# the `signedAttrs` DER rather than the EML bytes, and pulls in the `rsa` crate.
+cms = { version = "=0.3.0-pre.2", default-features = false, features = ["std"] }
 rustls-pki-types = "1"
 if-addrs = "0.15"
 rustls = "0.23"

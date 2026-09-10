@@ -28,7 +28,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={userappdata}\{#MyAppName}
+DefaultDirName={localappdata}\{#MyAppName}
 ; Setup will not show the Select Destination Location wizard page.
 DisableDirPage=yes
 ; "ArchitecturesAllowed=x64compatible" specifies that Setup cannot run
@@ -181,7 +181,7 @@ begin
                     MB_YESNO, ['Database en backups verwijderen', 'Bewaren'],
                     0) of
         IDYES: begin
-          DelTree(ExpandConstant('{userappdata}\{#MyAppName}'), True, True, True);
+          DelTree(ExpandConstant('{app}'), True, True, True);
           MsgBox('Database en backups zijn verwijderd.', mbInformation, MB_OK);
         end;
         IDNO: MsgBox('Database en backups worden behouden.', mbInformation, MB_OK);

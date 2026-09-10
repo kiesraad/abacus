@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT private_key FROM signing_keypair WHERE election_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "name": "private_key",
+        "ordinal": 0,
+        "type_info": "Blob",
+        "origin": {
+          "Table": {
+            "table": "signing_keypair",
+            "name": "private_key"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "c9db7ff274ebdb7522fdffac3ea32219f9cd482b02abe469ca37f5c34d1ed6d7"
+}

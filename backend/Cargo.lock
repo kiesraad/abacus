@@ -46,6 +46,7 @@ dependencies = [
  "utoipa",
  "utoipa-axum",
  "utoipa-swagger-ui",
+ "zeroize",
 ]
 
 [[package]]

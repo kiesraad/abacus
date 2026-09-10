@@ -37,6 +37,7 @@ describe("AbortDataEntryControl", () => {
       pollingStation: undefined,
       investigations: [],
       investigation: undefined,
+      showKeypairReminder: undefined,
       refetch: () =>
         Promise.resolve({
           status: ApiResponseStatus.Success,

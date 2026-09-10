@@ -15,6 +15,7 @@ export interface iElectionProviderContext {
   election: ElectionWithPoliticalGroups;
   pollingStations: Required<PollingStation[]>;
   investigations: PollingStationInvestigation[];
+  showKeypairReminder?: boolean;
   refetch: (controller?: AbortController) => Promise<ApiResult<ElectionDetailsResponse>>;
 }
 

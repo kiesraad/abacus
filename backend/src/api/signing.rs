@@ -1,6 +1,7 @@
 use axum::{
     Json,
     extract::{Path, State},
+    http::StatusCode,
     response::IntoResponse,
 };
 use axum_extra::response::Attachment;
@@ -11,15 +12,27 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, AppState, ErrorResponse,
+    APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::middleware::authentication::RouteAuthorization,
     domain::{
         election::{CommitteeCategory, ElectionId},
         role::Role,
     },
     error::ErrorReference,
-    repository::election_repo,
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
+    repository::{election_repo, signing_keypair_repo},
 };
+
+#[derive(Serialize)]
+struct PublicKeyUploadReminderDismissedAuditData {
+    pub election_id: ElectionId,
+    pub election_name: String,
+}
+
+impl AsAuditEvent for PublicKeyUploadReminderDismissedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PublicKeyUploadReminderDismissed;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     const ADMIN: &[Role] = &[Role::Administrator];
@@ -27,6 +40,52 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(certificate).authorize(ADMIN))
         .routes(routes!(certificate_details).authorize(ADMIN))
+        .routes(routes!(dismiss_public_key_upload_reminder).authorize(ADMIN))
+}
+
+#[utoipa::path(
+    put,
+    path = "/api/elections/{election_id}/dismiss_public_key_upload_reminder",
+    responses(
+        (status = 204, description = "Public key upload reminder dismissed"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "Not Found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+    ),
+)]
+pub async fn dismiss_public_key_upload_reminder(
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Path(election_id): Path<ElectionId>,
+) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
+
+    let updated = signing_keypair_repo::set_show_reminder(&mut tx, election_id, false).await?;
+    if !updated {
+        return Err(APIError::NotFound(
+            "No signing keypair found for this election".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
+
+    audit_service
+        .log(
+            &mut tx,
+            &PublicKeyUploadReminderDismissedAuditData {
+                election_id,
+                election_name: election.name,
+            },
+            None,
+        )
+        .await?;
+
+    tx.commit().await?;
+
+    Ok(StatusCode::NO_CONTENT)
 }
 
 #[derive(Serialize, ToSchema, Debug)]

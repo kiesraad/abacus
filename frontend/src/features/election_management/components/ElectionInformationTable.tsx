@@ -11,6 +11,7 @@ interface ElectionInformationTableProps {
   committeeSession: CommitteeSession;
   numberOfPollingStations: number;
   role?: Role;
+  publicKeyRegistered?: boolean;
 }
 
 function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
@@ -29,6 +30,7 @@ export function ElectionInformationTable({
   committeeSession,
   numberOfPollingStations,
   role,
+  publicKeyRegistered,
 }: ElectionInformationTableProps) {
   const rowLink =
     committeeSession.number === 1 &&
@@ -84,7 +86,11 @@ export function ElectionInformationTable({
                 <Table.HeaderCell scope="row" className="normal">
                   {t("election_certificate.certificate")}
                 </Table.HeaderCell>
-                <Table.Cell className="underlined">{t("election_certificate.details")}</Table.Cell>
+                <Table.Cell className="underlined">
+                  {publicKeyRegistered
+                    ? t("election_certificate.details")
+                    : t("election_certificate.not_yet_registered")}
+                </Table.Cell>
               </Table.Row>
             )}
             <Table.Row key={election.id} to="polling-stations">

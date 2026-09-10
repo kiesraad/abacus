@@ -5,7 +5,7 @@ use axum::{
 };
 use chrono::{DateTime, Datelike, Local};
 use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
-use sqlx::SqlitePool;
+use sqlx::{SqliteConnection, SqlitePool};
 use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -13,7 +13,7 @@ use crate::{
     APIError, AppState, ErrorResponse,
     api::middleware::authentication::RouteAuthorization,
     domain::{
-        committee_session::CommitteeSessionId,
+        committee_session::{CommitteeSession, CommitteeSessionId},
         election::{ElectionId, ElectionWithPoliticalGroups},
         report::files::{get_files_csb_election, get_files_gsb_election},
         role::Role,
@@ -92,6 +92,24 @@ pub fn with_zip_extension(filename: &str) -> String {
     format!("{}.zip", base)
 }
 
+pub async fn get_election_committee_session(
+    conn: &mut SqliteConnection,
+    election_id: ElectionId,
+    committee_session_id: CommitteeSessionId,
+) -> Result<(ElectionWithPoliticalGroups, CommitteeSession), APIError> {
+    let committee_session = committee_session_repo::get(conn, committee_session_id).await?;
+    if committee_session.election_id != election_id {
+        return Err(APIError::NotFound(
+            "Committee session does not match election".to_string(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
+
+    let election = election_repo::get(conn, election_id).await?;
+
+    Ok((election, committee_session))
+}
+
 /// Download a zip containing a PDF for the PV and the EML with GSB election results
 #[utoipa::path(
     get,
@@ -128,8 +146,8 @@ pub async fn election_download_zip_results_gsb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    let election = election_repo::get(&mut conn, election_id).await?;
-    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let (election, committee_session) =
+        get_election_committee_session(&mut conn, election_id, committee_session_id).await?;
     let files = get_files_gsb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -208,8 +226,8 @@ pub async fn election_download_zip_results_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    let election = election_repo::get(&mut conn, election_id).await?;
-    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let (election, committee_session) =
+        get_election_committee_session(&mut conn, election_id, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -274,8 +292,8 @@ pub async fn election_download_zip_attachment_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    let election = election_repo::get(&mut conn, election_id).await?;
-    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let (election, committee_session) =
+        get_election_committee_session(&mut conn, election_id, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -335,8 +353,8 @@ pub async fn election_download_zip_total_counts_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    let election = election_repo::get(&mut conn, election_id).await?;
-    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let (election, committee_session) =
+        get_election_committee_session(&mut conn, election_id, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 

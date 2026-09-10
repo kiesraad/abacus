@@ -476,13 +476,19 @@ export const gsbListMockData: RegionDetails[] = [
     frisian_export_allowed: true,
   },
   {
+    name: "Appeldorp",
+    key: { category: "Municipality", number: 36 },
+    roman_numerals: false,
+    frisian_export_allowed: true,
+  },
+  {
     name: "Súdwest-Eemstricht",
     key: { category: "Municipality", number: 123 },
     roman_numerals: false,
     frisian_export_allowed: true,
   },
   {
-    name: "Sud-Test",
+    name: "Sudwest-Eemstricht",
     key: { category: "Municipality", number: 5678 },
     roman_numerals: false,
     frisian_export_allowed: true,
@@ -490,6 +496,12 @@ export const gsbListMockData: RegionDetails[] = [
   {
     name: "'s Gravenveen",
     key: { category: "Municipality", number: 55 },
+    roman_numerals: false,
+    frisian_export_allowed: true,
+  },
+  {
+    name: "Gravenstad",
+    key: { category: "Municipality", number: 999 },
     roman_numerals: false,
     frisian_export_allowed: true,
   },

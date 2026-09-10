@@ -155,6 +155,10 @@ struct Args {
     #[arg(long, default_value = "1100", value_parser = parse_range::<u32>)]
     political_group_distribution_slope: Range<u32>,
 
+    /// Amount of GSBs
+    #[arg(long, default_value = "5..10", value_parser = parse_range::<u32>)]
+    gsbs: Range<u32>,
+
     /// Export the election definition, candidate list and polling stations to a directory
     #[arg(long)]
     export_definition: Option<PathBuf>,
@@ -182,6 +186,7 @@ impl From<Args> for GenerateElectionArgs {
             political_group_distribution_slope: RandomRange(
                 args.political_group_distribution_slope,
             ),
+            gsbs: RandomRange(args.gsbs),
         }
     }
 }

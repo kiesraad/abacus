@@ -22,6 +22,7 @@ import { StringFormData } from "@/utils/stringFormData";
 const RANGE_HINT = "Gebruik notatie zoals 10..50 of 9..=45 of een enkel getal zoals 40";
 
 const RANGE_FIELDS = [
+  { key: "gsbs", label: "Aantal GSB's", placeholder: "5..10" },
   { key: "political_groups", label: "Aantal politieke partijen", placeholder: "20..50" },
   { key: "candidates_per_group", label: "Aantal kandidaten per partij", placeholder: "10..50" },
   { key: "polling_stations", label: "Aantal stembureaus", placeholder: "50..200" },
@@ -197,6 +198,14 @@ export function GenerateTestElectionForm() {
               ))}
             </ChoiceList>
             {RANGE_FIELDS.map((field) => {
+              // Skip GSB's field when only one GSB is ever generated
+              if (
+                field.key === "gsbs" &&
+                (formState.committee_category === "GSB" || formState.election_category === "Municipal")
+              ) {
+                return null;
+              }
+
               const input = (
                 <InputField
                   id={field.key}

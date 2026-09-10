@@ -42,8 +42,11 @@ import { UserCreateElectionPgObj } from "e2e-tests/page-objects/users/UserCreate
 import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
-import { eml110a_AB2023_Limburg, eml110b_single, eml230b_AB2023_Limburg } from "e2e-tests/test-data/eml-files";
-import { dataEntryAB2023_LimburgDSO } from "e2e-tests/test-data/specific-data-entries/AB2023_Limburg";
+import { eml110a_AB, eml110b_single, eml230b_AB } from "e2e-tests/test-data/eml-files";
+import {
+  checksAndCorrectionsWithVoterCardCountDataEntryDSO,
+  noRecountNoDifferencesWithVoterCardCountDataEntry,
+} from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
 import { test } from "../../fixtures";
 
@@ -119,7 +122,7 @@ test.describe("full flow WS GSB DSO", () => {
     const electionsOverviewPage = new ElectionsOverviewPgObj(page);
     await electionsOverviewPage.create.click();
 
-    await uploadElectionAndInputHash(page, eml110a_AB2023_Limburg);
+    await uploadElectionAndInputHash(page, eml110a_AB);
 
     const committeeCategoryPage = new CommitteeCategoryPgObj(page);
     await expect(committeeCategoryPage.header).toBeVisible();
@@ -128,15 +131,15 @@ test.describe("full flow WS GSB DSO", () => {
 
     const selectGSBPage = new SelectGSBPgObj(page);
     await expect(selectGSBPage.header).toBeVisible();
-    await expect(selectGSBPage.regions).toHaveCount(31);
-    await selectGSBPage.clickRegionFromList("0907");
+    await expect(selectGSBPage.regions).toHaveCount(12);
+    await selectGSBPage.clickRegionFromList("0126");
 
-    await uploadCandidatesAndInputHash(page, eml230b_AB2023_Limburg);
+    await uploadCandidatesAndInputHash(page, eml230b_AB);
 
     await uploadPollingStations(page, eml110b_single);
 
     const countingMethodPage = new CountingMethodTypePgObj(page);
-    await expect(countingMethodPage.getHeader("Gennep")).toBeVisible();
+    await expect(countingMethodPage.getHeader("'s Gravenveen")).toBeVisible();
     await expect(countingMethodPage.cso).not.toBeChecked();
     await expect(countingMethodPage.dso).not.toBeChecked();
     await countingMethodPage.dso.check();
@@ -161,7 +164,7 @@ test.describe("full flow WS GSB DSO", () => {
     await electionsOverviewPage.findElectionRowById(electionId).click();
 
     const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toHaveText("Waterschap Limburg 2023");
+    await expect(electionHomePage.header).toHaveText("Waterschap Rivier en Polder 2023");
     const sessionCard = electionHomePage.getCommitteeSessionCard(1);
     await expect(sessionCard).toContainText("Eerste zitting — Klaar voor invoer");
 
@@ -275,15 +278,15 @@ test.describe("full flow WS GSB DSO", () => {
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHome = new ElectionHome(page);
-    await expect(electionHome.header).toHaveText("Waterschap Limburg 2023");
+    await expect(electionHome.header).toHaveText("Waterschap Rivier en Polder 2023");
     await expect(electionHome.getCommitteeSessionCard(1)).toContainText("Eerste zitting");
     await electionHome.detailsButton.click();
 
     const electionDetails = new ElectionDetailsPgObj(page);
-    await expect(electionDetails.header).toHaveText("Gemeentelijk stembureau Gennep");
+    await expect(electionDetails.header).toHaveText("Gemeentelijk stembureau 's Gravenveen");
     await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
 
-    await expect(electionHome.header).toContainText("Waterschap Limburg 2023");
+    await expect(electionHome.header).toContainText("Waterschap Rivier en Polder 2023");
     await expect(page.getByText("Begon op 18 maart 2026 om 21:34")).toBeVisible();
     await electionHome.startButton.click();
 
@@ -334,7 +337,7 @@ test.describe("full flow WS GSB DSO", () => {
       await expect(dataEntryHomePage.feedback).toContainText(station.name);
       await dataEntryHomePage.start.click();
 
-      await fillDataEntryPagesAndSave(page, dataEntryAB2023_LimburgDSO);
+      await fillDataEntryPagesAndSave(page, checksAndCorrectionsWithVoterCardCountDataEntryDSO);
       await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
       await logout(page);
@@ -357,7 +360,7 @@ test.describe("full flow WS GSB DSO", () => {
       await expect(dataEntryHomePage.feedback).toContainText(station.name);
       await dataEntryHomePage.start.click();
 
-      await fillDataEntryPagesAndSave(page, dataEntryAB2023_LimburgDSO);
+      await fillDataEntryPagesAndSave(page, checksAndCorrectionsWithVoterCardCountDataEntryDSO);
       await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
       await logout(page);
@@ -375,7 +378,7 @@ test.describe("full flow WS GSB DSO", () => {
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toHaveText("Waterschap Limburg 2023");
+    await expect(electionHomePage.header).toHaveText("Waterschap Rivier en Polder 2023");
     await electionHomePage.statusButton.click();
 
     const electionStatusPage = new ElectionStatus(page);
@@ -391,7 +394,7 @@ test.describe("full flow WS GSB DSO", () => {
     const download = await downloadPromise;
 
     expect(download.suggestedFilename()).toMatch(
-      /definitieve-documenten_ab2023_gennep_gemeente_gennep-\d{8}-\d{6}.zip/,
+      /definitieve-documenten_ab2023_'sgravenveen_gemeente_'s-gravenveen-\d{8}-\d{6}.zip/,
     );
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 
@@ -409,7 +412,7 @@ test.describe("full flow WS GSB DSO", () => {
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHome = new ElectionHome(page);
-    await expect(electionHome.header).toHaveText("Waterschap Limburg 2023");
+    await expect(electionHome.header).toHaveText("Waterschap Rivier en Polder 2023");
     await electionHome.newSessionButton.click();
     await electionHome.newSessionModalConfirmButton.click();
     await expect(electionHome.getCommitteeSessionCard(2)).toContainText("Tweede zitting");
@@ -428,7 +431,7 @@ test.describe("full flow WS GSB DSO", () => {
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toHaveText("Waterschap Limburg 2023");
+    await expect(electionHomePage.header).toHaveText("Waterschap Rivier en Polder 2023");
 
     const downloadPromise = page.waitForEvent("download");
     await electionHomePage.downloadNa31_1Inlegvel.click();
@@ -451,7 +454,7 @@ test.describe("full flow WS GSB DSO", () => {
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHome = new ElectionHome(page);
-    await expect(electionHome.header).toHaveText("Waterschap Limburg 2023");
+    await expect(electionHome.header).toHaveText("Waterschap Rivier en Polder 2023");
     await electionHome.investigationsOverviewButton.click();
 
     const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
@@ -487,12 +490,12 @@ test.describe("full flow WS GSB DSO", () => {
       await overviewPage.findElectionRowById(electionId!).click();
 
       const electionHome = new ElectionHome(page);
-      await expect(electionHome.header).toHaveText("Waterschap Limburg 2023");
+      await expect(electionHome.header).toHaveText("Waterschap Rivier en Polder 2023");
       await expect(electionHome.getCommitteeSessionCard(2)).toContainText("Tweede zitting");
       await electionHome.detailsButton.click();
 
       const electionDetails = new ElectionDetailsPgObj(page);
-      await expect(electionDetails.header).toHaveText("Gemeentelijk stembureau Gennep");
+      await expect(electionDetails.header).toHaveText("Gemeentelijk stembureau 's Gravenveen");
       await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
 
       await electionHome.investigationsOverviewButton.click();
@@ -518,7 +521,7 @@ test.describe("full flow WS GSB DSO", () => {
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHome = new ElectionHome(page);
-    await expect(electionHome.header).toHaveText("Waterschap Limburg 2023");
+    await expect(electionHome.header).toHaveText("Waterschap Rivier en Polder 2023");
     await electionHome.startDataEntryButton.click();
 
     const electionStatus = new ElectionStatus(page);
@@ -539,7 +542,7 @@ test.describe("full flow WS GSB DSO", () => {
       await overviewPage.findElectionRowById(electionId!).click();
 
       const electionHome = new ElectionHome(page);
-      await expect(electionHome.header).toHaveText("Waterschap Limburg 2023");
+      await expect(electionHome.header).toHaveText("Waterschap Rivier en Polder 2023");
       await electionHome.investigationsOverviewButton.click();
 
       const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
@@ -581,7 +584,7 @@ test.describe("full flow WS GSB DSO", () => {
       await extraInvestigationPage.next.click();
 
       const differencesPage = new DifferencesPage(page);
-      await differencesPage.votesCastGreaterThanAdmittedVotersCheckbox.check();
+      await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
       await differencesPage.differenceCompletelyAccountedForNo.check();
       await differencesPage.next.click();
 
@@ -589,11 +592,11 @@ test.describe("full flow WS GSB DSO", () => {
       const listNames = await progressList.allListNames();
 
       const firstCandidatesPage = new CandidatesListPage(page, 0, listNames[0]!);
-      await firstCandidatesPage.fillCandidate(1, 3);
-      await firstCandidatesPage.fillCandidate(3, 0);
+      await firstCandidatesPage.fillCandidate(0, 1336);
+      await firstCandidatesPage.fillCandidate(1, 424);
       await firstCandidatesPage.next.click();
 
-      for (let i = 1; i < dataEntryAB2023_LimburgDSO.political_group_votes.length; i++) {
+      for (let i = 1; i < checksAndCorrectionsWithVoterCardCountDataEntryDSO.political_group_votes.length; i++) {
         const candidatesPage = new CandidatesListPage(page, i, listNames[i]!);
         await expect(candidatesPage.fieldset).toBeVisible();
         await page.keyboard.press("Shift+Enter");
@@ -629,15 +632,17 @@ test.describe("full flow WS GSB DSO", () => {
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       await votersAndVotesPage.fillInPageAndClickNext(
-        dataEntryAB2023_LimburgDSO.voters_counts,
-        dataEntryAB2023_LimburgDSO.votes_counts,
+        noRecountNoDifferencesWithVoterCardCountDataEntry.voters_counts,
+        noRecountNoDifferencesWithVoterCardCountDataEntry.votes_counts,
       );
 
       const differencesPage = new DifferencesPage(page);
       await expect(differencesPage.fieldset).toBeVisible();
-      await differencesPage.fillInPageAndClickNext(dataEntryAB2023_LimburgDSO.differences_counts);
+      await differencesPage.fillInPageAndClickNext(
+        noRecountNoDifferencesWithVoterCardCountDataEntry.differences_counts,
+      );
 
-      await fillCandidatesListPages(page, dataEntryAB2023_LimburgDSO);
+      await fillCandidatesListPages(page, noRecountNoDifferencesWithVoterCardCountDataEntry);
 
       const checkAndSavePage = new CheckAndSavePage(page);
       await checkAndSavePage.save.click();
@@ -659,7 +664,7 @@ test.describe("full flow WS GSB DSO", () => {
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHome = new ElectionHome(page);
-    await expect(electionHome.header).toHaveText("Waterschap Limburg 2023");
+    await expect(electionHome.header).toHaveText("Waterschap Rivier en Polder 2023");
     await expect(electionHome.header).toBeVisible();
     await electionHome.statusButton.click();
 
@@ -676,7 +681,9 @@ test.describe("full flow WS GSB DSO", () => {
     await electionHomePage.downloadSecondSessionZip.click();
 
     const download = await downloadPromise;
-    expect(download.suggestedFilename()).toMatch(/correctie_ab2023_gennep_gemeente_gennep-\d{8}-\d{6}.zip/);
+    expect(download.suggestedFilename()).toMatch(
+      /correctie_ab2023_'sgravenveen_gemeente_'s-gravenveen-\d{8}-\d{6}.zip/,
+    );
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 
     await logout(page);

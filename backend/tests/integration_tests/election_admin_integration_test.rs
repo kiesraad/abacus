@@ -199,19 +199,19 @@ async fn test_csb_water_authority_election_import_save(pool: SqlitePool) {
         .json(&serde_json::json!({
             "committee_category": "CSB",
             "election_hash": [
-                "8ca6", "b30d", "f37e", "5b8d",
-                "b3e3", "b027", "7776", "7166",
-                "d058", "92ce", "9202", "a90e",
-                "acd9", "3e30", "a925", "44c2"
+                "826e", "01a7", "0264", "3575",
+                "2784", "fa1b", "4448", "7c7c",
+                "a90e", "494e", "a96f", "3090",
+                "8c1c", "98b5", "02c1", "aeb8",
             ],
-            "election_data": include_str!("../../src/eml/tests/definitions/Verkiezingsdefinitie_AB2023_Limburg.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test_AB.eml.xml"),
             "candidate_hash": [
-                "dbac", "871e", "4e26", "8ddf",
-                "5127", "bbd3", "d744", "cd86",
-                "f353", "3158", "fbbb", "92ac",
-                "3a08", "f2ff", "c4df", "6510"
+                "2ef7", "9762", "3b27", "1c08",
+                "7ba6", "0473", "40b0", "a7fe",
+                "7e43", "35e1", "014f", "0e61",
+                "e737", "1d0d", "1639", "999d",
             ],
-            "candidate_data": include_str!("../../src/eml/tests/definitions/Kandidatenlijsten_AB2023_Limburg.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test_AB.eml.xml"),
         }))
         .send()
         .await

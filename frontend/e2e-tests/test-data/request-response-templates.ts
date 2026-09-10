@@ -217,6 +217,23 @@ export const noChecksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & { mode
   ...structuredClone(commonDataEntry),
 };
 
+export const noRecountNoDifferencesWithVoterCardCountDataEntry: CSOFirstSessionResults & { model: "CSOFirstSession" } =
+  structuredClone(noRecountNoDifferencesDataEntry);
+noRecountNoDifferencesWithVoterCardCountDataEntry.voters_counts.proxy_certificate_count = 150;
+noRecountNoDifferencesWithVoterCardCountDataEntry.voters_counts.voter_card_count = 7;
+
+export const checksAndCorrectionsWithVoterCardCountDataEntryDSO: DSOFirstSessionResults & {
+  model: "DSOFirstSession";
+} = structuredClone(checksAndCorrectionsDataEntryDSO);
+checksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.proxy_certificate_count = 150;
+checksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.voter_card_count = 7;
+
+export const noChecksAndCorrectionsWithVoterCardCountDataEntryDSO: DSOFirstSessionResults & {
+  model: "DSOFirstSession";
+} = structuredClone(noChecksAndCorrectionsDataEntryDSO);
+noChecksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.proxy_certificate_count = 150;
+noChecksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.voter_card_count = 7;
+
 export const noRecountNoDifferencesDataEntryGSB: GSBResults & { model: "GSB" } = {
   model: "GSB",
   number_of_voters: 612694,

@@ -393,6 +393,7 @@ mod tests {
         response::{IntoResponse, Response},
     };
     use chrono::NaiveDateTime;
+    use http_body_util::BodyExt;
     use sqlx::SqlitePool;
     use test_log::test;
 
@@ -411,10 +412,10 @@ mod tests {
     async fn call_handlers_gsb(
         pool: SqlitePool,
         coordinator_role: Role,
+        election_id: ElectionId,
     ) -> Vec<(&'static str, Response)> {
         let user = User::test_user(coordinator_role, UserId::from(1));
         let audit = AuditService::new(Some(user.clone()), None);
-        let election_id = ElectionId::from(5);
         let committee_session_id = CommitteeSessionId::from(5);
 
         #[rustfmt::skip]
@@ -427,11 +428,11 @@ mod tests {
     async fn call_handlers_csb(
         pool: SqlitePool,
         coordinator_role: Role,
+        election_id: ElectionId,
     ) -> Vec<(&'static str, Response)> {
         let mut conn = pool.acquire().await.unwrap();
         let user = User::test_user(coordinator_role, UserId::from(1));
         let audit = AuditService::new(Some(user.clone()), None);
-        let election_id = ElectionId::from(8);
         let committee_session_id = CommitteeSessionId::from(801);
 
         // Change committee session status to completed
@@ -464,25 +465,50 @@ mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_gsb_election_committee_category_authorization_err(pool: SqlitePool) {
-        let results = call_handlers_gsb(pool, Role::CoordinatorCSB).await;
+        let results = call_handlers_gsb(pool, Role::CoordinatorCSB, ElectionId::from(5)).await;
         assert_committee_category_authorization_err(results).await;
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_gsb_election_committee_category_authorization_ok(pool: SqlitePool) {
-        let results = call_handlers_gsb(pool, Role::CoordinatorGSB).await;
+        let results = call_handlers_gsb(pool, Role::CoordinatorGSB, ElectionId::from(5)).await;
         assert_committee_category_authorization_ok(results);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_csb_election_committee_category_authorization_err(pool: SqlitePool) {
-        let results = call_handlers_csb(pool, Role::CoordinatorGSB).await;
+        let results = call_handlers_csb(pool, Role::CoordinatorGSB, ElectionId::from(8)).await;
         assert_committee_category_authorization_err(results).await;
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_csb_election_committee_category_authorization_ok(pool: SqlitePool) {
-        let results = call_handlers_csb(pool, Role::CoordinatorCSB).await;
+        let results = call_handlers_csb(pool, Role::CoordinatorCSB, ElectionId::from(8)).await;
         assert_committee_category_authorization_ok(results);
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_5_with_results", "election_8_csb_with_results")
+    )))]
+    async fn test_err_election_committee_session_mismatch(pool: SqlitePool) {
+        // Passing non-matching election ids
+        let gsb_results =
+            call_handlers_gsb(pool.clone(), Role::CoordinatorGSB, ElectionId::from(4)).await;
+        let csb_results = call_handlers_csb(pool, Role::CoordinatorCSB, ElectionId::from(7)).await;
+
+        for (handler, response) in gsb_results.into_iter().chain(csb_results) {
+            let body = response.into_body().collect().await.unwrap().to_bytes();
+            let error: ErrorResponse = serde_json::from_slice(&body).unwrap();
+            assert_eq!(
+                error.reference,
+                ErrorReference::EntryNotFound,
+                "handler '{handler}'"
+            );
+            assert_eq!(
+                error.error, "Committee session does not match election",
+                "handler '{handler}'"
+            );
+        }
     }
 }

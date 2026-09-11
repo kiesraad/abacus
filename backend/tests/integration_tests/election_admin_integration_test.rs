@@ -199,10 +199,10 @@ async fn test_csb_water_authority_election_import_save(pool: SqlitePool) {
         .json(&serde_json::json!({
             "committee_category": "CSB",
             "election_hash": [
-                "826e", "01a7", "0264", "3575",
-                "2784", "fa1b", "4448", "7c7c",
-                "a90e", "494e", "a96f", "3090",
-                "8c1c", "98b5", "02c1", "aeb8",
+                "f958", "1366", "c63f", "b36e",
+                "2989", "bf4e", "4bb2", "e6a8",
+                "ba2f", "e9b6", "9d40", "7ac6",
+                "f546", "863c", "6a6c", "d0f4",
             ],
             "election_data": include_str!("../../src/eml/tests/eml110a_test_AB.eml.xml"),
             "candidate_hash": [

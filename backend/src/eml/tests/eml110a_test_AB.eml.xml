@@ -40,31 +40,7 @@
                     <kr:RegionName>Middelgein</kr:RegionName>
                 </kr:Region>
                 <kr:Region RegionNumber="126" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
-                    <kr:RegionName>'s Gravenveen</kr:RegionName>
-                </kr:Region>
-                <kr:Region RegionNumber="130" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
-                    <kr:RegionName>Sluisdam</kr:RegionName>
-                </kr:Region>
-                <kr:Region RegionNumber="132" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
-                    <kr:RegionName>Hovenerwoud</kr:RegionName>
-                </kr:Region>
-                <kr:Region RegionNumber="135" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
-                    <kr:RegionName>Bloemstede</kr:RegionName>
-                </kr:Region>
-                <kr:Region RegionNumber="137" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
-                    <kr:RegionName>Eksterlo</kr:RegionName>
-                </kr:Region>
-                <kr:Region RegionNumber="140" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
-                    <kr:RegionName>Eemstricht</kr:RegionName>
-                </kr:Region>
-                <kr:Region RegionNumber="145" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
-                    <kr:RegionName>Hoek van Zoom</kr:RegionName>
-                </kr:Region>
-                <kr:Region RegionNumber="146" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
-                    <kr:RegionName>Lekkum</kr:RegionName>
-                </kr:Region>
-                <kr:Region RegionNumber="147" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
-                    <kr:RegionName>Huisden</kr:RegionName>
+                    <kr:RegionName>'s-Gravenveen</kr:RegionName>
                 </kr:Region>
             </kr:ElectionTree>
             <kr:RegisteredParties>

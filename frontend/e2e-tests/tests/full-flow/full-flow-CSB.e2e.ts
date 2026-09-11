@@ -29,156 +29,128 @@ import { UserCreateElectionPgObj } from "e2e-tests/page-objects/users/UserCreate
 import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
-import { eml230b_more_than_45_candidates } from "e2e-tests/test-data/eml-files";
+import { type Eml110a, type Eml230b, eml110a, eml230b_more_than_45_candidates } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntryGSB } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
+import type { GSBResults } from "@/types/generated/openapi";
 import { test } from "../../fixtures";
 
-// Note: Do not use the randomSuffix in test titles. You cannot interpolate a non-static value.
-// Using the randomSuffix in test titles will result in those tests being executed last.
-const randomSuffix = Date.now();
-
-const adminUser: TestUser = {
-  username: `admin1-CSB-${randomSuffix}`,
-  fullname: `full flow admin1 CSB`,
-  role: "administrator",
+const dateTimePattern = /\d{8}-\d{6}/;
+type TestVariant = {
+  name: string;
+  electionDefinition: Eml110a;
+  candidateDefinition: Eml230b;
+  regionName: string;
+  electionName: string;
+  filename: string;
+  dataEntry: GSBResults & { model: "GSB" };
 };
 
-const coordinatorUser: TestUser = {
-  username: `coordinator1-CSB-${randomSuffix}`,
-  fullname: `full flow coordinator1 CSB`,
-  role: "coordinator_csb",
-};
-
-const typistUsers: TestUser[] = [
+const variants: TestVariant[] = [
   {
-    username: `typist1-CSB-${randomSuffix}`,
-    fullname: `full flow typist1 CSB`,
-    role: "typist_csb",
-  },
-  {
-    username: `typist2-CSB-${randomSuffix}`,
-    fullname: `full flow typist2 CSB`,
-    role: "typist_csb",
+    name: "GR",
+    electionDefinition: eml110a,
+    candidateDefinition: eml230b_more_than_45_candidates,
+    regionName: "Test",
+    electionName: "Gemeenteraad Test 2022",
+    filename: "gr2022_test_gemeente_test",
+    dataEntry: noRecountNoDifferencesDataEntryGSB,
   },
 ];
 
 test.describe.configure({ mode: "serial" });
 
-test.describe("full flow CSB", () => {
-  let electionId: number | null = null;
+for (const variant of variants) {
+  test.describe(`full flow ${variant.name}`, () => {
+    // Note: Do not use the randomSuffix in test titles. You cannot interpolate a non-static value.
+    // Using the randomSuffix in test titles will result in those tests being executed last.
+    const randomSuffix = Date.now();
 
-  test("create and complete admin user account", async ({ adminOne }) => {
-    const { request: adminOneContext } = adminOne;
+    const adminUser: TestUser = {
+      username: `admin1-${variant.name}-${randomSuffix}`,
+      fullname: `full flow admin1 ${variant.name}`,
+      role: "administrator",
+    };
 
-    await createUser(adminOneContext, adminUser);
+    const coordinatorUser: TestUser = {
+      username: `coordinator1-${variant.name}-${randomSuffix}`,
+      fullname: `full flow coordinator1 ${variant.name}`,
+      role: "coordinator_csb",
+    };
 
-    const newAdminContext = await request.newContext();
-    await firstLogin(newAdminContext, adminUser);
-    const logoutResponse = await apiLogout(newAdminContext);
-    expect(logoutResponse.status()).toBe(204);
-  });
+    const typistUsers: TestUser[] = [
+      {
+        username: `typist1-${variant.name}-${randomSuffix}`,
+        fullname: `full flow typist1 ${variant.name}`,
+        role: "typist_csb",
+      },
+      {
+        username: `typist2-${variant.name}-${randomSuffix}`,
+        fullname: `full flow typist2 ${variant.name}`,
+        role: "typist_csb",
+      },
+    ];
 
-  test("create CSB election", async ({ page }) => {
-    await page.goto("/account/login");
+    let electionId: number | null = null;
 
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
+    test("create and complete admin user account", async ({ adminOne }) => {
+      const { request: adminOneContext } = adminOne;
 
-    const electionsOverviewPage = new ElectionsOverviewPgObj(page);
-    await electionsOverviewPage.create.click();
+      await createUser(adminOneContext, adminUser);
 
-    await uploadElectionAndInputHash(page);
+      const newAdminContext = await request.newContext();
+      await firstLogin(newAdminContext, adminUser);
+      const logoutResponse = await apiLogout(newAdminContext);
+      expect(logoutResponse.status()).toBe(204);
+    });
 
-    const committeeCategoryPage = new CommitteeCategoryPgObj(page);
-    await expect(committeeCategoryPage.header).toBeVisible();
-    await committeeCategoryPage.csb.click();
-    await expect(committeeCategoryPage.csb).toBeChecked();
-    await committeeCategoryPage.next.click();
+    test("create CSB election", async ({ page }) => {
+      await page.goto("/account/login");
 
-    await uploadCandidatesAndInputHash(page, eml230b_more_than_45_candidates);
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
 
-    const checkAndSavePage = new CheckAndSavePgObj(page);
-    await expect(checkAndSavePage.header).toBeVisible();
-    await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
-    const election = await checkAndSavePage.saveElection();
+      const electionsOverviewPage = new ElectionsOverviewPgObj(page);
+      await electionsOverviewPage.create.click();
 
-    electionId = election.id;
+      await uploadElectionAndInputHash(page, variant.electionDefinition);
 
-    await expect(electionsOverviewPage.adminHeader).toBeVisible();
-    await expect(electionsOverviewPage.alertCSBElectionCreated).toBeVisible();
-    await electionsOverviewPage.findElectionRowById(electionId).click();
+      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+      await expect(committeeCategoryPage.header).toBeVisible();
+      await committeeCategoryPage.csb.click();
+      await expect(committeeCategoryPage.csb).toBeChecked();
+      await committeeCategoryPage.next.click();
 
-    const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
-    const sessionCard = electionHomePage.getCommitteeSessionCard(1);
-    await expect(sessionCard).toContainText("Zitting CSB — Klaar voor invoer");
+      await uploadCandidatesAndInputHash(page, variant.candidateDefinition);
 
-    await logout(page);
-  });
+      const checkAndSavePage = new CheckAndSavePgObj(page);
+      await expect(checkAndSavePage.header).toBeVisible();
+      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
+      const election = await checkAndSavePage.saveElection();
 
-  test("create coordinator user account", async ({ page }) => {
-    await page.goto("/account/login");
+      electionId = election.id;
 
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
+      await expect(electionsOverviewPage.adminHeader).toBeVisible();
+      await expect(electionsOverviewPage.getAlertElectionCreated("CSB", variant.electionName)).toBeVisible();
+      await electionsOverviewPage.findElectionRowById(electionId).click();
 
-    const userInfoTopBar = new UserInfoTopBar(page);
-    await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
+      const electionHomePage = new ElectionHome(page);
+      await expect(electionHomePage.header).toHaveText(variant.electionName);
+      const sessionCard = electionHomePage.getCommitteeSessionCard(1);
+      await expect(sessionCard).toContainText("Zitting CSB — Klaar voor invoer");
 
-    const adminNavBar = new AdminNavBar(page);
-    await adminNavBar.users.click();
+      await logout(page);
+    });
 
-    const userListPgObj = new UserListPgObj(page);
-    await userListPgObj.create.click();
+    test("create coordinator user account", async ({ page }) => {
+      await page.goto("/account/login");
 
-    const userCreateRolePgObj = new UserCreateRolePgObj(page);
-    await userCreateRolePgObj.coordinator.click();
-    await userCreateRolePgObj.continue.click();
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
 
-    const userCreateElectionPgObj = new UserCreateElectionPgObj(page);
-    await userCreateElectionPgObj.csb.click();
-    await userCreateElectionPgObj.continue.click();
+      const userInfoTopBar = new UserInfoTopBar(page);
+      await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
 
-    const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-    await userCreateDetailsPgObj.createNamedUser(
-      coordinatorUser.username,
-      coordinatorUser.fullname,
-      getTestPassword(coordinatorUser.username, "Temp"),
-    );
-
-    await expect(userListPgObj.alert).toContainText(`${coordinatorUser.username} is toegevoegd met de rol Coördinator`);
-
-    await logout(page);
-  });
-
-  test("complete coordinator user account", async ({ page }) => {
-    await page.goto("/account/login");
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username, "Temp"));
-
-    const password = getTestPassword(coordinatorUser.username);
-    const accountSetupPage = new AccountSetupPgObj(page);
-    await accountSetupPage.password.fill(password);
-    await accountSetupPage.passwordRepeat.fill(password);
-    await accountSetupPage.saveBtn.click();
-
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.alertAccountSetup).toBeVisible();
-
-    await logout(page);
-  });
-
-  test("create typist user accounts", async ({ page }) => {
-    await page.goto("/account/login");
-
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
-
-    const userInfoTopBar = new UserInfoTopBar(page);
-    await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
-
-    for (const typist of typistUsers) {
       const adminNavBar = new AdminNavBar(page);
       await adminNavBar.users.click();
 
@@ -186,59 +158,33 @@ test.describe("full flow CSB", () => {
       await userListPgObj.create.click();
 
       const userCreateRolePgObj = new UserCreateRolePgObj(page);
-      await userCreateRolePgObj.typist.click();
+      await userCreateRolePgObj.coordinator.click();
       await userCreateRolePgObj.continue.click();
 
       const userCreateElectionPgObj = new UserCreateElectionPgObj(page);
       await userCreateElectionPgObj.csb.click();
       await userCreateElectionPgObj.continue.click();
 
-      const userCreateTypePgObj = new UserCreateTypePgObj(page);
-      await userCreateTypePgObj.continue.click();
-
       const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-      await userCreateDetailsPgObj.createNamedUser(typist.username, typist.fullname, typist.username.repeat(3));
-      await expect(userListPgObj.alert).toContainText(`${typist.username} is toegevoegd met de rol Invoerder`);
-    }
-    await logout(page);
-  });
+      await userCreateDetailsPgObj.createNamedUser(
+        coordinatorUser.username,
+        coordinatorUser.fullname,
+        getTestPassword(coordinatorUser.username, "Temp"),
+      );
 
-  test("start data entry", async ({ page }) => {
-    await page.goto("/account/login");
+      await expect(userListPgObj.alert).toContainText(
+        `${coordinatorUser.username} is toegevoegd met de rol Coördinator`,
+      );
 
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
+      await logout(page);
+    });
 
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.header).toBeVisible();
-    await overviewPage.findElectionRowById(electionId!).click();
-
-    const electionHome = new ElectionHome(page);
-    await expect(electionHome.header).toHaveText("Gemeenteraad Test 2022");
-    await expect(electionHome.getCommitteeSessionCard(1)).toContainText("Zitting CSB");
-    await electionHome.detailsButton.click();
-
-    const electionDetails = new ElectionDetailsPgObj(page);
-    await expect(electionDetails.header).toHaveText("Centraal stembureau Test");
-    await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
-
-    await expect(electionHome.header).toContainText("Gemeenteraad Test 2022");
-    await expect(page.getByText("Begon op 18 maart 2026 om 21:34")).toBeVisible();
-    await electionHome.startButton.click();
-
-    const electionStatus = new ElectionStatus(page);
-    await expect(electionStatus.header).toContainText("Zitting CSB");
-
-    await logout(page);
-  });
-
-  for (const typist of typistUsers) {
-    test(`complete user account for ${typist.fullname}`, async ({ page }) => {
+    test("complete coordinator user account", async ({ page }) => {
       await page.goto("/account/login");
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(typist.username, typist.username.repeat(3));
+      await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username, "Temp"));
 
-      const password = getTestPassword(typist.username);
+      const password = getTestPassword(coordinatorUser.username);
       const accountSetupPage = new AccountSetupPgObj(page);
       await accountSetupPage.password.fill(password);
       await accountSetupPage.passwordRepeat.fill(password);
@@ -249,129 +195,211 @@ test.describe("full flow CSB", () => {
 
       await logout(page);
     });
-  }
 
-  test("first data entry", async ({ page }) => {
-    await page.goto("/account/login");
+    test("create typist user accounts", async ({ page }) => {
+      await page.goto("/account/login");
 
-    const firstTypist = typistUsers[0]!;
-    const loginPage = new LoginPgObj(page);
-    const password = getTestPassword(firstTypist.username);
-    await loginPage.login(firstTypist.username, password);
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
 
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.header).toBeVisible();
-    await overviewPage.findElectionRowById(electionId!).click();
+      const userInfoTopBar = new UserInfoTopBar(page);
+      await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
 
-    const dataEntryHomePage = new DataEntryHomePage(page);
-    await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await expect(dataEntryHomePage.pollingStations).toBeVisible();
-    await dataEntryHomePage.clickPollingStationFromList(0);
+      for (const typist of typistUsers) {
+        const adminNavBar = new AdminNavBar(page);
+        await adminNavBar.users.click();
 
-    await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntryGSB);
-    await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
+        const userListPgObj = new UserListPgObj(page);
+        await userListPgObj.create.click();
 
-    await logout(page);
+        const userCreateRolePgObj = new UserCreateRolePgObj(page);
+        await userCreateRolePgObj.typist.click();
+        await userCreateRolePgObj.continue.click();
+
+        const userCreateElectionPgObj = new UserCreateElectionPgObj(page);
+        await userCreateElectionPgObj.csb.click();
+        await userCreateElectionPgObj.continue.click();
+
+        const userCreateTypePgObj = new UserCreateTypePgObj(page);
+        await userCreateTypePgObj.continue.click();
+
+        const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
+        await userCreateDetailsPgObj.createNamedUser(typist.username, typist.fullname, typist.username.repeat(3));
+        await expect(userListPgObj.alert).toContainText(`${typist.username} is toegevoegd met de rol Invoerder`);
+      }
+      await logout(page);
+    });
+
+    test("start data entry", async ({ page }) => {
+      await page.goto("/account/login");
+
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
+
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
+
+      const electionHome = new ElectionHome(page);
+      await expect(electionHome.header).toHaveText(variant.electionName);
+      await expect(electionHome.getCommitteeSessionCard(1)).toContainText("Zitting CSB");
+      await electionHome.detailsButton.click();
+
+      const electionDetails = new ElectionDetailsPgObj(page);
+      await expect(electionDetails.header).toHaveText(`Centraal stembureau ${variant.regionName}`);
+      await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
+
+      await expect(electionHome.header).toContainText(variant.electionName);
+      await expect(page.getByText("Begon op 18 maart 2026 om 21:34")).toBeVisible();
+      await electionHome.startButton.click();
+
+      const electionStatus = new ElectionStatus(page);
+      await expect(electionStatus.header).toContainText("Zitting CSB");
+
+      await logout(page);
+    });
+
+    for (const typist of typistUsers) {
+      test(`complete user account for ${typist.fullname}`, async ({ page }) => {
+        await page.goto("/account/login");
+        const loginPage = new LoginPgObj(page);
+        await loginPage.login(typist.username, typist.username.repeat(3));
+
+        const password = getTestPassword(typist.username);
+        const accountSetupPage = new AccountSetupPgObj(page);
+        await accountSetupPage.password.fill(password);
+        await accountSetupPage.passwordRepeat.fill(password);
+        await accountSetupPage.saveBtn.click();
+
+        const overviewPage = new ElectionsOverviewPgObj(page);
+        await expect(overviewPage.alertAccountSetup).toBeVisible();
+
+        await logout(page);
+      });
+    }
+
+    test("first data entry", async ({ page }) => {
+      await page.goto("/account/login");
+
+      const firstTypist = typistUsers[0]!;
+      const loginPage = new LoginPgObj(page);
+      const password = getTestPassword(firstTypist.username);
+      await loginPage.login(firstTypist.username, password);
+
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
+
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
+      await expect(dataEntryHomePage.pollingStations).toBeVisible();
+      await dataEntryHomePage.clickPollingStationFromList(0);
+
+      await fillDataEntryPagesAndSave(page, variant.dataEntry);
+      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
+
+      await logout(page);
+    });
+
+    test("second data entry", async ({ page }) => {
+      await page.goto("/account/login");
+
+      const secondTypist = typistUsers[1]!;
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(secondTypist.username, getTestPassword(secondTypist.username));
+
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
+
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
+      await expect(dataEntryHomePage.pollingStations).toBeVisible();
+      await dataEntryHomePage.clickPollingStationFromList(0);
+
+      await fillDataEntryPagesAndSave(page, variant.dataEntry);
+      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
+
+      await logout(page);
+    });
+
+    test("finish session, check apportionment and download results", async ({ page }) => {
+      await page.goto("/account/login");
+
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
+
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
+
+      const electionHomePage = new ElectionHome(page);
+      await expect(electionHomePage.header).toHaveText(variant.electionName);
+      const sessionCard = electionHomePage.getCommitteeSessionCard(1);
+      await expect(sessionCard).toContainText("Zitting CSB — Invoer bezig");
+      await electionHomePage.statusButton.click();
+
+      const electionStatusPage = new ElectionStatus(page);
+      await electionStatusPage.finish.click();
+
+      const finishDataEntryPage = new FinishDataEntry(page);
+      await finishDataEntryPage.finishDataEntry.click();
+
+      const includeAllCandidatesPage = new IncludeAllCandidates(page);
+      await expect(includeAllCandidatesPage.header).toBeVisible();
+      await expect(includeAllCandidatesPage.dataEntryFinishedAlert).toBeVisible();
+      await expect(includeAllCandidatesPage.title).toBeVisible();
+      await expect(includeAllCandidatesPage.noDeceased).toBeVisible();
+      await expect(includeAllCandidatesPage.hasDeceased).toBeVisible();
+      await includeAllCandidatesPage.noDeceased.check();
+      await includeAllCandidatesPage.next.click();
+
+      const apportionmentPage = new Apportionment(page);
+      await expect(apportionmentPage.header).toBeVisible();
+      await expect(apportionmentPage.allSeatsAssignedAlert).toBeVisible();
+
+      await expect(apportionmentPage.fullSeatInformation).toBeVisible();
+      await apportionmentPage.fullSeatsPageLink.click();
+      const apportionmentFullSeatsPage = new ApportionmentFullSeats(page);
+      await expect(apportionmentFullSeatsPage.header).toBeVisible();
+
+      await page.goBack();
+      await expect(apportionmentPage.residualSeatInformation).toBeVisible();
+      await apportionmentPage.residualSeatsPageLink.click();
+      const apportionmentResidualSeatsPage = new ApportionmentResidualSeats(page);
+      await expect(apportionmentResidualSeatsPage.header).toBeVisible();
+
+      await page.goBack();
+
+      await apportionmentPage.toReport.click();
+
+      const electionReportPage = new ElectionReport(page);
+
+      const resultsDownloadPromise = page.waitForEvent("download");
+      await electionReportPage.downloadCSBResultsZip.click();
+      const resultsDownload = await resultsDownloadPromise;
+      expect(resultsDownload.suggestedFilename()).toMatch(
+        new RegExp(`vaststelling-uitslag_${variant.filename}-${dateTimePattern.source}.zip`),
+      );
+      expect((await stat(await resultsDownload.path())).size).toBeGreaterThan(1024);
+
+      const attachmentDownloadPromise = page.waitForEvent("download");
+      await electionReportPage.downloadCSBAttachmentZip.click();
+      const attachmentDownload = await attachmentDownloadPromise;
+      expect(attachmentDownload.suggestedFilename()).toMatch(
+        new RegExp(`model-p22-2-bijlage_${variant.filename}-${dateTimePattern.source}.zip`),
+      );
+      expect((await stat(await attachmentDownload.path())).size).toBeGreaterThan(1024);
+
+      const countsDownloadPromise = page.waitForEvent("download");
+      await electionReportPage.downloadCSBCountsZip.click();
+      const countsDownload = await countsDownloadPromise;
+      expect(countsDownload.suggestedFilename()).toMatch(
+        new RegExp(`definitieve-documenten_${variant.filename}-${dateTimePattern.source}.zip`),
+      );
+      expect((await stat(await countsDownload.path())).size).toBeGreaterThan(1024);
+
+      await logout(page);
+    });
   });
-
-  test("second data entry", async ({ page }) => {
-    await page.goto("/account/login");
-
-    const secondTypist = typistUsers[1]!;
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(secondTypist.username, getTestPassword(secondTypist.username));
-
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.header).toBeVisible();
-    await overviewPage.findElectionRowById(electionId!).click();
-
-    const dataEntryHomePage = new DataEntryHomePage(page);
-    await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await expect(dataEntryHomePage.pollingStations).toBeVisible();
-    await dataEntryHomePage.clickPollingStationFromList(0);
-
-    await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntryGSB);
-    await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
-
-    await logout(page);
-  });
-
-  test("finish session, check apportionment and download results", async ({ page }) => {
-    await page.goto("/account/login");
-
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
-
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.header).toBeVisible();
-    await overviewPage.findElectionRowById(electionId!).click();
-
-    const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
-    const sessionCard = electionHomePage.getCommitteeSessionCard(1);
-    await expect(sessionCard).toContainText("Zitting CSB — Invoer bezig");
-    await electionHomePage.statusButton.click();
-
-    const electionStatusPage = new ElectionStatus(page);
-    await electionStatusPage.finish.click();
-
-    const finishDataEntryPage = new FinishDataEntry(page);
-    await finishDataEntryPage.finishDataEntry.click();
-
-    const includeAllCandidatesPage = new IncludeAllCandidates(page);
-    await expect(includeAllCandidatesPage.header).toBeVisible();
-    await expect(includeAllCandidatesPage.dataEntryFinishedAlert).toBeVisible();
-    await expect(includeAllCandidatesPage.title).toBeVisible();
-    await expect(includeAllCandidatesPage.noDeceased).toBeVisible();
-    await expect(includeAllCandidatesPage.hasDeceased).toBeVisible();
-    await includeAllCandidatesPage.noDeceased.check();
-    await includeAllCandidatesPage.next.click();
-
-    const apportionmentPage = new Apportionment(page);
-    await expect(apportionmentPage.header).toBeVisible();
-    await expect(apportionmentPage.allSeatsAssignedAlert).toBeVisible();
-
-    await expect(apportionmentPage.fullSeatInformation).toBeVisible();
-    await apportionmentPage.fullSeatsPageLink.click();
-    const apportionmentFullSeatsPage = new ApportionmentFullSeats(page);
-    await expect(apportionmentFullSeatsPage.header).toBeVisible();
-
-    await page.goBack();
-    await expect(apportionmentPage.residualSeatInformation).toBeVisible();
-    await apportionmentPage.residualSeatsPageLink.click();
-    const apportionmentResidualSeatsPage = new ApportionmentResidualSeats(page);
-    await expect(apportionmentResidualSeatsPage.header).toBeVisible();
-
-    await page.goBack();
-
-    await apportionmentPage.toReport.click();
-
-    const electionReportPage = new ElectionReport(page);
-
-    const resultsDownloadPromise = page.waitForEvent("download");
-    await electionReportPage.downloadCSBResultsZip.click();
-    const resultsDownload = await resultsDownloadPromise;
-    expect(resultsDownload.suggestedFilename()).toMatch(
-      /vaststelling-uitslag_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
-    );
-    expect((await stat(await resultsDownload.path())).size).toBeGreaterThan(1024);
-
-    const attachmentDownloadPromise = page.waitForEvent("download");
-    await electionReportPage.downloadCSBAttachmentZip.click();
-    const attachmentDownload = await attachmentDownloadPromise;
-    expect(attachmentDownload.suggestedFilename()).toMatch(
-      /model-p22-2-bijlage_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
-    );
-    expect((await stat(await attachmentDownload.path())).size).toBeGreaterThan(1024);
-
-    const countsDownloadPromise = page.waitForEvent("download");
-    await electionReportPage.downloadCSBCountsZip.click();
-    const countsDownload = await countsDownloadPromise;
-    expect(countsDownload.suggestedFilename()).toMatch(
-      /definitieve-documenten_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
-    );
-    expect((await stat(await countsDownload.path())).size).toBeGreaterThan(1024);
-
-    await logout(page);
-  });
-});
+}

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <EML xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:kr="http://www.kiesraad.nl/extensions" Id="110a" SchemaVersion="5">
     <TransactionId>1</TransactionId>
-    <IssueDate>2023-02-09</IssueDate>
-    <kr:CreationDateTime>2023-02-09T15:12:25.983</kr:CreationDateTime>
+    <IssueDate>2023-02-03</IssueDate>
+    <kr:CreationDateTime>2023-02-03T17:46:24.541</kr:CreationDateTime>
     <ElectionEvent>
         <EventIdentifier/>
         <Election>
-            <ElectionIdentifier Id="AB2023_RivierenPolder">
-                <ElectionName>Algemeen bestuur van het waterschap Rivier en Polder 2023</ElectionName>
-                <ElectionCategory>AB</ElectionCategory>
-                <kr:ElectionSubcategory>AB2</kr:ElectionSubcategory>
-                <kr:ElectionDomain Id="10">Rivier en Polder</kr:ElectionDomain>
+            <ElectionIdentifier Id="PS2023_OostHolland">
+                <ElectionName>Provinciale Staten Oost-Holland 2023</ElectionName>
+                <ElectionCategory>PS</ElectionCategory>
+                <kr:ElectionSubcategory>PS1</kr:ElectionSubcategory>
+                <kr:ElectionDomain>Oost-Holland</kr:ElectionDomain>
                 <kr:ElectionDate>2023-03-15</kr:ElectionDate>
                 <kr:NominationDate>2023-01-30</kr:NominationDate>
             </ElectionIdentifier>
@@ -19,14 +19,14 @@
                 <VotingMethod>SPV</VotingMethod>
                 <MaxVotes></MaxVotes>
             </Contest>
-            <kr:NumberOfSeats>26</kr:NumberOfSeats>
+            <kr:NumberOfSeats>43</kr:NumberOfSeats>
             <kr:PreferenceThreshold>25</kr:PreferenceThreshold>
             <kr:ElectionTree>
-                <kr:Region RegionNumber="10" RegionCategory="WATERSCHAP">
-                    <kr:RegionName>Rivier en Polder</kr:RegionName>
+                <kr:Region RegionNumber="13" RegionCategory="PROVINCIE">
+                    <kr:RegionName>Oost-Holland</kr:RegionName>
                 </kr:Region>
-                <kr:Region RegionNumber="1" RegionCategory="KIESKRING" SuperiorRegionNumber="10" SuperiorRegionCategory="WATERSCHAP">
-                    <kr:RegionName>Rivier en Polder</kr:RegionName>
+                <kr:Region RegionNumber="1" RegionCategory="KIESKRING" SuperiorRegionNumber="13" SuperiorRegionCategory="PROVINCIE">
+                    <kr:RegionName>Heemdamseburg</kr:RegionName>
                     <kr:Committee CommitteeCategory="CSB"/>
                     <kr:Committee CommitteeCategory="HSB"/>
                 </kr:Region>

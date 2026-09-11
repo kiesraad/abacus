@@ -48,7 +48,7 @@ type TestVariant = {
 
 const variants: TestVariant[] = [
   {
-    name: "GR CSB",
+    name: "GR",
     electionDefinition: eml110a,
     candidateDefinition: eml230b_more_than_45_candidates,
     regionName: "Test",
@@ -131,7 +131,7 @@ for (const variant of variants) {
       electionId = election.id;
 
       await expect(electionsOverviewPage.adminHeader).toBeVisible();
-      await expect(electionsOverviewPage.alertCSBElectionCreated).toBeVisible();
+      await expect(electionsOverviewPage.getAlertElectionCreated("CSB", variant.electionName)).toBeVisible();
       await electionsOverviewPage.findElectionRowById(electionId).click();
 
       const electionHomePage = new ElectionHome(page);

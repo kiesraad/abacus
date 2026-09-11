@@ -95,7 +95,7 @@ test.describe("Election creation", () => {
       // Back to the check and save page to test saving the election
       const election = await checkAndSavePage.saveElection();
       await expect(overviewPage.adminHeader).toBeVisible();
-      await expect(overviewPage.alertGSBElectionCreated).toBeVisible();
+      await expect(overviewPage.getAlertElectionCreated("GSB", "Gemeenteraad Test 2022")).toBeVisible();
 
       const electionRow = overviewPage.findElectionRowById(election.id);
       await expect(electionRow).toBeVisible();
@@ -252,7 +252,7 @@ test.describe("Election creation", () => {
       // Back to the check and save page to test saving the election
       const election = await checkAndSavePage.saveElection();
       await expect(overviewPage.adminHeader).toBeVisible();
-      await expect(overviewPage.alertGSBElectionCreated).toBeVisible();
+      await expect(overviewPage.getAlertElectionCreated("GSB", "Gemeenteraad Test 2022")).toBeVisible();
 
       const electionRow = overviewPage.findElectionRowById(election.id);
       await expect(electionRow).toBeVisible();
@@ -375,7 +375,7 @@ test.describe("Election creation", () => {
       // Save page to test saving the election
       const election = await checkAndSavePage.saveElection();
       await expect(overviewPage.adminHeader).toBeVisible();
-      await expect(overviewPage.alertCSBElectionCreated).toBeVisible();
+      await expect(overviewPage.getAlertElectionCreated("CSB", "Gemeenteraad Test 2022")).toBeVisible();
 
       const electionRow = overviewPage.findElectionRowById(election.id);
       await expect(electionRow).toBeVisible();
@@ -679,7 +679,7 @@ test.describe("Election creation", () => {
 
       await checkAndSavePage.saveElection();
       await expect(overviewPage.adminHeader).toBeVisible();
-      await expect(overviewPage.alertGSBElectionCreated).toBeVisible();
+      await expect(overviewPage.getAlertElectionCreated("GSB", "Gemeenteraad Test 2022")).toBeVisible();
     });
 
     test("it fails on valid, but incorrect polling station file", async ({ page }) => {

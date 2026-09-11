@@ -48,13 +48,18 @@ import {
   type Eml230b,
   eml110a,
   eml110a_AB,
+  eml110a_PS1,
+  eml110a_PS2,
   eml110b_single,
   eml230b,
   eml230b_AB,
+  eml230b_PS1,
+  eml230b_PS2,
 } from "e2e-tests/test-data/eml-files";
 import {
   checksAndCorrectionsDataEntryDSO,
   checksAndCorrectionsWithVoterCardCountDataEntryDSO,
+  noChecksAndCorrectionsWithVoterCardCountDataEntryDSO,
   noRecountNoDifferencesDataEntry,
   noRecountNoDifferencesWithVoterCardCountDataEntry,
 } from "e2e-tests/test-data/request-response-templates";
@@ -77,7 +82,7 @@ type TestVariant = {
 
 const variants: TestVariant[] = [
   {
-    name: "GR GSB CSO",
+    name: "GR CSO",
     electionDefinition: eml110a,
     candidateDefinition: eml230b,
     countingMethod: "CSO",
@@ -87,7 +92,7 @@ const variants: TestVariant[] = [
     dataEntry: noRecountNoDifferencesDataEntry,
   },
   {
-    name: "GR GSB DSO",
+    name: "GR DSO",
     electionDefinition: eml110a,
     candidateDefinition: eml230b,
     countingMethod: "DSO",
@@ -97,7 +102,7 @@ const variants: TestVariant[] = [
     dataEntry: checksAndCorrectionsDataEntryDSO,
   },
   {
-    name: "WS GSB CSO",
+    name: "WS CSO",
     electionDefinition: eml110a_AB,
     candidateDefinition: eml230b_AB,
     countingMethod: "CSO",
@@ -108,7 +113,7 @@ const variants: TestVariant[] = [
     dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntry,
   },
   {
-    name: "WS GSB DSO",
+    name: "WS DSO",
     electionDefinition: eml110a_AB,
     candidateDefinition: eml230b_AB,
     countingMethod: "DSO",
@@ -117,6 +122,28 @@ const variants: TestVariant[] = [
     electionName: "Waterschap Rivier en Polder 2023",
     filename: "ab2023_'s-gravenveen_gemeente_'s-gravenveen",
     dataEntry: checksAndCorrectionsWithVoterCardCountDataEntryDSO,
+  },
+  {
+    name: "PS1 CSO",
+    electionDefinition: eml110a_PS1,
+    candidateDefinition: eml230b_PS1,
+    countingMethod: "CSO",
+    regionNumber: "0124",
+    regionName: "Juinen",
+    electionName: "Provinciale Staten Oost-Holland 2023",
+    filename: "ps2023_juinen_gemeente_juinen",
+    dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntry,
+  },
+  {
+    name: "PS2 DSO",
+    electionDefinition: eml110a_PS2,
+    candidateDefinition: eml230b_PS2,
+    countingMethod: "DSO",
+    regionNumber: "0125",
+    regionName: "Middelgein",
+    electionName: "Provinciale Staten Zuid-Brabant 2023",
+    filename: "ps2023_middelgein_gemeente_middelgein",
+    dataEntry: noChecksAndCorrectionsWithVoterCardCountDataEntryDSO,
   },
 ];
 
@@ -237,7 +264,7 @@ for (const variant of variants) {
       electionId = election.id;
 
       await expect(electionsOverviewPage.adminHeader).toBeVisible();
-      await expect(electionsOverviewPage.alertGSBElectionCreated).toBeVisible();
+      await expect(electionsOverviewPage.getAlertElectionCreated("GSB", variant.electionName)).toBeVisible();
       await electionsOverviewPage.findElectionRowById(electionId).click();
 
       const electionHomePage = new ElectionHome(page);

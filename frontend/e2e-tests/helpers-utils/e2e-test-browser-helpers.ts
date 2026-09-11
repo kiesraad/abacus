@@ -38,8 +38,10 @@ export async function fillDataEntryPages(page: Page, results: Results) {
     const aboutReportPage = new AboutReportPage(page);
     await aboutReportPage.fillAndClickNext(results.about_report);
 
-    const checksAndCorrectionsPage = new ChecksAndCorrectionsPage(page);
-    await checksAndCorrectionsPage.fillAndClickNext(results.checks_and_corrections);
+    if (results.about_report.checks_and_corrections_present === "PagePresent") {
+      const checksAndCorrectionsPage = new ChecksAndCorrectionsPage(page);
+      await checksAndCorrectionsPage.fillAndClickNext(results.checks_and_corrections);
+    }
   }
 
   const votersAndVotesPage = new VotersAndVotesPage(page);

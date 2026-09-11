@@ -432,7 +432,7 @@
               "initials": "A.I.",
               "last_name_prefix": "van",
               "last_name": "Bekking",
-              "locality": "'s Gravenveen",
+              "locality": "'s-Gravenveen",
               "gender": "X"
             },
             "votes": 150
@@ -451,7 +451,7 @@
             "initials": "A.I.",
             "last_name_prefix": "van",
             "last_name": "Bekking",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "X"
           },
           {
@@ -496,7 +496,7 @@
               "initials": "R.",
               "first_name": "Ruth",
               "last_name": "Wolfswinkel",
-              "locality": "'s Gravenveen",
+              "locality": "'s-Gravenveen",
               "gender": "X"
             },
             "votes": 300
@@ -509,7 +509,7 @@
             "initials": "R.",
             "first_name": "Ruth",
             "last_name": "Wolfswinkel",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "X"
           },
           {
@@ -562,7 +562,7 @@
         "initials": "A.I.",
         "last_name_prefix": "van",
         "last_name": "Bekking",
-        "locality": "'s Gravenveen",
+        "locality": "'s-Gravenveen",
         "gender": "X",
         "list_number": 4,
         "list_name": "GROEP 11"
@@ -705,7 +705,7 @@
         "initials": "R.",
         "first_name": "Ruth",
         "last_name": "Wolfswinkel",
-        "locality": "'s Gravenveen",
+        "locality": "'s-Gravenveen",
         "gender": "X",
         "list_number": 5,
         "list_name": "GROEP 12"

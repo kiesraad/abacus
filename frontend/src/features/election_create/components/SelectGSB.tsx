@@ -29,9 +29,9 @@ export function SelectGSB() {
     return <Navigate to="/elections/create" />;
   }
 
-  // Sort gsbList alphabetically (ignoring leading `'s `)
+  // Sort gsbList alphabetically (ignoring leading `'s-`)
   const gsbList = [...state.gsbList].sort((a, b) =>
-    a.name.replace(/^('s )/, "").localeCompare(b.name.replace(/^('s )/, ""), "nl"),
+    a.name.replace(/^('s-)/, "").localeCompare(b.name.replace(/^('s-)/, ""), "nl"),
   );
 
   async function selectGSB(gsb: RegionDetails) {

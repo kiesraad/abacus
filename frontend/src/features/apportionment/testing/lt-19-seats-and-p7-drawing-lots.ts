@@ -2134,7 +2134,7 @@ export const election: ElectionWithPoliticalGroups = {
           number: 4,
           initials: "X.Z.",
           last_name: "Cornelis",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -2169,7 +2169,7 @@ export const election: ElectionWithPoliticalGroups = {
           number: 9,
           initials: "B.N.",
           last_name: "Meulenkolk",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -2193,7 +2193,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "U.F.",
           last_name_prefix: "van de",
           last_name: "Wal",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -2302,7 +2302,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "V.O.",
           last_name_prefix: "van der",
           last_name: "Meulen",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -2384,7 +2384,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "X.X.",
           last_name_prefix: "van",
           last_name: "Lent",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -2470,7 +2470,7 @@ export const election: ElectionWithPoliticalGroups = {
           number: 50,
           initials: "Y.",
           last_name: "Groenen",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
       ],
@@ -2498,7 +2498,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "K.O.J.",
           last_name_prefix: "de",
           last_name: "Vegt",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -2774,14 +2774,14 @@ export const election: ElectionWithPoliticalGroups = {
           number: 41,
           initials: "F.",
           last_name: "Hoogstraten",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
           number: 42,
           initials: "C.O.",
           last_name: "Katsma",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -2945,7 +2945,7 @@ export const election: ElectionWithPoliticalGroups = {
           first_name: "Gijsbertje",
           last_name_prefix: "de",
           last_name: "Vegt",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -3038,7 +3038,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "F.A.",
           first_name: "Florien",
           last_name: "Titulaer",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -3088,7 +3088,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "U.",
           first_name: "Jelisa",
           last_name: "Born",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -3274,7 +3274,7 @@ export const election: ElectionWithPoliticalGroups = {
           first_name: "Rachid",
           last_name_prefix: "van",
           last_name: "Lent",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -3299,7 +3299,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "J.",
           first_name: "Jory",
           last_name: "Wolfswinkel",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -3332,7 +3332,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "Y.",
           first_name: "Yağmur",
           last_name: "Born",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -3434,7 +3434,7 @@ export const election: ElectionWithPoliticalGroups = {
           first_name: "Eelko",
           last_name_prefix: "den",
           last_name: "Mateman",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -3499,7 +3499,7 @@ export const election: ElectionWithPoliticalGroups = {
           first_name: "Madelène",
           last_name_prefix: "van",
           last_name: "Bekking",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -3647,7 +3647,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "S.G.K.",
           first_name: "Sibel",
           last_name: "Cornelis",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -3917,7 +3917,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "M.",
           first_name: "Madelène",
           last_name: "Brienen",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -4015,7 +4015,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "B.",
           first_name: "Bart",
           last_name: "Goedhart",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -4032,7 +4032,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "D.T.",
           first_name: "Dirk-Jan",
           last_name: "Goedhart",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -4040,7 +4040,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "R.A.",
           first_name: "Ruth",
           last_name: "Goedhart",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -4048,7 +4048,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "D.B.T.",
           first_name: "Damian",
           last_name: "Wolfswinkel",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -4064,7 +4064,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "E.",
           first_name: "Esra",
           last_name: "Hoogstraten",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -4203,7 +4203,7 @@ export const election: ElectionWithPoliticalGroups = {
           number: 14,
           initials: "C.",
           last_name: "Gopal",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -4353,7 +4353,7 @@ export const election: ElectionWithPoliticalGroups = {
           number: 35,
           initials: "U.K.D.",
           last_name: "Cornelis",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -4455,7 +4455,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "X.O.",
           last_name_prefix: "van de",
           last_name: "Kerkhof",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -4866,7 +4866,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "J.",
           first_name: "Jory",
           last_name: "Tax",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -5008,7 +5008,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "D.",
           first_name: "Dirk-Jan",
           last_name: "Tax",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -5057,7 +5057,7 @@ export const election: ElectionWithPoliticalGroups = {
           first_name: "Rachid",
           last_name_prefix: "de",
           last_name: "Vegt",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -5098,7 +5098,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "B.",
           first_name: "Bart",
           last_name: "Prakken",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -5123,7 +5123,7 @@ export const election: ElectionWithPoliticalGroups = {
           first_name: "Eelko",
           last_name_prefix: "de",
           last_name: "Vegt",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {
@@ -5254,7 +5254,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "T.H.",
           first_name: "Tiemen",
           last_name: "Güneş",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Male",
         },
         {

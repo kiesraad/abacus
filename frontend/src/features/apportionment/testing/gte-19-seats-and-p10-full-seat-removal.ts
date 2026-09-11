@@ -478,7 +478,7 @@ export const candidate_nomination: CandidateNomination = {
       first_name: "Christina",
       last_name_prefix: "de",
       last_name: "Vegt",
-      locality: "'s Gravenveen",
+      locality: "'s-Gravenveen",
       gender: "Female",
       list_number: 4,
       list_name: "Political Group D",
@@ -1004,7 +1004,7 @@ export const election: ElectionWithPoliticalGroups = {
           first_name: "Christina",
           last_name_prefix: "de",
           last_name: "Vegt",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {

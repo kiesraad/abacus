@@ -494,7 +494,7 @@ export const gsbListMockData: RegionDetails[] = [
     frisian_export_allowed: true,
   },
   {
-    name: "'s Gravenveen",
+    name: "'s-Gravenveen",
     key: { category: "Municipality", number: 55 },
     roman_numerals: false,
     frisian_export_allowed: true,

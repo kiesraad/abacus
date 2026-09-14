@@ -250,19 +250,19 @@ async fn test_csb_election_import_only_municipal_and_water_authority_elections_s
         .json(&serde_json::json!({
             "committee_category": "CSB",
             "election_hash": [
-                "e8e0", "b931", "623b", "cd14",
-                "4a77", "35a4", "3012", "fef2",
-                "a7e1", "ab0b", "d1dd", "4080",
-                "b72c", "84e6", "1697", "8ff3"
+                "135c", "e08d", "519f", "1d3f",
+                "4d1e", "8122", "4c67", "f676",
+                "6746", "a0ac", "020d", "0a76",
+                "7a28", "21e6", "5a01", "5ad2",
             ],
-            "election_data": include_str!("../../src/eml/tests/definitions/Verkiezingsdefinitie_PS2023_Drenthe.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test_PS1.eml.xml"),
             "candidate_hash": [
-                "fa92", "0b2b", "55e4", "086d",
-                "cb23", "b346", "b475", "91f5",
-                "a0d0", "6391", "bc76", "0610",
-                "ca8d", "359c", "5f4d", "f349"
+                "9cc9", "29f3", "c415", "67de",
+                "f033", "c1d2", "1e48", "dfee",
+                "8ad8", "0862", "05f2", "5dcc",
+                "c3e4", "e812", "1034", "4953",
             ],
-            "candidate_data": include_str!("../../src/eml/tests/definitions/Kandidatenlijsten_PS2023_Drenthe.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test_PS1.eml.xml"),
         }))
         .send()
         .await

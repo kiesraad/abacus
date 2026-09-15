@@ -22,7 +22,7 @@ import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigation
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
-import type { Results, VoteCountingMethod } from "@/types/generated/openapi";
+import type { Results } from "@/types/generated/openapi";
 import { type Eml110a, type Eml230b, eml110a, eml110b } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: Results) {
@@ -146,20 +146,11 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
   await checkDefinitionPage.next.click();
 }
 
-function getCorrigendumFilename(countingMethod: VoteCountingMethod): RegExp {
-  switch (countingMethod) {
-    case "CSO":
-      return /Model_Na14-2_[A-Z]{2}\d{4}_Stembureau_\d+_Bijlage_1.pdf/;
-    case "DSO":
-      return /Model_Na14-1_versie_2_[A-Z]{2}\d{4}_Stembureau_\d+.pdf/;
-  }
-}
-
 export async function createInvestigation(
   page: Page,
   pollingStation: string,
   reason: string,
-  countingMethod: VoteCountingMethod,
+  expectedFilename: RegExp,
 ) {
   const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
   await investigationsOverviewPage.addInvestigationButton.click();
@@ -178,7 +169,7 @@ export async function createInvestigation(
   const downloadPromise = page.waitForEvent("download");
   await investigationPrintCorrigendumPage.downloadLink.click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(getCorrigendumFilename(countingMethod));
+  expect(download.suggestedFilename()).toMatch(expectedFilename);
   expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 
   await investigationPrintCorrigendumPage.backToInvestigationsButton.click();

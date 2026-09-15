@@ -77,6 +77,7 @@ type TestVariant = {
   regionName: string;
   electionName: string;
   filename: string;
+  corrigendumFilename: RegExp;
   dataEntry: Exclude<Results, { model: "GSB" }>;
 };
 
@@ -89,6 +90,7 @@ const variants: TestVariant[] = [
     regionName: "Test",
     electionName: "Gemeenteraad Test 2022",
     filename: "gr2022_test_gemeente_test",
+    corrigendumFilename: /Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/,
     dataEntry: noRecountNoDifferencesDataEntry,
   },
   {
@@ -99,6 +101,7 @@ const variants: TestVariant[] = [
     regionName: "Test",
     electionName: "Gemeenteraad Test 2022",
     filename: "gr2022_test_gemeente_test",
+    corrigendumFilename: /Model_Na14-1_versie_2_GR2022_Stembureau_\d+.pdf/,
     dataEntry: checksAndCorrectionsDataEntryDSO,
   },
   {
@@ -110,6 +113,7 @@ const variants: TestVariant[] = [
     regionName: "Heemdamseburg",
     electionName: "Waterschap Rivier en Polder 2023",
     filename: "ab2023_heemdamseburg_gemeente_heemdamseburg",
+    corrigendumFilename: /Model_Na14-2_AB2023_Stembureau_\d+_Bijlage_1.pdf/,
     dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntry,
   },
   {
@@ -121,6 +125,7 @@ const variants: TestVariant[] = [
     regionName: "'s-Gravenveen",
     electionName: "Waterschap Rivier en Polder 2023",
     filename: "ab2023_'s-gravenveen_gemeente_'s-gravenveen",
+    corrigendumFilename: /Model_Na14-1_versie_2_AB2023_Stembureau_\d+.pdf/,
     dataEntry: checksAndCorrectionsWithVoterCardCountDataEntryDSO,
   },
   {
@@ -132,6 +137,7 @@ const variants: TestVariant[] = [
     regionName: "Juinen",
     electionName: "Provinciale Staten Oost-Holland 2023",
     filename: "ps2023_juinen_gemeente_juinen",
+    corrigendumFilename: /Model_Na14-2_PS2023_Stembureau_\d+_Bijlage_1.pdf/,
     dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntry,
   },
   {
@@ -143,6 +149,7 @@ const variants: TestVariant[] = [
     regionName: "Middelgein",
     electionName: "Provinciale Staten Zuid-Brabant 2023",
     filename: "ps2023_middelgein_gemeente_middelgein",
+    corrigendumFilename: /Model_Na14-1_versie_2_PS2023_Stembureau_\d+.pdf/,
     dataEntry: noChecksAndCorrectionsWithVoterCardCountDataEntryDSO,
   },
 ];
@@ -607,7 +614,7 @@ for (const variant of variants) {
         const electionHome = new ElectionHome(page);
         await electionHome.investigationsOverviewButton.click();
 
-        await createInvestigation(page, station.name, station.reason, variant.countingMethod);
+        await createInvestigation(page, station.name, station.reason, variant.corrigendumFilename);
         const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
         await expect(investigationsOverviewPage.alert).toHaveText(
           `Onderzoek voor stembureau ${station.number} (${station.name}) toegevoegd`,

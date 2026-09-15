@@ -151,7 +151,7 @@ fn public_key_filename(election: &ElectionWithPoliticalGroups) -> Result<String,
     }
 }
 /// Map Dutch lowercase characters with diacritics to their base character
-/// https://nl.wikipedia.org/wiki/Accenttekens_in_de_Nederlandse_spelling#Frequentie
+/// <https://nl.wikipedia.org/wiki/Accenttekens_in_de_Nederlandse_spelling#Frequentie>
 fn strip_diacritic(c: char) -> char {
     match c {
         'à' | 'á' | 'â' | 'ä' | 'å' => 'a',

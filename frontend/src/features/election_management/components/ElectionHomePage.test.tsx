@@ -39,7 +39,7 @@ const renderGSBPage = async (userRole: Role) => {
       </ElectionProvider>
     </TestUserProvider>,
   );
-  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraad Heemdamseburg 2026" })).toBeVisible();
 
   expect(await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" })).toBeVisible();
 };
@@ -54,7 +54,7 @@ const renderCSBPage = async () => {
       </ElectionProvider>
     </TestUserProvider>,
   );
-  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraad Heemdamseburg 2026" })).toBeVisible();
 
   expect(await screen.findByRole("heading", { level: 2, name: "Centraal stembureau Heemdamseburg" })).toBeVisible();
 };
@@ -106,8 +106,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -176,8 +176,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -326,7 +326,7 @@ describe("ElectionHomePage", () => {
 
       rtlRender(<Providers router={router} />);
 
-      expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+      expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraad Heemdamseburg 2026" })).toBeVisible();
       expect(
         await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" }),
       ).toBeVisible();
@@ -371,8 +371,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -680,8 +680,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "CSB - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Type stembureau", "Centraal stembureau"],
       ]);

@@ -84,6 +84,7 @@ axum-extra.workspace = true
 chrono.workspace = true
 clap = { version = "4.6", default-features = false, features = ["derive", "std", "help", "env", "string"] }
 eml-nl = { version = "0.7.0" }
+eml_signature.workspace = true
 hyper = { version = "1", features = ["full"] }
 icu_collator = "2.2.0"
 icu_locale_core = "2.2.0"

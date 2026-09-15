@@ -3,6 +3,7 @@ mod committee_session;
 mod data_entry;
 mod investigation;
 mod polling_station;
+mod signing;
 mod sub_committee;
 
 pub use apportionment::{
@@ -22,6 +23,7 @@ pub use investigation::create_test_investigation;
 pub use polling_station::{
     PollingStationServiceError, list_for_session as list_polling_stations_for_session,
 };
+pub use signing::{SigningServiceError, get_election_certificate};
 pub use sub_committee::{
     SubCommitteeServiceError, create as create_sub_committee,
     list_for_first_session as list_sub_committees_for_first_session,

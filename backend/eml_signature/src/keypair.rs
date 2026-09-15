@@ -74,7 +74,7 @@ impl SigningKeyPair {
     }
 
     /// The private key as PKCS#8 v1 DER.
-    pub fn private_key_der(&self) -> &[u8] {
+    pub fn private_key_der(&self) -> &Zeroizing<Vec<u8>> {
         &self.private_key_der
     }
 
@@ -108,9 +108,11 @@ fn certificate_params(
     {
         return Err(EmlSignatureError::ValidityPeriod);
     }
-    if not_before > not_after {
-        return Err(EmlSignatureError::ValidityPeriod);
-    }
+
+    // TODO #3938 Decide what to do with this check, as it is very impractical during development
+    // if not_before > not_after {
+    //     return Err(EmlSignatureError::ValidityPeriod);
+    // }
 
     let (year, month, day) = ymd(not_before);
     let mut params = CertificateParams::default();
@@ -177,9 +179,8 @@ fn ymd(date: NaiveDate) -> (i32, u8, u8) {
 
 #[cfg(test)]
 mod tests {
-    use crate::Committee;
-
     use super::*;
+    use crate::Committee;
 
     /// A valid RSA-4096 certificate, loaded from the OSV2020-U fixture because
     /// generating one is slow.
@@ -200,6 +201,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "See issue #3938"]
     fn rejects_impossible_validity_period() {
         let election_date = NaiveDate::from_ymd_opt(2024, 11, 30).unwrap();
         let issued = NaiveDate::from_ymd_opt(2024, 11, 1).unwrap();

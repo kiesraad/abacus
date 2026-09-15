@@ -33,7 +33,7 @@ export function CSBElectionReportSection({ election, committeeSession, sessionLa
   return (
     <>
       <h2 className="form_title">
-        {t("apportionment.title")} {t("municipality").toLowerCase()} {election.location}
+        {t("apportionment.title")} {election.authority_region}
       </h2>
       <div className={cls.reportInfoSection}>
         {t("election_report.committee_session_started", {

@@ -15,12 +15,13 @@ import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationsFilePgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationsFilePgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
+import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
 import { PollingStationImportPgObj } from "e2e-tests/page-objects/polling_station/PollingStationImportPgObj";
 import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
-import { eml110a, eml110b, eml110b_zero_voters, eml230b } from "e2e-tests/test-data/eml-files";
+import { eml110a, eml110a_AB, eml110b, eml110b_zero_voters, eml230b, eml230b_AB } from "e2e-tests/test-data/eml-files";
 import { test } from "../../fixtures";
 
 test.use({
@@ -382,6 +383,59 @@ test.describe("Election creation", () => {
       await expect(electionRow).toContainText("Gemeenteraad Test 2022");
       await expect(electionRow).toContainText("CSB - Test (0000)");
       await expect(electionRow).toContainText("Klaar voor invoer— Zitting CSB");
+    });
+  });
+
+  test.describe("WS CSB election creation", () => {
+    test("it uploads an election file and candidate list", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // Upload election and check hash
+      await uploadElectionAndInputHash(page, eml110a_AB);
+
+      // Pick committee category
+      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+      await expect(committeeCategoryPage.header).toBeVisible();
+      await committeeCategoryPage.csb.check();
+      await expect(committeeCategoryPage.csb).toBeChecked();
+      await committeeCategoryPage.next.click();
+
+      // Upload candidates list and check hash
+      await uploadCandidatesAndInputHash(page, eml230b_AB);
+
+      // The check-and-save page shows
+      const checkAndSavePage = new CheckAndSavePgObj(page);
+      await expect(checkAndSavePage.header).toBeVisible();
+      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Waterschap Rivier en Polder 2023");
+      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Rivier en Polder");
+      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+      await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
+      await expect(checkAndSavePage.countingMethod).toBeHidden();
+      await expect(checkAndSavePage.numberOfVoters).toBeHidden();
+
+      // Save the election
+      const election = await checkAndSavePage.saveElection();
+      await expect(overviewPage.adminHeader).toBeVisible();
+      await expect(overviewPage.getAlertElectionCreated("CSB", "Waterschap Rivier en Polder 2023")).toBeVisible();
+
+      // The election overview page
+      const electionRow = overviewPage.findElectionRowById(election.id);
+      await expect(electionRow).toBeVisible();
+      await expect(electionRow).toContainText("Waterschap Rivier en Polder 2023");
+      await expect(electionRow).toContainText("CSB - Rivier en Polder (10)");
+      await expect(electionRow).toContainText("Klaar voor invoer— Zitting CSB");
+
+      await test.step("check it creates a subcommittee for every GSB", async () => {
+        await page.goto(`/elections/${election.id}/status`);
+        const statusPage = new ElectionStatus(page);
+        await expect(statusPage.notStartedRows).toHaveCount(4);
+        for (const name of ["Heemdamseburg", "Juinen", "Middelgein", "'s-Gravenveen"]) {
+          await expect(statusPage.notStarted).toContainText(name);
+        }
+      });
     });
   });
 

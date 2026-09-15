@@ -13,6 +13,7 @@ use crate::{
 #[derive(Debug)]
 pub enum SigningServiceError {
     DatabaseError(sqlx::Error),
+    JoinError(tokio::task::JoinError),
     InvalidElectionError(String),
     EmlSignatureError(String),
 }
@@ -20,6 +21,12 @@ pub enum SigningServiceError {
 impl From<sqlx::Error> for SigningServiceError {
     fn from(err: sqlx::Error) -> Self {
         Self::DatabaseError(err)
+    }
+}
+
+impl From<tokio::task::JoinError> for SigningServiceError {
+    fn from(err: tokio::task::JoinError) -> Self {
+        Self::JoinError(err)
     }
 }
 
@@ -58,7 +65,7 @@ pub async fn get_election_certificate(
         return Ok(certificate);
     }
 
-    let keypair = generate_keypair(election)?;
+    let keypair = generate_keypair(election).await?;
     let certificate = keypair.certificate().to_pem();
     let private_key = keypair.private_key_der().to_owned();
 
@@ -71,7 +78,7 @@ pub async fn get_election_certificate(
     Ok(certificate)
 }
 
-fn generate_keypair(
+async fn generate_keypair(
     election: &ElectionWithPoliticalGroups,
 ) -> Result<SigningKeyPair, SigningServiceError> {
     let committee = match election.committee_category {
@@ -91,8 +98,13 @@ fn generate_keypair(
         committee,
     );
 
-    SigningKeyPair::generate(&subject, Utc::now().date_naive(), election.election_date)
-        .map_err(Into::into)
+    let valid_from = Utc::now().date_naive();
+    let election_date = election.election_date;
+
+    tokio::task::spawn_blocking(move || {
+        SigningKeyPair::generate(&subject, valid_from, election_date).map_err(Into::into)
+    })
+    .await?
 }
 
 #[cfg(test)]

@@ -466,10 +466,12 @@ impl From<polling_station_repo::CreateDataEntryError> for APIError {
         }
     }
 }
+
 impl From<SigningServiceError> for APIError {
     fn from(err: SigningServiceError) -> Self {
         match err {
             SigningServiceError::DatabaseError(e) => e.into(),
+            SigningServiceError::JoinError(e) => APIError::StdError(Box::new(e)),
             SigningServiceError::InvalidElectionError(msg) => APIError::SigningError(msg),
             SigningServiceError::EmlSignatureError(msg) => APIError::SigningError(msg),
         }

@@ -9,7 +9,9 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
+aws-lc-rs.workspace = true
 chrono.workspace = true
+cms.workspace = true
 const-oid.workspace = true
 der.workspace = true
 rcgen.workspace = true

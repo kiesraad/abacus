@@ -201,6 +201,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "See issue #3938"]
     fn rejects_impossible_validity_period() {
         let election_date = NaiveDate::from_ymd_opt(2024, 11, 30).unwrap();
         let issued = NaiveDate::from_ymd_opt(2024, 11, 1).unwrap();

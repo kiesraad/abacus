@@ -4,6 +4,7 @@ use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::{SqliteConnection, SqlitePool};
 use tracing::{info, warn};
+use zeroize::Zeroizing;
 
 use crate::{
     SqlitePoolExt,
@@ -46,7 +47,7 @@ use crate::{
     repository::{
         committee_session_repo,
         data_entry_repo::{self, list_results_for_committee_session},
-        election_repo, polling_station_repo,
+        election_repo, polling_station_repo, signing_keypair_repo,
         user_repo::UserId,
     },
     service::create_sub_committee,
@@ -201,6 +202,7 @@ async fn generate_csb_election_data(
     Ok((Vec::new(), data_entry_complete))
 }
 
+#[expect(clippy::too_many_lines)]
 pub async fn create_test_election(
     args: &GenerateElectionArgs,
     pool: &SqlitePool,
@@ -213,6 +215,18 @@ pub async fn create_test_election(
     // generate and store the election
     let election =
         election_repo::create(&mut tx, generate_election(&mut rng, args, votes.as_ref())).await?;
+
+    // TODO generate an actual signing keypair in issue #3769
+    // stub record for signing keypair
+    if election.committee_category == CommitteeCategory::GSB {
+        signing_keypair_repo::create(
+            &mut tx,
+            election.id,
+            "-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----".to_string(),
+            Zeroizing::new(Vec::new()),
+        )
+        .await?
+    }
 
     // generate the committee session for the election
     let mut committee_session = committee_session_repo::create(

@@ -91,8 +91,8 @@ describe("ElectionInformationTable", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
         ["Aantal kiesgerechtigden", "0"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -114,8 +114,8 @@ describe("ElectionInformationTable", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
         ["Aantal kiesgerechtigden", "1.234"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -137,8 +137,8 @@ describe("ElectionInformationTable", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
         ["Aantal kiesgerechtigden", "1.234"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -160,8 +160,8 @@ describe("ElectionInformationTable", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
         ["Aantal kiesgerechtigden", "1.234"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -183,8 +183,8 @@ describe("ElectionInformationTable", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
         ["Aantal kiesgerechtigden", "1.234"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -208,8 +208,8 @@ describe("ElectionInformationTable", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "CSB - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Type stembureau", "Centraal stembureau"],
       ]);

@@ -150,6 +150,7 @@ fn public_key_filename(election: &ElectionWithPoliticalGroups) -> Result<String,
         )),
     }
 }
+
 /// Map Dutch lowercase characters with diacritics to their base character
 /// <https://nl.wikipedia.org/wiki/Accenttekens_in_de_Nederlandse_spelling#Frequentie>
 fn strip_diacritic(c: char) -> char {
@@ -258,7 +259,7 @@ mod tests {
         )
         .await;
 
-        let response = dbg!(result.expect("should be ok").into_response());
+        let response = result.expect("should be ok").into_response();
         assert_eq!(
             response.headers().get("content-type").unwrap(),
             "application/x-pem-file"

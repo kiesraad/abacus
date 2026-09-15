@@ -222,11 +222,11 @@ async fn generate_csb_election_data(
         ElectionCategory::WaterAuthority => {
             // We need at least one GSB
             let gsbs = rng.random_range(args.gsbs.clone()).max(1);
-            let mut data_entry_complete = args.with_data_entry;
+            let mut data_entry_completes = Vec::new();
             for number in 1..=gsbs {
                 let name = locality(rng);
-                data_entry_complete = data_entry_complete
-                    && generate_csb_sub_committee(
+                data_entry_completes.push(
+                    generate_csb_sub_committee(
                         tx,
                         rng,
                         args,
@@ -236,9 +236,10 @@ async fn generate_csb_election_data(
                         election,
                         votes.clone(),
                     )
-                    .await?;
+                    .await?,
+                );
             }
-            data_entry_complete
+            !data_entry_completes.contains(&false)
         }
         ElectionCategory::Provincial => {
             // TODO: Provincial CSB election generation not yet supported

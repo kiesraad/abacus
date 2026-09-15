@@ -1186,10 +1186,8 @@ mod tests {
             create_test_election(&election(GSB, Municipal, Some(CSO)), &pool, None).await,
             create_test_election(&election(GSB, Municipal, Some(DSO)), &pool, None).await,
             create_test_election(&election(CSB, Municipal, None), &pool, None).await,
-            create_test_election(&election(CSB, Municipal, None), &pool, None).await,
             create_test_election(&election(GSB, WaterAuthority, Some(CSO)), &pool, None).await,
             create_test_election(&election(GSB, WaterAuthority, Some(DSO)), &pool, None).await,
-            create_test_election(&election(CSB, WaterAuthority, None), &pool, None).await,
             create_test_election(&election(CSB, WaterAuthority, None), &pool, None).await,
         ];
 

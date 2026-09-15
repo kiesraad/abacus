@@ -241,7 +241,8 @@ async fn generate_csb_election_data(
             data_entry_complete
         }
         ElectionCategory::Provincial => {
-            todo!("Provincial CSB election generation not supported")
+            // TODO: Provincial CSB election generation not yet supported
+            false
         }
     };
 

@@ -366,7 +366,7 @@ describe("ApportionmentListDetailsPage", () => {
       expect(preferentially_chosen_candidates_table).toBeVisible();
       expect(preferentially_chosen_candidates_table).toHaveTableContent([
         ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
-        ["1", "Wolfswinkel, R. (Ruth) (x)", "'s Gravenveen", "300"],
+        ["1", "Wolfswinkel, R. (Ruth) (x)", "'s-Gravenveen", "300"],
       ]);
 
       expect(
@@ -405,7 +405,7 @@ describe("ApportionmentListDetailsPage", () => {
       expect(total_votes_per_candidate_table).toHaveTableContent([
         ["Nummer", "Kandidaat", "Woonplaats", "Aantal stemmen"],
         ["1", "Wolfswinkel, G. (Gijsbertje) (x)", "Eemstricht", "300"],
-        ["2", "Wolfswinkel, R. (Ruth) (x)", "'s Gravenveen", "300"],
+        ["2", "Wolfswinkel, R. (Ruth) (x)", "'s-Gravenveen", "300"],
         ["3", "Güneş, İ. (İlknur) (x)", "Eksterlo", "50"],
         ["4", "Güneş, K. (Kris) (x)", "Lekkum", "0"],
         ["5", "den Mateman, L. (Leontien) (v)", "Bloemstede", "0"],

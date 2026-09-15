@@ -24,7 +24,10 @@ use crate::{
     eml::EMLImportError,
     infra::backup::BackupError,
     repository::polling_station_repo,
-    service::{DataEntryServiceError, PollingStationServiceError, SubCommitteeServiceError},
+    service::{
+        DataEntryServiceError, PollingStationServiceError, SigningServiceError,
+        SubCommitteeServiceError,
+    },
 };
 
 /// Trait for error types that can be converted to HTTP response parts
@@ -134,6 +137,7 @@ pub enum APIError {
     NotFound(String, ErrorReference),
     PdfGenError(PdfGenError),
     SerdeJsonError(serde_json::Error),
+    SigningError(String),
     SqlxError(sqlx::Error),
     StdError(Box<dyn Error>),
     ZipError(ZipResponseError),
@@ -195,6 +199,13 @@ impl APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     ErrorResponse::new("Internal server error", ErrorReference::InvalidJson, true),
+                )
+            }
+            APIError::SigningError(msg) => {
+                error!("Signing error: {:?}", msg);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    ErrorResponse::new(msg, ErrorReference::InternalServerError, true),
                 )
             }
             APIError::SqlxError(sqlx::Error::RowNotFound) => (
@@ -452,6 +463,15 @@ impl From<polling_station_repo::CreateDataEntryError> for APIError {
             polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
                 APIError::DataIntegrityError(String::from("Data entry is already linked"))
             }
+        }
+    }
+}
+impl From<SigningServiceError> for APIError {
+    fn from(err: SigningServiceError) -> Self {
+        match err {
+            SigningServiceError::DatabaseError(e) => e.into(),
+            SigningServiceError::InvalidElectionError(msg) => APIError::SigningError(msg),
+            SigningServiceError::EmlSignatureError(msg) => APIError::SigningError(msg),
         }
     }
 }

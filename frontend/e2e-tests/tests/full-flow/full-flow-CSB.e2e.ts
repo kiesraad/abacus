@@ -58,10 +58,10 @@ const variants: TestVariant[] = [
   },
 ];
 
-test.describe.configure({ mode: "serial" });
-
 for (const variant of variants) {
   test.describe(`full flow ${variant.name}`, () => {
+    test.describe.configure({ mode: "serial" });
+
     // Note: Do not use the randomSuffix in test titles. You cannot interpolate a non-static value.
     // Using the randomSuffix in test titles will result in those tests being executed last.
     const randomSuffix = Date.now();

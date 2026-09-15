@@ -2,9 +2,6 @@ import type {
   CommonPollingStationResults,
   CSOFirstSessionResults,
   DataEntry,
-  DSOFirstSessionResults,
-  GSBResults,
-  NextSessionResults,
   PollingStationRequest,
   Results,
   SaveDataEntryResponse,
@@ -174,7 +171,7 @@ const commonDataEntry: CommonPollingStationResults = {
   ],
 };
 
-export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: "CSOFirstSession" } = {
+export const noRecountNoDifferencesDataEntry: Extract<Results, { model: "CSOFirstSession" }> = {
   model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: true },
@@ -187,9 +184,7 @@ export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: 
   ...structuredClone(commonDataEntry),
 };
 
-export const checksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & {
-  model: "DSOFirstSession";
-} = {
+export const checksAndCorrectionsDataEntryDSO: Extract<Results, { model: "DSOFirstSession" }> = {
   model: "DSOFirstSession",
   about_report: {
     corrigendum_present: "TwoDocuments",
@@ -203,7 +198,7 @@ export const checksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & {
   ...structuredClone(commonDataEntry),
 };
 
-export const noChecksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & { model: "DSOFirstSession" } = {
+export const noChecksAndCorrectionsDataEntryDSO: Extract<Results, { model: "DSOFirstSession" }> = {
   model: "DSOFirstSession",
   about_report: {
     corrigendum_present: "OneDocument",
@@ -217,24 +212,22 @@ export const noChecksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & { mode
   ...structuredClone(commonDataEntry),
 };
 
-export const noRecountNoDifferencesWithVoterCardCountDataEntry: CSOFirstSessionResults & { model: "CSOFirstSession" } =
+export const noRecountNoDifferencesWithVoterCardCountDataEntry: Extract<Results, { model: "CSOFirstSession" }> =
   structuredClone(noRecountNoDifferencesDataEntry);
 noRecountNoDifferencesWithVoterCardCountDataEntry.voters_counts.proxy_certificate_count = 150;
 noRecountNoDifferencesWithVoterCardCountDataEntry.voters_counts.voter_card_count = 7;
 
-export const checksAndCorrectionsWithVoterCardCountDataEntryDSO: DSOFirstSessionResults & {
-  model: "DSOFirstSession";
-} = structuredClone(checksAndCorrectionsDataEntryDSO);
+export const checksAndCorrectionsWithVoterCardCountDataEntryDSO: Extract<Results, { model: "DSOFirstSession" }> =
+  structuredClone(checksAndCorrectionsDataEntryDSO);
 checksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.proxy_certificate_count = 150;
 checksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.voter_card_count = 7;
 
-export const noChecksAndCorrectionsWithVoterCardCountDataEntryDSO: DSOFirstSessionResults & {
-  model: "DSOFirstSession";
-} = structuredClone(noChecksAndCorrectionsDataEntryDSO);
+export const noChecksAndCorrectionsWithVoterCardCountDataEntryDSO: Extract<Results, { model: "DSOFirstSession" }> =
+  structuredClone(noChecksAndCorrectionsDataEntryDSO);
 noChecksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.proxy_certificate_count = 150;
 noChecksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.voter_card_count = 7;
 
-export const noRecountNoDifferencesDataEntryGSB: GSBResults & { model: "GSB" } = {
+export const noRecountNoDifferencesDataEntryGSB: Extract<Results, { model: "GSB" }> = {
   model: "GSB",
   number_of_voters: 612694,
   voters_counts: {
@@ -375,7 +368,7 @@ export const noRecountNoDifferencesDataEntryGSB: GSBResults & { model: "GSB" } =
   ],
 };
 
-export const noRecountNoDifferencesDrawingLotsForListAndCandidateDataEntryGSB: GSBResults & { model: "GSB" } = {
+export const noRecountNoDifferencesDrawingLotsForListAndCandidateDataEntryGSB: Extract<Results, { model: "GSB" }> = {
   model: "GSB",
   number_of_voters: 612694,
   voters_counts: {
@@ -516,7 +509,7 @@ export const noRecountNoDifferencesDrawingLotsForListAndCandidateDataEntryGSB: G
   ],
 };
 
-export const noRecountNoDifferencesDrawingLotsForP9DataEntryGSB: GSBResults & { model: "GSB" } = {
+export const noRecountNoDifferencesDrawingLotsForP9DataEntryGSB: Extract<Results, { model: "GSB" }> = {
   model: "GSB",
   number_of_voters: 8000,
   voters_counts: {
@@ -657,7 +650,7 @@ export const noRecountNoDifferencesDrawingLotsForP9DataEntryGSB: GSBResults & { 
   ],
 };
 
-export const nextSessionResults: NextSessionResults & { model: "CSONextSession" } = {
+export const nextSessionResults: Extract<Results, { model: "CSONextSession" }> = {
   model: "CSONextSession",
   voters_counts: {
     poll_card_count: noRecountNoDifferencesDataEntry.voters_counts.poll_card_count,
@@ -675,7 +668,7 @@ export const nextSessionResults: NextSessionResults & { model: "CSONextSession" 
   political_group_votes: noRecountNoDifferencesDataEntry.political_group_votes,
 };
 
-export const nextSessionResultsWithDifferences: NextSessionResults & { model: "CSONextSession" } = {
+export const nextSessionResultsWithDifferences: Extract<Results, { model: "CSONextSession" }> = {
   model: "CSONextSession",
   voters_counts: {
     poll_card_count: nextSessionResults.voters_counts.poll_card_count - 20,

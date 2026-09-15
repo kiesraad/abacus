@@ -2,16 +2,16 @@ import type { Locator, Page } from "@playwright/test";
 
 export class SelectGSBPgObj {
   readonly header: Locator;
-  readonly region_list: Locator;
+  readonly regionList: Locator;
   readonly regions: Locator;
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 2, name: "Selecteer het gemeentelijk stembureau" });
-    this.region_list = page.getByTestId("region_list");
-    this.regions = this.region_list.locator("tbody").getByRole("row");
+    this.regionList = page.getByTestId("region_list");
+    this.regions = this.regionList.locator("tbody").getByRole("row");
   }
 
   async clickRegionFromList(number: string) {
-    await this.region_list.getByTestId(`region-${number}`).click();
+    await this.regionList.getByTestId(`region-${number}`).click();
   }
 }

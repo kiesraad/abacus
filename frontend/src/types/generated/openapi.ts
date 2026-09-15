@@ -1442,6 +1442,8 @@ export interface GenerateElectionArgs {
   generate_drawing_lots: boolean;
   /** Generate multiple elections, each resulting in a different P 22-2 variant */
   generate_p22_2_variants: boolean;
+  /** Amount of GSBs */
+  gsbs: RandomRange;
   political_group_distribution_slope: RandomRange;
   /** Number of political groups to create */
   political_groups: RandomRange;

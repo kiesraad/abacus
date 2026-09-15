@@ -70,6 +70,9 @@ pub struct GenerateElectionArgs {
 
     pub candidate_distribution_slope: RandomRange,
     pub political_group_distribution_slope: RandomRange,
+
+    /// Amount of GSBs
+    pub gsbs: RandomRange,
 }
 
 impl<'de> Deserialize<'de> for RandomRange {

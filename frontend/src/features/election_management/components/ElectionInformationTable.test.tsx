@@ -22,10 +22,10 @@ const renderGSBTable = (
       <ElectionInformationTable
         election={{
           id: 1,
-          name: "Gemeenteraadsverkiezingen 2026",
+          name: "Gemeenteraad Heemdamseburg 2026",
           committee_category: "GSB",
           counting_method: "DSO",
-          election_id: "Heemdamseburg_2024",
+          election_id: "GR2026_Heemdamseburg",
           location: "Heemdamseburg",
           authority_id: "0035",
           authority_name: "Heemdamseburg",
@@ -36,8 +36,8 @@ const renderGSBTable = (
           sub_category: "GR2",
           number_of_seats: 29,
           number_of_voters: electionNumberOfVoters,
-          election_date: "2024-11-30",
-          nomination_date: "2024-11-01",
+          election_date: "2026-11-30",
+          nomination_date: "2026-11-01",
           political_groups: [
             {
               number: 1,

@@ -31,7 +31,7 @@ Abacus is werk in uitvoering! Dit betekent dat de functionaliteit stapsgewijs wo
 
 ### Techniek
 
-Abacus wordt gebouwd als een stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in de programmeertaal Rust, de frontend in TypeScript/React.
+Abacus wordt beschikbaar gesteld als stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. De backend is geschreven in de programmeertaal Rust, de frontend in TypeScript/React.```
 
 Een [overzicht van de architectuur](https://github.com/kiesraad/abacus-documentatie/blob/main/softwarearchitectuur/Overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, TypeScript en React](https://github.com/kiesraad/abacus-documentatie/blob/main/softwarearchitectuur/overwegingen-talen-en-frameworks.md).
 

@@ -194,6 +194,8 @@ export function GenerateTestElectionForm() {
                   defaultValue={electionCategory}
                   label={t(`election_category.${electionCategory}`)}
                   onChange={handleRadioChange}
+                  // Provincial CSB election generation not yet supported
+                  disabled={formState.committee_category === "CSB" && electionCategory === "Provincial"}
                 />
               ))}
             </ChoiceList>

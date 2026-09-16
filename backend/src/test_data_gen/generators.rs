@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
-use rand::{RngExt, SeedableRng, rngs::StdRng, seq::IndexedRandom};
+use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::{SqliteConnection, SqlitePool};
 use tracing::{info, warn};
 
@@ -50,7 +50,7 @@ use crate::{
         user_repo::UserId,
     },
     service::create_sub_committee,
-    test_data_gen::{GenerateElectionArgs, RandomRange, data::locality},
+    test_data_gen::{GenerateElectionArgs, RandomRange},
 };
 
 #[derive(Debug)]
@@ -86,7 +86,7 @@ async fn generate_gsb_data_entries(
 /// Generate CSB data entries and return whether data entry is completed
 async fn generate_csb_data_entries(
     conn: &mut SqliteConnection,
-    rng: &mut StdRng,
+    rng: &mut impl rand::RngExt,
     args: &GenerateElectionArgs,
     sub_committee_first_session: SubCommitteeFirstSession,
     election: &ElectionWithPoliticalGroups,
@@ -114,7 +114,7 @@ async fn generate_csb_data_entries(
 #[expect(clippy::too_many_arguments)]
 async fn generate_csb_sub_committee(
     conn: &mut SqliteConnection,
-    rng: &mut StdRng,
+    rng: &mut impl rand::RngExt,
     args: &GenerateElectionArgs,
     committee_session_id: CommitteeSessionId,
     number: SubCommitteeNumber,
@@ -189,7 +189,7 @@ async fn generate_gsb_election_data(
 
 /// Create subcommittee and set status to InPreparation for a CSB election
 async fn generate_csb_election_data(
-    rng: &mut StdRng,
+    rng: &mut impl rand::RngExt,
     tx: &mut SqliteConnection,
     args: &GenerateElectionArgs,
     committee_session: &mut CommitteeSession,
@@ -224,7 +224,7 @@ async fn generate_csb_election_data(
             let gsbs = rng.random_range(args.gsbs.clone()).max(1);
             let mut data_entry_completes = Vec::new();
             for number in 1..=gsbs {
-                let name = locality(rng);
+                let name = super::data::locality(rng);
                 data_entry_completes.push(
                     generate_csb_sub_committee(
                         tx,
@@ -242,8 +242,7 @@ async fn generate_csb_election_data(
             !data_entry_completes.contains(&false)
         }
         ElectionCategory::Provincial => {
-            // TODO: Provincial CSB election generation not yet supported
-            false
+            todo!("Provincial CSB election generation not yet supported");
         }
     };
 

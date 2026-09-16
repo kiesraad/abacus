@@ -1,13 +1,18 @@
 //! Compare this crate's output with OSV2020-U output: a created certificate
-//! must match the OSV format, and the OSV fixture must parse and round-trip.
+//! and `.signature` must match the OSV format, and the OSV fixtures must
+//! parse, verify and round-trip.
 
 mod common;
 
 use chrono::{DateTime, NaiveDate, TimeZone, Utc};
+use cms::{
+    content_info::{CmsVersion, ContentInfo},
+    signed_data::{SignerIdentifier, SignerInfos},
+};
 use common::*;
-use const_oid::db::{rfc4519, rfc5912};
-use der::{Decode, Encode, Tag};
-use eml_signature::{RSA_KEY_BITS, SigningKeyPair};
+use const_oid::db::{rfc4519, rfc5911, rfc5912};
+use der::{Any, Decode, Encode, Tag, Tagged};
+use eml_signature::{EmlSignatureError, RSA_KEY_BITS, Signature, SigningKeyPair};
 use x509_cert::{Certificate as X509Certificate, Version, spki::SubjectPublicKeyInfoOwned};
 use zeroize::Zeroizing;
 
@@ -152,4 +157,231 @@ fn certificate_to_pem_round_trips_the_osv_file() {
         std::str::from_utf8(OSV_CRT).unwrap().trim_end(),
         "PEM -> DER -> PEM reproduces the file OSV served"
     );
+}
+
+/// Assert that the shape of the signature file matches OSV2020-U.
+fn assert_osv_signature_file_shape(name: &str, signature: &[u8]) {
+    let signed_data = parse_signed_data(signature);
+
+    assert_eq!(signed_data.version, CmsVersion::V1, "{name}");
+    assert!(signed_data.crls.is_none(), "{name}");
+
+    let [digest_algorithm] = signed_data.digest_algorithms.as_slice() else {
+        panic!("{name}: expected one digestAlgorithm");
+    };
+    assert_eq!(digest_algorithm.oid, rfc5912::ID_SHA_256, "{name}");
+    assert_eq!(
+        digest_algorithm.parameters,
+        Some(Any::null()),
+        "{name}: sha256 with explicit NULL parameters"
+    );
+
+    // Present but empty
+    assert_eq!(
+        signed_data.encap_content_info.econtent_type,
+        rfc5911::ID_DATA,
+        "{name}"
+    );
+    let econtent = signed_data.encap_content_info.econtent.expect("present");
+    assert_eq!(econtent.tag(), Tag::OctetString, "{name}");
+    assert!(econtent.value().is_empty(), "{name}");
+
+    assert_eq!(
+        signed_data.certificates.expect("present").0.len(),
+        1,
+        "{name}: exactly one embedded certificate"
+    );
+    assert_eq!(signed_data.signer_infos.0.len(), 1, "{name}");
+}
+
+/// The `signerInfo` carries no attributes, uses `rsaEncryption`, and
+/// identifies the embedded certificate.
+fn assert_signer_info_matches_the_certificate(keypair: &SigningKeyPair, signature: &Signature) {
+    let signed_data = parse_signed_data(&signature.to_der());
+    let certificate = raw_certificate(&keypair.certificate().to_der());
+
+    let [signer_info] = signed_data.signer_infos.0.as_slice() else {
+        panic!("expected one signerInfo");
+    };
+
+    assert_eq!(signer_info.version, CmsVersion::V1);
+    assert!(
+        signer_info.signed_attrs.is_none(),
+        "signedAttrs change what is signed"
+    );
+    assert!(signer_info.unsigned_attrs.is_none());
+    assert_eq!(
+        signer_info.signature.as_bytes().len(),
+        RSA_KEY_BITS / 8,
+        "an RSA-4096 signature is 512 bytes"
+    );
+
+    assert_eq!(
+        signer_info.signature_algorithm.oid,
+        rfc5912::RSA_ENCRYPTION,
+        "rsaEncryption, not sha256WithRSAEncryption"
+    );
+    assert_eq!(
+        signer_info.signature_algorithm.parameters,
+        Some(Any::null()),
+        "explicit NULL parameters"
+    );
+
+    let SignerIdentifier::IssuerAndSerialNumber(sid) = &signer_info.sid else {
+        panic!("expected issuerAndSerialNumber");
+    };
+    let tbs = certificate.tbs_certificate();
+    assert_eq!(
+        sid.issuer.to_der().expect("issuer encodes"),
+        tbs.subject().to_der().expect("subject encodes"),
+        "the sid issuer and subject are equal"
+    );
+    assert_eq!(&sid.serial_number, tbs.serial_number());
+}
+
+/// All assertions on a `.signature` made with a generated keypair, in a
+/// single test so that the slow key generation runs only once.
+#[test]
+fn signature_file_matches_osv2020() {
+    let keypair = keypair();
+    let signature = keypair.sign(OSV_EML).unwrap();
+
+    assert_osv_signature_file_shape("ours", &signature.to_der());
+    assert_osv_signature_file_shape("OSV", OSV_SIGNATURE);
+    assert_signer_info_matches_the_certificate(&keypair, &signature);
+
+    assert_eq!(
+        embedded_certificate_der(&signature.to_der()),
+        keypair.certificate().to_der(),
+        "the certificate DER survives the round trip through cms/x509-cert unchanged"
+    );
+
+    // PKCS#1 v1.5 is deterministic: signing the same bytes again reproduces
+    // the same file.
+    assert_eq!(keypair.sign(OSV_EML).unwrap().to_der(), signature.to_der());
+
+    // An empty document signs and verifies, and its signature covers nothing
+    // else.
+    let public_key = keypair.certificate().public_key();
+    let empty = keypair.sign(b"").unwrap();
+    public_key.verify(b"", &empty).unwrap();
+    assert_eq!(
+        public_key.verify(b" ", &empty),
+        Err(EmlSignatureError::SignatureInvalid)
+    );
+}
+
+/// Generate, sign and verify with a new keypair, and test that
+/// verification depends on the key alone.
+#[test]
+fn generate_sign_verify_round_trip() {
+    let keypair = keypair();
+    let eml = b"<EML xmlns=\"urn:oasis:names:tc:evs:schema:eml\">test</EML>";
+
+    let signature = keypair.sign(eml).unwrap();
+    let public_key = keypair.certificate().public_key();
+
+    public_key
+        .verify(eml, &signature)
+        .expect("round trip verifies");
+    assert_eq!(
+        public_key.verify(b"<EML>other</EML>", &signature),
+        Err(EmlSignatureError::SignatureInvalid)
+    );
+
+    // A signature that is valid under one key is invalid under the other,
+    // and vice versa.
+    assert_eq!(
+        public_key.verify(OSV_EML, &osv_signature()),
+        Err(EmlSignatureError::SignatureInvalid)
+    );
+    assert_eq!(
+        osv_public_key().verify(eml, &signature),
+        Err(EmlSignatureError::SignatureInvalid)
+    );
+}
+
+#[test]
+fn parses_and_round_trips_osv_output() {
+    let signature = osv_signature();
+
+    assert_eq!(signature.to_der(), OSV_SIGNATURE);
+}
+
+#[test]
+fn verifies_osv_output() {
+    osv_public_key()
+        .verify(OSV_EML, &osv_signature())
+        .expect("OSV output verifies");
+}
+
+#[test]
+fn rejects_a_single_flipped_byte_in_the_eml() {
+    let mut tampered = OSV_EML.to_vec();
+    tampered[5000] ^= 0x01;
+
+    assert_eq!(
+        osv_public_key().verify(&tampered, &osv_signature()),
+        Err(EmlSignatureError::SignatureInvalid)
+    );
+}
+
+/// The embedded certificate is not required.
+#[test]
+fn accepts_a_signature_without_a_certificate() {
+    let mut signed_data = parse_signed_data(OSV_SIGNATURE);
+    signed_data.certificates = None;
+
+    let signature = Signature::from_der(&signature_file(&signed_data)).expect("parses");
+
+    osv_public_key()
+        .verify(OSV_EML, &signature)
+        .expect("verifies: the certificate was never used");
+}
+
+/// Malformed `.signature` files fixture.
+fn malformed_signature_files() -> Vec<(&'static str, Vec<u8>)> {
+    vec![
+        ("empty", Vec::new()),
+        ("garbage", vec![0xff; 64]),
+        (
+            "truncated",
+            OSV_SIGNATURE[..OSV_SIGNATURE.len() / 2].to_vec(),
+        ),
+        ("one trailing byte", [OSV_SIGNATURE, &[0x00]].concat()),
+        (
+            "a certificate instead of a signature",
+            osv_certificate().to_der(),
+        ),
+        (
+            "wrong content type",
+            ContentInfo {
+                content_type: rfc5911::ID_DATA,
+                content: Any::encode_from(&parse_signed_data(OSV_SIGNATURE))
+                    .expect("SignedData encodes"),
+            }
+            .to_der()
+            .expect("ContentInfo encodes"),
+        ),
+        ("no signerInfo", {
+            // OSV signature fixture with empty `signerInfos`.
+            let mut signed_data = parse_signed_data(OSV_SIGNATURE);
+            signed_data.signer_infos = SignerInfos::try_from(Vec::new()).expect("empty set");
+            signature_file(&signed_data)
+        }),
+    ]
+}
+
+/// Malformed `.signature` files are rejected without panicking.
+#[test]
+fn rejects_malformed_signature_files_without_panicking() {
+    for (name, bytes) in malformed_signature_files() {
+        assert!(
+            matches!(
+                Signature::from_der(&bytes),
+                Err(EmlSignatureError::InvalidSignatureFile(_))
+            ),
+            "{name} should be rejected"
+        );
+    }
 }

@@ -22,8 +22,8 @@ import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigation
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
-import type { Results, VoteCountingMethod } from "@/types/generated/openapi";
-import { type Eml230b, eml110a, eml110b } from "../test-data/eml-files";
+import type { Results } from "@/types/generated/openapi";
+import { type Eml110a, type Eml230b, eml110a, eml110b } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: Results) {
   if (results.model === "CSOFirstSession") {
@@ -38,8 +38,10 @@ export async function fillDataEntryPages(page: Page, results: Results) {
     const aboutReportPage = new AboutReportPage(page);
     await aboutReportPage.fillAndClickNext(results.about_report);
 
-    const checksAndCorrectionsPage = new ChecksAndCorrectionsPage(page);
-    await checksAndCorrectionsPage.fillAndClickNext(results.checks_and_corrections);
+    if (results.about_report.checks_and_corrections_present === "PagePresent") {
+      const checksAndCorrectionsPage = new ChecksAndCorrectionsPage(page);
+      await checksAndCorrectionsPage.fillAndClickNext(results.checks_and_corrections);
+    }
   }
 
   const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -109,16 +111,16 @@ export async function fillDataEntryPagesAndSave(page: Page, results: Results) {
   return dataEntryHomePage;
 }
 
-export async function uploadElectionAndInputHash(page: Page) {
+export async function uploadElectionAndInputHash(page: Page, eml: Eml110a = eml110a) {
   const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
   await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-  await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
-  await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.electionDate);
+  await uploadElectionDefinitionPage.uploadFile(eml.path);
+  await expect(uploadElectionDefinitionPage.main).toContainText(eml.filename);
+  await expect(uploadElectionDefinitionPage.main).toContainText(eml.electionDate);
 
   const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
-  await checkDefinitionPage.inputHash(eml110a.hashInput1, eml110a.hashInput2);
+  await checkDefinitionPage.inputHash(eml.hashInput1, eml.hashInput2);
 }
 
 export async function uploadCandidatesAndInputHash(page: Page, eml: Eml230b) {
@@ -144,20 +146,11 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
   await checkDefinitionPage.next.click();
 }
 
-function getCorrigendumFilename(countingMethod: VoteCountingMethod): RegExp {
-  switch (countingMethod) {
-    case "CSO":
-      return /Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/;
-    case "DSO":
-      return /Model_Na14-1_versie_2_GR2022_Stembureau_\d+.pdf/;
-  }
-}
-
 export async function createInvestigation(
   page: Page,
   pollingStation: string,
   reason: string,
-  countingMethod: VoteCountingMethod,
+  expectedFilename: RegExp,
 ) {
   const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
   await investigationsOverviewPage.addInvestigationButton.click();
@@ -176,7 +169,7 @@ export async function createInvestigation(
   const downloadPromise = page.waitForEvent("download");
   await investigationPrintCorrigendumPage.downloadLink.click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(getCorrigendumFilename(countingMethod));
+  expect(download.suggestedFilename()).toMatch(expectedFilename);
   expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 
   await investigationPrintCorrigendumPage.backToInvestigationsButton.click();

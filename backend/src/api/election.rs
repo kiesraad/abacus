@@ -41,7 +41,7 @@ use crate::{
         polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, user_repo::User},
+    repository::{committee_session_repo, election_repo, signing_keypair_repo, user_repo::User},
     service::{create_sub_committee, list_polling_stations_for_session},
 };
 
@@ -81,6 +81,9 @@ pub struct ElectionDetailsResponse {
     pub election: ElectionWithPoliticalGroups,
     pub polling_stations: Vec<PollingStationResponse>,
     pub investigations: Vec<PollingStationInvestigation>,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    #[schema(nullable = false)]
+    pub show_keypair_reminder: Option<bool>,
 }
 
 #[derive(Serialize)]
@@ -205,6 +208,8 @@ pub async fn election_details(
         list_polling_stations_for_session(&mut conn, &current_committee_session).await?;
     let investigations = session_pss.investigations();
     let polling_stations = session_pss.into_responses(election_id);
+    let show_keypair_reminder =
+        signing_keypair_repo::get_show_reminder(&mut conn, election_id).await?;
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,
@@ -212,6 +217,7 @@ pub async fn election_details(
         election,
         polling_stations,
         investigations,
+        show_keypair_reminder,
     }))
 }
 

@@ -1695,7 +1695,7 @@ export const election: ElectionWithPoliticalGroups = {
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",
-  authority_id: "0035",
+  authority_id: "CSB",
   authority_name: "Juinen",
   authority_region: "Juinen",
   district: { district: "None" },

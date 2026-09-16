@@ -259,8 +259,8 @@ export const politicalGroupsMockData: PoliticalGroup[] = [
 ];
 
 const baseElectionGR = {
-  name: "Gemeenteraadsverkiezingen 2026",
-  election_id: "GR2024_Heemdamseburg",
+  name: "Gemeenteraad Heemdamseburg 2026",
+  election_id: "GR2026_Heemdamseburg",
   location: "Heemdamseburg",
   authority_id: "0035",
   authority_name: "Heemdamseburg",
@@ -270,55 +270,63 @@ const baseElectionGR = {
   category: "Municipal",
   sub_category: "GR2",
   number_of_seats: 29,
-  election_date: "2024-11-30",
-  nomination_date: "2024-11-01",
+  election_date: "2026-11-30",
+  nomination_date: "2026-11-01",
 } satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
 
 const baseElectionPS = {
-  name: "Provinciale Staten Juinen 2027",
+  name: "Provinciale Staten Oost-Holland 2027",
   election_id: "PS2027_Juinen",
   location: "Juinen",
   authority_id: "0036",
   authority_name: "Juinen",
   authority_region: "Juinen",
   district: { district: "None" },
-  domain: { name: "Juinen" },
+  domain: { name: "Oost-Holland" },
   category: "Provincial",
   sub_category: "PS1",
   number_of_seats: 29,
-  election_date: "2024-11-30",
-  nomination_date: "2024-11-01",
+  election_date: "2027-11-30",
+  nomination_date: "2027-11-01",
 } satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
 
-const baseElectionAB = {
-  name: "Waterschap Juinen 2027",
+const baseElectionABGSB = {
+  name: "Waterschap Rivier en Polder 2027",
   election_id: "AB2027_Juinen",
   location: "Juinen",
   authority_id: "0037",
   authority_name: "Juinen",
   authority_region: "Juinen",
   district: { district: "None" },
-  domain: { id: "0037", name: "Juinen" },
+  domain: { id: "10", name: "Rivier en Polder" },
   category: "WaterAuthority",
   sub_category: "AB2",
   number_of_seats: 29,
-  election_date: "2024-11-30",
-  nomination_date: "2024-11-01",
+  election_date: "2027-11-30",
+  nomination_date: "2027-11-01",
+} satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
+
+const baseElectionABCSB = {
+  ...baseElectionABGSB,
+  election_id: "AB2027_RivierenPolder",
+  location: "Rivier en Polder",
+  authority_name: "Rivier en Polder",
+  authority_region: "Rivier en Polder",
 } satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
 
 const baseElections = {
   Municipal: baseElectionGR,
   Provincial: baseElectionPS,
-  WaterAuthority: baseElectionAB,
+  WaterAuthority: baseElectionABGSB,
 } satisfies Record<ElectionCategory, Omit<Election, "id" | "committee_category" | "number_of_voters">>;
 
 export const electionListMockResponse: ElectionListResponse = {
   committee_sessions: [committeeSessionMockData],
   elections: [
     { ...baseElectionGR, id: 1, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
-    { ...baseElectionGR, id: 2, committee_category: "CSB", number_of_voters: 0 },
-    { ...baseElectionAB, id: 3, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
-    { ...baseElectionAB, id: 4, committee_category: "CSB", number_of_voters: 0 },
+    { ...baseElectionGR, id: 2, committee_category: "CSB", authority_id: "CSB", number_of_voters: 0 },
+    { ...baseElectionABGSB, id: 3, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
+    { ...baseElectionABCSB, id: 4, committee_category: "CSB", authority_id: "CSB", number_of_voters: 0 },
     { ...baseElectionPS, id: 5, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
   ],
 };
@@ -358,7 +366,7 @@ export const getElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
   investigations: PollingStationInvestigation[] = mockInvestigations,
-): Required<ElectionDetailsResponse> => {
+): ElectionDetailsResponse => {
   const updatedCommitteeSession = getCommitteeSessionMockData(committeeSession);
 
   // If committee session number > 1, add prev_data_entry_id to polling stations
@@ -386,7 +394,7 @@ export const getElectionMockData = (
 export const getCSBElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
-): Required<ElectionDetailsResponse> => {
+): ElectionDetailsResponse => {
   const updatedCommitteeSession = getCSBCommitteeSessionMockData(committeeSession);
 
   return {
@@ -403,8 +411,8 @@ export const getCSBElectionMockData = (
 };
 
 export const investigationListMockResponse: InvestigationListResponse = { investigations: mockInvestigations };
-export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
-export const csbElectionDetailsMockResponse: Required<ElectionDetailsResponse> = getCSBElectionMockData();
+export const electionDetailsMockResponse = getElectionMockData();
+export const csbElectionDetailsMockResponse = getCSBElectionMockData();
 
 export const electionMockData = electionDetailsMockResponse.election;
 export const provincialElectionMockData = getElectionMockData(electionListMockResponse.elections[4]).election;

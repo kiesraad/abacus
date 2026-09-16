@@ -44,6 +44,25 @@ pub async fn get_show_reminder(
     .await
 }
 
+pub async fn set_show_reminder(
+    conn: &mut SqliteConnection,
+    election_id: ElectionId,
+    show_reminder: bool,
+) -> Result<bool, sqlx::Error> {
+    let result = sqlx::query!(
+        r#"
+            UPDATE signing_keypair
+            SET show_reminder = $1
+            WHERE election_id = $2
+        "#,
+        show_reminder,
+        election_id
+    )
+    .execute(conn)
+    .await?;
+    Ok(result.rows_affected() > 0)
+}
+
 pub async fn create(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
@@ -107,6 +126,48 @@ mod tests {
         assert_eq!(
             get_private_key(&mut conn, election_id).await.unwrap(),
             Some(private_key)
+        );
+        assert_eq!(
+            get_show_reminder(&mut conn, election_id).await.unwrap(),
+            Some(true)
+        );
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/election_1.sql")))]
+    async fn test_set_show_reminder(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let election_id = ElectionId::from(1);
+
+        // no keypair, nothing to update
+        assert!(
+            !set_show_reminder(&mut conn, election_id, false)
+                .await
+                .unwrap()
+        );
+
+        create(
+            &mut conn,
+            election_id,
+            String::from("testing"),
+            Zeroizing::new(Vec::from("123456")),
+        )
+        .await
+        .unwrap();
+
+        assert!(
+            set_show_reminder(&mut conn, election_id, false)
+                .await
+                .unwrap()
+        );
+        assert_eq!(
+            get_show_reminder(&mut conn, election_id).await.unwrap(),
+            Some(false)
+        );
+
+        assert!(
+            set_show_reminder(&mut conn, election_id, true)
+                .await
+                .unwrap()
         );
         assert_eq!(
             get_show_reminder(&mut conn, election_id).await.unwrap(),

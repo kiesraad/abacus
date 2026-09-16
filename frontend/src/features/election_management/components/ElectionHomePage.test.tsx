@@ -10,6 +10,7 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import {
   getCommitteeSessionListMockData,
   getCSBCommitteeSessionMockData,
@@ -18,6 +19,7 @@ import { getCSBElectionMockData, getElectionMockData } from "@/testing/api-mocks
 import {
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
+  DismissPublicKeyUploadReminderRequestHandler,
   ElectionRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, type Router } from "@/testing/router";
@@ -34,12 +36,14 @@ const renderGSBPage = async (userRole: Role) => {
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <ElectionHomePage />
+          <MessagesProvider>
+            <ElectionHomePage />
+          </MessagesProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
   );
-  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraad Heemdamseburg 2026" })).toBeVisible();
 
   expect(await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" })).toBeVisible();
 };
@@ -49,12 +53,14 @@ const renderCSBPage = async () => {
     <TestUserProvider userRole={"coordinator_csb"}>
       <ElectionProvider electionId={2}>
         <ElectionStatusProvider electionId={2}>
-          <ElectionHomePage />
+          <MessagesProvider>
+            <ElectionHomePage />
+          </MessagesProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
   );
-  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraad Heemdamseburg 2026" })).toBeVisible();
 
   expect(await screen.findByRole("heading", { level: 2, name: "Centraal stembureau Heemdamseburg" })).toBeVisible();
 };
@@ -106,8 +112,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -176,8 +182,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -288,7 +294,9 @@ describe("ElectionHomePage", () => {
             <TestUserProvider userRole="coordinator_gsb">
               <ElectionProvider electionId={1}>
                 <ElectionStatusProvider electionId={1}>
-                  <RouterProvider router={router} />
+                  <MessagesProvider>
+                    <RouterProvider router={router} />
+                  </MessagesProvider>
                 </ElectionStatusProvider>
               </ElectionProvider>
             </TestUserProvider>
@@ -326,7 +334,7 @@ describe("ElectionHomePage", () => {
 
       rtlRender(<Providers router={router} />);
 
-      expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+      expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraad Heemdamseburg 2026" })).toBeVisible();
       expect(
         await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" }),
       ).toBeVisible();
@@ -371,8 +379,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -645,6 +653,59 @@ describe("ElectionHomePage", () => {
         ]);
       });
     });
+
+    describe("Certificate registration alert", () => {
+      test("Shows alert for administrator and hides it after confirming", async () => {
+        const user = userEvent.setup();
+        const dismissReminder = spyOnHandler(DismissPublicKeyUploadReminderRequestHandler);
+        server.use(ElectionRequestHandler, DismissPublicKeyUploadReminderRequestHandler);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(
+              { ...getElectionMockData(), show_keypair_reminder: true } satisfies ElectionDetailsResponse,
+              { status: 200 },
+            ),
+          ),
+        );
+        await renderGSBPage("administrator");
+
+        const alert = await screen.findByRole("alert");
+        expect(within(alert).getByText("Publieke sleutel registreren", { selector: "strong" })).toBeVisible();
+        expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+          "Je moet de publieke sleutel van dit gemeentelijk stembureau registreren. Doe dit door de sleutel te uploaden naar het overdrachtsplatform van Kiesraad. Doe dit uiterlijk twee dagen voor de dag van stemming.",
+        );
+        expect(within(alert).getByRole("link", { name: "Publieke sleutel registreren" })).toHaveAttribute(
+          "href",
+          "/certificate",
+        );
+
+        const election_information_table = await screen.findByTestId("election-information-table");
+        expect(within(election_information_table).getByRole("row", { name: /Publieke sleutel/ })).toHaveTextContent(
+          "Nog niet geregistreerd",
+        );
+
+        overrideOnce("get", "/api/elections/1", 200, { ...getElectionMockData(), show_keypair_reminder: false });
+        await user.click(within(alert).getByRole("button", { name: "Ik heb dit al gedaan" }));
+        expect(alert).not.toBeInTheDocument();
+        expect(dismissReminder).toHaveBeenCalledOnce();
+        expect(within(election_information_table).getByRole("row", { name: /Publieke sleutel/ })).toHaveTextContent(
+          "Bekijken en downloaden",
+        );
+      });
+
+      test("Does not show alert for coordinator", async () => {
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(
+              { ...getElectionMockData(), show_keypair_reminder: true } satisfies ElectionDetailsResponse,
+              { status: 200 },
+            ),
+          ),
+        );
+        await renderGSBPage("coordinator_gsb");
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      });
+    });
   });
 
   describe("CSB", () => {
@@ -680,8 +741,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "CSB - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Type stembureau", "Centraal stembureau"],
       ]);

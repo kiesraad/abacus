@@ -1,31 +1,46 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <EML xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:kr="http://www.kiesraad.nl/extensions" Id="110a" SchemaVersion="5">
     <TransactionId>1</TransactionId>
-    <IssueDate>2022-02-04</IssueDate>
-    <kr:CreationDateTime>2022-02-04T11:16:26.827</kr:CreationDateTime>
+    <IssueDate>2023-02-09</IssueDate>
+    <kr:CreationDateTime>2023-02-09T15:12:25.983</kr:CreationDateTime>
     <ElectionEvent>
         <EventIdentifier/>
         <Election>
-            <ElectionIdentifier Id="GR2022_Test">
-                <ElectionName>Waterschap Juinen Test 2022</ElectionName>
+            <ElectionIdentifier Id="AB2023_RivierenPolder">
+                <ElectionName>Algemeen bestuur van het waterschap Rivier en Polder 2023</ElectionName>
                 <ElectionCategory>AB</ElectionCategory>
                 <kr:ElectionSubcategory>AB2</kr:ElectionSubcategory>
-                <kr:ElectionDomain Id="0000">Test</kr:ElectionDomain>
-                <kr:ElectionDate>2022-03-16</kr:ElectionDate>
-                <kr:NominationDate>2022-01-31</kr:NominationDate>
+                <kr:ElectionDomain Id="10">Rivier en Polder</kr:ElectionDomain>
+                <kr:ElectionDate>2023-03-15</kr:ElectionDate>
+                <kr:NominationDate>2023-01-30</kr:NominationDate>
             </ElectionIdentifier>
             <Contest>
                 <ContestIdentifier Id="geen"/>
                 <VotingMethod>SPV</VotingMethod>
                 <MaxVotes></MaxVotes>
             </Contest>
-            <kr:NumberOfSeats>45</kr:NumberOfSeats>
+            <kr:NumberOfSeats>26</kr:NumberOfSeats>
             <kr:PreferenceThreshold>25</kr:PreferenceThreshold>
             <kr:ElectionTree>
-                <kr:Region RegionNumber="000" RegionCategory="WATERSCHAP">
-                    <kr:RegionName>Test</kr:RegionName>
+                <kr:Region RegionNumber="10" RegionCategory="WATERSCHAP">
+                    <kr:RegionName>Rivier en Polder</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1" RegionCategory="KIESKRING" SuperiorRegionNumber="10" SuperiorRegionCategory="WATERSCHAP">
+                    <kr:RegionName>Rivier en Polder</kr:RegionName>
                     <kr:Committee CommitteeCategory="CSB"/>
                     <kr:Committee CommitteeCategory="HSB"/>
+                </kr:Region>
+                <kr:Region RegionNumber="123" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Heemdamseburg</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="124" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Juinen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="125" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Middelgein</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="126" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>'s-Gravenveen</kr:RegionName>
                 </kr:Region>
             </kr:ElectionTree>
             <kr:RegisteredParties>

@@ -368,6 +368,19 @@ export const noRecountNoDifferencesDataEntryGSB: Extract<Results, { model: "GSB"
   ],
 };
 
+export const noRecountNoDifferencesWithVoterCardCountDataEntryGSB: Extract<Results, { model: "GSB" }> = structuredClone(
+  noRecountNoDifferencesDataEntryGSB,
+);
+noRecountNoDifferencesWithVoterCardCountDataEntryGSB.voters_counts.proxy_certificate_count = 1400;
+noRecountNoDifferencesWithVoterCardCountDataEntryGSB.voters_counts.voter_card_count = 100;
+// Move a vote from list 1 to list 4 to avoid a tie on residual seats.
+noRecountNoDifferencesWithVoterCardCountDataEntryGSB.political_group_votes[0]!.total--;
+noRecountNoDifferencesWithVoterCardCountDataEntryGSB.political_group_votes[0]!.candidate_votes[0]!.votes--;
+noRecountNoDifferencesWithVoterCardCountDataEntryGSB.votes_counts.political_group_total_votes[0]!.total--;
+noRecountNoDifferencesWithVoterCardCountDataEntryGSB.political_group_votes[3]!.total++;
+noRecountNoDifferencesWithVoterCardCountDataEntryGSB.political_group_votes[3]!.candidate_votes[1]!.votes++;
+noRecountNoDifferencesWithVoterCardCountDataEntryGSB.votes_counts.political_group_total_votes[3]!.total++;
+
 export const noRecountNoDifferencesDrawingLotsForListAndCandidateDataEntryGSB: Extract<Results, { model: "GSB" }> = {
   model: "GSB",
   number_of_voters: 612694,

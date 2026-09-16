@@ -31,7 +31,7 @@ describe("SelectGSB component", () => {
     expect(router.state.location.pathname).toEqual("/elections/create");
   });
 
-  test("Shows the GSBs sorted alphabetically with zero padded numbers", async () => {
+  test("Shows the GSBs sorted alphabetically (ignoring leading `'s-`) with zero padded numbers", async () => {
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
 
@@ -44,8 +44,10 @@ describe("SelectGSB component", () => {
     expect(await screen.findByRole("heading", { name: "Selecteer het gemeentelijk stembureau" })).toBeVisible();
     expect(screen.getByRole("table")).toHaveTableContent([
       ["Nummer", "Gemeentelijk stembureau"],
-      ["0055", "'s Gravenveen"],
-      ["5678", "Sud-Test"],
+      ["0036", "Appeldorp"],
+      ["0999", "Gravenstad"],
+      ["0055", "'s-Gravenveen"],
+      ["5678", "Sudwest-Eemstricht"],
       ["0123", "Súdwest-Eemstricht"],
       ["0020", "Wegenstede"],
     ]);

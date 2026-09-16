@@ -217,6 +217,8 @@ The following dependencies (crates) are used:
 
 The `eml_signature` crate (see [its README](eml_signature/README.md)) additionally uses:
 
+- `aws-lc-rs`: RSA PKCS#1 v1.5 signing and verification.
+- `cms`: CMS `SignedData` types for `.signature` files.
 - `const-oid`: OID constants for reading the certificate subject and key algorithm.
 - `der`: ASN.1 DER primitives and PEM encoding.
 - `rcgen`: RSA key generation and X.509 certificate building (`aws-lc-rs` backend).

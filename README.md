@@ -13,7 +13,7 @@
 
 ### Releases en prereleases
 
-Voor elke verkiezing stelt de Kiesraad [een aparte versie van Abacus](https://github.com/kiesraad/abacus/releases) beschikbaar. De broncode, de uitgevoerde toetsen en de applicatie zelf worden volgens de termijnen in de [verkiezingskalender](https://www.kiesraad.nl/actueel/agenda) gepubliceerd. Op de pagina met alle releases zijn ook prereleases te vinden die voor test- en onderzoeksdoeleinden worden gebruikt. Bij elke officiele versie horen releasenotes met een vrijgaveadvies.
+Voor elke verkiezing stelt de Kiesraad een aparte versie van Abacus beschikbaar. De broncode, de uitgevoerde toetsen en de applicatie zelf worden volgens de termijnen in de [verkiezingskalender](https://www.kiesraad.nl/actueel/agenda) gepubliceerd. Op de [pagina met alle releases](https://github.com/kiesraad/abacus/releases) zijn ook prereleases te vinden die voor test- en onderzoeksdoeleinden worden gebruikt. Bij elke officiële versie horen releasenotes met een vrijgaveadvies.
 
 ### Projectstructuur
 

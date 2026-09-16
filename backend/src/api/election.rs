@@ -41,8 +41,8 @@ use crate::{
         polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, signing_keypair_repo, user_repo::User},
-    service::{create_sub_committee, list_polling_stations_for_session},
+    repository::{committee_session_repo, election_repo, user_repo::User},
+    service::{create_sub_committee, get_show_keypair_reminder, list_polling_stations_for_session},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -208,8 +208,7 @@ pub async fn election_details(
         list_polling_stations_for_session(&mut conn, &current_committee_session).await?;
     let investigations = session_pss.investigations();
     let polling_stations = session_pss.into_responses(election_id);
-    let show_keypair_reminder =
-        signing_keypair_repo::get_show_reminder(&mut conn, election_id).await?;
+    let show_keypair_reminder = get_show_keypair_reminder(&mut conn, &election).await?;
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,

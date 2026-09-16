@@ -138,12 +138,6 @@ pub async fn certificate_details(
 ) -> Result<Json<CertificateDetailsResponse>, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
-    if election.committee_category != CommitteeCategory::GSB {
-        return Err(APIError::NotFound(
-            "Certificate is only available for GSB elections".into(),
-            ErrorReference::EntryNotFound,
-        ));
-    }
 
     let certificate_pem = get_election_certificate(&mut conn, &audit_service, &election).await?;
 
@@ -180,12 +174,6 @@ pub async fn certificate(
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
-    if election.committee_category != CommitteeCategory::GSB {
-        return Err(APIError::NotFound(
-            "Certificate is only available for GSB elections".into(),
-            ErrorReference::EntryNotFound,
-        ));
-    }
 
     let certificate = get_election_certificate(&mut conn, &audit_service, &election).await?;
 

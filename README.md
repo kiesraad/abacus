@@ -60,7 +60,7 @@ De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonder
 
 De software wordt ontworpen en gebouwd door de Kiesraad zelf, in nauwe samenspraak met gebruikers, met name mensen bij gemeenten, waterschappen en de Caribische openbare lichamen. Het team werkt in deze repository aan de software, dus wat je hier ziet is in ontwikkeling. De software staat figuurlijk in de steigers, we werken er dagelijks aan.
 
-Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie is genomen verving de module van OSV2020-U voor het GSB bij 14 gemeenten tijdens de gemeenteraadsverkiezingen in 2026. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen. De software wordt pas in productie genomen als deze aan alle eisen voldoet.
+Abacus vervangt OSV2020 stapsgewijs. Abacus 1.0.1 verving tijdens de gemeenteraadsverkiezingen in 2026 in 14 gemeenten de module _OSV2020-U voor het GSB_. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen (HSB, CSB) en verkiezingen.
 
 De uitgangspunten bij het ontwerp en de bouw van Abacus zijn gebruiksvriendelijkheid en eenvoud, naast de waarden integriteit, transparantie en controleerbaarheid. De software dient voor het correct invoeren van de resultaten van de stembureaus volgens het vier-ogenprincipe, voor het maken van de optelling van alle ingevoerde stembureaus en het opstellen van het proces-verbaal met de resultaten.
 

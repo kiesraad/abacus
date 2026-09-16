@@ -27,7 +27,7 @@ export const GSB_CSO: Story = {
     await expect(lists[0]).toBeVisible();
     const first_listitems = within(lists[0]!).getAllByRole("listitem");
     await expect(first_listitems.length).toBe(3);
-    await expect(first_listitems[0]).toHaveTextContent("verkiezing: Gemeenteraadsverkiezingen 2026");
+    await expect(first_listitems[0]).toHaveTextContent("verkiezing: Gemeenteraad Heemdamseburg 2026");
     await expect(first_listitems[1]).toHaveTextContent("type stembureau: Gemeentelijk stembureau");
     await expect(first_listitems[2]).toHaveTextContent("gebiedsaanduiding: Heemdamseburg");
 
@@ -56,7 +56,7 @@ export const GSB_DSO_WithoutPollingStations: Story = {
     await expect(lists[0]).toBeVisible();
     const first_listitems = within(lists[0]!).getAllByRole("listitem");
     await expect(first_listitems.length).toBe(3);
-    await expect(first_listitems[0]).toHaveTextContent("verkiezing: Gemeenteraadsverkiezingen 2026");
+    await expect(first_listitems[0]).toHaveTextContent("verkiezing: Gemeenteraad Heemdamseburg 2026");
     await expect(first_listitems[1]).toHaveTextContent("type stembureau: Gemeentelijk stembureau");
     await expect(first_listitems[2]).toHaveTextContent("gebiedsaanduiding: Heemdamseburg");
 
@@ -82,7 +82,7 @@ export const CSB: Story = {
     await expect(lists[0]).toBeVisible();
     const first_listitems = within(lists[0]!).getAllByRole("listitem");
     await expect(first_listitems.length).toBe(3);
-    await expect(first_listitems[0]).toHaveTextContent("verkiezing: Gemeenteraadsverkiezingen 2026");
+    await expect(first_listitems[0]).toHaveTextContent("verkiezing: Gemeenteraad Heemdamseburg 2026");
     await expect(first_listitems[1]).toHaveTextContent("type stembureau: Centraal stembureau");
     await expect(first_listitems[2]).toHaveTextContent("gebiedsaanduiding: Heemdamseburg");
 

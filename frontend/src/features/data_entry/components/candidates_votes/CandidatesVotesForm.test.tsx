@@ -299,7 +299,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const electionMockData: ElectionWithPoliticalGroups = {
         id: 1,
-        name: "Gemeenteraadsverkiezingen 2026",
+        name: "Gemeenteraad Heemdamseburg 2026",
         committee_category: "GSB",
         counting_method: "CSO",
         election_id: "GR2024_Heemdamseburg",

@@ -54,7 +54,7 @@ export function ElectionInformationTable({
             {t("election_management.electoral_area")}
           </Table.HeaderCell>
           <Table.Cell>
-            {election.authority_id} - {t("municipality")} {election.authority_region}
+            {election.authority_id} - {election.authority_region}
           </Table.Cell>
         </Table.Row>
         <Table.Row>

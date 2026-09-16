@@ -96,7 +96,7 @@ describe("GSBElectionReportSection", () => {
     expect(
       await screen.findByRole("heading", {
         level: 2,
-        name: "Telresultaten tweede zitting gemeentelijk stembureau gemeente Heemdamseburg",
+        name: "Telresultaten tweede zitting gemeentelijk stembureau Heemdamseburg",
       }),
     ).toBeVisible();
 
@@ -141,7 +141,7 @@ describe("GSBElectionReportSection", () => {
     expect(
       await screen.findByRole("heading", {
         level: 2,
-        name: "Telresultaten tweede zitting gemeentelijk stembureau gemeente Heemdamseburg",
+        name: "Telresultaten tweede zitting gemeentelijk stembureau Heemdamseburg",
       }),
     ).toBeVisible();
 

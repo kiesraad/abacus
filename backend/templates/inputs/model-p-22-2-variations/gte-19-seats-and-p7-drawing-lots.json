@@ -208,7 +208,7 @@
               "initials": "B.",
               "first_name": "Bart",
               "last_name": "Tax",
-              "locality": "'s Gravenveen",
+              "locality": "'s-Gravenveen",
               "gender": "Female"
             },
             "votes": 0
@@ -295,7 +295,7 @@
             "initials": "B.",
             "first_name": "Bart",
             "last_name": "Tax",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Female"
           },
           {
@@ -312,7 +312,7 @@
             "initials": "R.E.",
             "first_name": "Ruth",
             "last_name": "Hoogstraten",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Female"
           },
           {
@@ -387,7 +387,7 @@
             "initials": "C.",
             "first_name": "Christina",
             "last_name": "Gopal",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Male"
           },
           {
@@ -646,7 +646,7 @@
               "initials": "G.",
               "last_name_prefix": "de",
               "last_name": "Vegt",
-              "locality": "'s Gravenveen",
+              "locality": "'s-Gravenveen",
               "gender": "Male"
             },
             "votes": 140
@@ -683,7 +683,7 @@
             "initials": "G.",
             "last_name_prefix": "de",
             "last_name": "Vegt",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Male"
           },
           {
@@ -713,7 +713,7 @@
             "initials": "N.",
             "last_name_prefix": "van de",
             "last_name": "Kerkhof",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Female"
           },
           {
@@ -793,7 +793,7 @@
             "number": 16,
             "initials": "G.",
             "last_name": "Boermans",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Male"
           },
           {
@@ -915,7 +915,7 @@
             "number": 33,
             "initials": "E.L.",
             "last_name": "Goedhart",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Male"
           },
           {
@@ -1032,7 +1032,7 @@
             "number": 49,
             "initials": "T.",
             "last_name": "Wiertz",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Male"
           },
           {
@@ -1131,7 +1131,7 @@
             "initials": "R.V.",
             "first_name": "Rachid",
             "last_name": "Born",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Male"
           },
           {
@@ -1190,7 +1190,7 @@
             "first_name": "Madelène",
             "last_name_prefix": "den",
             "last_name": "Mateman",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "X"
           },
           {
@@ -1289,7 +1289,7 @@
             "initials": "J.",
             "first_name": "Jory",
             "last_name": "Hoogstraten",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Male"
           },
           {
@@ -1306,7 +1306,7 @@
             "initials": "R.",
             "first_name": "Ruth",
             "last_name": "Wiertz",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Female"
           },
           {
@@ -1363,7 +1363,7 @@
             "initials": "H.",
             "first_name": "Henk",
             "last_name": "Boermans",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Male"
           },
           {
@@ -1404,7 +1404,7 @@
             "initials": "E.",
             "first_name": "Eelko",
             "last_name": "Cornelis",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Female"
           },
           {
@@ -1502,7 +1502,7 @@
               "initials": "D.B.F.",
               "last_name_prefix": "van",
               "last_name": "Jaspers-Gezen",
-              "locality": "'s Gravenveen",
+              "locality": "'s-Gravenveen",
               "gender": "Female"
             },
             "votes": 140
@@ -1539,7 +1539,7 @@
             "initials": "D.B.F.",
             "last_name_prefix": "van",
             "last_name": "Jaspers-Gezen",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Female"
           },
           {
@@ -1666,7 +1666,7 @@
             "number": 18,
             "initials": "S.",
             "last_name": "Wolfswinkel",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "X"
           },
           {
@@ -1738,7 +1738,7 @@
             "number": 28,
             "initials": "S.D.",
             "last_name": "Katsma",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Female"
           },
           {
@@ -1774,7 +1774,7 @@
             "number": 33,
             "initials": "L.O.",
             "last_name": "Bruins-Van den Kerk",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Male"
           },
           {
@@ -2137,7 +2137,7 @@
             "initials": "J.E.",
             "first_name": "Jelisa",
             "last_name": "Wolfswinkel",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "X"
           },
           {
@@ -2376,7 +2376,7 @@
               "first_name": "Salomon",
               "last_name_prefix": "van de",
               "last_name": "Kerkhof",
-              "locality": "'s Gravenveen",
+              "locality": "'s-Gravenveen",
               "gender": "X"
             },
             "votes": 0
@@ -2410,7 +2410,7 @@
             "first_name": "Salomon",
             "last_name_prefix": "van de",
             "last_name": "Kerkhof",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "X"
           },
           {
@@ -2486,7 +2486,7 @@
             "initials": "L.",
             "first_name": "Leontien",
             "last_name": "Wolfswinkel",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Female"
           },
           {
@@ -2518,7 +2518,7 @@
             "initials": "C.",
             "first_name": "Christina",
             "last_name": "Goedhart",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "Female"
           },
           {
@@ -2627,7 +2627,7 @@
             "initials": "L.M.N.T.",
             "first_name": "Leontien",
             "last_name": "Wiertz",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "X"
           },
           {
@@ -2678,7 +2678,7 @@
             "first_name": "Jelisa",
             "last_name_prefix": "van",
             "last_name": "Lent",
-            "locality": "'s Gravenveen",
+            "locality": "'s-Gravenveen",
             "gender": "X"
           },
           {
@@ -2881,7 +2881,7 @@
         "initials": "D.B.F.",
         "last_name_prefix": "van",
         "last_name": "Jaspers-Gezen",
-        "locality": "'s Gravenveen",
+        "locality": "'s-Gravenveen",
         "gender": "Female",
         "list_number": 4,
         "list_name": "De Kandidatenlijst"
@@ -2913,7 +2913,7 @@
         "first_name": "Salomon",
         "last_name_prefix": "van de",
         "last_name": "Kerkhof",
-        "locality": "'s Gravenveen",
+        "locality": "'s-Gravenveen",
         "gender": "X",
         "list_number": 6,
         "list_name": "Algemene Lijst"
@@ -2986,7 +2986,7 @@
         "initials": "B.",
         "first_name": "Bart",
         "last_name": "Tax",
-        "locality": "'s Gravenveen",
+        "locality": "'s-Gravenveen",
         "gender": "Female",
         "list_number": 1,
         "list_name": "Stem nu!"
@@ -3025,7 +3025,7 @@
         "initials": "G.",
         "last_name_prefix": "de",
         "last_name": "Vegt",
-        "locality": "'s Gravenveen",
+        "locality": "'s-Gravenveen",
         "gender": "Male",
         "list_number": 2,
         "list_name": "Stemmers 101"

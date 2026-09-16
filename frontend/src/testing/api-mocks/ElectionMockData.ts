@@ -358,7 +358,7 @@ export const getElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
   investigations: PollingStationInvestigation[] = mockInvestigations,
-): Required<ElectionDetailsResponse> => {
+): ElectionDetailsResponse => {
   const updatedCommitteeSession = getCommitteeSessionMockData(committeeSession);
 
   // If committee session number > 1, add prev_data_entry_id to polling stations
@@ -386,7 +386,7 @@ export const getElectionMockData = (
 export const getCSBElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
-): Required<ElectionDetailsResponse> => {
+): ElectionDetailsResponse => {
   const updatedCommitteeSession = getCSBCommitteeSessionMockData(committeeSession);
 
   return {
@@ -403,8 +403,8 @@ export const getCSBElectionMockData = (
 };
 
 export const investigationListMockResponse: InvestigationListResponse = { investigations: mockInvestigations };
-export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
-export const csbElectionDetailsMockResponse: Required<ElectionDetailsResponse> = getCSBElectionMockData();
+export const electionDetailsMockResponse = getElectionMockData();
+export const csbElectionDetailsMockResponse = getCSBElectionMockData();
 
 export const electionMockData = electionDetailsMockResponse.election;
 export const provincialElectionMockData = getElectionMockData(electionListMockResponse.elections[4]).election;
@@ -476,20 +476,32 @@ export const gsbListMockData: RegionDetails[] = [
     frisian_export_allowed: true,
   },
   {
+    name: "Appeldorp",
+    key: { category: "Municipality", number: 36 },
+    roman_numerals: false,
+    frisian_export_allowed: true,
+  },
+  {
     name: "Súdwest-Eemstricht",
     key: { category: "Municipality", number: 123 },
     roman_numerals: false,
     frisian_export_allowed: true,
   },
   {
-    name: "Sud-Test",
+    name: "Sudwest-Eemstricht",
     key: { category: "Municipality", number: 5678 },
     roman_numerals: false,
     frisian_export_allowed: true,
   },
   {
-    name: "'s Gravenveen",
+    name: "'s-Gravenveen",
     key: { category: "Municipality", number: 55 },
+    roman_numerals: false,
+    frisian_export_allowed: true,
+  },
+  {
+    name: "Gravenstad",
+    key: { category: "Municipality", number: 999 },
     roman_numerals: false,
     frisian_export_allowed: true,
   },

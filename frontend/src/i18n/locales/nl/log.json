@@ -43,6 +43,7 @@
     "PollingStationUpdated": "Stembureau bijgewerkt",
     "PollingStationsImported": "Stembureaus geïmporteerd",
     "PollingStationsExported": "Stembureaus geëxporteerd",
+    "PublicKeyUploadReminderDismissed": "Publieke sleutel uploadherinnering afgevinkt",
     "SigningKeypairCreated": "Sleutel-paar voor digitale handtekeningen aangemaakt",
     "UnknownEvent": "Onbekende gebeurtenis",
     "UserAccountUpdated": "Eigen account bijgewerkt",

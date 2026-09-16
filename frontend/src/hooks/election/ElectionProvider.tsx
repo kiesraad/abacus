@@ -26,6 +26,7 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
             election: data.election,
             pollingStations: data.polling_stations,
             investigations: data.investigations,
+            showKeypairReminder: data.show_keypair_reminder,
             refetch,
           }}
         >

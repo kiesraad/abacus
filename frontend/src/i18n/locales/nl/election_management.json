@@ -3,6 +3,12 @@
   "add_polling_stations_first": "De invoerfase kan pas gestart worden als er stembureaus zijn toegevoegd.",
   "add_the_date_and_time": "Voer de datum en tijd in waarop de zitting van het gemeentelijke stembureau officieel is geopend.",
   "add_the_location": "Vul de plaatsnaam in. Bijvoorbeeld <em>Amersfoort</em>",
+  "alert_register": {
+    "title": "Publieke sleutel registreren",
+    "explanation": "Je moet de publieke sleutel van dit {committee} registreren. Doe dit door de sleutel te uploaden naar het overdrachtsplatform van Kiesraad. <strong>Doe dit uiterlijk twee dagen voor de dag van stemming.</strong>",
+    "register": "Publieke sleutel registreren",
+    "register_already_done": "Ik heb dit al gedaan"
+  },
   "began_on": "Begon op",
   "committee_session_details": "Details van de zitting",
   "custom_committee_session_details": "Details van {sessionLabel}",

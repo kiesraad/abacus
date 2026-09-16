@@ -133,7 +133,7 @@ const LOCALITIES: &[&str] = &[
     "Heemdamseburg",
     "Juinen",
     "Middelgein",
-    "'s Gravenveen",
+    "'s-Gravenveen",
     "Sluisdam",
     "Hovenerwoud",
     "Bloemstede",

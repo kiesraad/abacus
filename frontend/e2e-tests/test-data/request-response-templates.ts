@@ -2,9 +2,6 @@ import type {
   CommonPollingStationResults,
   CSOFirstSessionResults,
   DataEntry,
-  DSOFirstSessionResults,
-  GSBResults,
-  NextSessionResults,
   PollingStationRequest,
   Results,
   SaveDataEntryResponse,
@@ -71,90 +68,36 @@ export function emptyCSOFirstSessionResults(): CSOFirstSessionResults {
         number: 1,
         total: 0,
         candidate_votes: [
-          {
-            number: 1,
-            votes: 0,
-          },
-          {
-            number: 2,
-            votes: 0,
-          },
-          {
-            number: 3,
-            votes: 0,
-          },
-          {
-            number: 4,
-            votes: 0,
-          },
-          {
-            number: 5,
-            votes: 0,
-          },
-          {
-            number: 6,
-            votes: 0,
-          },
-          {
-            number: 7,
-            votes: 0,
-          },
-          {
-            number: 8,
-            votes: 0,
-          },
-          {
-            number: 9,
-            votes: 0,
-          },
-          {
-            number: 10,
-            votes: 0,
-          },
-          {
-            number: 11,
-            votes: 0,
-          },
-          {
-            number: 12,
-            votes: 0,
-          },
+          { number: 1, votes: 0 },
+          { number: 2, votes: 0 },
+          { number: 3, votes: 0 },
+          { number: 4, votes: 0 },
+          { number: 5, votes: 0 },
+          { number: 6, votes: 0 },
+          { number: 7, votes: 0 },
+          { number: 8, votes: 0 },
+          { number: 9, votes: 0 },
+          { number: 10, votes: 0 },
+          { number: 11, votes: 0 },
+          { number: 12, votes: 0 },
         ],
       },
       {
         number: 2,
         total: 0,
         candidate_votes: [
-          {
-            number: 1,
-            votes: 0,
-          },
-          {
-            number: 2,
-            votes: 0,
-          },
-          {
-            number: 3,
-            votes: 0,
-          },
-          {
-            number: 4,
-            votes: 0,
-          },
+          { number: 1, votes: 0 },
+          { number: 2, votes: 0 },
+          { number: 3, votes: 0 },
+          { number: 4, votes: 0 },
         ],
       },
       {
         number: 3,
         total: 0,
         candidate_votes: [
-          {
-            number: 1,
-            votes: 0,
-          },
-          {
-            number: 2,
-            votes: 0,
-          },
+          { number: 1, votes: 0 },
+          { number: 2, votes: 0 },
         ],
       },
     ],
@@ -193,96 +136,42 @@ const commonDataEntry: CommonPollingStationResults = {
       number: 1,
       total: 3536,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 1337,
-        },
-        {
-          number: 2,
-          votes: 423,
-        },
-        {
-          number: 3,
-          votes: 300,
-        },
-        {
-          number: 4,
-          votes: 236,
-        },
-        {
-          number: 5,
-          votes: 533,
-        },
-        {
-          number: 6,
-          votes: 205,
-        },
-        {
-          number: 7,
-          votes: 103,
-        },
-        {
-          number: 8,
-          votes: 286,
-        },
-        {
-          number: 9,
-          votes: 0,
-        },
-        {
-          number: 10,
-          votes: 0,
-        },
-        {
-          number: 11,
-          votes: 113,
-        },
-        {
-          number: 12,
-          votes: 0,
-        },
+        { number: 1, votes: 1337 },
+        { number: 2, votes: 423 },
+        { number: 3, votes: 300 },
+        { number: 4, votes: 236 },
+        { number: 5, votes: 533 },
+        { number: 6, votes: 205 },
+        { number: 7, votes: 103 },
+        { number: 8, votes: 286 },
+        { number: 9, votes: 0 },
+        { number: 10, votes: 0 },
+        { number: 11, votes: 113 },
+        { number: 12, votes: 0 },
       ],
     },
     {
       number: 2,
       total: 36,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 28,
-        },
-        {
-          number: 2,
-          votes: 4,
-        },
-        {
-          number: 3,
-          votes: 2,
-        },
-        {
-          number: 4,
-          votes: 2,
-        },
+        { number: 1, votes: 28 },
+        { number: 2, votes: 4 },
+        { number: 3, votes: 2 },
+        { number: 4, votes: 2 },
       ],
     },
     {
       number: 3,
       total: 0,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 0,
-        },
-        {
-          number: 2,
-          votes: 0,
-        },
+        { number: 1, votes: 0 },
+        { number: 2, votes: 0 },
       ],
     },
   ],
 };
 
-export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: "CSOFirstSession" } = {
+export const noRecountNoDifferencesDataEntry: Extract<Results, { model: "CSOFirstSession" }> = {
   model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: true },
@@ -295,9 +184,7 @@ export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: 
   ...structuredClone(commonDataEntry),
 };
 
-export const checksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & {
-  model: "DSOFirstSession";
-} = {
+export const checksAndCorrectionsDataEntryDSO: Extract<Results, { model: "DSOFirstSession" }> = {
   model: "DSOFirstSession",
   about_report: {
     corrigendum_present: "TwoDocuments",
@@ -311,7 +198,7 @@ export const checksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & {
   ...structuredClone(commonDataEntry),
 };
 
-export const noChecksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & { model: "DSOFirstSession" } = {
+export const noChecksAndCorrectionsDataEntryDSO: Extract<Results, { model: "DSOFirstSession" }> = {
   model: "DSOFirstSession",
   about_report: {
     corrigendum_present: "OneDocument",
@@ -325,7 +212,22 @@ export const noChecksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & { mode
   ...structuredClone(commonDataEntry),
 };
 
-export const noRecountNoDifferencesDataEntryGSB: GSBResults & { model: "GSB" } = {
+export const noRecountNoDifferencesWithVoterCardCountDataEntry: Extract<Results, { model: "CSOFirstSession" }> =
+  structuredClone(noRecountNoDifferencesDataEntry);
+noRecountNoDifferencesWithVoterCardCountDataEntry.voters_counts.proxy_certificate_count = 150;
+noRecountNoDifferencesWithVoterCardCountDataEntry.voters_counts.voter_card_count = 7;
+
+export const checksAndCorrectionsWithVoterCardCountDataEntryDSO: Extract<Results, { model: "DSOFirstSession" }> =
+  structuredClone(checksAndCorrectionsDataEntryDSO);
+checksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.proxy_certificate_count = 150;
+checksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.voter_card_count = 7;
+
+export const noChecksAndCorrectionsWithVoterCardCountDataEntryDSO: Extract<Results, { model: "DSOFirstSession" }> =
+  structuredClone(noChecksAndCorrectionsDataEntryDSO);
+noChecksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.proxy_certificate_count = 150;
+noChecksAndCorrectionsWithVoterCardCountDataEntryDSO.voters_counts.voter_card_count = 7;
+
+export const noRecountNoDifferencesDataEntryGSB: Extract<Results, { model: "GSB" }> = {
   model: "GSB",
   number_of_voters: 612694,
   voters_counts: {
@@ -359,276 +261,114 @@ export const noRecountNoDifferencesDataEntryGSB: GSBResults & { model: "GSB" } =
       number: 1,
       total: 80000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 40000,
-        },
-        {
-          number: 2,
-          votes: 20000,
-        },
-        {
-          number: 3,
-          votes: 5000,
-        },
-        {
-          number: 4,
-          votes: 900,
-        },
-        {
-          number: 5,
-          votes: 800,
-        },
-        {
-          number: 6,
-          votes: 700,
-        },
-        {
-          number: 7,
-          votes: 600,
-        },
-        {
-          number: 8,
-          votes: 500,
-        },
-        {
-          number: 9,
-          votes: 400,
-        },
-        {
-          number: 10,
-          votes: 300,
-        },
-        {
-          number: 11,
-          votes: 200,
-        },
-        {
-          number: 12,
-          votes: 10600,
-        },
+        { number: 1, votes: 40000 },
+        { number: 2, votes: 20000 },
+        { number: 3, votes: 5000 },
+        { number: 4, votes: 900 },
+        { number: 5, votes: 800 },
+        { number: 6, votes: 700 },
+        { number: 7, votes: 600 },
+        { number: 8, votes: 500 },
+        { number: 9, votes: 400 },
+        { number: 10, votes: 300 },
+        { number: 11, votes: 200 },
+        { number: 12, votes: 10600 },
       ],
     },
     {
       number: 2,
       total: 14000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 8000,
-        },
-        {
-          number: 2,
-          votes: 2000,
-        },
-        {
-          number: 3,
-          votes: 1500,
-        },
-        {
-          number: 4,
-          votes: 2500,
-        },
+        { number: 1, votes: 8000 },
+        { number: 2, votes: 2000 },
+        { number: 3, votes: 1500 },
+        { number: 4, votes: 2500 },
       ],
     },
     {
       number: 3,
       total: 6000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 4000,
-        },
-        {
-          number: 2,
-          votes: 2000,
-        },
+        { number: 1, votes: 4000 },
+        { number: 2, votes: 2000 },
       ],
     },
     {
       number: 4,
       total: 70000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 30000,
-        },
-        {
-          number: 2,
-          votes: 20000,
-        },
-        {
-          number: 3,
-          votes: 5000,
-        },
-        {
-          number: 4,
-          votes: 900,
-        },
-        {
-          number: 5,
-          votes: 800,
-        },
-        {
-          number: 6,
-          votes: 700,
-        },
-        {
-          number: 7,
-          votes: 600,
-        },
-        {
-          number: 8,
-          votes: 500,
-        },
-        {
-          number: 9,
-          votes: 400,
-        },
-        {
-          number: 10,
-          votes: 300,
-        },
-        {
-          number: 11,
-          votes: 200,
-        },
-        {
-          number: 12,
-          votes: 10600,
-        },
+        { number: 1, votes: 30000 },
+        { number: 2, votes: 20000 },
+        { number: 3, votes: 5000 },
+        { number: 4, votes: 900 },
+        { number: 5, votes: 800 },
+        { number: 6, votes: 700 },
+        { number: 7, votes: 600 },
+        { number: 8, votes: 500 },
+        { number: 9, votes: 400 },
+        { number: 10, votes: 300 },
+        { number: 11, votes: 200 },
+        { number: 12, votes: 10600 },
       ],
     },
     {
       number: 5,
       total: 21000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 10000,
-        },
-        {
-          number: 2,
-          votes: 5000,
-        },
-        {
-          number: 3,
-          votes: 1500,
-        },
-        {
-          number: 4,
-          votes: 4500,
-        },
+        { number: 1, votes: 10000 },
+        { number: 2, votes: 5000 },
+        { number: 3, votes: 1500 },
+        { number: 4, votes: 4500 },
       ],
     },
     {
       number: 6,
       total: 9000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 7000,
-        },
-        {
-          number: 2,
-          votes: 2000,
-        },
+        { number: 1, votes: 7000 },
+        { number: 2, votes: 2000 },
       ],
     },
     {
       number: 7,
       total: 60000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 30000,
-        },
-        {
-          number: 2,
-          votes: 10000,
-        },
-        {
-          number: 3,
-          votes: 5000,
-        },
-        {
-          number: 4,
-          votes: 900,
-        },
-        {
-          number: 5,
-          votes: 800,
-        },
-        {
-          number: 6,
-          votes: 700,
-        },
-        {
-          number: 7,
-          votes: 600,
-        },
-        {
-          number: 8,
-          votes: 500,
-        },
-        {
-          number: 9,
-          votes: 400,
-        },
-        {
-          number: 10,
-          votes: 300,
-        },
-        {
-          number: 11,
-          votes: 200,
-        },
-        {
-          number: 12,
-          votes: 10600,
-        },
+        { number: 1, votes: 30000 },
+        { number: 2, votes: 10000 },
+        { number: 3, votes: 5000 },
+        { number: 4, votes: 900 },
+        { number: 5, votes: 800 },
+        { number: 6, votes: 700 },
+        { number: 7, votes: 600 },
+        { number: 8, votes: 500 },
+        { number: 9, votes: 400 },
+        { number: 10, votes: 300 },
+        { number: 11, votes: 200 },
+        { number: 12, votes: 10600 },
       ],
     },
     {
       number: 8,
       total: 32000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 26000,
-        },
-        {
-          number: 2,
-          votes: 2000,
-        },
-        {
-          number: 3,
-          votes: 1500,
-        },
-        {
-          number: 4,
-          votes: 2500,
-        },
+        { number: 1, votes: 26000 },
+        { number: 2, votes: 2000 },
+        { number: 3, votes: 1500 },
+        { number: 4, votes: 2500 },
       ],
     },
     {
       number: 9,
       total: 8000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 5000,
-        },
-        {
-          number: 2,
-          votes: 3000,
-        },
+        { number: 1, votes: 5000 },
+        { number: 2, votes: 3000 },
       ],
     },
   ],
 };
 
-export const noRecountNoDifferencesDrawingLotsForListAndCandidateDataEntryGSB: GSBResults & { model: "GSB" } = {
+export const noRecountNoDifferencesDrawingLotsForListAndCandidateDataEntryGSB: Extract<Results, { model: "GSB" }> = {
   model: "GSB",
   number_of_voters: 612694,
   voters_counts: {
@@ -662,276 +402,114 @@ export const noRecountNoDifferencesDrawingLotsForListAndCandidateDataEntryGSB: G
       number: 1,
       total: 80000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 40000,
-        },
-        {
-          number: 2,
-          votes: 20000,
-        },
-        {
-          number: 3,
-          votes: 5000,
-        },
-        {
-          number: 4,
-          votes: 900,
-        },
-        {
-          number: 5,
-          votes: 800,
-        },
-        {
-          number: 6,
-          votes: 700,
-        },
-        {
-          number: 7,
-          votes: 600,
-        },
-        {
-          number: 8,
-          votes: 500,
-        },
-        {
-          number: 9,
-          votes: 400,
-        },
-        {
-          number: 10,
-          votes: 300,
-        },
-        {
-          number: 11,
-          votes: 200,
-        },
-        {
-          number: 12,
-          votes: 10600,
-        },
+        { number: 1, votes: 40000 },
+        { number: 2, votes: 20000 },
+        { number: 3, votes: 5000 },
+        { number: 4, votes: 900 },
+        { number: 5, votes: 800 },
+        { number: 6, votes: 700 },
+        { number: 7, votes: 600 },
+        { number: 8, votes: 500 },
+        { number: 9, votes: 400 },
+        { number: 10, votes: 300 },
+        { number: 11, votes: 200 },
+        { number: 12, votes: 10600 },
       ],
     },
     {
       number: 2,
       total: 10000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 2500,
-        },
-        {
-          number: 2,
-          votes: 2500,
-        },
-        {
-          number: 3,
-          votes: 2500,
-        },
-        {
-          number: 4,
-          votes: 2500,
-        },
+        { number: 1, votes: 2500 },
+        { number: 2, votes: 2500 },
+        { number: 3, votes: 2500 },
+        { number: 4, votes: 2500 },
       ],
     },
     {
       number: 3,
       total: 10000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 5000,
-        },
-        {
-          number: 2,
-          votes: 5000,
-        },
+        { number: 1, votes: 5000 },
+        { number: 2, votes: 5000 },
       ],
     },
     {
       number: 4,
       total: 80000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 40000,
-        },
-        {
-          number: 2,
-          votes: 20000,
-        },
-        {
-          number: 3,
-          votes: 5000,
-        },
-        {
-          number: 4,
-          votes: 900,
-        },
-        {
-          number: 5,
-          votes: 800,
-        },
-        {
-          number: 6,
-          votes: 700,
-        },
-        {
-          number: 7,
-          votes: 600,
-        },
-        {
-          number: 8,
-          votes: 500,
-        },
-        {
-          number: 9,
-          votes: 400,
-        },
-        {
-          number: 10,
-          votes: 300,
-        },
-        {
-          number: 11,
-          votes: 200,
-        },
-        {
-          number: 12,
-          votes: 10600,
-        },
+        { number: 1, votes: 40000 },
+        { number: 2, votes: 20000 },
+        { number: 3, votes: 5000 },
+        { number: 4, votes: 900 },
+        { number: 5, votes: 800 },
+        { number: 6, votes: 700 },
+        { number: 7, votes: 600 },
+        { number: 8, votes: 500 },
+        { number: 9, votes: 400 },
+        { number: 10, votes: 300 },
+        { number: 11, votes: 200 },
+        { number: 12, votes: 10600 },
       ],
     },
     {
       number: 5,
       total: 14000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 8000,
-        },
-        {
-          number: 2,
-          votes: 2000,
-        },
-        {
-          number: 3,
-          votes: 1500,
-        },
-        {
-          number: 4,
-          votes: 2500,
-        },
+        { number: 1, votes: 8000 },
+        { number: 2, votes: 2000 },
+        { number: 3, votes: 1500 },
+        { number: 4, votes: 2500 },
       ],
     },
     {
       number: 6,
       total: 6000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 4000,
-        },
-        {
-          number: 2,
-          votes: 2000,
-        },
+        { number: 1, votes: 4000 },
+        { number: 2, votes: 2000 },
       ],
     },
     {
       number: 7,
       total: 80000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 40000,
-        },
-        {
-          number: 2,
-          votes: 20000,
-        },
-        {
-          number: 3,
-          votes: 5000,
-        },
-        {
-          number: 4,
-          votes: 900,
-        },
-        {
-          number: 5,
-          votes: 800,
-        },
-        {
-          number: 6,
-          votes: 700,
-        },
-        {
-          number: 7,
-          votes: 600,
-        },
-        {
-          number: 8,
-          votes: 500,
-        },
-        {
-          number: 9,
-          votes: 400,
-        },
-        {
-          number: 10,
-          votes: 300,
-        },
-        {
-          number: 11,
-          votes: 200,
-        },
-        {
-          number: 12,
-          votes: 10600,
-        },
+        { number: 1, votes: 40000 },
+        { number: 2, votes: 20000 },
+        { number: 3, votes: 5000 },
+        { number: 4, votes: 900 },
+        { number: 5, votes: 800 },
+        { number: 6, votes: 700 },
+        { number: 7, votes: 600 },
+        { number: 8, votes: 500 },
+        { number: 9, votes: 400 },
+        { number: 10, votes: 300 },
+        { number: 11, votes: 200 },
+        { number: 12, votes: 10600 },
       ],
     },
     {
       number: 8,
       total: 14000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 8000,
-        },
-        {
-          number: 2,
-          votes: 2000,
-        },
-        {
-          number: 3,
-          votes: 1500,
-        },
-        {
-          number: 4,
-          votes: 2500,
-        },
+        { number: 1, votes: 8000 },
+        { number: 2, votes: 2000 },
+        { number: 3, votes: 1500 },
+        { number: 4, votes: 2500 },
       ],
     },
     {
       number: 9,
       total: 6000,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 4000,
-        },
-        {
-          number: 2,
-          votes: 2000,
-        },
+        { number: 1, votes: 4000 },
+        { number: 2, votes: 2000 },
       ],
     },
   ],
 };
 
-export const noRecountNoDifferencesDrawingLotsForP9DataEntryGSB: GSBResults & { model: "GSB" } = {
+export const noRecountNoDifferencesDrawingLotsForP9DataEntryGSB: Extract<Results, { model: "GSB" }> = {
   model: "GSB",
   number_of_voters: 8000,
   voters_counts: {
@@ -965,276 +543,114 @@ export const noRecountNoDifferencesDrawingLotsForP9DataEntryGSB: GSBResults & { 
       number: 1,
       total: 2552,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 1000,
-        },
-        {
-          number: 2,
-          votes: 400,
-        },
-        {
-          number: 3,
-          votes: 300,
-        },
-        {
-          number: 4,
-          votes: 200,
-        },
-        {
-          number: 5,
-          votes: 100,
-        },
-        {
-          number: 6,
-          votes: 50,
-        },
-        {
-          number: 7,
-          votes: 2,
-        },
-        {
-          number: 8,
-          votes: 0,
-        },
-        {
-          number: 9,
-          votes: 0,
-        },
-        {
-          number: 10,
-          votes: 0,
-        },
-        {
-          number: 11,
-          votes: 0,
-        },
-        {
-          number: 12,
-          votes: 500,
-        },
+        { number: 1, votes: 1000 },
+        { number: 2, votes: 400 },
+        { number: 3, votes: 300 },
+        { number: 4, votes: 200 },
+        { number: 5, votes: 100 },
+        { number: 6, votes: 50 },
+        { number: 7, votes: 2 },
+        { number: 8, votes: 0 },
+        { number: 9, votes: 0 },
+        { number: 10, votes: 0 },
+        { number: 11, votes: 0 },
+        { number: 12, votes: 500 },
       ],
     },
     {
       number: 2,
       total: 511,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 500,
-        },
-        {
-          number: 2,
-          votes: 0,
-        },
-        {
-          number: 3,
-          votes: 0,
-        },
-        {
-          number: 4,
-          votes: 11,
-        },
+        { number: 1, votes: 500 },
+        { number: 2, votes: 0 },
+        { number: 3, votes: 0 },
+        { number: 4, votes: 11 },
       ],
     },
     {
       number: 3,
       total: 511,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 400,
-        },
-        {
-          number: 2,
-          votes: 111,
-        },
+        { number: 1, votes: 400 },
+        { number: 2, votes: 111 },
       ],
     },
     {
       number: 4,
       total: 511,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 300,
-        },
-        {
-          number: 2,
-          votes: 100,
-        },
-        {
-          number: 3,
-          votes: 0,
-        },
-        {
-          number: 4,
-          votes: 0,
-        },
-        {
-          number: 5,
-          votes: 0,
-        },
-        {
-          number: 6,
-          votes: 0,
-        },
-        {
-          number: 7,
-          votes: 0,
-        },
-        {
-          number: 8,
-          votes: 0,
-        },
-        {
-          number: 9,
-          votes: 0,
-        },
-        {
-          number: 10,
-          votes: 0,
-        },
-        {
-          number: 11,
-          votes: 0,
-        },
-        {
-          number: 12,
-          votes: 111,
-        },
+        { number: 1, votes: 300 },
+        { number: 2, votes: 100 },
+        { number: 3, votes: 0 },
+        { number: 4, votes: 0 },
+        { number: 5, votes: 0 },
+        { number: 6, votes: 0 },
+        { number: 7, votes: 0 },
+        { number: 8, votes: 0 },
+        { number: 9, votes: 0 },
+        { number: 10, votes: 0 },
+        { number: 11, votes: 0 },
+        { number: 12, votes: 111 },
       ],
     },
     {
       number: 5,
       total: 509,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 500,
-        },
-        {
-          number: 2,
-          votes: 0,
-        },
-        {
-          number: 3,
-          votes: 0,
-        },
-        {
-          number: 4,
-          votes: 9,
-        },
+        { number: 1, votes: 500 },
+        { number: 2, votes: 0 },
+        { number: 3, votes: 0 },
+        { number: 4, votes: 9 },
       ],
     },
     {
       number: 6,
       total: 509,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 450,
-        },
-        {
-          number: 2,
-          votes: 59,
-        },
+        { number: 1, votes: 450 },
+        { number: 2, votes: 59 },
       ],
     },
     {
       number: 7,
       total: 0,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 0,
-        },
-        {
-          number: 2,
-          votes: 0,
-        },
-        {
-          number: 3,
-          votes: 0,
-        },
-        {
-          number: 4,
-          votes: 0,
-        },
-        {
-          number: 5,
-          votes: 0,
-        },
-        {
-          number: 6,
-          votes: 0,
-        },
-        {
-          number: 7,
-          votes: 0,
-        },
-        {
-          number: 8,
-          votes: 0,
-        },
-        {
-          number: 9,
-          votes: 0,
-        },
-        {
-          number: 10,
-          votes: 0,
-        },
-        {
-          number: 11,
-          votes: 0,
-        },
-        {
-          number: 12,
-          votes: 0,
-        },
+        { number: 1, votes: 0 },
+        { number: 2, votes: 0 },
+        { number: 3, votes: 0 },
+        { number: 4, votes: 0 },
+        { number: 5, votes: 0 },
+        { number: 6, votes: 0 },
+        { number: 7, votes: 0 },
+        { number: 8, votes: 0 },
+        { number: 9, votes: 0 },
+        { number: 10, votes: 0 },
+        { number: 11, votes: 0 },
+        { number: 12, votes: 0 },
       ],
     },
     {
       number: 8,
       total: 0,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 0,
-        },
-        {
-          number: 2,
-          votes: 0,
-        },
-        {
-          number: 3,
-          votes: 0,
-        },
-        {
-          number: 4,
-          votes: 0,
-        },
+        { number: 1, votes: 0 },
+        { number: 2, votes: 0 },
+        { number: 3, votes: 0 },
+        { number: 4, votes: 0 },
       ],
     },
     {
       number: 9,
       total: 0,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 0,
-        },
-        {
-          number: 2,
-          votes: 0,
-        },
+        { number: 1, votes: 0 },
+        { number: 2, votes: 0 },
       ],
     },
   ],
 };
 
-export const nextSessionResults: NextSessionResults & { model: "CSONextSession" } = {
+export const nextSessionResults: Extract<Results, { model: "CSONextSession" }> = {
   model: "CSONextSession",
   voters_counts: {
     poll_card_count: noRecountNoDifferencesDataEntry.voters_counts.poll_card_count,
@@ -1252,7 +668,7 @@ export const nextSessionResults: NextSessionResults & { model: "CSONextSession" 
   political_group_votes: noRecountNoDifferencesDataEntry.political_group_votes,
 };
 
-export const nextSessionResultsWithDifferences: NextSessionResults & { model: "CSONextSession" } = {
+export const nextSessionResultsWithDifferences: Extract<Results, { model: "CSONextSession" }> = {
   model: "CSONextSession",
   voters_counts: {
     poll_card_count: nextSessionResults.voters_counts.poll_card_count - 20,
@@ -1413,48 +829,21 @@ export const noRecountNoDifferencesDataEntryWithGaps: Results = {
       number: 1,
       total: 2173,
       candidate_votes: [
-        {
-          number: 2,
-          votes: 1337,
-        },
-        {
-          number: 3,
-          votes: 423,
-        },
-        {
-          number: 6,
-          votes: 300,
-        },
-        {
-          number: 8,
-          votes: 0,
-        },
-        {
-          number: 9,
-          votes: 0,
-        },
-        {
-          number: 11,
-          votes: 113,
-        },
-        {
-          number: 12,
-          votes: 0,
-        },
+        { number: 2, votes: 1337 },
+        { number: 3, votes: 423 },
+        { number: 6, votes: 300 },
+        { number: 8, votes: 0 },
+        { number: 9, votes: 0 },
+        { number: 11, votes: 113 },
+        { number: 12, votes: 0 },
       ],
     },
     {
       number: 3,
       total: 0,
       candidate_votes: [
-        {
-          number: 1,
-          votes: 0,
-        },
-        {
-          number: 2,
-          votes: 0,
-        },
+        { number: 1, votes: 0 },
+        { number: 2, votes: 0 },
       ],
     },
   ],

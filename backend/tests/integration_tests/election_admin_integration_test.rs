@@ -139,7 +139,7 @@ async fn test_csb_election_validate_with_candidates(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
-async fn test_csb_election_import_save(pool: SqlitePool) {
+async fn test_csb_municipal_election_import_save(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
@@ -188,7 +188,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
-async fn test_csb_election_import_only_municipal_election_supported(pool: SqlitePool) {
+async fn test_csb_water_authority_election_import_save(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
@@ -199,19 +199,70 @@ async fn test_csb_election_import_only_municipal_election_supported(pool: Sqlite
         .json(&serde_json::json!({
             "committee_category": "CSB",
             "election_hash": [
-                "4fd2", "2e51", "1566", "d059",
-                "e2a3", "6862", "56fe", "d4eb",
-                "7d47", "8a74", "7be5", "8f92",
-                "b127", "2f55", "540b", "5aa4"
+                "f958", "1366", "c63f", "b36e",
+                "2989", "bf4e", "4bb2", "e6a8",
+                "ba2f", "e9b6", "9d40", "7ac6",
+                "f546", "863c", "6a6c", "d0f4",
             ],
             "election_data": include_str!("../../src/eml/tests/eml110a_test_AB.eml.xml"),
             "candidate_hash": [
-                "146d", "3784", "efa2", "93b5",
-                "721a", "7578", "a43f", "0636",
-                "7281", "66a0", "acf1", "55d3",
-                "ab25", "083c", "c000", "7096"
+                "2ef7", "9762", "3b27", "1c08",
+                "7ba6", "0473", "40b0", "a7fe",
+                "7e43", "35e1", "014f", "0e61",
+                "e737", "1d0d", "1639", "999d",
             ],
-            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test_AB.eml.xml"),
+        }))
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::CREATED);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["committee_category"], "CSB");
+    assert!(body["counting_method"].is_null());
+    let election_details = get_election_details(
+        &addr,
+        &admin_cookie,
+        u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
+    )
+    .await;
+    assert_eq!(election_details["election"]["committee_category"], "CSB");
+    assert!(election_details["election"]["counting_method"].is_null());
+    assert_eq!(election_details["election"]["number_of_voters"], 1);
+    assert_eq!(
+        election_details["current_committee_session"]["status"],
+        "in_preparation"
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
+async fn test_csb_election_import_only_municipal_and_water_authority_elections_supported(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/import");
+    let admin_cookie = login(&addr, Admin).await;
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", &admin_cookie)
+        .json(&serde_json::json!({
+            "committee_category": "CSB",
+            "election_hash": [
+                "135c", "e08d", "519f", "1d3f",
+                "4d1e", "8122", "4c67", "f676",
+                "6746", "a0ac", "020d", "0a76",
+                "7a28", "21e6", "5a01", "5ad2",
+            ],
+            "election_data": include_str!("../../src/eml/tests/eml110a_test_PS1.eml.xml"),
+            "candidate_hash": [
+                "9cc9", "29f3", "c415", "67de",
+                "f033", "c1d2", "1e48", "dfee",
+                "8ad8", "0862", "05f2", "5dcc",
+                "c3e4", "e812", "1034", "4953",
+            ],
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test_PS1.eml.xml"),
         }))
         .send()
         .await

@@ -1077,6 +1077,8 @@ export interface Election {
   election_date: string;
   /** See [`ElectionWithPoliticalGroups::election_id`] */
   election_id: string;
+  /** See [`ElectionWithPoliticalGroups::eml_name`] */
+  eml_name: string;
   /** See [`ElectionWithPoliticalGroups::id`] */
   id: ElectionId;
   /** See [`ElectionWithPoliticalGroups::location`] */
@@ -1259,6 +1261,8 @@ the date that the committee is in session. */
   election_date: string;
   /** The election identifier as defined in the EML_NL election definition */
   election_id: string;
+  /** Name of the election, as defined in the EML_NL election definition. */
+  eml_name: string;
   /** Identifier of the election within Abacus */
   id: ElectionId;
   /** The location of the committee.
@@ -1630,6 +1634,8 @@ export interface NewElection {
   election_date: string;
   /** See [`ElectionWithPoliticalGroups::election_id`] */
   election_id: string;
+  /** See [`ElectionWithPoliticalGroups::eml_name`] */
+  eml_name: string;
   /** See [`ElectionWithPoliticalGroups::location`] */
   location: string;
   /** See [`ElectionWithPoliticalGroups::name`] */

@@ -387,55 +387,78 @@ test.describe("Election creation", () => {
   });
 
   test.describe("WS CSB election creation", () => {
-    test("it uploads an election file and candidate list", async ({ page }) => {
-      await page.goto("/elections");
+    test("it creates an election with a subcommittee per GSB", async ({ page }) => {
       const overviewPage = new ElectionsOverviewPgObj(page);
-      await overviewPage.create.click();
-
-      // Upload election and check hash
-      await uploadElectionAndInputHash(page, eml110a_AB);
-
-      // Pick committee category
-      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
-      await expect(committeeCategoryPage.header).toBeVisible();
-      await committeeCategoryPage.csb.check();
-      await expect(committeeCategoryPage.csb).toBeChecked();
-      await committeeCategoryPage.next.click();
-
-      // Upload candidates list and check hash
-      await uploadCandidatesAndInputHash(page, eml230b_AB);
-
-      // The check-and-save page shows
       const checkAndSavePage = new CheckAndSavePgObj(page);
-      await expect(checkAndSavePage.header).toBeVisible();
-      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Waterschap Rivier en Polder 2023");
-      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
-      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Rivier en Polder");
-      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
-      await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
-      await expect(checkAndSavePage.countingMethod).toBeHidden();
-      await expect(checkAndSavePage.numberOfVoters).toBeHidden();
 
-      // Save the election
-      const election = await checkAndSavePage.saveElection();
-      await expect(overviewPage.adminHeader).toBeVisible();
-      await expect(overviewPage.getAlertElectionCreated("CSB", "Waterschap Rivier en Polder 2023")).toBeVisible();
-
-      // The election overview page
-      const electionRow = overviewPage.findElectionRowById(election.id);
-      await expect(electionRow).toBeVisible();
-      await expect(electionRow).toContainText("Waterschap Rivier en Polder 2023");
-      await expect(electionRow).toContainText("CSB - Rivier en Polder (10)");
-      await expect(electionRow).toContainText("Klaar voor invoer— Zitting CSB");
-
-      await test.step("check it creates a subcommittee for every GSB", async () => {
-        await page.goto(`/elections/${election.id}/status`);
-        const statusPage = new ElectionStatus(page);
-        await expect(statusPage.notStartedRows).toHaveCount(4);
-        for (const name of ["Heemdamseburg", "Juinen", "Middelgein", "'s-Gravenveen"]) {
-          await expect(statusPage.notStarted).toContainText(name);
-        }
+      await test.step("start creating an election", async () => {
+        await page.goto("/elections");
+        await overviewPage.create.click();
       });
+
+      await test.step("upload election definition and check hash", async () => {
+        await uploadElectionAndInputHash(page, eml110a_AB);
+      });
+
+      await test.step("pick committee category", async () => {
+        const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+        await expect(committeeCategoryPage.header).toBeVisible();
+        await committeeCategoryPage.csb.check();
+        await expect(committeeCategoryPage.csb).toBeChecked();
+        await committeeCategoryPage.next.click();
+      });
+
+      await test.step("upload candidate list and check hash", async () => {
+        await uploadCandidatesAndInputHash(page, eml230b_AB);
+      });
+
+      await test.step("check the election summary before saving", async () => {
+        await expect(checkAndSavePage.header).toBeVisible();
+        await expect(checkAndSavePage.electionName).toContainText("verkiezing: Waterschap Rivier en Polder 2023");
+        await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
+        await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Rivier en Polder");
+        await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+        await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
+        await expect(checkAndSavePage.countingMethod).toBeHidden();
+        await expect(checkAndSavePage.numberOfVoters).toBeHidden();
+      });
+
+      const election = await test.step("save the election", async () => {
+        const saved = await checkAndSavePage.saveElection();
+        await expect(overviewPage.adminHeader).toBeVisible();
+        await expect(overviewPage.getAlertElectionCreated("CSB", "Waterschap Rivier en Polder 2023")).toBeVisible();
+        return saved;
+      });
+
+      await test.step("check the election overview row", async () => {
+        const electionRow = overviewPage.findElectionRowById(election.id);
+        await expect(electionRow).toBeVisible();
+        await expect(electionRow).toContainText("Waterschap Rivier en Polder 2023");
+        await expect(electionRow).toContainText("CSB - Rivier en Polder (10)");
+        await expect(electionRow).toContainText("Klaar voor invoer— Zitting CSB");
+      });
+
+      await test.step(
+        "check a subcommittee exists for every GSB",
+        async () => {
+          await page.goto(`/elections/${election.id}/status`);
+          const statusPage = new ElectionStatus(page);
+          const gsbNames = ["Heemdamseburg", "Juinen", "Middelgein", "'s-Gravenveen"];
+          await expect(statusPage.notStartedRows).toHaveCount(gsbNames.length);
+          for (const name of gsbNames) {
+            // Intentionally nested: a failure will list the subcommittee.
+            // eslint-disable-next-line playwright/no-nested-step
+            await test.step(
+              "subcommittee is listed",
+              async () => {
+                await expect(statusPage.notStarted).toContainText(name);
+              },
+              { subtitle: name },
+            );
+          }
+        },
+        { subtitle: `election ${election.id}` },
+      );
     });
   });
 

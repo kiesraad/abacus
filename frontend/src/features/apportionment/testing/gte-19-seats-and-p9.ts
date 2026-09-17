@@ -2069,6 +2069,7 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 5,
   name: "Election >= 19 seats & Absolute Majority Change",
+  official_name: "Election >= 19 seats & Absolute Majority Change",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",

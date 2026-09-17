@@ -1114,6 +1114,7 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 11,
   name: "Election < 19 seats & Drawing lots, Candidate",
+  official_name: "Election < 19 seats & Drawing lots, Candidate",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",

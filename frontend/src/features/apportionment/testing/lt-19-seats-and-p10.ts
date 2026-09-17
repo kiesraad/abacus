@@ -859,6 +859,7 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 6,
   name: "Election < 19 seats & List Exhaustion",
+  official_name: "Election < 19 seats & List Exhaustion",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",

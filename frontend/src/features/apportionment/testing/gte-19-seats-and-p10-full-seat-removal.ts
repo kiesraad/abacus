@@ -822,6 +822,7 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 15,
   name: "Election >= 19 seats with full seat removal",
+  official_name: "Election >= 19 seats with full seat removal",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",

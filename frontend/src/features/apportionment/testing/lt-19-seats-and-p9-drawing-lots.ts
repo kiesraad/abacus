@@ -1994,6 +1994,7 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 9,
   name: "Drawing lots < 19 seats, AbsoluteMajority",
+  official_name: "Drawing lots < 19 seats, AbsoluteMajority",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",

@@ -3083,6 +3083,7 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 10,
   name: "Drawing lots >= 19 seats, AbsoluteMajority, and Deceased Candidates",
+  official_name: "Drawing lots >= 19 seats, AbsoluteMajority, and Deceased Candidates",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",

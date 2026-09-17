@@ -1564,7 +1564,7 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 4,
   name: "Election Absolute Majority Change and List Exhaustion",
-  official_name: "Election Absolute Majority Change and List Exhaustion",
+  official_name: "Gemeenteraad Juinen 2026",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",

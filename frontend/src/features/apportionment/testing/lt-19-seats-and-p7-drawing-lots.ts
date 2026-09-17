@@ -2090,7 +2090,7 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 7,
   name: "Drawing lots < 19 seats, LargestRemainderResidualSeat",
-  official_name: "Drawing lots < 19 seats, LargestRemainderResidualSeat",
+  official_name: "Gemeenteraad Juinen 2026",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",

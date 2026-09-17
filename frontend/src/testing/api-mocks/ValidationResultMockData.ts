@@ -9,9 +9,9 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     fields: ["data.extra_investigation"],
     code: "F101",
   },
-  F102: {
+  F104: {
     fields: ["data.extra_investigation"],
-    code: "F102",
+    code: "F104",
   },
   F111: {
     fields: ["data.counting_differences_polling_station"],

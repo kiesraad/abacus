@@ -5,7 +5,7 @@
       "content": "Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden.\nAls er geen extra onderzoek is gedaan, moeten deze vragen overgeslagen worden."
     }
   },
-  "F102": {
+  "F104": {
     "coordinator": {
       "title": "Er mag maar één antwoord per vraag worden gegeven"
     }

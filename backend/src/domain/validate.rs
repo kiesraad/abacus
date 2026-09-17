@@ -67,7 +67,7 @@ pub enum ValidationResultCode {
     /// GSB CSO: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
     F101,
     /// GSB CSO: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
-    F102,
+    F104,
     /// GSB CSO: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
     F111,
     /// GSB CSO: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag

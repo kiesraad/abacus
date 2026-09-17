@@ -60,7 +60,7 @@ impl Validate for ExtraInvestigation {
             {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![path.to_string()],
-                    code: ValidationResultCode::F102,
+                    code: ValidationResultCode::F104,
                     context: None,
                 });
             }
@@ -141,13 +141,13 @@ pub mod tests {
         Ok(())
     }
 
-    /// GSB CSO | F.102: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    /// GSB CSO | F.104: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
     #[test]
-    fn test_f102() -> Result<(), DataError> {
+    fn test_f104() -> Result<(), DataError> {
         use CommitteeCategory::*;
 
-        let f102 = ValidationResult {
-            code: ValidationResultCode::F102,
+        let f104 = ValidationResult {
+            code: ValidationResultCode::F104,
             fields: vec!["extra_investigation".into()],
             context: None,
         };
@@ -162,11 +162,11 @@ pub mod tests {
             (CSB, YesNo::default(), YesNo::both(), false), // Not applicable for CSB
         ];
 
-        for (committee_category, investigation, recounted, expect_f102) in cases {
+        for (committee_category, investigation, recounted, expect_f104) in cases {
             let result = validate(committee_category, investigation, recounted)?;
-            let has_f102 = result.errors.iter().any(|e| e == &f102);
+            let has_f104 = result.errors.iter().any(|e| e == &f104);
             assert_eq!(
-                has_f102, expect_f102,
+                has_f104, expect_f104,
                 "Failed: {committee_category:?}, investigated: {investigation:?}, recounted: {recounted:?}"
             );
         }
@@ -186,7 +186,7 @@ pub mod tests {
                     context: None,
                 },
                 ValidationResult {
-                    code: ValidationResultCode::F102,
+                    code: ValidationResultCode::F104,
                     fields: vec!["extra_investigation".into()],
                     context: None,
                 }
@@ -203,7 +203,7 @@ pub mod tests {
                     context: None,
                 },
                 ValidationResult {
-                    code: ValidationResultCode::F102,
+                    code: ValidationResultCode::F104,
                     fields: vec!["extra_investigation".into()],
                     context: None,
                 }

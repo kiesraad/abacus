@@ -241,7 +241,7 @@ async fn generate_csb_election_data(
         }
         ElectionCategory::Provincial => {
             return Err(GenerateError::unsupported(
-                "CSB voor Provinciale Statenverkiezing is nog niet ondersteund",
+                "CSB voor Provinciale Statenverkiezing wordt nog niet ondersteund",
             ));
         }
     };

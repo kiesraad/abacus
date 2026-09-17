@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use tracing::error;
 
 use crate::{AppError, ErrorResponse, error::ErrorReference, service::SubCommitteeServiceError};
 
@@ -57,10 +58,11 @@ impl From<GenerateError> for AppError {
 // For API endpoint
 impl IntoResponse for GenerateError {
     fn into_response(self) -> Response {
-        let status = StatusCode::INTERNAL_SERVER_ERROR;
-        let body = ErrorResponse::new(self.to_string(), ErrorReference::InternalServerError, true);
+        let error = self.to_string();
+        error!("GenerateError: {error}");
 
-        let mut response = (status, body.clone()).into_response();
+        let body = ErrorResponse::new(error, ErrorReference::InternalServerError, true);
+        let mut response = (StatusCode::INTERNAL_SERVER_ERROR, body.clone()).into_response();
         response.extensions_mut().insert(body);
         response
     }

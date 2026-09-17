@@ -76,6 +76,7 @@
   "election": {
     "id": 11,
     "name": "Drawing lots >= 19 seats, AbsoluteMajority & List Exhaustion and Deceased Candidates",
+    "official_name": "Drawing lots >= 19 seats, AbsoluteMajority & List Exhaustion and Deceased Candidates",
     "committee_category": "CSB",
     "election_id": "GR2026_Juinen",
     "location": "Juinen",

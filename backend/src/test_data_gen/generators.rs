@@ -344,17 +344,17 @@ pub async fn create_test_election(
 fn format_election_name(
     rng: &mut impl rand::RngExt,
     election_category: ElectionCategory,
-    locality: &str,
+    domain_name: &str,
     year: i32,
 ) -> String {
     let (election_type, election_locality) = match election_category {
-        ElectionCategory::Municipal => ("Gemeenteraad", locality),
-        ElectionCategory::Provincial => ("Provinciale Staten", super::data::province(rng)),
+        ElectionCategory::Municipal => ("Gemeenteraad", domain_name),
+        ElectionCategory::Provincial => ("Provinciale Staten", domain_name),
         ElectionCategory::WaterAuthority => (
             *["Waterschap", "Hoogheemraadschap"]
                 .choose(rng)
                 .expect("Missing test data"),
-            super::data::water_authority(rng),
+            domain_name,
         ),
     };
     format!("{election_type} {election_locality} {year}")
@@ -418,6 +418,15 @@ fn generate_election(
         .unwrap_or_else(|| format_election_name(rng, args.election_category, &domain.name, year));
     let cleaned_up_locality = domain.name.replace(" ", "_").replace("'", "");
     let election_id = format!("{category}{year}_{cleaned_up_locality}");
+    let mut eml_name = name.clone();
+    if args.election_category == ElectionCategory::WaterAuthority {
+        let mut chars = eml_name.chars();
+        let lowercased_name = match chars.next() {
+            Some(first) => first.to_lowercase().chain(chars).collect(),
+            None => String::new(),
+        };
+        eml_name = format!("Algemeen bestuur van het {}", lowercased_name);
+    }
 
     info!("Election has name '{name}'");
 
@@ -449,7 +458,7 @@ fn generate_election(
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name: name.clone(),
-        eml_name: name,
+        eml_name,
         committee_category: args.committee_category,
         counting_method,
         authority_id: match args.committee_category {
@@ -472,16 +481,7 @@ fn generate_election(
         district: CommitteeDistrict::None,
         domain: Some(domain.clone()),
         election_id,
-        location: if is_municipal {
-            // Municipal elections take the location from their domain
-            domain.name.clone()
-        } else if args.committee_category == CommitteeCategory::CSB {
-            // The CSB is seated in a specific spot, generate a locality for that
-            super::data::locality(rng).to_owned()
-        } else {
-            // For GSBs we use the same locality used for authority name
-            gsb_committee_locality.to_owned()
-        },
+        location: authority_name,
         category: args.election_category,
         sub_category: args.election_category.sub_category(number_of_seats),
         number_of_seats,

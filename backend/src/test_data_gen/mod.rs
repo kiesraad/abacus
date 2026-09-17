@@ -6,6 +6,7 @@ use utoipa::{PartialSchema, ToSchema};
 
 mod api;
 mod data;
+mod error;
 mod generators;
 
 pub use api::router;

@@ -79,7 +79,7 @@ Use `cargo test` to run the tests. The tests are also run in a GitHub Actions wo
 
 ### Debugging with gdb/lldb
 
-Debug builds are compiled with [`debug = "line-tables-only"`](debug), which keeps panic backtraces with file and line
+Debug builds are compiled with [`debug = "line-tables-only"`][debug], which keeps panic backtraces with file and line
 numbers but omits type and variable information. To inspect variables in a debugger:
 
 - **Single command:** `CARGO_PROFILE_DEV_DEBUG=2 cargo build` (or `cargo nextest run`, `cargo run`).
@@ -276,9 +276,9 @@ To update `openapi.json` in the repository, run the command `cargo run --bin gen
 
 ### Test data generation
 
-You can fill the database with test data and (optionally) export the election definition files with `gen-test-gsb-election.rs`.
+You can fill the database with test data and (optionally) export the election definition files with `gen-test-election.rs`.
 
-Run `cargo run --bin gen-test-gsb-election -- --help` to see all command-line options.
+Run `cargo run --bin gen-test-election -- --help` to see all command-line options.
 
 ### Binary usage
 

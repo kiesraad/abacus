@@ -70,9 +70,9 @@ describe("OverviewPage", () => {
       ["Verkiezing", "Type stembureau", "Status"],
       ["Gemeenteraad Heemdamseburg 2026", "GSB - Heemdamseburg (0035)", "Invoer bezig — Eerste zitting"],
       ["Gemeenteraad Heemdamseburg 2026", "CSB - Heemdamseburg (0035)", ""],
-      ["Waterschap Rivier en Polder 2027", "GSB - Juinen (10)", ""],
+      ["Waterschap Rivier en Polder 2027", "GSB - Juinen (0037)", ""],
       ["Waterschap Rivier en Polder 2027", "CSB - Rivier en Polder (10)", ""],
-      ["Provinciale Staten Oost-Holland 2027", "GSB - Juinen", ""],
+      ["Provinciale Staten Oost-Holland 2027", "GSB - Juinen (0036)", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -97,9 +97,9 @@ describe("OverviewPage", () => {
       ["Verkiezing", "Type stembureau", "Status"],
       ["Gemeenteraad Heemdamseburg 2026", "GSB - Heemdamseburg (0035)", "Invoer bezig — Eerste zitting"],
       ["Gemeenteraad Heemdamseburg 2026", "CSB - Heemdamseburg (0035)", ""],
-      ["Waterschap Rivier en Polder 2027", "GSB - Juinen (10)", ""],
+      ["Waterschap Rivier en Polder 2027", "GSB - Juinen (0037)", ""],
       ["Waterschap Rivier en Polder 2027", "CSB - Rivier en Polder (10)", ""],
-      ["Provinciale Staten Oost-Holland 2027", "GSB - Juinen", ""],
+      ["Provinciale Staten Oost-Holland 2027", "GSB - Juinen (0036)", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");

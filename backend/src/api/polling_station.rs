@@ -692,14 +692,14 @@ fn polling_stations_eml_file_name(election: &ElectionWithPoliticalGroups) -> Str
 }
 
 /// Format ZIP file name for polling stations export:
-/// `abacus-exporteren_stemgebieden-{eml_name}-eml_110b_stembureaus-{yyyymmdd-hhmmss}.zip`
+/// `abacus-exporteren_stemgebieden-{official_name}-eml_110b_stembureaus-{yyyymmdd-hhmmss}.zip`
 fn polling_stations_zip_file_name(
     election: &ElectionWithPoliticalGroups,
     datetime: DateTime<Local>,
 ) -> String {
     format!(
         "abacus-exporteren_stemgebieden-{}-eml_110b_stembureaus-{}.zip",
-        election.eml_name.replace(" ", "_").to_lowercase(),
+        election.official_name.replace(" ", "_").to_lowercase(),
         datetime.format("%Y%m%d-%H%M%S"),
     )
 }
@@ -968,7 +968,7 @@ VALUES
     fn test_zip_file_name() {
         let mut election =
             election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
-        election.eml_name = "Gemeenteraad Heemdamseburg 2024".to_string();
+        election.official_name = "Gemeenteraad Heemdamseburg 2024".to_string();
         let datetime = Local.with_ymd_and_hms(2026, 9, 1, 10, 20, 30).unwrap();
         assert_eq!(
             polling_stations_zip_file_name(&election, datetime),

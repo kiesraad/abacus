@@ -22,7 +22,7 @@ async fn it_generates_a_pdf() {
     let election = ElectionWithPoliticalGroups {
         id: ElectionId::from(1),
         name: "Gemeenteraad Heemdamseburg 2025".to_string(),
-        eml_name: "Gemeenteraad Heemdamseburg 2025".to_string(),
+        official_name: "Gemeenteraad Heemdamseburg 2025".to_string(),
         committee_category: CommitteeCategory::GSB,
         counting_method: Some(VoteCountingMethod::CSO),
         election_id: "GR2025_Heemdamseburg".to_string(),

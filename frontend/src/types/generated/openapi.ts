@@ -1077,8 +1077,6 @@ export interface Election {
   election_date: string;
   /** See [`ElectionWithPoliticalGroups::election_id`] */
   election_id: string;
-  /** See [`ElectionWithPoliticalGroups::eml_name`] */
-  eml_name: string;
   /** See [`ElectionWithPoliticalGroups::id`] */
   id: ElectionId;
   /** See [`ElectionWithPoliticalGroups::location`] */
@@ -1091,6 +1089,8 @@ export interface Election {
   number_of_seats: number;
   /** See [`ElectionWithPoliticalGroups::number_of_voters`] */
   number_of_voters: number;
+  /** See [`ElectionWithPoliticalGroups::official_name`] */
+  official_name: string;
   /** See [`ElectionWithPoliticalGroups::sub_category`] */
   sub_category: ElectionSubCategory;
 }
@@ -1261,8 +1261,6 @@ the date that the committee is in session. */
   election_date: string;
   /** The election identifier as defined in the EML_NL election definition */
   election_id: string;
-  /** Name of the election, as defined in the EML_NL election definition. */
-  eml_name: string;
   /** Identifier of the election within Abacus */
   id: ElectionId;
   /** The location of the committee.
@@ -1280,6 +1278,8 @@ for elections for the House of Representatives (Tweede Kamer). */
   number_of_seats: number;
   /** How many voters are registered for this election. */
   number_of_voters: number;
+  /** Name of the election, as defined in the EML_NL election definition. */
+  official_name: string;
   /** The political groups and their candidates that are registered for this
 election. */
   political_groups: PoliticalGroup[];
@@ -1634,8 +1634,6 @@ export interface NewElection {
   election_date: string;
   /** See [`ElectionWithPoliticalGroups::election_id`] */
   election_id: string;
-  /** See [`ElectionWithPoliticalGroups::eml_name`] */
-  eml_name: string;
   /** See [`ElectionWithPoliticalGroups::location`] */
   location: string;
   /** See [`ElectionWithPoliticalGroups::name`] */
@@ -1646,6 +1644,8 @@ export interface NewElection {
   number_of_seats: number;
   /** See [`ElectionWithPoliticalGroups::number_of_voters`] */
   number_of_voters: number;
+  /** See [`ElectionWithPoliticalGroups::official_name`] */
+  official_name: string;
   /** See [`ElectionWithPoliticalGroups::political_groups`] */
   political_groups: RegisteredPoliticalGroup[];
   /** See [`ElectionWithPoliticalGroups::sub_category`] */

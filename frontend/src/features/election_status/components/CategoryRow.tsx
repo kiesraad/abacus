@@ -8,6 +8,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import type { DataEntryStatusName, ElectionStatusResponseEntry } from "@/types/generated/openapi";
+import { formatDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { formatDateTime } from "@/utils/dateTime";
 import type { StatusCategory, StatusEntryWithTypist } from "../hooks/useElectionStatus";
 import cls from "./ElectionStatus.module.css";
@@ -74,7 +75,7 @@ function CategoryRowContent({ category, statusEntryWithTypist, warning }: Catego
 
   return (
     <>
-      <Table.NumberCell key={`${key}-number`}>{entry.source.number}</Table.NumberCell>
+      <Table.NumberCell key={`${key}-number`}>{formatDataEntrySourceNumber(entry.source)}</Table.NumberCell>
       <Table.Cell key={`${key}-name`}>
         <div className={cls.cellWithBadge}>
           <span>{entry.source.name}</span>

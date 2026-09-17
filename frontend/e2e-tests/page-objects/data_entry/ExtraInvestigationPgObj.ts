@@ -23,12 +23,11 @@ export class ExtraInvestigationPage extends DataEntryBasePage {
     super(page);
 
     this.fieldset = page.getByRole("group", {
-      name: /^Alleen bij extra onderzoek B1-1/,
+      name: /^Extra onderzoek B1-1/,
     });
 
     this.extraInvestigationOtherReason = this.fieldset.getByRole("group").filter({
-      hasText:
-        "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
+      hasText: "Heeft het gemeentelijk stembureau extra onderzoek gedaan?",
     });
     this.extraInvestigationOtherReasonYes = this.extraInvestigationOtherReason.getByRole("checkbox", { name: "Ja" });
     this.extraInvestigationOtherReasonNo = this.extraInvestigationOtherReason.getByRole("checkbox", { name: "Nee" });

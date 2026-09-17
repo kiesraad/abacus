@@ -9,12 +9,12 @@ use crate::domain::{
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
-/// Extra investigation, part of the results ("B1-1 Alleen bij extra onderzoek")
+/// Extra investigation, part of the results ("B1-1 Extra onderzoek")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ExtraInvestigation {
-    /// Whether extra investigation was done for another reason than an unexplained difference
-    /// ("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?")
+    /// Whether extra investigation was done
+    /// ("Heeft het gemeentelijk stembureau extra onderzoek gedaan?")
     pub extra_investigation_other_reason: YesNo,
     /// Whether ballots were (partially) recounted following the extra investigation
     /// ("Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?")
@@ -108,7 +108,7 @@ pub mod tests {
         Ok(validation_results)
     }
 
-    /// GSB CSO | F.101: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+    /// GSB CSO | F.101: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
     #[test]
     fn test_f101() -> Result<(), DataError> {
         use CommitteeCategory::*;
@@ -141,7 +141,7 @@ pub mod tests {
         Ok(())
     }
 
-    /// GSB CSO | F.102: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    /// GSB CSO | F.102: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
     #[test]
     fn test_f102() -> Result<(), DataError> {
         use CommitteeCategory::*;

@@ -6561,7 +6561,7 @@
           },
           "extra_investigation": {
             "$ref": "#/components/schemas/ExtraInvestigation",
-            "description": "Extra investigation (\"B1-1 Alleen bij extra onderzoek\")"
+            "description": "Extra investigation (\"B1-1 Extra onderzoek\")"
           },
           "political_group_votes": {
             "type": "array",
@@ -8373,7 +8373,7 @@
       },
       "ExtraInvestigation": {
         "type": "object",
-        "description": "Extra investigation, part of the results (\"B1-1 Alleen bij extra onderzoek\")",
+        "description": "Extra investigation, part of the results (\"B1-1 Extra onderzoek\")",
         "required": [
           "extra_investigation_other_reason",
           "ballots_recounted_extra_investigation"
@@ -8385,7 +8385,7 @@
           },
           "extra_investigation_other_reason": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether extra investigation was done for another reason than an unexplained difference\n(\"Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?\")"
+            "description": "Whether extra investigation was done\n(\"Heeft het gemeentelijk stembureau extra onderzoek gedaan?\")"
           }
         },
         "additionalProperties": false

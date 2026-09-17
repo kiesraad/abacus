@@ -640,7 +640,7 @@ export interface CSOFirstSessionResults {
   counting_differences_polling_station: CountingDifferencesPollingStation;
   /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
   differences_counts: DifferencesCounts;
-  /** Extra investigation ("B1-1 Alleen bij extra onderzoek") */
+  /** Extra investigation ("B1-1 Extra onderzoek") */
   extra_investigation: ExtraInvestigation;
   /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
   political_group_votes: PoliticalGroupCandidateVotes[];
@@ -1348,14 +1348,14 @@ export interface ErrorResponse {
 }
 
 /**
- * Extra investigation, part of the results ("B1-1 Alleen bij extra onderzoek")
+ * Extra investigation, part of the results ("B1-1 Extra onderzoek")
  */
 export interface ExtraInvestigation {
   /** Whether ballots were (partially) recounted following the extra investigation
 ("Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?") */
   ballots_recounted_extra_investigation: YesNo;
-  /** Whether extra investigation was done for another reason than an unexplained difference
-("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?") */
+  /** Whether extra investigation was done
+("Heeft het gemeentelijk stembureau extra onderzoek gedaan?") */
   extra_investigation_other_reason: YesNo;
 }
 

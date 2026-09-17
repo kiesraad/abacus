@@ -1,5 +1,3 @@
-use std::error::Error;
-
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::{SqliteConnection, SqlitePool};
@@ -51,7 +49,7 @@ use crate::{
         user_repo::UserId,
     },
     service::create_sub_committee,
-    test_data_gen::{GenerateElectionArgs, RandomRange},
+    test_data_gen::{GenerateElectionArgs, RandomRange, error::GenerateError},
 };
 
 #[derive(Debug)]
@@ -71,7 +69,7 @@ async fn generate_gsb_data_entries(
     committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[(PollingStation, DataEntryId)],
-) -> Result<bool, Box<dyn Error>> {
+) -> Result<bool, GenerateError> {
     committee_session_repo::change_status(
         conn,
         committee_session.id,
@@ -92,7 +90,7 @@ async fn generate_csb_data_entries(
     sub_committee_first_session: SubCommitteeFirstSession,
     election: &ElectionWithPoliticalGroups,
     votes: Option<Vec<Vec<u32>>>,
-) -> Result<bool, Box<dyn Error>> {
+) -> Result<bool, GenerateError> {
     committee_session_repo::change_status(
         conn,
         sub_committee_first_session.committee_session_id,
@@ -122,7 +120,7 @@ async fn generate_csb_sub_committee(
     name: &str,
     election: &ElectionWithPoliticalGroups,
     votes: Option<Vec<Vec<u32>>>,
-) -> Result<bool, Box<dyn Error>> {
+) -> Result<bool, GenerateError> {
     let sub_committee_first_session = create_sub_committee(
         conn,
         committee_session_id,
@@ -130,8 +128,7 @@ async fn generate_csb_sub_committee(
         name,
         CommitteeCategory::GSB,
     )
-    .await
-    .map_err(|e| format!("{e:?}"))?;
+    .await?;
 
     if args.with_data_entry {
         generate_csb_data_entries(
@@ -155,7 +152,7 @@ async fn generate_gsb_election_data(
     args: &GenerateElectionArgs,
     committee_session: &mut CommitteeSession,
     election: &ElectionWithPoliticalGroups,
-) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
+) -> Result<(Vec<PollingStation>, bool), GenerateError> {
     let polling_stations_with_ids = generate_polling_stations(rng, election, tx, args).await;
 
     if !polling_stations_with_ids.is_empty() {
@@ -196,7 +193,7 @@ async fn generate_csb_election_data(
     committee_session: &mut CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     votes: Option<Vec<Vec<u32>>>,
-) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
+) -> Result<(Vec<PollingStation>, bool), GenerateError> {
     let data_entry_complete = match election.category {
         ElectionCategory::Municipal => {
             let number = election
@@ -243,7 +240,9 @@ async fn generate_csb_election_data(
             !data_entry_completes.contains(&false)
         }
         ElectionCategory::Provincial => {
-            todo!("Provincial CSB election generation not yet supported");
+            return Err(GenerateError::unsupported(
+                "CSB voor Provinciale Statenverkiezing is nog niet ondersteund",
+            ));
         }
     };
 
@@ -263,7 +262,7 @@ pub async fn create_test_election(
     args: &GenerateElectionArgs,
     pool: &SqlitePool,
     votes: Option<Vec<Vec<u32>>>,
-) -> Result<CreateTestElectionResult, Box<dyn Error>> {
+) -> Result<CreateTestElectionResult, GenerateError> {
     let mut rng = StdRng::from_rng(&mut rand::rng());
 
     let mut tx = pool.begin_immediate().await?;

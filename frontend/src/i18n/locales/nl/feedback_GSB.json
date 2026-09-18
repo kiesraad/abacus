@@ -5,6 +5,12 @@
       "actions": "<ul><li>Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.</li></ul>"
     }
   },
+  "F102": {
+    "coordinator": {
+      "title": "De tweede vraag moet beantwoord worden",
+      "content": "Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden."
+    }
+  },
   "F104": {
     "coordinator": {
       "title": "Er mag maar één antwoord per vraag worden gegeven"

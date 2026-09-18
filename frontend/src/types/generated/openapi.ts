@@ -1999,6 +1999,7 @@ export interface ValidationResult {
 
 export const validationResultCodeValues = [
   "F101",
+  "F102",
   "F104",
   "F111",
   "F112",

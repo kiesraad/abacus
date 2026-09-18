@@ -66,6 +66,8 @@ pub struct ValidationResultContext {
 pub enum ValidationResultCode {
     /// GSB CSO: 'Extra onderzoek B1-1': de eerste vraag is niet beantwoord
     F101,
+    /// GSB CSO: 'Extra onderzoek B1-1': 'extra onderzoek gedaan' = 'ja' en de tweede vraag is niet beantwoord
+    F102,
     /// GSB CSO: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
     F104,
     /// GSB CSO: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord

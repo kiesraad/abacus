@@ -10,22 +10,22 @@
       },
       {
         "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
-        "error_path": "extra_investigation.extra_investigation_other_reason",
+        "error_path": "extra_investigation.extra_investigation",
         "options": [
           {
             "autoFocusInput": true,
             "label": "Ja",
-            "path": "extra_investigation.extra_investigation_other_reason.yes",
+            "path": "extra_investigation.extra_investigation.yes",
             "short_label": "Ja",
           },
           {
             "label": "Nee",
-            "path": "extra_investigation.extra_investigation_other_reason.no",
+            "path": "extra_investigation.extra_investigation.no",
             "short_label": "Nee",
           },
         ],
         "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?",
-        "title": "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
+        "title": "Heeft het gemeentelijk stembureau extra onderzoek gedaan?",
         "type": "checkboxes",
       },
       {
@@ -48,7 +48,7 @@
         "type": "checkboxes",
       },
     ],
-    "title": "Alleen bij extra onderzoek",
+    "title": "Extra onderzoek",
   },
   {
     "id": "counting_differences_polling_station",

@@ -44,7 +44,7 @@ describe("doesValidationResultApplyToSection", () => {
   const extraInvestigationW001: ValidationResult = {
     code: "W001",
     fields: [
-      "data.extra_investigation.extra_investigation_other_reason.yes",
+      "data.extra_investigation.extra_investigation.yes",
       "data.extra_investigation.ballots_recounted_extra_investigation.no",
     ],
   };
@@ -192,7 +192,7 @@ describe("getTranslations", () => {
     expect(getTranslations(GSBCSOElection, validationResultMockData.F101, "coordinator")).toEqual({
       code: "F.101",
       title: t("feedback_GSB.F101.coordinator.title"),
-      content: tx("feedback_GSB.F101.coordinator.content"),
+      actions: tx("feedback_GSB.F101.coordinator.actions"),
     });
   });
 

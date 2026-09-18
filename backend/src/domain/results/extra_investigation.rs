@@ -9,13 +9,13 @@ use crate::domain::{
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
-/// Extra investigation, part of the results ("B1-1 Alleen bij extra onderzoek")
+/// Extra investigation, part of the results ("B1-1 Extra onderzoek")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ExtraInvestigation {
-    /// Whether extra investigation was done for another reason than an unexplained difference
-    /// ("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?")
-    pub extra_investigation_other_reason: YesNo,
+    /// Whether extra investigation was done
+    /// ("Heeft het gemeentelijk stembureau extra onderzoek gedaan?")
+    pub extra_investigation: YesNo,
     /// Whether ballots were (partially) recounted following the extra investigation
     /// ("Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?")
     pub ballots_recounted_extra_investigation: YesNo,
@@ -23,10 +23,10 @@ pub struct ExtraInvestigation {
 
 impl Compare for ExtraInvestigation {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        self.extra_investigation_other_reason.compare(
-            &first_entry.extra_investigation_other_reason,
+        self.extra_investigation.compare(
+            &first_entry.extra_investigation,
             different_fields,
-            &path.field("extra_investigation_other_reason"),
+            &path.field("extra_investigation"),
         );
 
         self.ballots_recounted_extra_investigation.compare(
@@ -45,9 +45,7 @@ impl Validate for ExtraInvestigation {
     ) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
         if election.committee_category == CommitteeCategory::GSB {
-            if self.extra_investigation_other_reason.is_empty()
-                != self.ballots_recounted_extra_investigation.is_empty()
-            {
+            if self.extra_investigation.is_empty() {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![path.to_string()],
                     code: ValidationResultCode::F101,
@@ -55,12 +53,32 @@ impl Validate for ExtraInvestigation {
                 });
             }
 
-            if self.extra_investigation_other_reason.is_both()
-                || self.ballots_recounted_extra_investigation.is_both()
+            if self.extra_investigation == YesNo::yes()
+                && self.ballots_recounted_extra_investigation.is_empty()
             {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![path.to_string()],
                     code: ValidationResultCode::F102,
+                    context: None,
+                });
+            }
+
+            if self.extra_investigation == YesNo::no()
+                && !self.ballots_recounted_extra_investigation.is_empty()
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F103,
+                    context: None,
+                });
+            }
+
+            if self.extra_investigation.is_both()
+                || self.ballots_recounted_extra_investigation.is_both()
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F104,
                     context: None,
                 });
             }
@@ -83,7 +101,7 @@ pub mod tests {
     impl ValidDefault for ExtraInvestigation {
         fn valid_default() -> Self {
             Self {
-                extra_investigation_other_reason: YesNo::default(),
+                extra_investigation: YesNo::no(),
                 ballots_recounted_extra_investigation: YesNo::default(),
             }
         }
@@ -95,7 +113,7 @@ pub mod tests {
         recounted: YesNo,
     ) -> Result<ValidationResults, DataError> {
         let extra_investigation = ExtraInvestigation {
-            extra_investigation_other_reason: investigation,
+            extra_investigation: investigation,
             ballots_recounted_extra_investigation: recounted,
         };
 
@@ -108,7 +126,7 @@ pub mod tests {
         Ok(validation_results)
     }
 
-    /// GSB CSO | F.101: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+    /// GSB CSO | F.101: 'Extra onderzoek B1-1': de eerste vraag is niet beantwoord
     #[test]
     fn test_f101() -> Result<(), DataError> {
         use CommitteeCategory::*;
@@ -120,11 +138,11 @@ pub mod tests {
         };
 
         let cases = vec![
-            (GSB, YesNo::default(), YesNo::default(), false),
+            (GSB, YesNo::default(), YesNo::default(), true),
             (GSB, YesNo::yes(), YesNo::yes(), false),
             (GSB, YesNo::no(), YesNo::no(), false),
             (GSB, YesNo::yes(), YesNo::no(), false),
-            (GSB, YesNo::yes(), YesNo::default(), true),
+            (GSB, YesNo::yes(), YesNo::default(), false),
             (GSB, YesNo::default(), YesNo::no(), true),
             (CSB, YesNo::default(), YesNo::no(), false), // Not applicable for CSB
         ];
@@ -141,7 +159,7 @@ pub mod tests {
         Ok(())
     }
 
-    /// GSB CSO | F.102: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    /// GSB CSO | F.102: 'Extra onderzoek B1-1': 'extra onderzoek gedaan' = 'ja' en de tweede vraag is niet beantwoord
     #[test]
     fn test_f102() -> Result<(), DataError> {
         use CommitteeCategory::*;
@@ -153,13 +171,12 @@ pub mod tests {
         };
 
         let cases = vec![
-            (GSB, YesNo::default(), YesNo::default(), false),
-            (GSB, YesNo::yes(), YesNo::yes(), false),
+            (GSB, YesNo::yes(), YesNo::default(), true),
             (GSB, YesNo::yes(), YesNo::no(), false),
-            (GSB, YesNo::both(), YesNo::default(), true),
-            (GSB, YesNo::default(), YesNo::both(), true),
-            (GSB, YesNo::both(), YesNo::both(), true),
-            (CSB, YesNo::default(), YesNo::both(), false), // Not applicable for CSB
+            (GSB, YesNo::yes(), YesNo::yes(), false),
+            (GSB, YesNo::no(), YesNo::default(), false),
+            (GSB, YesNo::default(), YesNo::default(), false),
+            (CSB, YesNo::yes(), YesNo::default(), false), // Not applicable for CSB
         ];
 
         for (committee_category, investigation, recounted, expect_f102) in cases {
@@ -174,25 +191,73 @@ pub mod tests {
         Ok(())
     }
 
+    /// GSB CSO | F.103: 'Extra onderzoek B1-1': 'extra onderzoek gedaan' = 'nee' en de tweede vraag is beantwoord
+    #[test]
+    fn test_f103() -> Result<(), DataError> {
+        use CommitteeCategory::*;
+
+        let f103 = ValidationResult {
+            code: ValidationResultCode::F103,
+            fields: vec!["extra_investigation".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (GSB, YesNo::no(), YesNo::default(), false),
+            (GSB, YesNo::no(), YesNo::yes(), true),
+            (GSB, YesNo::no(), YesNo::no(), true),
+            (GSB, YesNo::yes(), YesNo::yes(), false),
+            (GSB, YesNo::default(), YesNo::yes(), false),
+            (CSB, YesNo::no(), YesNo::yes(), false), // Not applicable for CSB
+        ];
+
+        for (committee_category, investigation, recounted, expect_f103) in cases {
+            let result = validate(committee_category, investigation, recounted)?;
+            let has_f103 = result.errors.iter().any(|e| e == &f103);
+            assert_eq!(
+                has_f103, expect_f103,
+                "Failed: {committee_category:?}, investigated: {investigation:?}, recounted: {recounted:?}"
+            );
+        }
+
+        Ok(())
+    }
+
+    /// GSB CSO | F.104: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    #[test]
+    fn test_f104() -> Result<(), DataError> {
+        use CommitteeCategory::*;
+
+        let f104 = ValidationResult {
+            code: ValidationResultCode::F104,
+            fields: vec!["extra_investigation".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (GSB, YesNo::default(), YesNo::default(), false),
+            (GSB, YesNo::yes(), YesNo::yes(), false),
+            (GSB, YesNo::yes(), YesNo::no(), false),
+            (GSB, YesNo::both(), YesNo::default(), true),
+            (GSB, YesNo::default(), YesNo::both(), true),
+            (GSB, YesNo::both(), YesNo::both(), true),
+            (CSB, YesNo::default(), YesNo::both(), false), // Not applicable for CSB
+        ];
+
+        for (committee_category, investigation, recounted, expect_f104) in cases {
+            let result = validate(committee_category, investigation, recounted)?;
+            let has_f104 = result.errors.iter().any(|e| e == &f104);
+            assert_eq!(
+                has_f104, expect_f104,
+                "Failed: {committee_category:?}, investigated: {investigation:?}, recounted: {recounted:?}"
+            );
+        }
+
+        Ok(())
+    }
+
     #[test]
     fn test_multiple_errors() -> Result<(), DataError> {
-        let validation_results = validate(CommitteeCategory::GSB, YesNo::both(), YesNo::default())?;
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F101,
-                    fields: vec!["extra_investigation".into()],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F102,
-                    fields: vec!["extra_investigation".into()],
-                    context: None,
-                }
-            ]
-        );
-
         let validation_results = validate(CommitteeCategory::GSB, YesNo::default(), YesNo::both())?;
         assert_eq!(
             validation_results.errors,
@@ -203,7 +268,7 @@ pub mod tests {
                     context: None,
                 },
                 ValidationResult {
-                    code: ValidationResultCode::F102,
+                    code: ValidationResultCode::F104,
                     fields: vec!["extra_investigation".into()],
                     context: None,
                 }

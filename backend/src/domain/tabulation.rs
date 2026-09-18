@@ -381,11 +381,7 @@ impl CSOInvestigations {
                 .push(polling_station.number());
         }
 
-        if let Some(true) = result
-            .extra_investigation
-            .extra_investigation_other_reason
-            .as_bool()
-        {
+        if let Some(true) = result.extra_investigation.extra_investigation.as_bool() {
             self.investigated_other_reason
                 .push(polling_station.number());
         }
@@ -524,7 +520,7 @@ mod tests {
     fn results_fixture_b() -> Results {
         Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: ExtraInvestigation {
-                extra_investigation_other_reason: YesNo::yes(),
+                extra_investigation: YesNo::yes(),
                 ballots_recounted_extra_investigation: YesNo::no(),
             },
             counting_differences_polling_station: ValidDefault::valid_default(),

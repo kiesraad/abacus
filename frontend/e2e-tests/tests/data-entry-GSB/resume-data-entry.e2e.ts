@@ -419,11 +419,11 @@ test.describe("resume data entry flow", () => {
       // extra investigation section should be empty
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await expect(extraInvestigationPage.fieldset).toBeVisible();
-      await expect(extraInvestigationPage.extraInvestigationOtherReasonYes).not.toBeChecked();
-      await expect(extraInvestigationPage.extraInvestigationOtherReasonNo).not.toBeChecked();
+      await expect(extraInvestigationPage.extraInvestigationYes).not.toBeChecked();
+      await expect(extraInvestigationPage.extraInvestigationNo).not.toBeChecked();
       await expect(extraInvestigationPage.ballotsRecountedYes).not.toBeChecked();
       await expect(extraInvestigationPage.ballotsRecountedNo).not.toBeChecked();
-      await extraInvestigationPage.next.click();
+      await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
       // counting differences polling station section should be empty
       const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);

@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/Spinner/Spinner";
 import { useUser } from "@/hooks/user/useUser";
 import { t, tx } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
+import { formatDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { removeLeadingZeros } from "@/utils/strings";
 import { useSingleCall } from "../hooks/useSingleCall";
 import { type DataEntryStatusWithUserStatus, DataEntryUserStatus } from "../utils/util";
@@ -80,7 +81,8 @@ export function DataEntrySourceNumberInput({
     }
 
     if (currentDataEntry) {
-      const { number: nr, name } = currentDataEntry.statusEntry.source;
+      const name = currentDataEntry.statusEntry.source.name;
+      const nr = formatDataEntrySourceNumber(currentDataEntry.statusEntry.source);
 
       switch (currentDataEntry.userStatus) {
         case DataEntryUserStatus.InProgressOtherUser:

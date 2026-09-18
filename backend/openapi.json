@@ -6295,6 +6295,7 @@
           "AirGapViolationResolved",
           "ApplicationStarted",
           "DatabaseBackupCreated",
+          "SigningKeypairCreated",
           "ApiError",
           "ApiWarning",
           "UnknownEvent"
@@ -6786,9 +6787,9 @@
           "election_identifier",
           "organizational_unit",
           "common_name",
-          "signature_algorithm",
           "not_before",
-          "not_after"
+          "not_after",
+          "signature_algorithm"
         ],
         "properties": {
           "common_name": {

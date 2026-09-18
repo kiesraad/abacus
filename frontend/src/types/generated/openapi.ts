@@ -552,6 +552,7 @@ export const auditEventTypeValues = [
   "AirGapViolationResolved",
   "ApplicationStarted",
   "DatabaseBackupCreated",
+  "SigningKeypairCreated",
   "ApiError",
   "ApiWarning",
   "UnknownEvent",

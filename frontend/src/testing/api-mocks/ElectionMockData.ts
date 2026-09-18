@@ -260,6 +260,7 @@ export const politicalGroupsMockData: PoliticalGroup[] = [
 
 const baseElectionGR = {
   name: "Gemeenteraad Heemdamseburg 2026",
+  official_name: "Gemeenteraad Heemdamseburg 2026",
   election_id: "GR2026_Heemdamseburg",
   location: "Heemdamseburg",
   authority_id: "0035",
@@ -276,6 +277,7 @@ const baseElectionGR = {
 
 const baseElectionPS = {
   name: "Provinciale Staten Oost-Holland 2027",
+  official_name: "Provinciale Staten Oost-Holland 2027",
   election_id: "PS2027_Juinen",
   location: "Juinen",
   authority_id: "0036",
@@ -292,6 +294,7 @@ const baseElectionPS = {
 
 const baseElectionABGSB = {
   name: "Waterschap Rivier en Polder 2027",
+  official_name: "Algemeen bestuur van het waterschap Rivier en Polder 2027",
   election_id: "AB2027_Juinen",
   location: "Juinen",
   authority_id: "0037",

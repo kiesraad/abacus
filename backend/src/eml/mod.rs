@@ -217,7 +217,7 @@ impl NewElection {
         Ok((
             Self {
                 name: format_election_name(&identifier.name, category),
-                eml_name: identifier.name.to_string(),
+                official_name: identifier.name.to_string(),
                 committee_category: CommitteeCategory::GSB,
                 counting_method: None,
                 election_id: identifier.id.raw().into_owned(),
@@ -507,7 +507,7 @@ impl ElectionWithPoliticalGroups {
     ) -> Result<eml_nl::documents::ElectionIdentifierBuilder, EMLError> {
         let mut builder = eml_nl::documents::ElectionIdentifierBuilder::new()
             .id(ElectionId::new(&self.election_id)?)
-            .name(self.eml_name.clone())
+            .name(self.official_name.clone())
             .election_date(self.election_date)
             .nomination_date(self.nomination_date)
             .category(self.get_eml_category())
@@ -1281,11 +1281,11 @@ mod tests {
             CommitteeCategory::GSB,
             &[0],
         );
-        election.eml_name = "Algemeen bestuur van het waterschap Juinen 2023".to_string();
+        election.official_name = "Algemeen bestuur van het waterschap Juinen 2023".to_string();
         election.name = "Waterschap Juinen 2023".to_string();
         let builder = election.get_eml_election_identifier_builder().unwrap();
         let election_definition = builder.build_for_definition().unwrap();
-        assert_eq!(election_definition.name.to_string(), election.eml_name);
+        assert_eq!(election_definition.name.to_string(), election.official_name);
     }
 
     #[test]

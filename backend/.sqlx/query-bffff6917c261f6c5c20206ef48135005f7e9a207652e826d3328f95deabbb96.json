@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id,\n            committee_session_id,\n            data_entry_id AS \"data_entry_id!: _\",\n            number,\n            name,\n            category\n        FROM sub_committees\n        WHERE committee_session_id = $1\n        ",
+  "query": "\n        INSERT INTO sub_committees (\n            committee_session_id,\n            data_entry_id,\n            number,\n            name,\n            category,\n            authority_id,\n            authority_name\n        ) VALUES (?, ?, ?, ?, ?, ?, ?)\n        RETURNING\n            id AS \"id!: _\",\n            committee_session_id,\n            data_entry_id AS \"data_entry_id!: _\",\n            number,\n            name,\n            category,\n            authority_id,\n            authority_name\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id",
+        "name": "id!: _",
         "ordinal": 0,
         "type_info": "Integer",
         "origin": {
@@ -68,19 +68,43 @@
             "name": "category"
           }
         }
+      },
+      {
+        "name": "authority_id",
+        "ordinal": 6,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "authority_id"
+          }
+        }
+      },
+      {
+        "name": "authority_name",
+        "ordinal": 7,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "authority_name"
+          }
+        }
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 7
     },
     "nullable": [
+      null,
       false,
       false,
       false,
       false,
       false,
-      false
+      false,
+      true
     ]
   },
-  "hash": "5634c7dc68be4dcd4c2688f9f09f01408359f98602bb33fc9c91f02044b20b22"
+  "hash": "bffff6917c261f6c5c20206ef48135005f7e9a207652e826d3328f95deabbb96"
 }

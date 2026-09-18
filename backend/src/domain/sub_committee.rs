@@ -20,6 +20,10 @@ pub struct SubCommittee {
     pub number: SubCommitteeNumber,
     pub name: String,
     pub category: CommitteeCategory,
+    pub authority_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub authority_name: Option<String>,
 }
 
 /// Sub electoral committee in a first committee session.

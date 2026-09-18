@@ -771,6 +771,8 @@ async fn create_sub_committees(
             region_number,
             &committee.responsible_region.name,
             committee.category,
+            &committee.managing_authority_id,
+            committee.name.clone(),
         )
         .await?;
     }

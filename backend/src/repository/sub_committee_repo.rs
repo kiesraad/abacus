@@ -24,7 +24,9 @@ async fn list(
             data_entry_id AS "data_entry_id!: _",
             number,
             name,
-            category
+            category,
+            authority_id,
+            authority_name
         FROM sub_committees
         WHERE committee_session_id = $1
         "#,
@@ -47,6 +49,7 @@ pub async fn list_first_session(
 }
 
 /// Create a single sub electoral committee for a committee session
+#[expect(clippy::too_many_arguments)]
 pub async fn create(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
@@ -54,6 +57,8 @@ pub async fn create(
     number: SubCommitteeNumber,
     name: &str,
     category: CommitteeCategory,
+    authority_id: &str,
+    authority_name: Option<String>,
 ) -> Result<SubCommitteeFirstSession, sqlx::Error> {
     query_as!(
         SubCommitteeRow,
@@ -63,28 +68,34 @@ pub async fn create(
             data_entry_id,
             number,
             name,
-            category
-        ) VALUES (?, ?, ?, ?, ?)
+            category,
+            authority_id,
+            authority_name
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
         RETURNING
             id AS "id!: _",
             committee_session_id,
             data_entry_id AS "data_entry_id!: _",
             number,
             name,
-            category
+            category,
+            authority_id,
+            authority_name
         "#,
         committee_session_id,
         data_entry_id,
         number,
         name,
         category,
+        authority_id,
+        authority_name
     )
     .fetch_one(conn)
     .await
     .map(SubCommitteeRow::into_sub_committee_first_session)
 }
 
-/// List all sub committees for a first committee session with their data entry status.
+/// List all subcommittees for a first committee session with their data entry status.
 pub async fn list_first_session_with_status(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
@@ -97,6 +108,8 @@ pub async fn list_first_session_with_status(
             sc.number,
             sc.name,
             sc.category,
+            sc.authority_id,
+            sc.authority_name,
             de.state AS "state!: Json<DataEntryStatus>"
         FROM sub_committees AS sc
         JOIN data_entries AS de ON de.id = sc.data_entry_id
@@ -114,6 +127,8 @@ pub async fn list_first_session_with_status(
                 number: row.number,
                 name: row.name,
                 category: row.category,
+                authority_id: row.authority_id,
+                authority_name: row.authority_name,
             },
         }),
         status: row.state.0,

@@ -97,8 +97,9 @@ pub async fn update(
     .await
 }
 
-/// Find which entity (polling station or sub committee) is the source of a data entry.
-/// We expect to only find one match: either a polling station or a sub committee, not both.
+/// Find which entity (polling station or subcommittee) is the source of a data entry.
+/// We expect to only find one match: either a polling station or a subcommittee, not both.
+#[expect(clippy::too_many_lines)]
 pub async fn resolve_source(
     conn: &mut SqliteConnection,
     data_entry_id: DataEntryId,
@@ -144,7 +145,9 @@ pub async fn resolve_source(
                 data_entry_id,
                 number,
                 name,
-                category
+                category,
+                authority_id,
+                authority_name
             FROM sub_committees
             WHERE data_entry_id = $1
         "#,

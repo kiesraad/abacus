@@ -961,13 +961,13 @@ fn generate_extra_investigation(rng: &mut impl rand::RngExt) -> ExtraInvestigati
         (7, YesNo::yes(), YesNo::yes()),
     ];
 
-    let (_, extra_investigation_other_reason, ballots_recounted_extra_investigation) =
+    let (_, extra_investigation, ballots_recounted_extra_investigation) =
         *extra_investigation_options
             .choose_weighted(rng, |(weight, ..)| *weight)
             .expect("Weighted random selection for extra_investigation should never fail");
 
     ExtraInvestigation {
-        extra_investigation_other_reason,
+        extra_investigation,
         ballots_recounted_extra_investigation,
     }
 }

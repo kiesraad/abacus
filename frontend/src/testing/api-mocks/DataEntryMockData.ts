@@ -76,7 +76,7 @@ export function emptyResults(model: DataEntryModel = "CSOFirstSession"): Results
       return {
         model,
         extra_investigation: {
-          extra_investigation_other_reason: { yes: false, no: false },
+          extra_investigation: { yes: false, no: false },
           ballots_recounted_extra_investigation: { yes: false, no: false },
         },
         counting_differences_polling_station: {
@@ -114,7 +114,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
   first_entry: {
     model: "CSOFirstSession",
     extra_investigation: {
-      extra_investigation_other_reason: { yes: false, no: true },
+      extra_investigation: { yes: false, no: true },
       ballots_recounted_extra_investigation: { yes: false, no: false },
     },
     counting_differences_polling_station: {
@@ -174,7 +174,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
   second_entry: {
     model: "CSOFirstSession",
     extra_investigation: {
-      extra_investigation_other_reason: { yes: false, no: true },
+      extra_investigation: { yes: false, no: true },
       ballots_recounted_extra_investigation: { yes: false, no: false },
     },
     counting_differences_polling_station: {

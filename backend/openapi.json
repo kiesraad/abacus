@@ -8375,7 +8375,7 @@
         "type": "object",
         "description": "Extra investigation, part of the results (\"B1-1 Extra onderzoek\")",
         "required": [
-          "extra_investigation_other_reason",
+          "extra_investigation",
           "ballots_recounted_extra_investigation"
         ],
         "properties": {
@@ -8383,7 +8383,7 @@
             "$ref": "#/components/schemas/YesNo",
             "description": "Whether ballots were (partially) recounted following the extra investigation\n(\"Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?\")"
           },
-          "extra_investigation_other_reason": {
+          "extra_investigation": {
             "$ref": "#/components/schemas/YesNo",
             "description": "Whether extra investigation was done\n(\"Heeft het gemeentelijk stembureau extra onderzoek gedaan?\")"
           }

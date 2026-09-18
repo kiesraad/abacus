@@ -15,7 +15,7 @@ use crate::domain::{
 pub struct ExtraInvestigation {
     /// Whether extra investigation was done
     /// ("Heeft het gemeentelijk stembureau extra onderzoek gedaan?")
-    pub extra_investigation_other_reason: YesNo,
+    pub extra_investigation: YesNo,
     /// Whether ballots were (partially) recounted following the extra investigation
     /// ("Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?")
     pub ballots_recounted_extra_investigation: YesNo,
@@ -23,10 +23,10 @@ pub struct ExtraInvestigation {
 
 impl Compare for ExtraInvestigation {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        self.extra_investigation_other_reason.compare(
-            &first_entry.extra_investigation_other_reason,
+        self.extra_investigation.compare(
+            &first_entry.extra_investigation,
             different_fields,
-            &path.field("extra_investigation_other_reason"),
+            &path.field("extra_investigation"),
         );
 
         self.ballots_recounted_extra_investigation.compare(
@@ -45,7 +45,7 @@ impl Validate for ExtraInvestigation {
     ) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
         if election.committee_category == CommitteeCategory::GSB {
-            if self.extra_investigation_other_reason.is_empty() {
+            if self.extra_investigation.is_empty() {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![path.to_string()],
                     code: ValidationResultCode::F101,
@@ -53,7 +53,7 @@ impl Validate for ExtraInvestigation {
                 });
             }
 
-            if self.extra_investigation_other_reason == YesNo::yes()
+            if self.extra_investigation == YesNo::yes()
                 && self.ballots_recounted_extra_investigation.is_empty()
             {
                 validation_results.errors.push(ValidationResult {
@@ -63,7 +63,7 @@ impl Validate for ExtraInvestigation {
                 });
             }
 
-            if self.extra_investigation_other_reason == YesNo::no()
+            if self.extra_investigation == YesNo::no()
                 && !self.ballots_recounted_extra_investigation.is_empty()
             {
                 validation_results.errors.push(ValidationResult {
@@ -73,7 +73,7 @@ impl Validate for ExtraInvestigation {
                 });
             }
 
-            if self.extra_investigation_other_reason.is_both()
+            if self.extra_investigation.is_both()
                 || self.ballots_recounted_extra_investigation.is_both()
             {
                 validation_results.errors.push(ValidationResult {
@@ -101,7 +101,7 @@ pub mod tests {
     impl ValidDefault for ExtraInvestigation {
         fn valid_default() -> Self {
             Self {
-                extra_investigation_other_reason: YesNo::no(),
+                extra_investigation: YesNo::no(),
                 ballots_recounted_extra_investigation: YesNo::default(),
             }
         }
@@ -113,7 +113,7 @@ pub mod tests {
         recounted: YesNo,
     ) -> Result<ValidationResults, DataError> {
         let extra_investigation = ExtraInvestigation {
-            extra_investigation_other_reason: investigation,
+            extra_investigation: investigation,
             ballots_recounted_extra_investigation: recounted,
         };
 

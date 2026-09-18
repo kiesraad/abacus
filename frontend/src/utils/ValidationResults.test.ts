@@ -44,7 +44,7 @@ describe("doesValidationResultApplyToSection", () => {
   const extraInvestigationW001: ValidationResult = {
     code: "W001",
     fields: [
-      "data.extra_investigation.extra_investigation_other_reason.yes",
+      "data.extra_investigation.extra_investigation.yes",
       "data.extra_investigation.ballots_recounted_extra_investigation.no",
     ],
   };

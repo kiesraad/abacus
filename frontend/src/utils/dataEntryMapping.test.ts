@@ -818,7 +818,7 @@ describe("setValueAtPath", () => {
       expected: 1500,
     },
     {
-      path: "extra_investigation.extra_investigation_other_reason.yes",
+      path: "extra_investigation.extra_investigation.yes",
       value: "true",
       type: "boolean",
       expected: true,

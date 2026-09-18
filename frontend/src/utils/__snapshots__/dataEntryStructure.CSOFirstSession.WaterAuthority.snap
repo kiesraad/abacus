@@ -10,17 +10,17 @@
       },
       {
         "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
-        "error_path": "extra_investigation.extra_investigation_other_reason",
+        "error_path": "extra_investigation.extra_investigation",
         "options": [
           {
             "autoFocusInput": true,
             "label": "Ja",
-            "path": "extra_investigation.extra_investigation_other_reason.yes",
+            "path": "extra_investigation.extra_investigation.yes",
             "short_label": "Ja",
           },
           {
             "label": "Nee",
-            "path": "extra_investigation.extra_investigation_other_reason.no",
+            "path": "extra_investigation.extra_investigation.no",
             "short_label": "Nee",
           },
         ],

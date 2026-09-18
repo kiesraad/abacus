@@ -53,7 +53,7 @@ pub fn example_cso_data_entry(client_state: Option<&str>) -> serde_json::Value {
         "data": {
             "model": "CSOFirstSession",
             "extra_investigation": {
-              "extra_investigation_other_reason": { "yes": false, "no": true },
+              "extra_investigation": { "yes": false, "no": true },
               "ballots_recounted_extra_investigation": { "yes": false, "no": false },
             },
             "counting_differences_polling_station": {

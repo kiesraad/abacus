@@ -3,7 +3,7 @@
   "short_title": "Extra onderzoek",
   "form_description": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
   "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
-  "extra_investigation_other_reason": {
+  "extra_investigation": {
     "title": "Heeft het gemeentelijk stembureau extra onderzoek gedaan?",
     "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?"
   },

@@ -30,7 +30,7 @@ export const pollingStationRequests: PollingStationRequest[] = [
 export function emptyCSOFirstSessionResults(): CSOFirstSessionResults {
   return {
     extra_investigation: {
-      extra_investigation_other_reason: { yes: false, no: false },
+      extra_investigation: { yes: false, no: false },
       ballots_recounted_extra_investigation: { yes: false, no: false },
     },
     counting_differences_polling_station: {
@@ -174,7 +174,7 @@ const commonDataEntry: CommonPollingStationResults = {
 export const noRecountNoDifferencesDataEntry: Extract<Results, { model: "CSOFirstSession" }> = {
   model: "CSOFirstSession",
   extra_investigation: {
-    extra_investigation_other_reason: { yes: false, no: true },
+    extra_investigation: { yes: false, no: true },
     ballots_recounted_extra_investigation: { yes: false, no: false },
   },
   counting_differences_polling_station: {
@@ -805,7 +805,7 @@ export const noErrorsWarningsResponse: SaveDataEntryResponse = {
 export const noRecountNoDifferencesDataEntryWithGaps: Results = {
   model: "CSOFirstSession",
   extra_investigation: {
-    extra_investigation_other_reason: { yes: false, no: true },
+    extra_investigation: { yes: false, no: true },
     ballots_recounted_extra_investigation: { yes: false, no: false },
   },
   counting_differences_polling_station: {

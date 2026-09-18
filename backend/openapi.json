@@ -10385,9 +10385,16 @@
           "id",
           "number",
           "name",
-          "category"
+          "category",
+          "authority_id"
         ],
         "properties": {
+          "authority_id": {
+            "type": "string"
+          },
+          "authority_name": {
+            "type": "string"
+          },
           "category": {
             "$ref": "#/components/schemas/CommitteeCategory"
           },

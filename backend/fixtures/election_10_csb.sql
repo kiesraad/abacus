@@ -53,5 +53,5 @@ VALUES (1001, 1, 10, 'data_entry', '', NULL);
 INSERT INTO data_entries (id, state, updated_at)
 VALUES (1001, '{"status":"Empty"}', '2024-12-05 09:15:00');
 
-INSERT INTO sub_committees (id, committee_session_id, data_entry_id, name, number, category)
-VALUES (1011, 1001, 1001, 'Heemdamseburg', 0065, 'GSB');
+INSERT INTO sub_committees (id, committee_session_id, data_entry_id, name, number, category, authority_id, authority_name)
+VALUES (1011, 1001, 1001, 'Heemdamseburg', 0065, 'GSB', '0065', NULL);

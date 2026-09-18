@@ -127,6 +127,8 @@ async fn generate_csb_sub_committee(
         number,
         name,
         CommitteeCategory::GSB,
+        &format!("{:0>4}", number),
+        None,
     )
     .await?;
 

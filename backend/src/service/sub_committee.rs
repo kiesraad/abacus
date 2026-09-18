@@ -26,6 +26,8 @@ pub async fn create(
     number: SubCommitteeNumber,
     name: &str,
     category: CommitteeCategory,
+    authority_id: &str,
+    authority_name: Option<String>,
 ) -> Result<SubCommitteeFirstSession, SubCommitteeServiceError> {
     let mut tx = conn.begin().await?;
     let data_entry = data_entry_repo::create_empty(&mut tx).await?;
@@ -36,6 +38,8 @@ pub async fn create(
         number,
         name,
         category,
+        authority_id,
+        authority_name,
     )
     .await?;
     tx.commit().await?;
@@ -68,6 +72,8 @@ mod tests {
             42,
             "Test GSB",
             CommitteeCategory::GSB,
+            &format!("{:0>4}", 42),
+            None,
         )
         .await
         .unwrap();
@@ -76,6 +82,8 @@ mod tests {
         assert_eq!(created.sub_committee.name, "Test GSB");
         assert_eq!(created.sub_committee.category, CommitteeCategory::GSB);
         assert_eq!(created.committee_session_id, committee_session_id);
+        assert_eq!(created.sub_committee.authority_id, "0042");
+        assert_eq!(created.sub_committee.authority_name, None);
 
         // List and verify
         let list = list_for_first_session(&mut conn, committee_session_id)

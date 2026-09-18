@@ -37,7 +37,7 @@ describe("Test ExtraInvestigationForm errors", () => {
     server.use(DataEntryClaimHandler, DataEntrySaveHandler);
   });
 
-  test("F.101 Both questions need to be answered or unanswered", async () => {
+  test("F.101 First question needs to be answered", async () => {
     const user = userEvent.setup();
 
     overrideServerClaimDataEntryResponse({

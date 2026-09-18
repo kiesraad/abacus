@@ -36,7 +36,7 @@ fn valid_empty_result() -> Results {
 fn valid_empty_cso_result() -> CSOFirstSessionResults {
     CSOFirstSessionResults {
         extra_investigation: ExtraInvestigation {
-            extra_investigation_other_reason: YesNo::default(),
+            extra_investigation_other_reason: YesNo::no(),
             ballots_recounted_extra_investigation: YesNo::default(),
         },
         counting_differences_polling_station: CountingDifferencesPollingStation {

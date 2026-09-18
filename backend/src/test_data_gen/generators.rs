@@ -956,7 +956,7 @@ fn generate_common_results(
 
 fn generate_extra_investigation(rng: &mut impl rand::RngExt) -> ExtraInvestigation {
     let extra_investigation_options = [
-        (85, YesNo::default(), YesNo::default()),
+        (85, YesNo::no(), YesNo::default()),
         (10, YesNo::no(), YesNo::no()),
         (3, YesNo::yes(), YesNo::no()),
         (2, YesNo::yes(), YesNo::yes()),

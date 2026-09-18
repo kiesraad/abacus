@@ -64,7 +64,7 @@ pub struct ValidationResultContext {
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum ValidationResultCode {
-    /// GSB CSO: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+    /// GSB CSO: 'Extra onderzoek B1-1': de eerste vraag is niet beantwoord
     F101,
     /// GSB CSO: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
     F104,

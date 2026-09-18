@@ -45,9 +45,7 @@ impl Validate for ExtraInvestigation {
     ) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
         if election.committee_category == CommitteeCategory::GSB {
-            if self.extra_investigation_other_reason.is_empty()
-                != self.ballots_recounted_extra_investigation.is_empty()
-            {
+            if self.extra_investigation_other_reason.is_empty() {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![path.to_string()],
                     code: ValidationResultCode::F101,
@@ -83,7 +81,7 @@ pub mod tests {
     impl ValidDefault for ExtraInvestigation {
         fn valid_default() -> Self {
             Self {
-                extra_investigation_other_reason: YesNo::default(),
+                extra_investigation_other_reason: YesNo::no(),
                 ballots_recounted_extra_investigation: YesNo::default(),
             }
         }
@@ -108,7 +106,7 @@ pub mod tests {
         Ok(validation_results)
     }
 
-    /// GSB CSO | F.101: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+    /// GSB CSO | F.101: 'Extra onderzoek B1-1': de eerste vraag is niet beantwoord
     #[test]
     fn test_f101() -> Result<(), DataError> {
         use CommitteeCategory::*;
@@ -120,11 +118,11 @@ pub mod tests {
         };
 
         let cases = vec![
-            (GSB, YesNo::default(), YesNo::default(), false),
+            (GSB, YesNo::default(), YesNo::default(), true),
             (GSB, YesNo::yes(), YesNo::yes(), false),
             (GSB, YesNo::no(), YesNo::no(), false),
             (GSB, YesNo::yes(), YesNo::no(), false),
-            (GSB, YesNo::yes(), YesNo::default(), true),
+            (GSB, YesNo::yes(), YesNo::default(), false),
             (GSB, YesNo::default(), YesNo::no(), true),
             (CSB, YesNo::default(), YesNo::no(), false), // Not applicable for CSB
         ];
@@ -176,23 +174,6 @@ pub mod tests {
 
     #[test]
     fn test_multiple_errors() -> Result<(), DataError> {
-        let validation_results = validate(CommitteeCategory::GSB, YesNo::both(), YesNo::default())?;
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F101,
-                    fields: vec!["extra_investigation".into()],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F104,
-                    fields: vec!["extra_investigation".into()],
-                    context: None,
-                }
-            ]
-        );
-
         let validation_results = validate(CommitteeCategory::GSB, YesNo::default(), YesNo::both())?;
         assert_eq!(
             validation_results.errors,

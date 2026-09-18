@@ -192,7 +192,7 @@ describe("getTranslations", () => {
     expect(getTranslations(GSBCSOElection, validationResultMockData.F101, "coordinator")).toEqual({
       code: "F.101",
       title: t("feedback_GSB.F101.coordinator.title"),
-      content: tx("feedback_GSB.F101.coordinator.content"),
+      actions: tx("feedback_GSB.F101.coordinator.actions"),
     });
   });
 

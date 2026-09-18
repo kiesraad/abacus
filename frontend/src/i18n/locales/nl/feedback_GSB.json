@@ -1,8 +1,8 @@
 {
   "F101": {
     "coordinator": {
-      "title": "Beide vragen moeten beantwoord ofwel overgeslagen zijn",
-      "content": "Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden.\nAls er geen extra onderzoek is gedaan, moeten deze vragen overgeslagen worden."
+      "title": "De eerste vraag moet beantwoord worden",
+      "actions": "<ul><li>Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.</li></ul>"
     }
   },
   "F104": {

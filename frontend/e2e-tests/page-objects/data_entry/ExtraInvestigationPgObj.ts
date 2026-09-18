@@ -6,7 +6,7 @@ import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export const noExtraInvestigation: ExtraInvestigation = {
   extra_investigation_other_reason: { yes: false, no: true },
-  ballots_recounted_extra_investigation: { yes: false, no: true },
+  ballots_recounted_extra_investigation: { yes: false, no: false },
 };
 
 export class ExtraInvestigationPage extends DataEntryBasePage {

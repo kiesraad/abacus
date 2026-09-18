@@ -63,6 +63,16 @@ impl Validate for ExtraInvestigation {
                 });
             }
 
+            if self.extra_investigation_other_reason == YesNo::no()
+                && !self.ballots_recounted_extra_investigation.is_empty()
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F103,
+                    context: None,
+                });
+            }
+
             if self.extra_investigation_other_reason.is_both()
                 || self.ballots_recounted_extra_investigation.is_both()
             {
@@ -174,6 +184,38 @@ pub mod tests {
             let has_f102 = result.errors.iter().any(|e| e == &f102);
             assert_eq!(
                 has_f102, expect_f102,
+                "Failed: {committee_category:?}, investigated: {investigation:?}, recounted: {recounted:?}"
+            );
+        }
+
+        Ok(())
+    }
+
+    /// GSB CSO | F.103: 'Extra onderzoek B1-1': 'extra onderzoek gedaan' = 'nee' en de tweede vraag is beantwoord
+    #[test]
+    fn test_f103() -> Result<(), DataError> {
+        use CommitteeCategory::*;
+
+        let f103 = ValidationResult {
+            code: ValidationResultCode::F103,
+            fields: vec!["extra_investigation".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (GSB, YesNo::no(), YesNo::default(), false),
+            (GSB, YesNo::no(), YesNo::yes(), true),
+            (GSB, YesNo::no(), YesNo::no(), true),
+            (GSB, YesNo::yes(), YesNo::yes(), false),
+            (GSB, YesNo::default(), YesNo::yes(), false),
+            (CSB, YesNo::no(), YesNo::yes(), false), // Not applicable for CSB
+        ];
+
+        for (committee_category, investigation, recounted, expect_f103) in cases {
+            let result = validate(committee_category, investigation, recounted)?;
+            let has_f103 = result.errors.iter().any(|e| e == &f103);
+            assert_eq!(
+                has_f103, expect_f103,
                 "Failed: {committee_category:?}, investigated: {investigation:?}, recounted: {recounted:?}"
             );
         }

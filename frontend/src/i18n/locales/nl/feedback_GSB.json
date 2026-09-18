@@ -11,6 +11,12 @@
       "content": "Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden."
     }
   },
+  "F103": {
+    "coordinator": {
+      "title": "De tweede vraag moet overgeslagen worden",
+      "content": "Als er geen extra onderzoek is gedaan, mag alleen de eerste vraag beantwoord worden."
+    }
+  },
   "F104": {
     "coordinator": {
       "title": "Er mag maar één antwoord per vraag worden gegeven"

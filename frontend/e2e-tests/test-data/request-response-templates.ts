@@ -175,7 +175,7 @@ export const noRecountNoDifferencesDataEntry: Extract<Results, { model: "CSOFirs
   model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: true },
-    ballots_recounted_extra_investigation: { yes: false, no: true },
+    ballots_recounted_extra_investigation: { yes: false, no: false },
   },
   counting_differences_polling_station: {
     difference_ballots_voters_completely_accounted_for: { yes: true, no: false },
@@ -806,7 +806,7 @@ export const noRecountNoDifferencesDataEntryWithGaps: Results = {
   model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: true },
-    ballots_recounted_extra_investigation: { yes: false, no: true },
+    ballots_recounted_extra_investigation: { yes: false, no: false },
   },
   counting_differences_polling_station: {
     difference_ballots_voters_completely_accounted_for: { yes: true, no: false },

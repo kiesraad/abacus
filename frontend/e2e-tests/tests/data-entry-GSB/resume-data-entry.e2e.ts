@@ -423,7 +423,7 @@ test.describe("resume data entry flow", () => {
       await expect(extraInvestigationPage.extraInvestigationOtherReasonNo).not.toBeChecked();
       await expect(extraInvestigationPage.ballotsRecountedYes).not.toBeChecked();
       await expect(extraInvestigationPage.ballotsRecountedNo).not.toBeChecked();
-      await extraInvestigationPage.next.click();
+      await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
       // counting differences polling station section should be empty
       const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);

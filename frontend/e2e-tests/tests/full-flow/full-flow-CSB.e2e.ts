@@ -29,10 +29,20 @@ import { UserCreateElectionPgObj } from "e2e-tests/page-objects/users/UserCreate
 import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
-import { type Eml110a, type Eml230b, eml110a, eml230b_more_than_45_candidates } from "e2e-tests/test-data/eml-files";
-import { noRecountNoDifferencesDataEntryGSB } from "e2e-tests/test-data/request-response-templates";
+import {
+  type Eml110a,
+  type Eml230b,
+  eml110a,
+  eml110a_AB,
+  eml230b_AB_more_than_45_candidates,
+  eml230b_more_than_45_candidates,
+} from "e2e-tests/test-data/eml-files";
+import {
+  noRecountNoDifferencesDataEntryGSB,
+  noRecountNoDifferencesWithVoterCardCountDataEntryGSB,
+} from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
-import type { GSBResults } from "@/types/generated/openapi";
+import type { Results } from "@/types/generated/openapi";
 import { test } from "../../fixtures";
 
 const dateTimePattern = /\d{8}-\d{6}/;
@@ -43,7 +53,8 @@ type TestVariant = {
   regionName: string;
   electionName: string;
   filename: string;
-  dataEntry: GSBResults & { model: "GSB" };
+  dataEntry: Extract<Results, { model: "GSB" }>;
+  subCommittees: { number: number; name: string }[];
 };
 
 const variants: TestVariant[] = [
@@ -55,6 +66,22 @@ const variants: TestVariant[] = [
     electionName: "Gemeenteraad Test 2022",
     filename: "gr2022_test_gemeente_test",
     dataEntry: noRecountNoDifferencesDataEntryGSB,
+    subCommittees: [{ number: 0, name: "Test" }],
+  },
+  {
+    name: "WS",
+    electionDefinition: eml110a_AB,
+    candidateDefinition: eml230b_AB_more_than_45_candidates,
+    regionName: "Rivier en Polder",
+    electionName: "Waterschap Rivier en Polder 2023",
+    filename: "ab2023_rivierenpolder_gemeente_rivier-en-polder",
+    dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntryGSB,
+    subCommittees: [
+      { number: 123, name: "Heemdamseburg" },
+      { number: 124, name: "Juinen" },
+      { number: 125, name: "Middelgein" },
+      { number: 126, name: "'s-Gravenveen" },
+    ],
   },
 ];
 
@@ -278,50 +305,57 @@ for (const variant of variants) {
       });
     }
 
-    test("first data entry", async ({ page }) => {
-      await page.goto("/account/login");
+    for (const [idx, subCommittee] of variant.subCommittees.entries()) {
+      test(`first data entry ${subCommittee.name}`, async ({ page }) => {
+        await page.goto("/account/login");
 
-      const firstTypist = typistUsers[0]!;
-      const loginPage = new LoginPgObj(page);
-      const password = getTestPassword(firstTypist.username);
-      await loginPage.login(firstTypist.username, password);
+        const firstTypist = typistUsers[0]!;
+        const loginPage = new LoginPgObj(page);
+        await loginPage.login(firstTypist.username, getTestPassword(firstTypist.username));
 
-      const overviewPage = new ElectionsOverviewPgObj(page);
-      await expect(overviewPage.header).toBeVisible();
-      await overviewPage.findElectionRowById(electionId!).click();
+        const overviewPage = new ElectionsOverviewPgObj(page);
+        await expect(overviewPage.header).toBeVisible();
+        await overviewPage.findElectionRowById(electionId!).click();
 
-      const dataEntryHomePage = new DataEntryHomePage(page);
-      await expect(dataEntryHomePage.fieldset).toBeVisible();
-      await expect(dataEntryHomePage.pollingStations).toBeVisible();
-      await dataEntryHomePage.clickPollingStationFromList(0);
+        const dataEntryHomePage = new DataEntryHomePage(page);
+        await expect(dataEntryHomePage.fieldset).toBeVisible();
+        const rowsVisible = variant.subCommittees.length - idx; // Row is removed after data entry completed.
+        await expect(dataEntryHomePage.pollingStations).toHaveCount(rowsVisible);
 
-      await fillDataEntryPagesAndSave(page, variant.dataEntry);
-      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
+        await dataEntryHomePage.clickPollingStationFromList(subCommittee.number);
 
-      await logout(page);
-    });
+        await fillDataEntryPagesAndSave(page, variant.dataEntry);
+        await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
-    test("second data entry", async ({ page }) => {
-      await page.goto("/account/login");
+        await logout(page);
+      });
+    }
 
-      const secondTypist = typistUsers[1]!;
-      const loginPage = new LoginPgObj(page);
-      await loginPage.login(secondTypist.username, getTestPassword(secondTypist.username));
+    for (const [idx, subCommittee] of variant.subCommittees.entries()) {
+      test(`second data entry ${subCommittee.name}`, async ({ page }) => {
+        await page.goto("/account/login");
 
-      const overviewPage = new ElectionsOverviewPgObj(page);
-      await expect(overviewPage.header).toBeVisible();
-      await overviewPage.findElectionRowById(electionId!).click();
+        const secondTypist = typistUsers[1]!;
+        const loginPage = new LoginPgObj(page);
+        await loginPage.login(secondTypist.username, getTestPassword(secondTypist.username));
 
-      const dataEntryHomePage = new DataEntryHomePage(page);
-      await expect(dataEntryHomePage.fieldset).toBeVisible();
-      await expect(dataEntryHomePage.pollingStations).toBeVisible();
-      await dataEntryHomePage.clickPollingStationFromList(0);
+        const overviewPage = new ElectionsOverviewPgObj(page);
+        await expect(overviewPage.header).toBeVisible();
+        await overviewPage.findElectionRowById(electionId!).click();
 
-      await fillDataEntryPagesAndSave(page, variant.dataEntry);
-      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
+        const dataEntryHomePage = new DataEntryHomePage(page);
+        await expect(dataEntryHomePage.fieldset).toBeVisible();
+        const rowsVisible = variant.subCommittees.length - idx; // Row is removed after data entry completed.
+        await expect(dataEntryHomePage.pollingStations).toHaveCount(rowsVisible);
 
-      await logout(page);
-    });
+        await dataEntryHomePage.clickPollingStationFromList(subCommittee.number);
+
+        await fillDataEntryPagesAndSave(page, variant.dataEntry);
+        await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
+
+        await logout(page);
+      });
+    }
 
     test("finish session, check apportionment and download results", async ({ page }) => {
       await page.goto("/account/login");

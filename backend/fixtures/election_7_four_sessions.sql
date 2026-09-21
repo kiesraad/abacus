@@ -1,4 +1,4 @@
-INSERT INTO elections (id, name, eml_name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+INSERT INTO elections (id, name, official_name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 VALUES (7, 'Gemeenteraad Grote Stad 2026 >= 19 seats', 'Gemeenteraad Grote Stad 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '0099', 'Grote Stad', 'Grote Stad', '{"district":"None"}', '{"id":"0099","name":"Grote Stad"}', 'Municipal', 'GR2', 23, 15000, '2026-03-18', '2026-02-02',
         '[
           {

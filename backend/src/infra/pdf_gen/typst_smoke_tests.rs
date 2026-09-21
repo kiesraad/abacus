@@ -141,7 +141,7 @@ fn random_election(
     ElectionWithPoliticalGroups {
         id: ElectionId::from(rng.random_range(0..5)),
         name: name.clone(),
-        eml_name: name,
+        official_name: name,
         committee_category,
         counting_method,
         election_id: random_string(rng, string_length),

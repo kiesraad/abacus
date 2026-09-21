@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id,\n            committee_session_id,\n            data_entry_id AS \"data_entry_id!: _\",\n            number,\n            name,\n            category\n        FROM sub_committees\n        WHERE committee_session_id = $1\n        ",
+  "query": "\n        SELECT\n            id,\n            committee_session_id,\n            data_entry_id AS \"data_entry_id!: _\",\n            number,\n            name,\n            category,\n            authority_id,\n            authority_name\n        FROM sub_committees\n        WHERE committee_session_id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -68,6 +68,28 @@
             "name": "category"
           }
         }
+      },
+      {
+        "name": "authority_id",
+        "ordinal": 6,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "authority_id"
+          }
+        }
+      },
+      {
+        "name": "authority_name",
+        "ordinal": 7,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "authority_name"
+          }
+        }
       }
     ],
     "parameters": {
@@ -79,8 +101,10 @@
       false,
       false,
       false,
+      false,
+      false,
       false
     ]
   },
-  "hash": "5634c7dc68be4dcd4c2688f9f09f01408359f98602bb33fc9c91f02044b20b22"
+  "hash": "90197cae48ca824299259caddc4bd2fb6232394eac16b832456813871bb1fd4e"
 }

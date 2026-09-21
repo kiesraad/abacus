@@ -1,4 +1,4 @@
-INSERT INTO elections (id, name, eml_name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+INSERT INTO elections (id, name, official_name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 -- copy of election_4 with committee_category changed to 'CSB' and subcommittee instead of polling station
 VALUES (9, 'Gemeenteraad Test Location 2026 < 19 seats', 'Gemeenteraad Test Location 2026', 'CSB', NULL, 'GR2026_TestLocation', 'Test Location', 'CSB', 'Test Location', 'Test Location', '{"district":"None"}', '{"id":"9101","name":"Test Location"}', 'Municipal', 'GR1', 15, 1, '2026-03-18', '2026-02-02', '[
          {
@@ -417,5 +417,5 @@ VALUES (901, 1, 9, 'data_entry', '', NULL);
 INSERT INTO data_entries (id, state, updated_at)
 VALUES (901, '{"status":"Empty"}', '2024-12-05 09:15:00');
 
-INSERT INTO sub_committees (id, committee_session_id, data_entry_id, name, number, category)
-VALUES (911, 901, 901, 'Test Location', 9101, 'GSB');
+INSERT INTO sub_committees (id, committee_session_id, data_entry_id, name, number, category, authority_id, authority_name)
+VALUES (911, 901, 901, 'Test Location', 9101, 'GSB', '9101', 'Test Location');

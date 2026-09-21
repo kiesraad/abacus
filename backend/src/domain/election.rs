@@ -30,10 +30,8 @@ pub struct Election {
     pub id: ElectionId,
     /// See [`ElectionWithPoliticalGroups::name`]
     pub name: String,
-    /// See [`ElectionWithPoliticalGroups::eml_name`]
-    #[serde(skip_serializing)]
-    #[serde(default)]
-    pub eml_name: String,
+    /// See [`ElectionWithPoliticalGroups::official_name`]
+    pub official_name: String,
     /// See [`ElectionWithPoliticalGroups::committee_category`]
     pub committee_category: CommitteeCategory,
     /// See [`ElectionWithPoliticalGroups::counting_method`]
@@ -89,9 +87,7 @@ pub struct ElectionWithPoliticalGroups {
     /// Name of the election, as formatted for display in Abacus.
     pub name: String,
     /// Name of the election, as defined in the EML_NL election definition.
-    #[serde(skip_serializing)]
-    #[serde(default)]
-    pub eml_name: String,
+    pub official_name: String,
     /// The category (e.g. CSB) of the committee that this struct represents
     pub committee_category: CommitteeCategory,
     /// If this is a GSB committee, this is the counting method used for
@@ -160,7 +156,7 @@ impl From<ElectionWithPoliticalGroups> for Election {
         Self {
             id: value.id,
             name: value.name,
-            eml_name: value.eml_name,
+            official_name: value.official_name,
             committee_category: value.committee_category,
             counting_method: value.counting_method,
             election_id: value.election_id,
@@ -258,10 +254,8 @@ impl NameResolver for ElectionWithPoliticalGroups {
 pub struct NewElection {
     /// See [`ElectionWithPoliticalGroups::name`]
     pub name: String,
-    /// See [`ElectionWithPoliticalGroups::eml_name`]
-    #[serde(skip_serializing)]
-    #[serde(default)]
-    pub eml_name: String,
+    /// See [`ElectionWithPoliticalGroups::official_name`]
+    pub official_name: String,
     /// See [`ElectionWithPoliticalGroups::committee_category`]
     pub committee_category: CommitteeCategory,
     /// See [`ElectionWithPoliticalGroups::counting_method`]
@@ -681,7 +675,7 @@ pub mod tests {
         ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
             name: "Gemeenteraad Test 2023".to_string(),
-            eml_name: "Gemeenteraad Test 2023".to_string(),
+            official_name: "Gemeenteraad Test 2023".to_string(),
             committee_category,
             counting_method: if committee_category == CommitteeCategory::GSB {
                 Some(VoteCountingMethod::CSO)

@@ -39,7 +39,7 @@ use crate::{
             votes_counts::VotesCounts,
             yes_no::YesNo,
         },
-        sub_committee::{SubCommitteeFirstSession, SubCommitteeNumber},
+        sub_committee::{NewSubCommittee, SubCommitteeFirstSession},
         validate::Validate,
     },
     repository::{
@@ -110,25 +110,17 @@ async fn generate_csb_data_entries(
     Ok(second_entries > 0)
 }
 
-#[expect(clippy::too_many_arguments)]
 async fn generate_csb_sub_committee(
     conn: &mut SqliteConnection,
     rng: &mut impl rand::RngExt,
     args: &GenerateElectionArgs,
     committee_session_id: CommitteeSessionId,
-    number: SubCommitteeNumber,
-    name: &str,
+    subcommittee: NewSubCommittee,
     election: &ElectionWithPoliticalGroups,
     votes: Option<Vec<Vec<u32>>>,
 ) -> Result<bool, GenerateError> {
-    let sub_committee_first_session = create_sub_committee(
-        conn,
-        committee_session_id,
-        number,
-        name,
-        CommitteeCategory::GSB,
-    )
-    .await?;
+    let sub_committee_first_session =
+        create_sub_committee(conn, committee_session_id, subcommittee).await?;
 
     if args.with_data_entry {
         generate_csb_data_entries(
@@ -186,6 +178,7 @@ async fn generate_gsb_election_data(
 }
 
 /// Create subcommittee and set status to InPreparation for a CSB election
+#[expect(clippy::too_many_lines)]
 async fn generate_csb_election_data(
     rng: &mut impl rand::RngExt,
     tx: &mut SqliteConnection,
@@ -210,8 +203,13 @@ async fn generate_csb_election_data(
                 rng,
                 args,
                 committee_session.id,
-                number,
-                &election.location,
+                NewSubCommittee {
+                    number,
+                    name: election.location.clone(),
+                    category: CommitteeCategory::GSB,
+                    authority_id: format!("{:0>4}", number),
+                    authority_name: election.location.clone(),
+                },
                 election,
                 votes,
             )
@@ -222,15 +220,20 @@ async fn generate_csb_election_data(
             let gsbs = rng.random_range(args.gsbs.clone()).max(1);
             let mut data_entry_completes = Vec::new();
             for number in 1..=gsbs {
-                let name = super::data::locality(rng);
+                let name = super::data::locality(rng).to_string();
                 data_entry_completes.push(
                     generate_csb_sub_committee(
                         tx,
                         rng,
                         args,
                         committee_session.id,
-                        number,
-                        name,
+                        NewSubCommittee {
+                            number,
+                            name: name.clone(),
+                            category: CommitteeCategory::GSB,
+                            authority_id: format!("{:0>4}", number),
+                            authority_name: name,
+                        },
                         election,
                         votes.clone(),
                     )
@@ -448,7 +451,7 @@ fn generate_election(
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name: name.clone(),
-        eml_name: name,
+        official_name: name,
         committee_category: args.committee_category,
         counting_method,
         authority_id: match args.committee_category {

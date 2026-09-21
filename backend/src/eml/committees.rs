@@ -173,7 +173,7 @@ pub struct CommitteeDetails {
     ///
     /// Note: most committees do not have specific names, and you probably want to use
     /// Self::managing_authority_name() if you actually want to get the name of the committee
-    pub name: Option<String>,
+    name: Option<String>,
 
     /// Managing authority id for this committee (i.e. `CSB`, `HSB1` or `0123`)
     pub managing_authority_id: String,

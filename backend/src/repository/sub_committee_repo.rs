@@ -1,11 +1,10 @@
 use sqlx::{SqliteConnection, query, query_as, types::Json};
 
-use crate::domain::sub_committee::NewSubCommittee;
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::{DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource},
-        sub_committee::{SubCommittee, SubCommitteeFirstSession},
+        sub_committee::{NewSubCommittee, SubCommittee, SubCommitteeFirstSession},
     },
     repository::common::{SubCommitteeRow, SubCommitteeRowLike},
 };

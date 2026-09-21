@@ -11,7 +11,6 @@ use strum::VariantArray;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::domain::sub_committee::NewSubCommittee;
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
@@ -33,6 +32,7 @@ use crate::{
         investigation::PollingStationInvestigation,
         polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
         role::Role,
+        sub_committee::NewSubCommittee,
     },
     eml::{
         EMLImportError, EmlHash, RedactedEmlHash,

@@ -1,8 +1,10 @@
 use sqlx::{Connection, SqliteConnection};
 
-use crate::domain::sub_committee::NewSubCommittee;
 use crate::{
-    domain::{committee_session::CommitteeSessionId, sub_committee::SubCommitteeFirstSession},
+    domain::{
+        committee_session::CommitteeSessionId,
+        sub_committee::{NewSubCommittee, SubCommitteeFirstSession},
+    },
     repository::{data_entry_repo, sub_committee_repo},
 };
 

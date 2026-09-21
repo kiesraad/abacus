@@ -97,16 +97,11 @@ pub async fn update(
     .await
 }
 
-/// Find which entity (polling station or subcommittee) is the source of a data entry.
-/// We expect to only find one match: either a polling station or a subcommittee, not both.
-#[expect(clippy::too_many_lines)]
-pub async fn resolve_source(
-    conn: &mut SqliteConnection,
+async fn try_fetch_polling_station_for_source(
+    tx: &mut SqliteConnection,
     data_entry_id: DataEntryId,
-) -> Result<DataEntrySourceContext, sqlx::Error> {
-    let mut tx = conn.begin().await?;
-
-    let ps = query_as!(
+) -> Result<Option<DataEntrySource>, sqlx::Error> {
+    query_as!(
         PollingStationRow,
         r#"
         SELECT
@@ -131,14 +126,16 @@ pub async fn resolve_source(
     )
     .map(PollingStationRow::into_polling_station_data_source)
     .fetch_optional(&mut *tx)
-    .await?;
+    .await
+}
 
-    let source = if let Some(ps) = ps {
-        ps
-    } else {
-        query_as!(
-            SubCommitteeRow,
-            r#"
+async fn try_fetch_sub_committee_for_source(
+    tx: &mut SqliteConnection,
+    data_entry_id: DataEntryId,
+) -> Result<DataEntrySource, sqlx::Error> {
+    query_as!(
+        SubCommitteeRow,
+        r#"
             SELECT
                 id,
                 committee_session_id,
@@ -151,11 +148,27 @@ pub async fn resolve_source(
             FROM sub_committees
             WHERE data_entry_id = $1
         "#,
-            data_entry_id
-        )
-        .map(SubCommitteeRow::into_sub_committee_data_source)
-        .fetch_one(&mut *tx)
-        .await?
+        data_entry_id
+    )
+    .map(SubCommitteeRow::into_sub_committee_data_source)
+    .fetch_one(&mut *tx)
+    .await
+}
+
+/// Find which entity (polling station or subcommittee) is the source of a data entry.
+/// We expect to only find one match: either a polling station or a subcommittee, not both.
+pub async fn resolve_source(
+    conn: &mut SqliteConnection,
+    data_entry_id: DataEntryId,
+) -> Result<DataEntrySourceContext, sqlx::Error> {
+    let mut tx = conn.begin().await?;
+
+    let ps = try_fetch_polling_station_for_source(&mut tx, data_entry_id).await?;
+
+    let source = if let Some(ps) = ps {
+        ps
+    } else {
+        try_fetch_sub_committee_for_source(&mut tx, data_entry_id).await?
     };
     let committee_session =
         committee_session_repo::get(&mut tx, source.committee_session_id()).await?;

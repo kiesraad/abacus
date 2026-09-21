@@ -11,7 +11,7 @@ import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 const results: Results = {
   model: "CSOFirstSession",
   extra_investigation: {
-    extra_investigation: { yes: false, no: true },
+    extra_investigation_done: { yes: false, no: true },
     ballots_recounted_extra_investigation: { yes: false, no: false },
   },
   counting_differences_polling_station: {

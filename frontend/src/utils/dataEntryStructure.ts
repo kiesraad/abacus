@@ -363,19 +363,19 @@ const extraInvestigationSection: DataEntrySection = {
     },
     {
       type: "checkboxes",
-      title: t("extra_investigation.extra_investigation.title"),
-      short_title: t("extra_investigation.extra_investigation.short_title"),
-      error_path: "extra_investigation.extra_investigation",
+      title: t("extra_investigation.extra_investigation_done.title"),
+      short_title: t("extra_investigation.extra_investigation_done.short_title"),
+      error_path: "extra_investigation.extra_investigation_done",
       error_message: t("extra_investigation.validation_error"),
       options: [
         {
-          path: "extra_investigation.extra_investigation.yes",
+          path: "extra_investigation.extra_investigation_done.yes",
           label: t("yes"),
           short_label: t("yes"),
           autoFocusInput: true,
         },
         {
-          path: "extra_investigation.extra_investigation.no",
+          path: "extra_investigation.extra_investigation_done.no",
           label: t("no"),
           short_label: t("no"),
         },

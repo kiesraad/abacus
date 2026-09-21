@@ -1360,7 +1360,7 @@ export interface ExtraInvestigation {
   ballots_recounted_extra_investigation: YesNo;
   /** Whether extra investigation was done
 ("Heeft het gemeentelijk stembureau extra onderzoek gedaan?") */
-  extra_investigation: YesNo;
+  extra_investigation_done: YesNo;
 }
 
 /**

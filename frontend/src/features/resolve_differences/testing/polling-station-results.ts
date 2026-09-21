@@ -25,7 +25,7 @@ export function resultsMockData(first: boolean): Results {
   return {
     model: "CSOFirstSession",
     extra_investigation: {
-      extra_investigation: { yes: !first, no: first },
+      extra_investigation_done: { yes: !first, no: first },
       ballots_recounted_extra_investigation: { yes: false, no: !first },
     },
     counting_differences_polling_station: {

@@ -11,6 +11,7 @@ use strum::VariantArray;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+use crate::domain::sub_committee::NewSubCommittee;
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
@@ -768,11 +769,13 @@ async fn create_sub_committees(
         create_sub_committee(
             tx,
             committee_session_id,
-            region_number,
-            &committee.responsible_region.name,
-            committee.category,
-            &committee.managing_authority_id,
-            committee.name.clone(),
+            NewSubCommittee {
+                number: region_number,
+                name: committee.responsible_region.name.clone(),
+                category: committee.category,
+                authority_id: committee.managing_authority_id.clone(),
+                authority_name: committee.managing_authority_name(),
+            },
         )
         .await?;
     }

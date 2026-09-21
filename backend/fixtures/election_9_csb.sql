@@ -418,4 +418,4 @@ INSERT INTO data_entries (id, state, updated_at)
 VALUES (901, '{"status":"Empty"}', '2024-12-05 09:15:00');
 
 INSERT INTO sub_committees (id, committee_session_id, data_entry_id, name, number, category, authority_id, authority_name)
-VALUES (911, 901, 901, 'Test Location', 9101, 'GSB', '9101', NULL);
+VALUES (911, 901, 901, 'Test Location', 9101, 'GSB', '9101', 'Test Location');

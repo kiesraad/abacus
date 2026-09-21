@@ -1942,7 +1942,7 @@ export interface SeatChangeStep {
  */
 export interface SubCommittee {
   authority_id: string;
-  authority_name?: string;
+  authority_name: string;
   category: CommitteeCategory;
   id: SubCommitteeId;
   name: string;

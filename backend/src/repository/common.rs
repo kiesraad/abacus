@@ -123,7 +123,7 @@ pub struct SubCommitteeRow {
     pub name: String,
     pub category: CommitteeCategory,
     pub authority_id: String,
-    pub authority_name: Option<String>,
+    pub authority_name: String,
 }
 
 pub trait SubCommitteeRowLike: Sized {

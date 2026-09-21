@@ -1,11 +1,11 @@
 use sqlx::{SqliteConnection, query, query_as, types::Json};
 
+use crate::domain::sub_committee::NewSubCommittee;
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::{DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource},
-        election::CommitteeCategory,
-        sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeNumber},
+        sub_committee::{SubCommittee, SubCommitteeFirstSession},
     },
     repository::common::{SubCommitteeRow, SubCommitteeRowLike},
 };
@@ -49,16 +49,11 @@ pub async fn list_first_session(
 }
 
 /// Create a single sub electoral committee for a committee session
-#[expect(clippy::too_many_arguments)]
 pub async fn create(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
     data_entry_id: DataEntryId,
-    number: SubCommitteeNumber,
-    name: &str,
-    category: CommitteeCategory,
-    authority_id: &str,
-    authority_name: Option<String>,
+    subcommittee: NewSubCommittee,
 ) -> Result<SubCommitteeFirstSession, sqlx::Error> {
     query_as!(
         SubCommitteeRow,
@@ -84,11 +79,11 @@ pub async fn create(
         "#,
         committee_session_id,
         data_entry_id,
-        number,
-        name,
-        category,
-        authority_id,
-        authority_name
+        subcommittee.number,
+        subcommittee.name,
+        subcommittee.category,
+        subcommittee.authority_id,
+        subcommittee.authority_name
     )
     .fetch_one(conn)
     .await

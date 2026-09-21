@@ -10386,7 +10386,8 @@
           "number",
           "name",
           "category",
-          "authority_id"
+          "authority_id",
+          "authority_name"
         ],
         "properties": {
           "authority_id": {

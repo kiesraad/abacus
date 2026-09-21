@@ -191,8 +191,7 @@ impl From<Args> for GenerateElectionArgs {
     }
 }
 
-/// Main entry point for the application. Sets up the database, and starts the
-/// API server and in-memory file router on port 8080.
+/// Main entry point for the application.
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
     // setup logging

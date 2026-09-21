@@ -26,6 +26,7 @@ const renderGSBTable = (
         election={{
           id: 1,
           name: "Gemeenteraad Heemdamseburg 2026",
+          official_name: "Gemeenteraad Heemdamseburg 2026",
           committee_category: "GSB",
           counting_method: "DSO",
           election_id: "GR2026_Heemdamseburg",

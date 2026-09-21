@@ -122,8 +122,7 @@ export function GenerateTestElectionForm() {
         throw response;
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      window.alert(`Failed to submit request: ${errorMessage}`);
+      window.alert(error instanceof Error ? error.message : String(error));
     }
   };
 
@@ -194,8 +193,6 @@ export function GenerateTestElectionForm() {
                   defaultValue={electionCategory}
                   label={t(`election_category.${electionCategory}`)}
                   onChange={handleRadioChange}
-                  // Provincial CSB election generation not yet supported
-                  disabled={formState.committee_category === "CSB" && electionCategory === "Provincial"}
                 />
               ))}
             </ChoiceList>

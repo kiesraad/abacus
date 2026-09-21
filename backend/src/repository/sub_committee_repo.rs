@@ -4,8 +4,7 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::{DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource},
-        election::CommitteeCategory,
-        sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeNumber},
+        sub_committee::{NewSubCommittee, SubCommittee, SubCommitteeFirstSession},
     },
     repository::common::{SubCommitteeRow, SubCommitteeRowLike},
 };
@@ -24,7 +23,9 @@ async fn list(
             data_entry_id AS "data_entry_id!: _",
             number,
             name,
-            category
+            category,
+            authority_id,
+            authority_name
         FROM sub_committees
         WHERE committee_session_id = $1
         "#,
@@ -51,9 +52,7 @@ pub async fn create(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
     data_entry_id: DataEntryId,
-    number: SubCommitteeNumber,
-    name: &str,
-    category: CommitteeCategory,
+    subcommittee: NewSubCommittee,
 ) -> Result<SubCommitteeFirstSession, sqlx::Error> {
     query_as!(
         SubCommitteeRow,
@@ -63,28 +62,34 @@ pub async fn create(
             data_entry_id,
             number,
             name,
-            category
-        ) VALUES (?, ?, ?, ?, ?)
+            category,
+            authority_id,
+            authority_name
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
         RETURNING
             id AS "id!: _",
             committee_session_id,
             data_entry_id AS "data_entry_id!: _",
             number,
             name,
-            category
+            category,
+            authority_id,
+            authority_name
         "#,
         committee_session_id,
         data_entry_id,
-        number,
-        name,
-        category,
+        subcommittee.number,
+        subcommittee.name,
+        subcommittee.category,
+        subcommittee.authority_id,
+        subcommittee.authority_name
     )
     .fetch_one(conn)
     .await
     .map(SubCommitteeRow::into_sub_committee_first_session)
 }
 
-/// List all sub committees for a first committee session with their data entry status.
+/// List all subcommittees for a first committee session with their data entry status.
 pub async fn list_first_session_with_status(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
@@ -97,6 +102,8 @@ pub async fn list_first_session_with_status(
             sc.number,
             sc.name,
             sc.category,
+            sc.authority_id,
+            sc.authority_name,
             de.state AS "state!: Json<DataEntryStatus>"
         FROM sub_committees AS sc
         JOIN data_entries AS de ON de.id = sc.data_entry_id
@@ -114,6 +121,8 @@ pub async fn list_first_session_with_status(
                 number: row.number,
                 name: row.name,
                 category: row.category,
+                authority_id: row.authority_id,
+                authority_name: row.authority_name,
             },
         }),
         status: row.state.0,

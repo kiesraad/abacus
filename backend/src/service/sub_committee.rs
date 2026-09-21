@@ -3,8 +3,7 @@ use sqlx::{Connection, SqliteConnection};
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
-        election::CommitteeCategory,
-        sub_committee::{SubCommitteeFirstSession, SubCommitteeNumber},
+        sub_committee::{NewSubCommittee, SubCommitteeFirstSession},
     },
     repository::{data_entry_repo, sub_committee_repo},
 };
@@ -23,21 +22,13 @@ impl From<sqlx::Error> for SubCommitteeServiceError {
 pub async fn create(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-    number: SubCommitteeNumber,
-    name: &str,
-    category: CommitteeCategory,
+    subcommittee: NewSubCommittee,
 ) -> Result<SubCommitteeFirstSession, SubCommitteeServiceError> {
     let mut tx = conn.begin().await?;
     let data_entry = data_entry_repo::create_empty(&mut tx).await?;
-    let sub_committee = sub_committee_repo::create(
-        &mut tx,
-        committee_session_id,
-        data_entry.id,
-        number,
-        name,
-        category,
-    )
-    .await?;
+    let sub_committee =
+        sub_committee_repo::create(&mut tx, committee_session_id, data_entry.id, subcommittee)
+            .await?;
     tx.commit().await?;
     Ok(sub_committee)
 }
@@ -51,23 +42,29 @@ pub async fn list_for_first_session(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::domain::election::CommitteeCategory;
     use sqlx::SqlitePool;
     use test_log::test;
-
-    use super::*;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_create_and_list(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let committee_session_id = CommitteeSessionId::from(801);
+        let number = 42;
+        let name = "Test GSB".to_string();
 
         // Create a subcommittee
         let created = create(
             &mut conn,
             committee_session_id,
-            42,
-            "Test GSB",
-            CommitteeCategory::GSB,
+            NewSubCommittee {
+                number,
+                name: name.clone(),
+                category: CommitteeCategory::GSB,
+                authority_id: format!("{:0>4}", number),
+                authority_name: name,
+            },
         )
         .await
         .unwrap();
@@ -76,6 +73,8 @@ mod tests {
         assert_eq!(created.sub_committee.name, "Test GSB");
         assert_eq!(created.sub_committee.category, CommitteeCategory::GSB);
         assert_eq!(created.committee_session_id, committee_session_id);
+        assert_eq!(created.sub_committee.authority_id, "0042");
+        assert_eq!(created.sub_committee.authority_name, "Test GSB");
 
         // List and verify
         let list = list_for_first_session(&mut conn, committee_session_id)

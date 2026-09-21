@@ -1947,6 +1947,8 @@ export interface SeatChangeStep {
  * of the election, committee session and data entry.
  */
 export interface SubCommittee {
+  authority_id: string;
+  authority_name: string;
   category: CommitteeCategory;
   id: SubCommitteeId;
   name: string;

@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n        INSERT INTO sub_committees (\n            committee_session_id,\n            data_entry_id,\n            number,\n            name,\n            category\n        ) VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id AS \"id!: _\",\n            committee_session_id,\n            data_entry_id AS \"data_entry_id!: _\",\n            number,\n            name,\n            category\n        ",
+  "query": "\n            SELECT\n                id,\n                committee_session_id,\n                data_entry_id,\n                number,\n                name,\n                category,\n                authority_id,\n                authority_name\n            FROM sub_committees\n            WHERE data_entry_id = $1\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id!: _",
+        "name": "id",
         "ordinal": 0,
         "type_info": "Integer",
         "origin": {
@@ -26,7 +26,7 @@
         }
       },
       {
-        "name": "data_entry_id!: _",
+        "name": "data_entry_id",
         "ordinal": 2,
         "type_info": "Integer",
         "origin": {
@@ -68,13 +68,37 @@
             "name": "category"
           }
         }
+      },
+      {
+        "name": "authority_id",
+        "ordinal": 6,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "authority_id"
+          }
+        }
+      },
+      {
+        "name": "authority_name",
+        "ordinal": 7,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "authority_name"
+          }
+        }
       }
     ],
     "parameters": {
-      "Right": 5
+      "Right": 1
     },
     "nullable": [
-      null,
+      false,
+      false,
+      false,
       false,
       false,
       false,
@@ -82,5 +106,5 @@
       false
     ]
   },
-  "hash": "942fe23b5ae8d845b507919ab1b5edd066b9683ba42e5a12cc9f3dfa773bd8fe"
+  "hash": "621f4dfa0a3630c57e83eae9bf8aaf599b613088647e266ca8f30e22ecd643a7"
 }

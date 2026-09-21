@@ -32,6 +32,7 @@ use crate::{
         investigation::PollingStationInvestigation,
         polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
         role::Role,
+        sub_committee::NewSubCommittee,
     },
     eml::{
         EMLImportError, EmlHash, RedactedEmlHash,
@@ -768,9 +769,13 @@ async fn create_sub_committees(
         create_sub_committee(
             tx,
             committee_session_id,
-            region_number,
-            &committee.responsible_region.name,
-            committee.category,
+            NewSubCommittee {
+                number: region_number,
+                name: committee.responsible_region.name.clone(),
+                category: committee.category,
+                authority_id: committee.managing_authority_id.clone(),
+                authority_name: committee.managing_authority_name(),
+            },
         )
         .await?;
     }

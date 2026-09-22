@@ -5,7 +5,7 @@ import { AbortDataEntryControl } from "@/features/data_entry/components/AbortDat
 import { useDataEntryContext } from "@/features/data_entry/hooks/useDataEntryContext";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
-import { formatDataEntrySourceNumber } from "@/utils/dataEntrySource";
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 
 export function DataEntryHeader() {
   const { source, dataEntryStatus } = useDataEntryContext();
@@ -17,10 +17,10 @@ export function DataEntryHeader() {
 
   return (
     <>
-      <PageTitle title={`${t("data_entry.title")} ${formatDataEntrySourceNumber(source)} ${source.name} - Abacus`} />
+      <PageTitle title={`${t("data_entry.title")} ${getDataEntrySourceNumber(source)} ${source.name} - Abacus`} />
       <header>
         <section className="smaller-gap">
-          <DataEntrySourceNumber>{formatDataEntrySourceNumber(source)}</DataEntrySourceNumber>
+          <DataEntrySourceNumber>{getDataEntrySourceNumber(source)}</DataEntrySourceNumber>
           <h1>{source.name}</h1>
           <Badge type={dataEntryStatus} userRole={user.role} />
         </section>

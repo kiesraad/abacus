@@ -12,7 +12,7 @@ import type {
   DataEntryStatusName,
   PollingStationInvestigation,
 } from "@/types/generated/openapi";
-import { formatDataEntrySourceNumber } from "@/utils/dataEntrySource";
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 
 interface ReadOnlyDataEntryDeleteProps {
   dataEntrySource: DataEntrySource;
@@ -64,11 +64,9 @@ export function ReadOnlyDataEntryDelete({
       {showModal && (
         <Modal title={t("data_entry_detail.delete")} onClose={toggleModal}>
           {statusWithTwoEntries.includes(status) ? (
-            <p>
-              {t("data_entry_detail.delete_all_are_you_sure", { nr: formatDataEntrySourceNumber(dataEntrySource) })}
-            </p>
+            <p>{t("data_entry_detail.delete_all_are_you_sure", { nr: getDataEntrySourceNumber(dataEntrySource) })}</p>
           ) : (
-            <p>{t("data_entry_detail.delete_are_you_sure", { nr: formatDataEntrySourceNumber(dataEntrySource) })}</p>
+            <p>{t("data_entry_detail.delete_are_you_sure", { nr: getDataEntrySourceNumber(dataEntrySource) })}</p>
           )}
           <nav>
             <Button

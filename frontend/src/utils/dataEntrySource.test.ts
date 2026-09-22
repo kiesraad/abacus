@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 import type { DataEntrySource } from "@/types/generated/openapi";
-import { formatDataEntrySourceNumber } from "./dataEntrySource";
+import { getDataEntrySourceNumber } from "./dataEntrySource";
 
-describe("formatDataEntrySourceNumber", () => {
+describe("getDataEntrySourceNumber", () => {
   const dataEntrySourcePollingStation: DataEntrySource = {
     type: "PollingStation",
     address: "Test",
@@ -16,42 +16,29 @@ describe("formatDataEntrySourceNumber", () => {
     data_entry_id: 1,
   };
 
-  const dataEntrySourceSubCommitteeGsb: DataEntrySource = {
+  const dataEntrySourceSubCommittee: DataEntrySource = {
     type: "SubCommittee",
     category: "GSB",
     id: 1,
-    name: "Gemeente Test",
+    name: "Juinen",
     number: 1,
     committee_session_id: 1,
     data_entry_id: 1,
-  };
-
-  const dataEntrySourceSubCommitteeNotGsb: DataEntrySource = {
-    type: "SubCommittee",
-    category: "CSB",
-    id: 1,
-    name: "Test",
-    number: 1,
-    committee_session_id: 1,
-    data_entry_id: 1,
+    authority_id: "0035",
+    authority_name: "Juinen",
   };
 
   test.each([
-    { source: dataEntrySourcePollingStation, number: 0, expected: "0" },
-    { source: dataEntrySourcePollingStation, number: 8, expected: "8" },
-    { source: dataEntrySourcePollingStation, number: 88, expected: "88" },
-    { source: dataEntrySourcePollingStation, number: 888, expected: "888" },
-    { source: dataEntrySourcePollingStation, number: 8888, expected: "8888" },
-    { source: dataEntrySourceSubCommitteeGsb, number: 0, expected: "0000" },
-    { source: dataEntrySourceSubCommitteeGsb, number: 8, expected: "0008" },
-    { source: dataEntrySourceSubCommitteeGsb, number: 88, expected: "0088" },
-    { source: dataEntrySourceSubCommitteeGsb, number: 888, expected: "0888" },
-    { source: dataEntrySourceSubCommitteeGsb, number: 8888, expected: "8888" },
-  ])(`Format $source.type $number as $expected`, ({ source, number, expected }) => {
-    expect(formatDataEntrySourceNumber({ ...source, number })).toBe(expected);
+    { number: 0, expected: "0" },
+    { number: 8, expected: "8" },
+    { number: 88, expected: "88" },
+    { number: 888, expected: "888" },
+    { number: 8888, expected: "8888" },
+  ])("returns polling station number $number as $expected", ({ number, expected }) => {
+    expect(getDataEntrySourceNumber({ ...dataEntrySourcePollingStation, number })).toBe(expected);
   });
 
-  test("Does not pad a sub committee that is not a GSB", () => {
-    expect(formatDataEntrySourceNumber({ ...dataEntrySourceSubCommitteeNotGsb, number: 8 })).toBe("8");
+  test("returns the authority id of a sub committee (not its number)", () => {
+    expect(getDataEntrySourceNumber(dataEntrySourceSubCommittee)).toBe("0035");
   });
 });

@@ -1,9 +1,7 @@
 import type { DataEntrySource } from "@/types/generated/openapi";
 
-/// Municipality codes are always displayed using four digits. Every other
-/// number is displayed as-is.
-export function formatDataEntrySourceNumber(source: DataEntrySource): string {
-  return source.type === "SubCommittee" && source.category === "GSB"
-    ? String(source.number).padStart(4, "0")
-    : String(source.number);
+/// The number for listing a sub committee (authority_id formatted in the backend
+/// to e.g. "0035") or a polling station (plain number).
+export function getDataEntrySourceNumber(source: DataEntrySource): string {
+  return source.type === "SubCommittee" ? source.authority_id : String(source.number);
 }

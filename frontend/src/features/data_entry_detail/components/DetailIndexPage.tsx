@@ -11,8 +11,9 @@ import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t, tx } from "@/i18n/translate";
 import type { ResolveErrorsAction } from "@/types/generated/openapi";
-import { formatDataEntrySourceNumber } from "@/utils/dataEntrySource";
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
+
 import { useDataEntryErrors } from "../hooks/useDataEntryErrors";
 import cls from "./detail.module.css";
 import { ErrorsAndWarningsOverview } from "./ErrorsAndWarningsOverview";
@@ -34,7 +35,7 @@ export function DetailIndexPage() {
       case "resume_first_entry":
         pushMessage({
           title: t("election_status.success.data_entry_resumed", {
-            nr: formatDataEntrySourceNumber(dataEntry.source),
+            nr: getDataEntrySourceNumber(dataEntry.source),
             typist: getName(dataEntry.user_id),
           }),
           text: t("election_status.success.typist_can_continue_data_entry"),
@@ -43,7 +44,7 @@ export function DetailIndexPage() {
       case "discard_first_entry":
         pushMessage({
           title: t("election_status.success.data_entry_discarded", {
-            nr: formatDataEntrySourceNumber(dataEntry.source),
+            nr: getDataEntrySourceNumber(dataEntry.source),
           }),
           text: t("election_status.success.polling_station_can_be_filled_again"),
         });

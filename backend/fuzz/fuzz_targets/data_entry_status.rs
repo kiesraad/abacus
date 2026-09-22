@@ -144,7 +144,7 @@ fn election() -> ElectionWithPoliticalGroups {
     ElectionWithPoliticalGroups {
         id: ElectionId::from(1),
         name: "Gemeenteraad Test Location 2025".to_string(),
-        eml_name: "Gemeenteraad Test Location 2025".to_string(),
+        official_name: "Gemeenteraad Test Location 2025".to_string(),
         committee_category: CommitteeCategory::GSB,
         counting_method: Some(VoteCountingMethod::CSO),
         election_id: "GR2025_TestLocation".to_string(),

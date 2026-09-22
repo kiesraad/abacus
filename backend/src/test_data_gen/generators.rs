@@ -2,7 +2,6 @@ use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::{SqliteConnection, SqlitePool};
 use tracing::{info, warn};
-use zeroize::Zeroizing;
 
 use crate::{
     SqlitePoolExt,
@@ -39,13 +38,13 @@ use crate::{
             votes_counts::VotesCounts,
             yes_no::YesNo,
         },
-        sub_committee::{SubCommitteeFirstSession, SubCommitteeNumber},
+        sub_committee::{NewSubCommittee, SubCommitteeFirstSession},
         validate::Validate,
     },
     repository::{
         committee_session_repo,
         data_entry_repo::{self, list_results_for_committee_session},
-        election_repo, polling_station_repo, signing_keypair_repo,
+        election_repo, polling_station_repo,
         user_repo::UserId,
     },
     service::create_sub_committee,
@@ -110,25 +109,17 @@ async fn generate_csb_data_entries(
     Ok(second_entries > 0)
 }
 
-#[expect(clippy::too_many_arguments)]
 async fn generate_csb_sub_committee(
     conn: &mut SqliteConnection,
     rng: &mut impl rand::RngExt,
     args: &GenerateElectionArgs,
     committee_session_id: CommitteeSessionId,
-    number: SubCommitteeNumber,
-    name: &str,
+    subcommittee: NewSubCommittee,
     election: &ElectionWithPoliticalGroups,
     votes: Option<Vec<Vec<u32>>>,
 ) -> Result<bool, GenerateError> {
-    let sub_committee_first_session = create_sub_committee(
-        conn,
-        committee_session_id,
-        number,
-        name,
-        CommitteeCategory::GSB,
-    )
-    .await?;
+    let sub_committee_first_session =
+        create_sub_committee(conn, committee_session_id, subcommittee).await?;
 
     if args.with_data_entry {
         generate_csb_data_entries(
@@ -186,6 +177,7 @@ async fn generate_gsb_election_data(
 }
 
 /// Create subcommittee and set status to InPreparation for a CSB election
+#[expect(clippy::too_many_lines)]
 async fn generate_csb_election_data(
     rng: &mut impl rand::RngExt,
     tx: &mut SqliteConnection,
@@ -210,8 +202,13 @@ async fn generate_csb_election_data(
                 rng,
                 args,
                 committee_session.id,
-                number,
-                &election.location,
+                NewSubCommittee {
+                    number,
+                    name: election.location.clone(),
+                    category: CommitteeCategory::GSB,
+                    authority_id: format!("{:0>4}", number),
+                    authority_name: election.location.clone(),
+                },
                 election,
                 votes,
             )
@@ -222,15 +219,20 @@ async fn generate_csb_election_data(
             let gsbs = rng.random_range(args.gsbs.clone()).max(1);
             let mut data_entry_completes = Vec::new();
             for number in 1..=gsbs {
-                let name = super::data::locality(rng);
+                let name = super::data::locality(rng).to_string();
                 data_entry_completes.push(
                     generate_csb_sub_committee(
                         tx,
                         rng,
                         args,
                         committee_session.id,
-                        number,
-                        name,
+                        NewSubCommittee {
+                            number,
+                            name: name.clone(),
+                            category: CommitteeCategory::GSB,
+                            authority_id: format!("{:0>4}", number),
+                            authority_name: name,
+                        },
                         election,
                         votes.clone(),
                     )
@@ -257,7 +259,6 @@ async fn generate_csb_election_data(
     Ok((Vec::new(), data_entry_complete))
 }
 
-#[expect(clippy::too_many_lines)]
 pub async fn create_test_election(
     args: &GenerateElectionArgs,
     pool: &SqlitePool,
@@ -270,18 +271,6 @@ pub async fn create_test_election(
     // generate and store the election
     let election =
         election_repo::create(&mut tx, generate_election(&mut rng, args, votes.as_ref())).await?;
-
-    // TODO generate an actual signing keypair in issue #3769
-    // stub record for signing keypair
-    if election.committee_category == CommitteeCategory::GSB {
-        signing_keypair_repo::create(
-            &mut tx,
-            election.id,
-            "-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----".to_string(),
-            Zeroizing::new(Vec::new()),
-        )
-        .await?
-    }
 
     // generate the committee session for the election
     let mut committee_session = committee_session_repo::create(
@@ -343,17 +332,17 @@ pub async fn create_test_election(
 fn format_election_name(
     rng: &mut impl rand::RngExt,
     election_category: ElectionCategory,
-    locality: &str,
+    domain_name: &str,
     year: i32,
 ) -> String {
     let (election_type, election_locality) = match election_category {
-        ElectionCategory::Municipal => ("Gemeenteraad", locality),
-        ElectionCategory::Provincial => ("Provinciale Staten", super::data::province(rng)),
+        ElectionCategory::Municipal => ("Gemeenteraad", domain_name),
+        ElectionCategory::Provincial => ("Provinciale Staten", domain_name),
         ElectionCategory::WaterAuthority => (
             *["Waterschap", "Hoogheemraadschap"]
                 .choose(rng)
                 .expect("Missing test data"),
-            super::data::water_authority(rng),
+            domain_name,
         ),
     };
     format!("{election_type} {election_locality} {year}")
@@ -417,6 +406,15 @@ fn generate_election(
         .unwrap_or_else(|| format_election_name(rng, args.election_category, &domain.name, year));
     let cleaned_up_locality = domain.name.replace(" ", "_").replace("'", "");
     let election_id = format!("{category}{year}_{cleaned_up_locality}");
+    let mut official_name = format_election_name(rng, args.election_category, &domain.name, year);
+    if args.election_category == ElectionCategory::WaterAuthority {
+        let mut chars = official_name.chars();
+        let lowercased_name = match chars.next() {
+            Some(first) => first.to_lowercase().chain(chars).collect(),
+            None => String::new(),
+        };
+        official_name = format!("Algemeen bestuur van het {}", lowercased_name);
+    }
 
     info!("Election has name '{name}'");
 
@@ -448,7 +446,7 @@ fn generate_election(
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name: name.clone(),
-        eml_name: name,
+        official_name,
         committee_category: args.committee_category,
         counting_method,
         authority_id: match args.committee_category {
@@ -471,16 +469,7 @@ fn generate_election(
         district: CommitteeDistrict::None,
         domain: Some(domain.clone()),
         election_id,
-        location: if is_municipal {
-            // Municipal elections take the location from their domain
-            domain.name.clone()
-        } else if args.committee_category == CommitteeCategory::CSB {
-            // The CSB is seated in a specific spot, generate a locality for that
-            super::data::locality(rng).to_owned()
-        } else {
-            // For GSBs we use the same locality used for authority name
-            gsb_committee_locality.to_owned()
-        },
+        location: authority_name,
         category: args.election_category,
         sub_category: args.election_category.sub_category(number_of_seats),
         number_of_seats,

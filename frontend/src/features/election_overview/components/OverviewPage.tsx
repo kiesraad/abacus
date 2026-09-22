@@ -50,16 +50,27 @@ export function OverviewPage() {
     election: Election;
   }
 
+  function committeeTypeLabel(election: Election): string {
+    const label = `${t(`committee_category.${election.committee_category}.abbreviation`)} - ${election.authority_region}`;
+
+    switch (election.committee_category) {
+      case "GSB":
+        return `${label} (${election.authority_id})`;
+      case "CSB":
+        if (!election.domain) return label;
+        return `${label} (${election.domain.id})`;
+      default:
+        // Exhaustive check
+        return election.committee_category satisfies never;
+    }
+  }
+
   function ElectionRow({ election }: ElectionRowProps): ReactNode {
     function ElectionRowContent() {
       return (
         <>
           <Table.Cell>{election.name}</Table.Cell>
-          <Table.Cell>
-            {isTypist
-              ? election.authority_region
-              : `${t(`committee_category.${election.committee_category}.abbreviation`)} - ${election.authority_region}${election.domain?.id ? ` (${election.domain.id})` : ""}`}
-          </Table.Cell>
+          <Table.Cell>{isTypist ? election.authority_region : committeeTypeLabel(election)}</Table.Cell>
           <Table.Cell>
             {isTypist ? (
               committeeSessionStatus

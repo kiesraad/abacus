@@ -122,6 +122,8 @@ pub struct SubCommitteeRow {
     pub number: SubCommitteeNumber,
     pub name: String,
     pub category: CommitteeCategory,
+    pub authority_id: String,
+    pub authority_name: String,
 }
 
 pub trait SubCommitteeRowLike: Sized {
@@ -149,6 +151,8 @@ impl SubCommitteeRowLike for SubCommitteeRow {
             number: self.number,
             name: self.name.clone(),
             category: self.category,
+            authority_id: self.authority_id.clone(),
+            authority_name: self.authority_name.clone(),
         }
     }
 

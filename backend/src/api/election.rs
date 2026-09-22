@@ -32,6 +32,7 @@ use crate::{
         investigation::PollingStationInvestigation,
         polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
         role::Role,
+        sub_committee::NewSubCommittee,
     },
     eml::{
         EMLImportError, EmlHash, RedactedEmlHash,
@@ -41,8 +42,8 @@ use crate::{
         polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, signing_keypair_repo, user_repo::User},
-    service::{create_sub_committee, list_polling_stations_for_session},
+    repository::{committee_session_repo, election_repo, user_repo::User},
+    service::{create_sub_committee, get_show_keypair_reminder, list_polling_stations_for_session},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -208,8 +209,7 @@ pub async fn election_details(
         list_polling_stations_for_session(&mut conn, &current_committee_session).await?;
     let investigations = session_pss.investigations();
     let polling_stations = session_pss.into_responses(election_id);
-    let show_keypair_reminder =
-        signing_keypair_repo::get_show_reminder(&mut conn, election_id).await?;
+    let show_keypair_reminder = get_show_keypair_reminder(&mut conn, &election).await?;
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,
@@ -768,9 +768,13 @@ async fn create_sub_committees(
         create_sub_committee(
             tx,
             committee_session_id,
-            region_number,
-            &committee.responsible_region.name,
-            committee.category,
+            NewSubCommittee {
+                number: region_number,
+                name: committee.responsible_region.name.clone(),
+                category: committee.category,
+                authority_id: committee.managing_authority_id.clone(),
+                authority_name: committee.managing_authority_name(),
+            },
         )
         .await?;
     }

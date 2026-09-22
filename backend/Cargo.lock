@@ -16,6 +16,7 @@ dependencies = [
  "clap",
  "cookie",
  "eml-nl",
+ "eml_signature",
  "http-body-util",
  "hyper",
  "icu_collator",

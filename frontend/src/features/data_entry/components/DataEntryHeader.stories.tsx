@@ -60,7 +60,7 @@ export const PollingStation: StoryObj<Props> = {
   },
   play: async ({ canvas }) => {
     const headerInfo = canvas.getByRole("banner");
-    await expect(headerInfo).toHaveTextContent("33" + "Op Rolletjes" + "1e invoer" + "Invoer afbreken");
+    await expect(headerInfo).toHaveTextContent(["33", "Op Rolletjes", "1e invoer", "Invoer afbreken"].join(""));
   },
 };
 
@@ -75,7 +75,7 @@ export const SubCommittee: StoryObj<Props> = {
   },
   play: async ({ canvas }) => {
     const headerInfo = canvas.getByRole("banner");
-    await expect(headerInfo).toHaveTextContent("0042" + "Hilversum" + "2e invoer" + "Invoer afbreken");
+    await expect(headerInfo).toHaveTextContent(["0042", "Hilversum", "2e invoer", "Invoer afbreken"].join(""));
   },
 };
 

@@ -155,6 +155,8 @@ pub enum AuditEventType {
     // system events
     ApplicationStarted,
     DatabaseBackupCreated,
+    // signing events
+    SigningKeypairCreated,
     // API events (one for each severity level)
     ApiError,
     ApiWarning,

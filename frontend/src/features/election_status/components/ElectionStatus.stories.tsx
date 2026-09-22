@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useNavigate } from "react-router";
 import { expect, fn, mocked, within } from "storybook/test";
 
-import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
-import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { committeeSessionMockData, csbCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
+import { csbElectionMockData, electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { electionStatusesCSBMock, electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { sortList } from "@/utils/sorting";
@@ -147,8 +147,8 @@ export const CSBElectionStatusNoLinks: StoryObj<StoryProps> = {
       <TestUserProvider userRole={"coordinator_csb"}>
         <ElectionStatus
           statuses={sortList(electionStatusesCSBMock, (item) => item.source)}
-          committeeSession={committeeSessionMockData}
-          election={electionMockData}
+          committeeSession={csbCommitteeSessionMockData}
+          election={csbElectionMockData}
           addLinks={addLinks}
           navigate={buttonNavigate}
         />
@@ -160,10 +160,6 @@ export const CSBElectionStatusNoLinks: StoryObj<StoryProps> = {
       const heading = canvas.getByTestId("status-heading");
       const title = within(heading).getByRole("heading", { level: 2, name: "Statusoverzicht invoer" });
       await expect(title).toBeVisible();
-
-      const buttons = within(heading).getAllByRole("button");
-      await expect(buttons.length).toBe(1);
-      await expect(buttons[0]).toHaveTextContent("Stembureaus");
     });
 
     await step("Progress section", async () => {

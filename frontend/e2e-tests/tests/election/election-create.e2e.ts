@@ -387,25 +387,25 @@ test.describe("Election creation", () => {
   });
 
   test.describe("WS CSB election creation", () => {
-    test("it uploads an election file and candidate list", async ({ page }) => {
+    test("it creates an election with a sub committee per GSB", async ({ page }) => {
       await page.goto("/elections");
       const overviewPage = new ElectionsOverviewPgObj(page);
       await overviewPage.create.click();
 
-      // Upload election and check hash
+      // Upload election definition and check hash.
       await uploadElectionAndInputHash(page, eml110a_AB);
 
-      // Pick committee category
+      // Pick committee category.
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();
       await committeeCategoryPage.csb.check();
       await expect(committeeCategoryPage.csb).toBeChecked();
       await committeeCategoryPage.next.click();
 
-      // Upload candidates list and check hash
+      // Upload candidate list and check hash.
       await uploadCandidatesAndInputHash(page, eml230b_AB);
 
-      // The check-and-save page shows
+      // Check the election summary before saving.
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
       await expect(checkAndSavePage.electionName).toContainText("verkiezing: Waterschap Rivier en Polder 2023");
@@ -416,25 +416,24 @@ test.describe("Election creation", () => {
       await expect(checkAndSavePage.countingMethod).toBeHidden();
       await expect(checkAndSavePage.numberOfVoters).toBeHidden();
 
-      // Save the election
+      // Save the election.
       const election = await checkAndSavePage.saveElection();
       await expect(overviewPage.adminHeader).toBeVisible();
       await expect(overviewPage.getAlertElectionCreated("CSB", "Waterschap Rivier en Polder 2023")).toBeVisible();
 
-      // The election overview page
+      // Check the election overview row.
       const electionRow = overviewPage.findElectionRowById(election.id);
       await expect(electionRow).toBeVisible();
       await expect(electionRow).toContainText("Waterschap Rivier en Polder 2023");
       await expect(electionRow).toContainText("CSB - Rivier en Polder (10)");
       await expect(electionRow).toContainText("Klaar voor invoer— Zitting CSB");
 
-      await test.step("check it creates a subcommittee for every GSB", async () => {
-        await page.goto(`/elections/${election.id}/status`);
+      await test.step("check a sub committee exists for every GSB", async () => {
+        await page.goto(`/elections/${election.id}/status`); // This page is not accessible via the UI at this point, hence the `goto`.
         const statusPage = new ElectionStatus(page);
-        await expect(statusPage.notStartedRows).toHaveCount(4);
-        for (const name of ["Heemdamseburg", "Juinen", "Middelgein", "'s-Gravenveen"]) {
-          await expect(statusPage.notStarted).toContainText(name);
-        }
+        const names = ["Heemdamseburg", "Juinen", "Middelgein", "'s-Gravenveen"];
+        await expect(statusPage.notStartedRows).toHaveCount(names.length);
+        await expect(statusPage.notStartedRows).toContainText(names);
       });
     });
   });

@@ -37,7 +37,7 @@ export function ImportedElectionInformation({
           {t(`committee_category.${committeeCategory}.short`)}
         </li>
         <li id="election-location">
-          <strong>{t("area_designation")}:</strong> {election.location}
+          <strong>{t("area_designation")}:</strong> {election.authority_region}
         </li>
       </ul>
       <ul>

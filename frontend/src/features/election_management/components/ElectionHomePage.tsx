@@ -385,7 +385,7 @@ export function ElectionHomePage() {
           <div className="mb-xl">
             <div>
               <h2>
-                {t(`committee_category.${election.committee_category}.short`)} {election.location}
+                {t(`committee_category.${election.committee_category}.short`)} {election.authority_region}
               </h2>
             </div>
           </div>

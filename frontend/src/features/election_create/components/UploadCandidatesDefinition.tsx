@@ -118,7 +118,7 @@ export function UploadCandidatesDefinition() {
       <CheckHash
         date={state.election.election_date}
         title={t("election.check_eml.list_name", {
-          location: state.election.location,
+          location: state.election.authority_region,
           name: state.election.election_id,
         })}
         header={t("election.check_eml.candidates_title")}

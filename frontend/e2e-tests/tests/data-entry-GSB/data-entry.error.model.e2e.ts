@@ -380,7 +380,7 @@ test.describe("Data entry model test - errors", () => {
             await votersAndVotesPage.abortInput.click();
           },
           NAV_TO_HOME_PAGE: async () => {
-            await navBar.clickElection(electionGSB.election.location, electionGSB.election.name);
+            await navBar.clickElection(electionGSB.election.authority_region, electionGSB.election.name);
           },
           GO_TO_PREVIOUS_PAGE: async () => {
             await votersAndVotesPage.progressList.countingDifferencesPollingStation.click();

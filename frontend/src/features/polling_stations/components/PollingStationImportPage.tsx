@@ -102,7 +102,7 @@ export function PollingStationImportPage() {
 
   // Show file upload button
   let content = (
-    <Form title={t("polling_station.import_subtitle", { location: election.location })}>
+    <Form title={t("polling_station.import_subtitle", { location: election.authority_region })}>
       <FormLayout>
         <FormLayout.Section>
           {error && (

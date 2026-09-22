@@ -8,7 +8,7 @@ import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 import { UploadPollingStationDefinition } from "./UploadPollingStationDefinition";
 
-const election = { name: "Naam", location: "Plek" } as NewElection;
+const election = { name: "Naam", authority_region: "Plek" } as NewElection;
 
 async function renderPage() {
   render(
@@ -18,7 +18,10 @@ async function renderPage() {
   );
 
   expect(
-    await screen.findByRole("heading", { level: 2, name: `Importeer stembureaus gemeente ${election.location}` }),
+    await screen.findByRole("heading", {
+      level: 2,
+      name: `Importeer stembureaus gemeente ${election.authority_region}`,
+    }),
   ).toBeInTheDocument();
 }
 

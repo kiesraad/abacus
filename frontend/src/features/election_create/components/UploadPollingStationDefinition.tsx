@@ -126,7 +126,9 @@ export function UploadPollingStationDefinition() {
   return (
     <section className="md">
       <Form
-        title={state.election ? t("election.import_polling_station_eml", { location: state.election.location }) : ""}
+        title={
+          state.election ? t("election.import_polling_station_eml", { location: state.election.authority_region }) : ""
+        }
       >
         <FormLayout>
           <FormLayout.Section>

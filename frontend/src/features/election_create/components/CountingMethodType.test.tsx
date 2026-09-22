@@ -7,7 +7,7 @@ import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
 import { CountingMethodType } from "./CountingMethodType";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 
-const election = { name: "Naam", location: "Plek" } as NewElection;
+const election = { name: "Naam", authority_region: "Plek" } as NewElection;
 
 describe("CountingMethodType component", () => {
   test("Navigates to election create page when no election", () => {
@@ -32,7 +32,7 @@ describe("CountingMethodType component", () => {
     );
 
     expect(
-      await screen.findByRole("heading", { name: `Type stemopneming in ${election.location}` }),
+      await screen.findByRole("heading", { name: `Type stemopneming in ${election.authority_region}` }),
     ).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ })).not.toBeChecked();
     expect(screen.getByRole("radio", { name: /Decentrale stemopneming \(DSO\)/ })).not.toBeChecked();
@@ -54,7 +54,7 @@ describe("CountingMethodType component", () => {
     );
 
     expect(
-      await screen.findByRole("heading", { name: `Type stemopneming in ${election.location}` }),
+      await screen.findByRole("heading", { name: `Type stemopneming in ${election.authority_region}` }),
     ).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ })).not.toBeChecked();
     const DSORadio = screen.getByRole("radio", { name: /Decentrale stemopneming \(DSO\)/ });

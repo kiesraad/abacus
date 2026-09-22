@@ -51,7 +51,7 @@ export function ElectionCertificatePage() {
   const pageTitle = t("election_certificate.certificate");
 
   const category = t(`committee_category.${election.committee_category}.abbreviation`);
-  const committee = `${category} ${election.location}`;
+  const committee = `${category} ${election.authority_region}`;
 
   return (
     <>

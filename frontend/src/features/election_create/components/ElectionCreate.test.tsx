@@ -538,7 +538,7 @@ describe("Election create pages", () => {
       const user = userEvent.setup();
       await importDefinitions(router, file, election, gsbSelected);
 
-      const location = gsbSelected?.name ?? election.location;
+      const location = gsbSelected?.name ?? election.authority_region;
 
       // polling stations
       await uploadPollingStationList(file, location, {

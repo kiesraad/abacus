@@ -121,7 +121,7 @@ export function CommitteeSessionDetailsPage() {
       <header>
         <section>
           <h1>
-            {t(`committee_category.${election.committee_category}.short`)} {election.location}
+            {t(`committee_category.${election.committee_category}.short`)} {election.authority_region}
           </h1>
         </section>
       </header>

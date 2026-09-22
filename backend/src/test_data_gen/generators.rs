@@ -945,19 +945,18 @@ fn generate_common_results(
 
 fn generate_extra_investigation(rng: &mut impl rand::RngExt) -> ExtraInvestigation {
     let extra_investigation_options = [
-        (85, YesNo::default(), YesNo::default()),
-        (10, YesNo::no(), YesNo::no()),
-        (3, YesNo::yes(), YesNo::no()),
-        (2, YesNo::yes(), YesNo::yes()),
+        (85, YesNo::no(), YesNo::default()),
+        (8, YesNo::yes(), YesNo::no()),
+        (7, YesNo::yes(), YesNo::yes()),
     ];
 
-    let (_, extra_investigation_other_reason, ballots_recounted_extra_investigation) =
+    let (_, extra_investigation_done, ballots_recounted_extra_investigation) =
         *extra_investigation_options
             .choose_weighted(rng, |(weight, ..)| *weight)
             .expect("Weighted random selection for extra_investigation should never fail");
 
     ExtraInvestigation {
-        extra_investigation_other_reason,
+        extra_investigation_done,
         ballots_recounted_extra_investigation,
     }
 }

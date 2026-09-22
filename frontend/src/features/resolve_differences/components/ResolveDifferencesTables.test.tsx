@@ -18,7 +18,7 @@ describe("ResolveDifferencesTables", () => {
     render(<ResolveDifferencesTables first={first} second={second} structure={structure} />);
 
     const extraInvestigationTable = await screen.findByRole("table", {
-      name: "Rubriek: Alleen bij extra onderzoek",
+      name: "Rubriek: Extra onderzoek",
     });
     expect(extraInvestigationTable).toBeVisible();
     expect(extraInvestigationTable).toHaveTableContent([

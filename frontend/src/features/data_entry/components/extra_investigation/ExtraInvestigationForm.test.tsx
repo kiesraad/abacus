@@ -37,7 +37,7 @@ describe("Test ExtraInvestigationForm errors", () => {
     server.use(DataEntryClaimHandler, DataEntrySaveHandler);
   });
 
-  test("F.101 Both questions need to be answered or unanswered", async () => {
+  test("F.101 First question needs to be answered", async () => {
     const user = userEvent.setup();
 
     overrideServerClaimDataEntryResponse({
@@ -65,7 +65,7 @@ describe("Test ExtraInvestigationForm errors", () => {
     expect(screen.queryByTestId("feedback-warning")).toBeNull();
   });
 
-  test("F.102 Only one answer per question is allowed", async () => {
+  test("F.104 Only one answer per question is allowed", async () => {
     const user = userEvent.setup();
     overrideServerClaimDataEntryResponse({
       formState: getDefaultDataEntryState().formState,
@@ -75,7 +75,7 @@ describe("Test ExtraInvestigationForm errors", () => {
 
     await screen.findByTestId("extra_investigation_form");
     overrideOnce("post", "/api/data_entries/1/1", 200, {
-      validation_results: { errors: [validationResultMockData.F102], warnings: [] },
+      validation_results: { errors: [validationResultMockData.F104], warnings: [] },
     });
 
     const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -83,7 +83,7 @@ describe("Test ExtraInvestigationForm errors", () => {
 
     const feedbackMessage = [
       "Controleer je antwoorden",
-      "F.102",
+      "F.104",
       "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
       "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     ].join("");

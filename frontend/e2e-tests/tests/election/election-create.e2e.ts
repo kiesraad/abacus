@@ -15,12 +15,22 @@ import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationsFilePgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationsFilePgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
+import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
 import { PollingStationImportPgObj } from "e2e-tests/page-objects/polling_station/PollingStationImportPgObj";
 import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
-import { eml110a, eml110b, eml110b_zero_voters, eml230b } from "e2e-tests/test-data/eml-files";
+import {
+  type Eml110a,
+  type Eml230b,
+  eml110a,
+  eml110a_AB,
+  eml110b,
+  eml110b_zero_voters,
+  eml230b,
+  eml230b_AB,
+} from "e2e-tests/test-data/eml-files";
 import { test } from "../../fixtures";
 
 test.use({
@@ -342,48 +352,90 @@ test.describe("Election creation", () => {
     });
   });
 
-  test.describe("CSB election creation", () => {
-    test("it uploads an election file and candidate list", async ({ page }) => {
-      await page.goto("/elections");
-      const overviewPage = new ElectionsOverviewPgObj(page);
-      await overviewPage.create.click();
+  type CsbVariant = {
+    name: string;
+    electionDefinition: Eml110a;
+    candidateDefinition: Eml230b;
+    regionName: string;
+    committeeLabel: string;
+    subCommittees: string[];
+  };
 
-      // upload election and check hash
-      await uploadElectionAndInputHash(page);
+  const csbVariants: CsbVariant[] = [
+    {
+      name: "GR",
+      electionDefinition: eml110a,
+      candidateDefinition: eml230b,
+      regionName: "Test",
+      committeeLabel: "CSB - Test (0000)",
+      subCommittees: ["Test"],
+    },
+    {
+      name: "WS",
+      electionDefinition: eml110a_AB,
+      candidateDefinition: eml230b_AB,
+      regionName: "Rivier en Polder",
+      committeeLabel: "CSB - Rivier en Polder (10)",
+      subCommittees: ["Heemdamseburg", "Juinen", "Middelgein", "'s-Gravenveen"],
+    },
+  ];
 
-      // committee category
-      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
-      await expect(committeeCategoryPage.header).toBeVisible();
-      await committeeCategoryPage.csb.check();
-      await expect(committeeCategoryPage.csb).toBeChecked();
-      await committeeCategoryPage.next.click();
+  for (const variant of csbVariants) {
+    test.describe(`${variant.name} CSB election creation`, () => {
+      test("it creates an election", async ({ page }) => {
+        await page.goto("/elections");
+        const overviewPage = new ElectionsOverviewPgObj(page);
+        await overviewPage.create.click();
 
-      // upload candidates list and check
-      await uploadCandidatesAndInputHash(page, eml230b);
+        // Upload election definition and check hash.
+        await uploadElectionAndInputHash(page, variant.electionDefinition);
 
-      // Now we should be at the check and save page
-      const checkAndSavePage = new CheckAndSavePgObj(page);
-      await expect(checkAndSavePage.header).toBeVisible();
-      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
-      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
-      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
-      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
-      await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
-      await expect(checkAndSavePage.countingMethod).toBeHidden();
-      await expect(checkAndSavePage.numberOfVoters).toBeHidden();
+        // Pick committee category.
+        const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+        await expect(committeeCategoryPage.header).toBeVisible();
+        await committeeCategoryPage.csb.check();
+        await expect(committeeCategoryPage.csb).toBeChecked();
+        await committeeCategoryPage.next.click();
 
-      // Save page to test saving the election
-      const election = await checkAndSavePage.saveElection();
-      await expect(overviewPage.adminHeader).toBeVisible();
-      await expect(overviewPage.getAlertElectionCreated("CSB", "Gemeenteraad Test 2022")).toBeVisible();
+        // Upload candidate list and check hash.
+        await uploadCandidatesAndInputHash(page, variant.candidateDefinition);
 
-      const electionRow = overviewPage.findElectionRowById(election.id);
-      await expect(electionRow).toBeVisible();
-      await expect(electionRow).toContainText("Gemeenteraad Test 2022");
-      await expect(electionRow).toContainText("CSB - Test (0000)");
-      await expect(electionRow).toContainText("Klaar voor invoer— Zitting CSB");
+        // Check the election summary before saving.
+        const checkAndSavePage = new CheckAndSavePgObj(page);
+        await expect(checkAndSavePage.header).toBeVisible();
+        await expect(checkAndSavePage.electionName).toContainText(
+          `verkiezing: ${variant.electionDefinition.electionName}`,
+        );
+        await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
+        await expect(checkAndSavePage.electionLocation).toContainText(`gebiedsaanduiding: ${variant.regionName}`);
+        await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+        await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
+        await expect(checkAndSavePage.countingMethod).toBeHidden();
+        await expect(checkAndSavePage.numberOfVoters).toBeHidden();
+
+        // Save the election.
+        const election = await checkAndSavePage.saveElection();
+        await expect(overviewPage.adminHeader).toBeVisible();
+        await expect(
+          overviewPage.getAlertElectionCreated("CSB", variant.electionDefinition.electionName),
+        ).toBeVisible();
+
+        // Check the election overview row.
+        const electionRow = overviewPage.findElectionRowById(election.id);
+        await expect(electionRow).toBeVisible();
+        await expect(electionRow).toContainText(variant.electionDefinition.electionName);
+        await expect(electionRow).toContainText(variant.committeeLabel);
+        await expect(electionRow).toContainText("Klaar voor invoer— Zitting CSB");
+
+        await test.step("check a sub committee exists for every GSB", async () => {
+          await page.goto(`/elections/${election.id}/status`); // This page is not accessible via the UI at this point, hence the `goto`.
+          const statusPage = new ElectionStatus(page);
+          await expect(statusPage.notStartedRows).toHaveCount(variant.subCommittees.length);
+          await expect(statusPage.notStartedRows).toContainText(variant.subCommittees);
+        });
+      });
     });
-  });
+  }
 
   test.describe("election definition", () => {
     test("it fails on incorrect hash for election definition", async ({ page }) => {

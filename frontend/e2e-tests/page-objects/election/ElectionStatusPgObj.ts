@@ -8,6 +8,7 @@ export class ElectionStatus {
   readonly firstEntryFinished: Locator;
   readonly definitive: Locator;
   readonly notStarted: Locator;
+  readonly notStartedRows: Locator;
   readonly differencesResolved: Locator;
   readonly firstDataEntryResumed: Locator;
   readonly firstDataEntryDiscarded: Locator;
@@ -23,6 +24,7 @@ export class ElectionStatus {
     this.firstEntryFinished = page.getByRole("table", { name: "Eerste invoer klaar" });
     this.definitive = page.getByRole("table", { name: "Eerste en tweede invoer klaar" });
     this.notStarted = page.getByRole("table", { name: "Werkvoorraad" });
+    this.notStartedRows = this.notStarted.locator("tbody").getByRole("row");
 
     this.differencesResolved = page.getByRole("strong").filter({
       hasText: /Verschil opgelost voor stembureau \d+/,

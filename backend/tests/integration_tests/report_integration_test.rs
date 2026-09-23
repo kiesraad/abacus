@@ -141,7 +141,7 @@ async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/11/download_zip_results"
     );
-    let prefix = "\"definitieve-documenten_ab2026_heemdamseburg_gemeente_heemdamseburg-";
+    let prefix = "\"definitieve-documenten_ab2026_rivierenpolder_gemeente_heemdamseburg-";
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let archive = ZipFileReader::new(bytes).await.unwrap();

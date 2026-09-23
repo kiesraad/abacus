@@ -65,6 +65,11 @@
       "actions": "<ul><li>Corrigeer de rekenfout in een corrigendum.</li><li>Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).</li><li>Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.</li><li>Vul nieuwe telresultaten op het corrigendum in.</li></ul>"
     }
   },
+  "F310": {
+    "coordinator": {
+      "content": "Bij vraag 2.3.2 moet één antwoord gekozen worden."
+    }
+  },
   "F401": {
     "coordinator": {
       "content": "Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 2.3 wegneemt.",

@@ -173,7 +173,8 @@
   },
   "F310": {
     "coordinator": {
-      "title": "Deze vraag moet precies één antwoord hebben"
+      "title": "Deze vraag moet precies één antwoord hebben",
+      "content": "Bij vraag 3.2.3 (eerste zitting) of 2.3.2 (volgende zitting) moet één antwoord gekozen worden."
     }
   },
   "F311": {

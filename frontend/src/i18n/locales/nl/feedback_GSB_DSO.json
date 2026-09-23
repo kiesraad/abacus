@@ -67,7 +67,8 @@
   },
   "F310": {
     "coordinator": {
-      "content": "Bij vraag 2.3.2 moet één antwoord gekozen worden."
+      "content": "Bij vraag 2.3.2 moet één antwoord gekozen worden. Is op het proces-verbaal duidelijk aangegeven welk van de opties bedoeld is?",
+      "actions": "<ul><li>Zo ja: laat dat dan overnemen in Abacus.</li><li>Zo nee: maak een corrigendum waarin de juiste optie geselecteerd wordt.</li></ul>"
     }
   },
   "F401": {

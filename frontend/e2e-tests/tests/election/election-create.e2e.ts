@@ -376,7 +376,7 @@ test.describe("Election creation", () => {
       candidateDefinition: eml230b_AB,
       regionName: "Rivier en Polder",
       committeeLabel: "CSB - Rivier en Polder (10)",
-      subCommittees: ["Heemdamseburg", "Juinen", "Middelgein", "'s-Gravenveen"],
+      subCommittees: ["'s-Gravenveen", "Heemdamseburg", "Juinen", "Middelgein"],
     },
   ];
 

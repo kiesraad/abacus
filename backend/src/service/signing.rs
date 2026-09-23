@@ -57,32 +57,12 @@ impl AsAuditEvent for SigningKeypairCreatedAuditData {
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
-fn election_with_signing(election: &ElectionWithPoliticalGroups) -> bool {
-    match election.committee_category {
-        CommitteeCategory::CSB => false,
-        CommitteeCategory::GSB => true,
-    }
-}
-
-pub async fn get_show_reminder(
-    conn: &mut SqliteConnection,
-    election: &ElectionWithPoliticalGroups,
-) -> Result<Option<bool>, sqlx::Error> {
-    if !election_with_signing(election) {
-        return Ok(None);
-    }
-
-    signing_keypair_repo::get_show_reminder(conn, election.id)
-        .await
-        .map(|show_reminder| show_reminder.or(Some(true)))
-}
-
 pub async fn get_election_certificate(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<String, APIError> {
-    if !election_with_signing(election) {
+    if !election.committee_category.supports_signing() {
         return Err(APIError::NotFound(
             "No certificate for this election".into(),
             ErrorReference::EntryNotFound,
@@ -152,43 +132,6 @@ mod tests {
         infra::audit_log::{assert_last_event, list_all},
         repository::user_repo::{User, UserId},
     };
-
-    #[test(sqlx::test(fixtures(
-        path = "../../fixtures",
-        scripts("election_1", "signing_keypair")
-    )))]
-    async fn get_show_reminder_certificate_generated(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
-        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]);
-
-        let show_reminder = get_show_reminder(&mut conn, &election).await.unwrap();
-        assert_eq!(show_reminder, Some(true));
-
-        signing_keypair_repo::set_show_reminder(&mut conn, election.id, false)
-            .await
-            .expect("should succeed");
-
-        let show_reminder = get_show_reminder(&mut conn, &election).await.unwrap();
-        assert_eq!(show_reminder, Some(false));
-    }
-
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1"))))]
-    async fn get_show_reminder_certificate_not_generated_yet(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
-        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]);
-
-        let show_reminder = get_show_reminder(&mut conn, &election).await.unwrap();
-        assert_eq!(show_reminder, Some(true));
-    }
-
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1"))))]
-    async fn get_show_reminder_certificate_wrong_election(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
-        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[]);
-
-        let show_reminder = get_show_reminder(&mut conn, &election).await.unwrap();
-        assert_eq!(show_reminder, None);
-    }
 
     fn get_audit_service() -> AuditService {
         let user = User::test_user(Role::Administrator, UserId::from(1));

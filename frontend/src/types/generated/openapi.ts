@@ -1131,7 +1131,7 @@ export interface ElectionDetailsResponse {
   election: ElectionWithPoliticalGroups;
   investigations: PollingStationInvestigation[];
   polling_stations: PollingStation[];
-  show_keypair_reminder?: boolean;
+  show_keypair_reminder?: KeypairReminder;
 }
 
 /**
@@ -1516,6 +1516,9 @@ export type InvestigationStatus =
   | { state: InvestigationInProgress; status: "InProgress" }
   | { state: InvestigationConcludedWithoutNewResults; status: "ConcludedWithoutNewResults" }
   | { state: InvestigationConcludedWithNewResults; status: "ConcludedWithNewResults" };
+
+export const keypairReminderValues = ["Dismissable", "NonDismissable"] as const;
+export type KeypairReminder = (typeof keypairReminderValues)[number];
 
 export interface LargestRemainderAssignedSeat {
   drawing_lots?: ListDrawingLotsVariant;

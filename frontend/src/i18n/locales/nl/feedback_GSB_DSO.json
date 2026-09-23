@@ -71,6 +71,12 @@
       "actions": "<ul><li>Zo ja: laat dat dan overnemen in Abacus.</li><li>Zo nee: maak een corrigendum waarin de juiste optie geselecteerd wordt.</li></ul>"
     }
   },
+  "F313": {
+    "coordinator": {
+      "content": "D en H zijn gelijk, dus er is geen onverklaard verschil. Vraag 2.3.2 moet overgeslagen worden. Is op het proces-verbaal duidelijk te zien wat de bedoeling was?",
+      "actions": "<ul><li>Zo ja: laat dat dan overnemen in Abacus.</li><li>Zo nee: maak een corrigendum waarin deze vraag wordt overgeslagen.</li></ul>"
+    }
+  },
   "F401": {
     "coordinator": {
       "content": "Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 2.3 wegneemt.",

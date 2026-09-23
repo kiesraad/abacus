@@ -184,6 +184,12 @@
       "actions": "<ul><li>Hertel de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.</li><li>Vul nieuwe telresultaten op een corrigendum in.</li><li>Is er al herteld? Zorg dan dat het inlegvel 'controles en correcties' wordt ingevuld en toegevoegd aan het proces-verbaal van het stembureau.</li></ul>"
     }
   },
+  "F313": {
+    "coordinator": {
+      "title": "Deze vraag moet overgelagen worden",
+      "content": "D en H zijn gelijk, dus er is geen onverklaard verschil. Vraag 3.2.3 (eerste zitting) of 2.3.2 (volgende zitting) moet overgeslagen worden."
+    }
+  },
   "F401": {
     "typist": {
       "title": "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.401)"

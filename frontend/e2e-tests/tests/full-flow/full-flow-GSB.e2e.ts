@@ -532,6 +532,8 @@ for (const variant of variants) {
       const electionDetails = new ElectionDetailsPgObj(page);
       await expect(electionDetails.header).toHaveText(`Gemeentelijk stembureau ${variant.regionName}`);
       await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
+      await expect(electionHome.header).toContainText(variant.electionName);
+      await expect(electionHome.getCommitteeSessionCard(2)).toContainText("Begon op 18 maart 2026 om 21:34");
 
       await logout(page);
     });
@@ -699,7 +701,6 @@ for (const variant of variants) {
 
         const differencesPage = new DifferencesPage(page);
         await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-        await differencesPage.differenceCompletelyAccountedForNo.check();
         await differencesPage.next.click();
 
         const progressList = new ProgressList(page);

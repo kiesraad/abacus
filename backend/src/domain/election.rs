@@ -151,6 +151,20 @@ pub struct ElectionWithPoliticalGroups {
     pub political_groups: Vec<PoliticalGroup>,
 }
 
+impl ElectionWithPoliticalGroups {
+    /// Returns the authority region category as a lowercase string.
+    pub fn region_category(&self) -> &str {
+        use CommitteeCategory::*;
+        use ElectionCategory::*;
+
+        match (self.committee_category, self.category) {
+            (CSB, Provincial) => "provincie",
+            (CSB, WaterAuthority) => "waterschap",
+            (CSB, Municipal) | (GSB, _) => "gemeente",
+        }
+    }
+}
+
 impl From<ElectionWithPoliticalGroups> for Election {
     fn from(value: ElectionWithPoliticalGroups) -> Self {
         Self {
@@ -740,6 +754,14 @@ pub mod tests {
             }
         }
 
+        pub fn with_election_category(election_category: ElectionCategory) -> Self {
+            Self {
+                election_category,
+                committee_category: None,
+                counting_method: None,
+            }
+        }
+
         pub fn with_committee_category(&self, committee_category: CommitteeCategory) -> Self {
             Self {
                 committee_category: Some(committee_category),
@@ -761,6 +783,35 @@ pub mod tests {
             let mut election = election_fixture(self.election_category, category, &[2]);
             election.counting_method = self.counting_method;
             election
+        }
+    }
+
+    #[test]
+    fn test_election_region_category() {
+        use CommitteeCategory::*;
+        use ElectionCategory::*;
+
+        let test_cases = [
+            (CSB, Provincial, "provincie"),
+            (CSB, WaterAuthority, "waterschap"),
+            (CSB, Municipal, "gemeente"),
+            (GSB, Provincial, "gemeente"),
+            (GSB, WaterAuthority, "gemeente"),
+            (GSB, Municipal, "gemeente"),
+        ];
+
+        for (committee_category, election_category, expected) in &test_cases {
+            let election = ElectionBuilder::with_election_category(*election_category)
+                .with_committee_category(*committee_category)
+                .build();
+
+            assert_eq!(
+                election.region_category(),
+                *expected,
+                "{}, {}",
+                committee_category,
+                election_category
+            );
         }
     }
 }

@@ -9,7 +9,7 @@ import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
 import type { DataEntryGetDifferencesResponse, DataEntryStatusName } from "@/types/generated/openapi";
-
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { type ResolveOutcome, useDataEntryDifferences } from "../hooks/useDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesForm } from "./ResolveDifferencesForm";
@@ -33,7 +33,7 @@ function resolvedMessageAndPath(
   outcome: ResolveOutcome,
 ): { message: Message; path: string } | null {
   const { differences, electionId, dataEntryId, getName } = navigation;
-  const number = differences.source.number;
+  const number = getDataEntrySourceNumber(differences.source);
   const statusPath = `/elections/${electionId}/status`;
 
   switch (status) {
@@ -116,7 +116,7 @@ export function ResolveDifferencesPage() {
       <PageTitle title={`${t("resolve_differences.page_title")} - Abacus`} />
       <header>
         <section className="smaller-gap">
-          <DataEntrySourceNumber>{source.number}</DataEntrySourceNumber>
+          <DataEntrySourceNumber>{getDataEntrySourceNumber(source)}</DataEntrySourceNumber>
           <h1>{source.name}</h1>
         </section>
       </header>

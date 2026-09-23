@@ -5,6 +5,7 @@ import type {
   CommitteeSession,
   ElectionDetailsResponse,
   ElectionWithPoliticalGroups,
+  KeypairReminder,
   PollingStation,
   PollingStationInvestigation,
 } from "@/types/generated/openapi";
@@ -15,7 +16,7 @@ export interface iElectionProviderContext {
   election: ElectionWithPoliticalGroups;
   pollingStations: Required<PollingStation[]>;
   investigations: PollingStationInvestigation[];
-  showKeypairReminder?: boolean;
+  showKeypairReminder?: KeypairReminder;
   refetch: (controller?: AbortController) => Promise<ApiResult<ElectionDetailsResponse>>;
 }
 

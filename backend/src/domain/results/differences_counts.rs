@@ -386,7 +386,7 @@ mod tests {
                 },
                 more_ballots_count: 0,
                 fewer_ballots_count: 0,
-                difference_completely_accounted_for: YesNo::yes(),
+                difference_completely_accounted_for: YesNo::default(),
             }
         }
     }
@@ -827,7 +827,6 @@ mod tests {
         let mut data = DifferencesCounts::zero();
         data.compare_votes_cast_admitted_voters
             .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
 
         let validation_results = validate(&data, 105, 105)?;
 
@@ -904,7 +903,6 @@ mod tests {
         let mut data = DifferencesCounts::zero();
         data.compare_votes_cast_admitted_voters
             .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
 
         let validation_results = validate(&data, 105, 105)?;
 
@@ -967,7 +965,6 @@ mod tests {
 
         data.compare_votes_cast_admitted_voters
             .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
 
         let validation_results = validate(&data, 103, 103)?;
 

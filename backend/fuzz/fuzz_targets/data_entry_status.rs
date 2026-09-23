@@ -55,7 +55,7 @@ fn valid_empty_cso_result() -> CSOFirstSessionResults {
             },
             more_ballots_count: 0,
             fewer_ballots_count: 0,
-            difference_completely_accounted_for: YesNo::yes(),
+            difference_completely_accounted_for: YesNo::default(),
         },
         political_group_votes: vec![],
     }

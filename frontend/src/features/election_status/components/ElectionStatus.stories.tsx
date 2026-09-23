@@ -205,11 +205,11 @@ export const CSBElectionStatusNoLinks: StoryObj<StoryProps> = {
         await expect(headings[0]).toHaveTextContent("Werkvoorraad (5)");
         await expect(tables[0]).toHaveTableContent([
           ["Nummer", "Stembureau"],
-          ["5", "Bloemstede"],
-          ["3", "Eksterlo"],
-          ["2", "'s-Gravenveen"],
-          ["4", "Hovenerwoud"],
-          ["1", "Juinen"],
+          ["0005", "Bloemstede"],
+          ["0003", "Eksterlo"],
+          ["0002", "'s-Gravenveen"],
+          ["0004", "Hovenerwoud"],
+          ["0001", "Juinen"],
         ]);
       });
     });

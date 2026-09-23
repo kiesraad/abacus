@@ -167,11 +167,11 @@ describe("DataEntryHomePage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Nummer", "Stembureau"],
-      ["5", "Bloemstede 1e invoer"],
-      ["3", "Eksterlo 1e invoer"],
-      ["2", "'s-Gravenveen 1e invoer"],
-      ["4", "Hovenerwoud 1e invoer"],
-      ["1", "Juinen 1e invoer"],
+      ["0005", "Bloemstede 1e invoer"],
+      ["0003", "Eksterlo 1e invoer"],
+      ["0002", "'s-Gravenveen 1e invoer"],
+      ["0004", "Hovenerwoud 1e invoer"],
+      ["0001", "Juinen 1e invoer"],
     ]);
   });
 });

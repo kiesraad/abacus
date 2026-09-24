@@ -378,9 +378,10 @@ pub async fn previous_results_for_polling_station(
 }
 
 /// Checks if results are complete for a committee session by verifying that
-/// - For first committee session: all new polling stations must have results
-/// - For subsequent committee sessions: all new polling stations and all investigated
-///   polling stations with corrected results must have results
+/// - For first committee session: all new polling stations (GSB) or all sub committees (CSB)
+///   must have results
+/// - For subsequent committee sessions (GSB-only): all new polling stations and all
+///   investigated polling stations with corrected results must have results
 pub async fn are_results_complete_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
@@ -405,9 +406,25 @@ pub async fn are_results_complete_for_committee_session(
     .await?
     .result;
 
-    if !all_new_ps_have_data || !committee_session.is_next_session() {
+    // Check that all sub committees (only present for CSB) have definitive results
+    let all_sub_committees_have_data = query!(
+        r#"
+        SELECT COUNT(*) = 0 as "result: bool"
+        FROM sub_committees AS sc
+        LEFT JOIN data_entries AS de ON de.id = sc.data_entry_id
+        WHERE sc.committee_session_id = ?
+          AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')
+        "#,
+        committee_session_id
+    )
+    .fetch_one(&mut *tx)
+    .await?
+    .result;
+
+    let all_new_have_data = all_new_ps_have_data && all_sub_committees_have_data;
+    if !all_new_have_data || !committee_session.is_next_session() {
         tx.commit().await?;
-        return Ok(all_new_ps_have_data);
+        return Ok(all_new_have_data);
     }
 
     // Validate that all investigations are finished and have definitive results
@@ -431,7 +448,7 @@ pub async fn are_results_complete_for_committee_session(
 
     tx.commit().await?;
 
-    Ok(all_new_ps_have_data && all_investigations_finished)
+    Ok(all_new_have_data && all_investigations_finished)
 }
 
 #[cfg(test)]

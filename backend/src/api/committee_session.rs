@@ -485,7 +485,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_4"))))]
-    async fn test_status_change_complete_without_results_failsd_gsb(pool: SqlitePool) {
+    async fn test_status_change_complete_without_results_fails_gsb(pool: SqlitePool) {
         let response = status_change(
             pool,
             Role::CoordinatorGSB,

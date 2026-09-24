@@ -1044,7 +1044,7 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(801);
 
-            // Add a second subcommittee without results next to the one with results
+            // Add a second sub committee without results next to the one with results
             create_sub_committee(
                 &mut conn,
                 committee_session_id,

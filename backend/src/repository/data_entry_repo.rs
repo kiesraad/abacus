@@ -378,9 +378,10 @@ pub async fn previous_results_for_polling_station(
 }
 
 /// Checks if results are complete for a committee session by verifying that
-/// - For first committee session: all new polling stations must have results
-/// - For subsequent committee sessions: all new polling stations and all investigated
-///   polling stations with corrected results must have results
+/// - For first committee session: all new polling stations (GSB) or all sub committees (CSB)
+///   must have results
+/// - For subsequent committee sessions (GSB-only): all new polling stations and all
+///   investigated polling stations with corrected results must have results
 pub async fn are_results_complete_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
@@ -405,9 +406,25 @@ pub async fn are_results_complete_for_committee_session(
     .await?
     .result;
 
-    if !all_new_ps_have_data || !committee_session.is_next_session() {
+    // Check that all sub committees (only present for CSB) have definitive results
+    let all_sub_committees_have_data = query!(
+        r#"
+        SELECT COUNT(*) = 0 as "result: bool"
+        FROM sub_committees AS sc
+        LEFT JOIN data_entries AS de ON de.id = sc.data_entry_id
+        WHERE sc.committee_session_id = ?
+          AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')
+        "#,
+        committee_session_id
+    )
+    .fetch_one(&mut *tx)
+    .await?
+    .result;
+
+    let all_new_have_data = all_new_ps_have_data && all_sub_committees_have_data;
+    if !all_new_have_data || !committee_session.is_next_session() {
         tx.commit().await?;
-        return Ok(all_new_ps_have_data);
+        return Ok(all_new_have_data);
     }
 
     // Validate that all investigations are finished and have definitive results
@@ -431,7 +448,7 @@ pub async fn are_results_complete_for_committee_session(
 
     tx.commit().await?;
 
-    Ok(all_new_ps_have_data && all_investigations_finished)
+    Ok(all_new_have_data && all_investigations_finished)
 }
 
 #[cfg(test)]
@@ -894,12 +911,12 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::investigation::InvestigationStatus,
+            domain::{investigation::InvestigationStatus, sub_committee::NewSubCommittee},
             repository::{
                 investigation_repo,
                 polling_station_repo::{self, insert_test_polling_station},
             },
-            service::create_definitive_data_entry,
+            service::{create_definitive_data_entry, create_sub_committee},
         };
 
         async fn create_test_investigation(
@@ -1004,6 +1021,62 @@ mod tests {
                 are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(2))
                     .await
                     .unwrap()
+            );
+        }
+
+        /// Test CSB session without results on its sub committees
+        #[test(sqlx::test(fixtures("../../fixtures/election_9_csb.sql")))]
+        async fn test_csb_session_without_results(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            assert!(
+                !are_results_complete_for_committee_session(
+                    &mut conn,
+                    CommitteeSessionId::from(901)
+                )
+                .await
+                .unwrap()
+            );
+        }
+
+        /// Test CSB session without results on one subcommittee
+        #[test(sqlx::test(fixtures("../../fixtures/election_8_csb_with_results.sql")))]
+        async fn test_csb_session_without_results_on_one_sub_committee(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let committee_session_id = CommitteeSessionId::from(801);
+
+            // Add a second sub committee without results next to the one with results
+            create_sub_committee(
+                &mut conn,
+                committee_session_id,
+                NewSubCommittee {
+                    number: 42,
+                    name: "Test GSB".to_string(),
+                    category: CommitteeCategory::GSB,
+                    authority_id: "0042".to_string(),
+                    authority_name: "Test GSB".to_string(),
+                },
+            )
+            .await
+            .unwrap();
+
+            assert!(
+                !are_results_complete_for_committee_session(&mut conn, committee_session_id)
+                    .await
+                    .unwrap()
+            );
+        }
+
+        /// Test CSB session with results on its sub committees
+        #[test(sqlx::test(fixtures("../../fixtures/election_8_csb_with_results.sql")))]
+        async fn test_csb_session_with_results(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            assert!(
+                are_results_complete_for_committee_session(
+                    &mut conn,
+                    CommitteeSessionId::from(801)
+                )
+                .await
+                .unwrap()
             );
         }
 

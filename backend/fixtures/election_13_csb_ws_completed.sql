@@ -30,10 +30,10 @@ VALUES (1301,
 
 INSERT INTO sub_committees (id, committee_session_id, data_entry_id, number, name,
                             category, authority_id, authority_name)
-VALUES (1311, 1301, 1301, 123, 'Heemdamseburg', 'GSB', 0123, 'Heemdamseburg'),
-       (1312, 1301, 1302, 124, 'Juinen', 'GSB', 0124, 'Juinen'),
-       (1313, 1301, 1303, 125, 'Middelgein', 'GSB', 0125, 'Middelgein'),
-       (1314, 1301, 1304, 126, '''s-Gravenveen', 'GSB', 0126, '''s-Gravenveen');
+VALUES (1311, 1301, 1301, 123, 'Heemdamseburg', 'GSB', '0123', 'Heemdamseburg'),
+       (1312, 1301, 1302, 124, 'Juinen', 'GSB', '0124', 'Juinen'),
+       (1313, 1301, 1303, 125, 'Middelgein', 'GSB', '0125', 'Middelgein'),
+       (1314, 1301, 1304, 126, '''s-Gravenveen', 'GSB', '0126', '''s-Gravenveen');
 
 INSERT INTO apportionment (committee_session_id, state)
 VALUES (1301, '{"type":"Finalised","deceased_candidates":[],"lists_drawn":[],"candidates_drawn":[]}');

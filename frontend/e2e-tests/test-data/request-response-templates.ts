@@ -129,7 +129,7 @@ const commonDataEntry: CommonPollingStationResults = {
       votes_cast_greater_than_admitted_voters: false,
       votes_cast_smaller_than_admitted_voters: false,
     },
-    difference_completely_accounted_for: { yes: true, no: false },
+    difference_completely_accounted_for: { yes: false, no: false },
   },
   political_group_votes: [
     {
@@ -835,7 +835,7 @@ export const noRecountNoDifferencesDataEntryWithGaps: Results = {
       votes_cast_greater_than_admitted_voters: false,
       votes_cast_smaller_than_admitted_voters: false,
     },
-    difference_completely_accounted_for: { yes: true, no: false },
+    difference_completely_accounted_for: { yes: false, no: false },
   },
   political_group_votes: [
     {

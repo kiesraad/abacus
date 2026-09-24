@@ -447,6 +447,7 @@ mod tests {
             votes_counts::VotesCounts,
         },
         valid_default::ValidDefault,
+        validate::ValidateRoot,
     };
 
     fn create_test_results(proxy_certificate_count: u32) -> Results {
@@ -1217,5 +1218,39 @@ mod tests {
         let results = previous_results_for_polling_station(&mut conn, polling_station_id).await;
         assert!(results.is_err());
         assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts(
+            "election_5_with_results",
+            "election_7_four_sessions",
+            "election_8_csb_with_results",
+            "election_12_dso_with_results"
+        )
+    )))]
+    async fn test_fixture_data_entries_valid(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+
+        let elections = election_repo::list(&mut conn, None).await.unwrap();
+        for election in elections {
+            // Get election with political groups
+            let election = election_repo::get(&mut conn, election.id).await.unwrap();
+
+            let sessions =
+                committee_session_repo::get_election_committee_session_list(&mut conn, election.id)
+                    .await
+                    .unwrap();
+            for session in sessions {
+                if let Ok(data_entries) =
+                    list_results_for_committee_session(&mut conn, session.id).await
+                {
+                    for (_, data_entry_results) in data_entries {
+                        let results = data_entry_results.start_validate(&election).unwrap();
+                        assert!(!results.has_errors());
+                    }
+                }
+            }
+        }
     }
 }

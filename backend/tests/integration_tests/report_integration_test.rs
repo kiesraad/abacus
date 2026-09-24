@@ -69,26 +69,29 @@ pub async fn download_zip_assert(
 /// and to compare two zip contents including crc32 hashes of the files.
 /// It will also include the list of files from an inner zip.
 async fn get_files(bytes: Vec<u8>) -> Vec<(String, u32)> {
-    let mut result = Vec::new();
+    let mut files = Vec::new();
     let archive = ZipFileReader::new(bytes).await.unwrap();
 
     for (index, file) in archive.file().entries().iter().enumerate() {
         let filename = file.filename().as_str().unwrap();
         assert!(file.uncompressed_size() > 512, "{filename} was too small");
-        result.push((filename.to_string(), file.crc32()));
 
         if filename.ends_with(".zip") {
+            // Do not compare crc32 for zip files
+            files.push((filename.to_string(), 0));
             // Add all files from zip-in-zip as well, prefixed with inner zip filename
             let mut reader = archive.reader_with_entry(index).await.unwrap();
             let mut buf = Vec::new();
             reader.read_to_end_checked(&mut buf).await.unwrap();
             for (inner_filename, crc) in Box::pin(get_files(buf)).await {
-                result.push((format!("{filename}/{inner_filename}"), crc));
+                files.push((format!("{filename}/{inner_filename}"), crc));
             }
+        } else {
+            files.push((filename.to_string(), file.crc32()));
         }
     }
 
-    result
+    files
 }
 
 /// Extract only the filenames, for assertions

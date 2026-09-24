@@ -292,6 +292,37 @@ async fn test_csb_election_zip_download_results_works(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(
     path = "../../fixtures",
+    scripts("election_13_csb_ws_completed", "users")
+)))]
+async fn test_csb_election_zip_download_water_authority(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = login(&addr, CoordinatorCSB).await;
+    let election_id = 13;
+    let committee_session_id = 1301;
+
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results_csb"
+    );
+    let prefix = "vaststelling-uitslag_ab2023_rivierenpolder_waterschap_rivier-en-polder";
+
+    let bytes = download_zip_assert(&cookie, &url, prefix).await;
+    let files = get_files(bytes).await;
+    assert_eq!(
+        filenames(&files),
+        [
+            "Model_P22-2.pdf",
+            "Resultaat_AB2023_RivierenPolder.zip",
+            "Resultaat_AB2023_RivierenPolder.zip/Resultaat_AB2023_RivierenPolder.eml.xml"
+        ]
+    );
+
+    let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
+    let files2 = get_files(bytes2).await;
+    assert_eq!(files, files2);
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
 async fn test_csb_election_zip_download_results_invalid_state(pool: SqlitePool) {
@@ -441,6 +472,37 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
             "osv4-3_telling_gr2024_juinen.csv",
             "Totaaltelling_GR2024_Juinen.zip",
             "Totaaltelling_GR2024_Juinen.zip/Totaaltelling_GR2024_Juinen.eml.xml",
+        ]
+    );
+
+    let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
+    let files2 = get_files(bytes2).await;
+    assert_eq!(files, files2);
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_13_csb_ws_completed", "users")
+)))]
+async fn test_csb_election_zip_download_total_counts_water_authority(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = login(&addr, CoordinatorCSB).await;
+    let election_id = 13;
+    let committee_session_id = 1301;
+
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_total_counts_csb"
+    );
+    let prefix = "definitieve-documenten_ab2023_rivierenpolder_waterschap_rivier-en-polder";
+
+    let bytes = download_zip_assert(&cookie, &url, prefix).await;
+    let files = get_files(bytes).await;
+    assert_eq!(
+        filenames(&files),
+        [
+            "osv4-3_telling_ab2023_rivierenpolder.csv",
+            "Totaaltelling_AB2023_RivierenPolder.zip",
+            "Totaaltelling_AB2023_RivierenPolder.zip/Totaaltelling_AB2023_RivierenPolder.eml.xml"
         ]
     );
 

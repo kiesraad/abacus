@@ -205,6 +205,11 @@ export function GenerateTestElectionForm() {
                 return null;
               }
 
+              // Only show polling stations field for GSBs
+              if (field.key === "polling_stations" && formState.committee_category !== "GSB") {
+                return null;
+              }
+
               const input = (
                 <InputField
                   id={field.key}

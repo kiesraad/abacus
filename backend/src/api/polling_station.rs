@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
 };
 use axum_extra::response::Attachment;
-use chrono::{DateTime, Datelike, Local};
+use chrono::Local;
 use eml_nl::io::EMLWrite;
 use pdf_gen::zip::zip_single_file;
 use serde::Serialize;
@@ -22,7 +22,8 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::DataEntryId,
-        election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
+        election::{CommitteeCategory, ElectionId},
+        filename::format_datetime,
         polling_station::{
             PollingStationFileRequest, PollingStationId, PollingStationListResponse,
             PollingStationRequest, PollingStationRequestListResponse, PollingStationResponse,
@@ -638,9 +639,18 @@ async fn polling_station_export(
 
     let eml = election.as_polling_stations_eml(&polling_stations, None, None)?;
     let xml = eml.write_eml_root_str(true, true)?;
-    let eml_file_name = polling_stations_eml_file_name(&election);
+    let eml_file_name = format!(
+        "Stembureaus_{}_{}.eml.xml",
+        election.election_id,
+        slugify(&election.authority_region)
+    );
+
     let zip = zip_single_file(&eml_file_name, xml.as_bytes()).await?;
-    let zip_file_name = polling_stations_zip_file_name(&election, Local::now());
+    let zip_file_name = format!(
+        "abacus-exporteren_stemgebieden-{}-eml_110b_stembureaus-{}.zip",
+        slugify(&election.official_name).to_lowercase(),
+        format_datetime(Local::now()),
+    );
 
     audit_service
         .log(
@@ -662,57 +672,24 @@ async fn polling_station_export(
         .content_type("application/zip"))
 }
 
-/// Format EML file name for polling stations export.
-///
-/// Regional elections:
-///     `Stembureaus_{eml_code}{year}_{domain.name}_{authority_region}.eml.xml`
-/// National elections (`election.domain` is `None`):
-///     `Stembureaus_{eml_code}{year}_{authority_region}.eml.xml`
-fn polling_stations_eml_file_name(election: &ElectionWithPoliticalGroups) -> String {
-    let parts: Vec<String> = [
-        "Stembureaus",
-        format!(
-            "{}{}",
-            election.category.to_eml_code(),
-            election.election_date.year()
-        )
-        .as_str(),
-        election
-            .domain
-            .as_ref()
-            .map_or("", |domain| domain.name.as_str()),
-        election.authority_region.as_str(),
-    ]
-    .into_iter()
-    .map(|part| part.split_whitespace().collect::<String>())
-    .filter(|part| !part.is_empty())
-    .collect();
-
-    format!("{}.eml.xml", parts.join("_"))
-}
-
-/// Format ZIP file name for polling stations export:
-/// `abacus-exporteren_stemgebieden-{official_name}-eml_110b_stembureaus-{yyyymmdd-hhmmss}.zip`
-fn polling_stations_zip_file_name(
-    election: &ElectionWithPoliticalGroups,
-    datetime: DateTime<Local>,
-) -> String {
-    format!(
-        "abacus-exporteren_stemgebieden-{}-eml_110b_stembureaus-{}.zip",
-        election.official_name.replace(" ", "_").to_lowercase(),
-        datetime.format("%Y%m%d-%H%M%S"),
-    )
+/// Slugify a part of the filename:
+/// - replace spaces with underscores
+/// - remove all characters that are not alphanumeric or hyphen or underscore
+pub fn slugify(part: &str) -> String {
+    part.chars()
+        .map(|c| if c == ' ' { '_' } else { c })
+        .filter(|c| c.is_alphanumeric() || *c == '-' || *c == '_')
+        .collect()
 }
 
 #[cfg(test)]
 mod tests {
-    use chrono::TimeZone;
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
     use super::*;
     use crate::domain::{
-        election::{ElectionCategory, ElectionDomain, ElectionId, tests::election_fixture},
+        election::ElectionId,
         polling_station::{PollingStationId, PollingStationRequest},
     };
 
@@ -927,52 +904,19 @@ VALUES
     }
 
     #[test]
-    fn test_polling_station_eml_file_name() {
-        for (description, category, domain_name, expected) in [
-            (
-                "regional election",
-                ElectionCategory::Municipal,
-                Some("Heemdamseburg"),
-                "Stembureaus_GR2023_Heemdamseburg_Test.eml.xml",
-            ),
-            (
-                "whitespace is stripped from `domain.name`",
-                ElectionCategory::WaterAuthority,
-                Some("Rivier en Polder"),
-                "Stembureaus_AB2023_RivierenPolder_Test.eml.xml",
-            ),
-            (
-                "national election (`election.domain` is `None`)",
-                ElectionCategory::Municipal,
-                None,
-                "Stembureaus_GR2023_Test.eml.xml",
-            ),
-        ] {
-            let mut election =
-                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
-            election.category = category;
-            election.domain = domain_name.map(|name| ElectionDomain {
-                id: Some("0000".to_string()),
-                name: name.to_string(),
-            });
+    fn test_slugify() {
+        #[rustfmt::skip]
+        let test_cases = [
+            ("Utrecht", "Utrecht"),
+            ("'s-Hertogenbosch", "s-Hertogenbosch"),
+            ("Reusel-De Mierden", "Reusel-De_Mierden"),
+            ("Nuenen, Gerwen en Nederwetten", "Nuenen_Gerwen_en_Nederwetten"),
+            ("Nuenen c.a.", "Nuenen_ca"),
+            ("Súdwest-Fryslân", "Súdwest-Fryslân"),
+        ];
 
-            assert_eq!(
-                polling_stations_eml_file_name(&election),
-                expected,
-                "{description}"
-            );
+        for (part, expected) in test_cases {
+            assert_eq!(slugify(part), expected);
         }
-    }
-
-    #[test]
-    fn test_zip_file_name() {
-        let mut election =
-            election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
-        election.official_name = "Gemeenteraad Heemdamseburg 2024".to_string();
-        let datetime = Local.with_ymd_and_hms(2026, 9, 1, 10, 20, 30).unwrap();
-        assert_eq!(
-            polling_stations_zip_file_name(&election, datetime),
-            "abacus-exporteren_stemgebieden-gemeenteraad_heemdamseburg_2024-eml_110b_stembureaus-20260901-102030.zip"
-        );
     }
 }

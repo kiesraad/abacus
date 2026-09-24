@@ -104,7 +104,12 @@ export function ElectionCertificatePage() {
                 <h3>{t("election_certificate.upload.title")}</h3>
                 <p>{t("election_certificate.upload.explanation")}</p>
                 <div className="mt-md-lg">
-                  <Button variant="primary" size="md" disabled={isLoading} onClick={() => void handleUploadDone()}>
+                  <Button
+                    variant="primary"
+                    size="md"
+                    disabled={!certificate || isLoading}
+                    onClick={() => void handleUploadDone()}
+                  >
                     {t("election_certificate.upload.done")}
                   </Button>
                 </div>

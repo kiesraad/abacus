@@ -147,7 +147,7 @@ async fn test_gsb_cso_election_first_session_zip_download_works(pool: SqlitePool
             "Model_Na31-2.pdf",
             "Telling_GR2024_Heemdamseburg.zip",
             "Telling_GR2024_Heemdamseburg.zip/Telling_GR2024_Heemdamseburg.eml.xml",
-            "osv4-3_telling_gr2024_heemdamseburg.csv",
+            "abacus_telling_gr2024_heemdamseburg.csv",
         ]
     );
 
@@ -178,7 +178,7 @@ async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool
             "Model_Na31-1.pdf",
             "Telling_AB2026_Heemdamseburg.zip",
             "Telling_AB2026_Heemdamseburg.zip/Telling_AB2026_Heemdamseburg.eml.xml",
-            "osv4-3_telling_ab2026_heemdamseburg.csv",
+            "abacus_telling_ab2026_rivierenpolder.csv",
         ]
     );
 
@@ -222,7 +222,7 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
             "Model_Na14-2.pdf",
             "Telling_GR2026_Juinen.zip",
             "Telling_GR2026_Juinen.zip/Telling_GR2026_Juinen.eml.xml",
-            "osv4-3_telling_gr2026_juinen.csv",
+            "abacus_telling_gr2026_juinen.csv",
             "Leeg_Model_P2a.pdf",
         ]
     );
@@ -472,7 +472,7 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
     assert_eq!(
         filenames(&files),
         [
-            "osv4-3_telling_gr2024_juinen.csv",
+            "abacus_telling_gr2024_juinen.csv",
             "Totaaltelling_GR2024_Juinen.zip",
             "Totaaltelling_GR2024_Juinen.zip/Totaaltelling_GR2024_Juinen.eml.xml",
         ]
@@ -503,7 +503,7 @@ async fn test_csb_election_zip_download_total_counts_water_authority(pool: Sqlit
     assert_eq!(
         filenames(&files),
         [
-            "osv4-3_telling_ab2023_rivierenpolder.csv",
+            "abacus_telling_ab2023_rivierenpolder.csv",
             "Totaaltelling_AB2023_RivierenPolder.zip",
             "Totaaltelling_AB2023_RivierenPolder.zip/Totaaltelling_AB2023_RivierenPolder.eml.xml"
         ]

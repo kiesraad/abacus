@@ -36,9 +36,9 @@ pub enum FileType {
     CsbResultsPdf,
     /// CSB attachment PDF (Model P 22-2 Bijlage 1)
     CsbAttachmentPdf,
-    /// CSB CSV counts file (OSV4-3)
+    /// CSB CSV counts file
     CsbCsvCounts,
-    /// GSB CSV counts file (OSV4-3)
+    /// GSB CSV counts file
     GsbCsvCounts,
 }
 

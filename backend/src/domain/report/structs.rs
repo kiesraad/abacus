@@ -154,16 +154,7 @@ pub fn election_filename(election: &ElectionWithPoliticalGroups, base: &str, ext
 }
 
 pub fn csv_filename(election: &ElectionWithPoliticalGroups) -> String {
-    format!(
-        "osv4-3_telling_{}{}_{}.csv",
-        election.category.to_eml_code().to_lowercase(),
-        election.election_date.year(),
-        election
-            .location
-            .split_whitespace()
-            .collect::<String>()
-            .to_lowercase(),
-    )
+    format!("abacus_telling_{}.csv", election.election_id.to_lowercase())
 }
 
 #[derive(Debug)]

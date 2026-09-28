@@ -301,7 +301,7 @@ async fn test_election_n_10_1_download(pool: SqlitePool) {
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     assert_eq!(
         &content_disposition_string[21..],
-        "\"AB2026_Heemdamseburg_n_10_1.zip\""
+        "\"AB2026_sLansbregen_n_10_1.zip\""
     );
 
     let bytes = response.bytes().await.unwrap();
@@ -346,7 +346,7 @@ async fn test_election_n_10_1_inlegvel_download(pool: SqlitePool) {
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     assert_eq!(
         &content_disposition_string[21..],
-        "\"AB2026_Heemdamseburg_n_10_1_Inlegvel.zip\""
+        "\"AB2026_sLansbregen_n_10_1_Inlegvel.zip\""
     );
 
     let bytes = response.bytes().await.unwrap();
@@ -436,7 +436,7 @@ async fn test_election_na_14_1_versie1_download(pool: SqlitePool) {
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     assert_eq!(
         &content_disposition_string[21..],
-        "\"AB2026_Heemdamseburg_na_14_1_versie1.zip\""
+        "\"AB2026_sLansbregen_na_14_1_versie1.zip\""
     );
 
     let bytes = response.bytes().await.unwrap();

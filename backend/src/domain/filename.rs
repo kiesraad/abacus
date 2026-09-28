@@ -1,16 +1,24 @@
 use chrono::{DateTime, Local};
 
-/// Map Dutch lowercase characters with diacritics to their base character
+/// Map Dutch characters with diacritics to their base character
 /// <https://nl.wikipedia.org/wiki/Accenttekens_in_de_Nederlandse_spelling#Frequentie>
 fn strip_diacritic(c: char) -> char {
     match c {
+        'À' | 'Á' | 'Â' | 'Ä' | 'Å' => 'A',
         'à' | 'á' | 'â' | 'ä' | 'å' => 'a',
+        'È' | 'É' | 'Ê' | 'Ë' => 'E',
         'è' | 'é' | 'ê' | 'ë' => 'e',
+        'Ì' | 'Í' | 'Î' | 'Ï' => 'I',
         'ì' | 'í' | 'î' | 'ï' => 'i',
+        'Ò' | 'Ó' | 'Ô' | 'Ö' => 'O',
         'ò' | 'ó' | 'ô' | 'ö' => 'o',
+        'Ù' | 'Ú' | 'Û' | 'Ü' => 'U',
         'ù' | 'ú' | 'û' | 'ü' => 'u',
+        'Ý' | 'Ŷ' | 'Ÿ' => 'Y',
         'ý' | 'ŷ' | 'ÿ' => 'y',
+        'Ç' => 'C',
         'ç' => 'c',
+        'Ñ' => 'N',
         'ñ' => 'n',
         other => other,
     }
@@ -28,10 +36,12 @@ pub fn hyphenate(authority_region: &str) -> String {
 }
 
 /// Slugify a part of the filename:
+/// - remove diacritics
 /// - replace spaces with underscores
 /// - remove all characters that are not alphanumeric or hyphen or underscore
 pub fn slugify(part: &str) -> String {
     part.chars()
+        .map(strip_diacritic)
         .map(|c| if c == ' ' { '_' } else { c })
         .filter(|c| c.is_alphanumeric() || *c == '-' || *c == '_')
         .collect()
@@ -75,7 +85,7 @@ mod tests {
             ("Reusel-De Mierden", "Reusel-De_Mierden"),
             ("Nuenen, Gerwen en Nederwetten", "Nuenen_Gerwen_en_Nederwetten"),
             ("Nuenen c.a.", "Nuenen_ca"),
-            ("Súdwest-Fryslân", "Súdwest-Fryslân"),
+            ("Súdwest-Fryslân", "Sudwest-Fryslan"),
         ];
 
         for (part, expected) in test_cases {

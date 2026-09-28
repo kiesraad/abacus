@@ -168,7 +168,7 @@ async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/11/download_zip_results"
     );
-    let prefix = "definitieve-documenten_ab2026_rivierenpolder_gemeente_heemdamseburg-";
+    let prefix = "definitieve-documenten_ab2026_slansbregen_gemeente_heemdamseburg-";
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let files = get_files(bytes).await;
@@ -178,7 +178,7 @@ async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool
             "Model_Na31-1.pdf",
             "Telling_AB2026_Heemdamseburg.zip",
             "Telling_AB2026_Heemdamseburg.zip/Telling_AB2026_Heemdamseburg.eml.xml",
-            "abacus_telling_ab2026_rivierenpolder.csv",
+            "abacus_telling_ab2026_slansbregen.csv",
         ]
     );
 

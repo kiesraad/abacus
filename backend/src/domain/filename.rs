@@ -27,6 +27,16 @@ pub fn hyphenate(authority_region: &str) -> String {
         .collect()
 }
 
+/// Slugify a part of the filename:
+/// - replace spaces with underscores
+/// - remove all characters that are not alphanumeric or hyphen or underscore
+pub fn slugify(part: &str) -> String {
+    part.chars()
+        .map(|c| if c == ' ' { '_' } else { c })
+        .filter(|c| c.is_alphanumeric() || *c == '-' || *c == '_')
+        .collect()
+}
+
 /// Format a DateTime to append to a filename: yymmdd-hhmmss
 pub fn format_datetime(datetime: DateTime<Local>) -> String {
     datetime.format("%Y%m%d-%H%M%S").to_string()
@@ -53,6 +63,23 @@ mod tests {
 
         for (region, expected) in test_cases {
             assert_eq!(hyphenate(region), expected);
+        }
+    }
+
+    #[test]
+    fn test_slugify() {
+        #[rustfmt::skip]
+        let test_cases = [
+            ("Utrecht", "Utrecht"),
+            ("'s-Hertogenbosch", "s-Hertogenbosch"),
+            ("Reusel-De Mierden", "Reusel-De_Mierden"),
+            ("Nuenen, Gerwen en Nederwetten", "Nuenen_Gerwen_en_Nederwetten"),
+            ("Nuenen c.a.", "Nuenen_ca"),
+            ("Súdwest-Fryslân", "Súdwest-Fryslân"),
+        ];
+
+        for (part, expected) in test_cases {
+            assert_eq!(slugify(part), expected);
         }
     }
 

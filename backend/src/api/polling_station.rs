@@ -23,7 +23,7 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         data_entry::DataEntryId,
         election::{CommitteeCategory, ElectionId},
-        filename::format_datetime,
+        filename::{format_datetime, slugify},
         polling_station::{
             PollingStationFileRequest, PollingStationId, PollingStationListResponse,
             PollingStationRequest, PollingStationRequestListResponse, PollingStationResponse,
@@ -672,16 +672,6 @@ async fn polling_station_export(
         .content_type("application/zip"))
 }
 
-/// Slugify a part of the filename:
-/// - replace spaces with underscores
-/// - remove all characters that are not alphanumeric or hyphen or underscore
-pub fn slugify(part: &str) -> String {
-    part.chars()
-        .map(|c| if c == ' ' { '_' } else { c })
-        .filter(|c| c.is_alphanumeric() || *c == '-' || *c == '_')
-        .collect()
-}
-
 #[cfg(test)]
 mod tests {
     use sqlx::{SqlitePool, query};
@@ -900,23 +890,6 @@ VALUES
         async fn test_committee_category_authorization_ok(pool: SqlitePool) {
             let results = call_handlers(pool, Role::CoordinatorGSB).await;
             assert_committee_category_authorization_ok(results);
-        }
-    }
-
-    #[test]
-    fn test_slugify() {
-        #[rustfmt::skip]
-        let test_cases = [
-            ("Utrecht", "Utrecht"),
-            ("'s-Hertogenbosch", "s-Hertogenbosch"),
-            ("Reusel-De Mierden", "Reusel-De_Mierden"),
-            ("Nuenen, Gerwen en Nederwetten", "Nuenen_Gerwen_en_Nederwetten"),
-            ("Nuenen c.a.", "Nuenen_ca"),
-            ("Súdwest-Fryslân", "Súdwest-Fryslân"),
-        ];
-
-        for (part, expected) in test_cases {
-            assert_eq!(slugify(part), expected);
         }
     }
 }

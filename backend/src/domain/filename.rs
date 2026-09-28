@@ -23,7 +23,7 @@ pub fn hyphenate(authority_region: &str) -> String {
         .chars()
         .map(strip_diacritic)
         .map(|c| if c == ' ' { '-' } else { c })
-        .filter(|c| c.is_alphabetic() || *c == '-')
+        .filter(|c| c.is_alphanumeric() || *c == '-')
         .collect()
 }
 
@@ -48,6 +48,7 @@ mod tests {
             ("Nuenen, Gerwen en Nederwetten", "nuenen-gerwen-en-nederwetten"),
             ("Nuenen c.a.", "nuenen-ca"),
             ("Súdwest-Fryslân", "sudwest-fryslan"),
+            ("Waterschap De 13 slootjes", "waterschap-de-13-slootjes"),
         ];
 
         for (region, expected) in test_cases {

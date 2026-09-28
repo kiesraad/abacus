@@ -399,7 +399,7 @@ async fn test_csb_election_zip_download_attachment_works(pool: SqlitePool) {
     let files2 = get_files(bytes2).await;
     assert_eq!(files, files2);
 }
-//
+
 #[test(sqlx::test(fixtures(
     path = "../../fixtures",
     scripts("election_8_csb_with_results", "users")

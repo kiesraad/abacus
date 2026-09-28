@@ -19,7 +19,7 @@ import * as gte19SeatsAndP9 from "../../testing/gte-19-seats-and-p9";
 import * as gte19SeatsAndP9DrawingLots from "../../testing/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates";
 import * as gte19AndP10FullSeatRemoval from "../../testing/gte-19-seats-and-p10-full-seat-removal";
 import * as lt19Seats from "../../testing/lt-19-seats";
-import * as lt19SeatsAndP7DrawingLots from "../../testing/lt-19-seats-and-p7-drawing-lots";
+import * as lt19SeatsAndP8DrawingLots from "../../testing/lt-19-seats-and-p8-drawing-lots";
 import * as lt19SeatsAndP9AndP10 from "../../testing/lt-19-seats-and-p9-and-p10";
 import * as lt19SeatsAndP9DrawingLots from "../../testing/lt-19-seats-and-p9-drawing-lots";
 import * as lt19SeatsAndP10 from "../../testing/lt-19-seats-and-p10";
@@ -666,13 +666,13 @@ describe("ApportionmentResidualSeatsPage", () => {
         "get",
         "/api/elections/7",
         200,
-        getElectionMockData(lt19SeatsAndP7DrawingLots.election, lt19SeatsAndP7DrawingLots.committee_session),
+        getElectionMockData(lt19SeatsAndP8DrawingLots.election, lt19SeatsAndP8DrawingLots.committee_session),
       );
       overrideOnce("post", "/api/elections/7/apportionment", 200, {
-        seat_assignment: lt19SeatsAndP7DrawingLots.seat_assignment,
-        election_totals: lt19SeatsAndP7DrawingLots.election_totals,
+        seat_assignment: lt19SeatsAndP8DrawingLots.seat_assignment,
+        election_totals: lt19SeatsAndP8DrawingLots.election_totals,
       });
-      overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7DrawingLots.state);
+      overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP8DrawingLots.state);
 
       renderApportionmentResidualSeatsPage(7, false);
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));

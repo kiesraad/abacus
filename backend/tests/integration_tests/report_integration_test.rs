@@ -145,8 +145,8 @@ async fn test_gsb_cso_election_first_session_zip_download_works(pool: SqlitePool
         filenames(&files),
         [
             "Model_Na31-2.pdf",
-            "Telling_GR2024_Heemdamseburg.zip",
-            "Telling_GR2024_Heemdamseburg.zip/Telling_GR2024_Heemdamseburg.eml.xml",
+            "Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.zip",
+            "Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.zip/Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.eml.xml",
             "abacus_telling_gr2024_heemdamseburg.csv",
         ]
     );
@@ -176,8 +176,8 @@ async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool
         filenames(&files),
         [
             "Model_Na31-1.pdf",
-            "Telling_AB2026_Heemdamseburg.zip",
-            "Telling_AB2026_Heemdamseburg.zip/Telling_AB2026_Heemdamseburg.eml.xml",
+            "Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.zip",
+            "Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.zip/Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.eml.xml",
             "abacus_telling_ab2026_slansbregen.csv",
         ]
     );
@@ -220,8 +220,8 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
         filenames(&files),
         [
             "Model_Na14-2.pdf",
-            "Telling_GR2026_Juinen.zip",
-            "Telling_GR2026_Juinen.zip/Telling_GR2026_Juinen.eml.xml",
+            "Telling_GR2026_Juinen_gemeente_Juinen.zip",
+            "Telling_GR2026_Juinen_gemeente_Juinen.zip/Telling_GR2026_Juinen_gemeente_Juinen.eml.xml",
             "abacus_telling_gr2026_juinen.csv",
             "Leeg_Model_P2a.pdf",
         ]
@@ -473,8 +473,8 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
         filenames(&files),
         [
             "abacus_telling_gr2024_juinen.csv",
-            "Totaaltelling_GR2024_Juinen.zip",
-            "Totaaltelling_GR2024_Juinen.zip/Totaaltelling_GR2024_Juinen.eml.xml",
+            "Totaaltelling_GR2024_Juinen_gemeente_Juinen.zip",
+            "Totaaltelling_GR2024_Juinen_gemeente_Juinen.zip/Totaaltelling_GR2024_Juinen_gemeente_Juinen.eml.xml",
         ]
     );
 
@@ -504,8 +504,8 @@ async fn test_csb_election_zip_download_total_counts_water_authority(pool: Sqlit
         filenames(&files),
         [
             "abacus_telling_ab2023_rivierenpolder.csv",
-            "Totaaltelling_AB2023_RivierenPolder.zip",
-            "Totaaltelling_AB2023_RivierenPolder.zip/Totaaltelling_AB2023_RivierenPolder.eml.xml"
+            "Totaaltelling_AB2023_RivierenPolder_waterschap_Rivier_en_Polder.zip",
+            "Totaaltelling_AB2023_RivierenPolder_waterschap_Rivier_en_Polder.zip/Totaaltelling_AB2023_RivierenPolder_waterschap_Rivier_en_Polder.eml.xml"
         ]
     );
 

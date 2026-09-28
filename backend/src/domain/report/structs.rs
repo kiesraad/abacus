@@ -1,5 +1,5 @@
 use apportionment::ApportionmentDetails;
-use chrono::{DateTime, Datelike, Local, Utc};
+use chrono::{DateTime, Local, Utc};
 use eml_nl::{EMLError, documents::election_count::ElectionCount, io::EMLWrite};
 use pdf_gen::generate_pdf;
 use serde::Serialize;
@@ -138,23 +138,6 @@ impl CsbFiles {
             || self.attachment_pdf.is_none()
             || self.csv_counts.is_none()
     }
-}
-
-/// Generates a filename for the given election and file extension
-/// E.g. "{base}_GR2026_GemeenteNaam.{ext}"
-pub fn election_filename(election: &ElectionWithPoliticalGroups, base: &str, ext: &str) -> String {
-    let location_without_whitespace: String = election.location.split_whitespace().collect();
-
-    format!(
-        "{base} {}{} {}.{ext}",
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        location_without_whitespace,
-    )
-}
-
-pub fn csv_filename(election: &ElectionWithPoliticalGroups) -> String {
-    format!("abacus_telling_{}.csv", election.election_id.to_lowercase())
 }
 
 #[derive(Debug)]

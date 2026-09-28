@@ -1,0 +1,2196 @@
+{
+  "committee_session": {
+    "id": 1,
+    "number": 1,
+    "election_id": 1,
+    "location": "Pannerdam",
+    "start_date_time": "2026-03-18T21:34:00",
+    "status": "completed"
+  },
+  "summary": {
+    "number_of_voters": 2450776,
+    "voters_counts": {
+      "poll_card_count": 1200000,
+      "proxy_certificate_count": 5600,
+      "voter_card_count": 400,
+      "total_admitted_voters_count": 1206000
+    },
+    "votes_counts": {
+      "political_group_total_votes": [
+        {
+          "number": 1,
+          "name": "Partijdige Partij",
+          "total": 319996
+        },
+        {
+          "number": 2,
+          "name": "Partij voor de Stemmer",
+          "total": 56000
+        },
+        {
+          "number": 3,
+          "name": "Stemmmers 22",
+          "total": 24000
+        },
+        {
+          "number": 4,
+          "name": "STEM",
+          "total": 280004
+        },
+        {
+          "number": 5,
+          "name": "De Stemunie",
+          "total": 84000
+        },
+        {
+          "number": 6,
+          "name": "Stemalliantie",
+          "total": 36000
+        },
+        {
+          "number": 7,
+          "name": "Lijst De Partij",
+          "total": 240000
+        },
+        {
+          "number": 8,
+          "name": "Het Stembiljet",
+          "total": 128000
+        },
+        {
+          "number": 9,
+          "name": "Partij voor de Opkomst",
+          "total": 32000
+        }
+      ],
+      "total_votes_candidates_count": 1200000,
+      "blank_votes_count": 4000,
+      "invalid_votes_count": 2000,
+      "total_votes_cast_count": 1206000
+    },
+    "differences_counts": {
+      "more_ballots_count": {
+        "count": 0,
+        "data_entry_sources": []
+      },
+      "fewer_ballots_count": {
+        "count": 0,
+        "data_entry_sources": []
+      }
+    }
+  },
+  "election": {
+    "id": 1,
+    "name": "Waterschap Rivier en Polder 2023",
+    "official_name": "Algemeen bestuur van het waterschap Rivier en Polder 2023",
+    "committee_category": "CSB",
+    "election_id": "AB2023_RivierenPolder",
+    "location": "Rivier en Polder",
+    "authority_id": "CSB",
+    "authority_name": "Rivier en Polder",
+    "authority_region": "Rivier en Polder",
+    "district": {
+      "district": "None"
+    },
+    "domain": {
+      "id": "10",
+      "name": "Rivier en Polder"
+    },
+    "category": "WaterAuthority",
+    "sub_category": "AB2",
+    "number_of_seats": 26,
+    "number_of_voters": 1,
+    "election_date": "2023-03-15",
+    "nomination_date": "2023-01-30"
+  },
+  "candidate_nomination": {
+    "list_candidate_nomination": [
+      {
+        "list_number": 1,
+        "list_name": "Partijdige Partij",
+        "list_seats": 7,
+        "preferential_nomination_columns": [
+          {
+            "list_seat_number": 1,
+            "candidate": {
+              "number": 1,
+              "initials": "A.B.C.",
+              "first_name": "Annemieke",
+              "last_name": "Oorschot",
+              "locality": "Heemdamseburg",
+              "country_code": "NL",
+              "gender": "Female"
+            },
+            "votes": 159996
+          },
+          {
+            "list_seat_number": 2,
+            "candidate": {
+              "number": 2,
+              "initials": "K.",
+              "first_name": "Krisje",
+              "last_name_prefix": "de",
+              "last_name": "Blikkert",
+              "locality": "Heemdamseburgsebuurt",
+              "gender": "Female"
+            },
+            "votes": 80000
+          },
+          {
+            "list_seat_number": 3,
+            "candidate": {
+              "number": 12,
+              "initials": "A.",
+              "first_name": "Arendina",
+              "last_name": "Cornelis",
+              "locality": "Heemdamseburg",
+              "gender": "Female"
+            },
+            "votes": 42400
+          },
+          {
+            "list_seat_number": 4,
+            "candidate": {
+              "number": 3,
+              "initials": "G.H.O.",
+              "first_name": "George",
+              "last_name_prefix": "van",
+              "last_name": "Jaspers-Gezen",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 20000
+          }
+        ],
+        "other_nomination_columns": [
+          {
+            "list_seat_number": 5,
+            "candidate": {
+              "number": 4,
+              "initials": "T.M.",
+              "first_name": "Teun",
+              "last_name": "Meulenkolk",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 3600
+          },
+          {
+            "list_seat_number": 6,
+            "candidate": {
+              "number": 5,
+              "initials": "L.",
+              "first_name": "Luc",
+              "last_name": "Katsma",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 3200
+          },
+          {
+            "list_seat_number": 7,
+            "candidate": {
+              "number": 6,
+              "initials": "M.",
+              "first_name": "Christine",
+              "last_name": "Blankenvoorde",
+              "locality": "Heemdamseburg",
+              "gender": "Female"
+            },
+            "votes": 2800
+          }
+        ],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "A.B.C.",
+            "first_name": "Annemieke",
+            "last_name": "Oorschot",
+            "locality": "Heemdamseburg",
+            "country_code": "NL",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "K.",
+            "first_name": "Krisje",
+            "last_name_prefix": "de",
+            "last_name": "Blikkert",
+            "locality": "Heemdamseburgsebuurt",
+            "gender": "Female"
+          },
+          {
+            "number": 12,
+            "initials": "A.",
+            "first_name": "Arendina",
+            "last_name": "Cornelis",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 3,
+            "initials": "G.H.O.",
+            "first_name": "George",
+            "last_name_prefix": "van",
+            "last_name": "Jaspers-Gezen",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 4,
+            "initials": "T.M.",
+            "first_name": "Teun",
+            "last_name": "Meulenkolk",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 5,
+            "initials": "L.",
+            "first_name": "Luc",
+            "last_name": "Katsma",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 6,
+            "initials": "M.",
+            "first_name": "Christine",
+            "last_name": "Blankenvoorde",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 7,
+            "initials": "S",
+            "first_name": "Salomon",
+            "last_name_prefix": "den",
+            "last_name": "Mateman",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 8,
+            "initials": "F.G.P.",
+            "first_name": "Fabio",
+            "last_name": "Oudenalder",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 9,
+            "initials": "I.",
+            "first_name": "Ishana",
+            "last_name_prefix": "den",
+            "last_name": "Wolbert",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 10,
+            "initials": "P.A.",
+            "first_name": "Patrik",
+            "last_name": "Hoven",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 11,
+            "initials": "J.M.H.",
+            "first_name": "Jorian",
+            "last_name": "Vredeveld",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "list_number": 2,
+        "list_name": "Partij voor de Stemmer",
+        "list_seats": 1,
+        "preferential_nomination_columns": [
+          {
+            "list_seat_number": 1,
+            "candidate": {
+              "number": 1,
+              "initials": "C.P.M.",
+              "first_name": "Charèl",
+              "last_name_prefix": "van der",
+              "last_name": "Spek",
+              "locality": "Heemdamseburg",
+              "gender": "Female"
+            },
+            "votes": 32000
+          }
+        ],
+        "other_nomination_columns": [],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "C.P.M.",
+            "first_name": "Charèl",
+            "last_name_prefix": "van der",
+            "last_name": "Spek",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "W.P.",
+            "first_name": "Tjeu",
+            "last_name": "Arets",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 3,
+            "initials": "X.T.",
+            "first_name": "Xuan",
+            "last_name_prefix": "van den",
+            "last_name": "Arets",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 4,
+            "initials": "F.M.",
+            "first_name": "Frédérique",
+            "last_name_prefix": "van den",
+            "last_name": "Eijnden",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          }
+        ]
+      },
+      {
+        "list_number": 3,
+        "list_name": "Stemmmers 22",
+        "list_seats": 0,
+        "preferential_nomination_columns": [],
+        "other_nomination_columns": [],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "M.O.",
+            "first_name": "Marcela",
+            "last_name": "Gopal",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "G.W.",
+            "first_name": "Giovani",
+            "last_name": "Wolfswinkel",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "list_number": 4,
+        "list_name": "STEM",
+        "list_seats": 7,
+        "preferential_nomination_columns": [
+          {
+            "list_seat_number": 1,
+            "candidate": {
+              "number": 1,
+              "initials": "A.B.C.",
+              "first_name": "Annemieke",
+              "last_name": "Oorschot",
+              "locality": "Heemdamseburg",
+              "country_code": "NL",
+              "gender": "Female"
+            },
+            "votes": 120000
+          },
+          {
+            "list_seat_number": 2,
+            "candidate": {
+              "number": 2,
+              "initials": "K.",
+              "first_name": "Krisje",
+              "last_name_prefix": "de",
+              "last_name": "Blikkert",
+              "locality": "Heemdamseburgsebuurt",
+              "gender": "Female"
+            },
+            "votes": 80004
+          },
+          {
+            "list_seat_number": 3,
+            "candidate": {
+              "number": 12,
+              "initials": "A.",
+              "first_name": "Arendina",
+              "last_name": "Cornelis",
+              "locality": "Heemdamseburg",
+              "gender": "Female"
+            },
+            "votes": 42400
+          },
+          {
+            "list_seat_number": 4,
+            "candidate": {
+              "number": 3,
+              "initials": "G.H.O.",
+              "first_name": "George",
+              "last_name_prefix": "van",
+              "last_name": "Jaspers-Gezen",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 20000
+          }
+        ],
+        "other_nomination_columns": [
+          {
+            "list_seat_number": 5,
+            "candidate": {
+              "number": 4,
+              "initials": "T.M.",
+              "first_name": "Teun",
+              "last_name": "Meulenkolk",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 3600
+          },
+          {
+            "list_seat_number": 6,
+            "candidate": {
+              "number": 5,
+              "initials": "L.",
+              "first_name": "Luc",
+              "last_name": "Katsma",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 3200
+          },
+          {
+            "list_seat_number": 7,
+            "candidate": {
+              "number": 6,
+              "initials": "M.",
+              "first_name": "Christine",
+              "last_name": "Blankenvoorde",
+              "locality": "Heemdamseburg",
+              "gender": "Female"
+            },
+            "votes": 2800
+          }
+        ],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "A.B.C.",
+            "first_name": "Annemieke",
+            "last_name": "Oorschot",
+            "locality": "Heemdamseburg",
+            "country_code": "NL",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "K.",
+            "first_name": "Krisje",
+            "last_name_prefix": "de",
+            "last_name": "Blikkert",
+            "locality": "Heemdamseburgsebuurt",
+            "gender": "Female"
+          },
+          {
+            "number": 12,
+            "initials": "A.",
+            "first_name": "Arendina",
+            "last_name": "Cornelis",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 3,
+            "initials": "G.H.O.",
+            "first_name": "George",
+            "last_name_prefix": "van",
+            "last_name": "Jaspers-Gezen",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 4,
+            "initials": "T.M.",
+            "first_name": "Teun",
+            "last_name": "Meulenkolk",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 5,
+            "initials": "L.",
+            "first_name": "Luc",
+            "last_name": "Katsma",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 6,
+            "initials": "M.",
+            "first_name": "Christine",
+            "last_name": "Blankenvoorde",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 7,
+            "initials": "S",
+            "first_name": "Salomon",
+            "last_name_prefix": "den",
+            "last_name": "Mateman",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 8,
+            "initials": "F.G.P.",
+            "first_name": "Fabio",
+            "last_name": "Oudenalder",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 9,
+            "initials": "I.",
+            "first_name": "Ishana",
+            "last_name_prefix": "den",
+            "last_name": "Wolbert",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 10,
+            "initials": "P.A.",
+            "first_name": "Patrik",
+            "last_name": "Hoven",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 11,
+            "initials": "J.M.H.",
+            "first_name": "Jorian",
+            "last_name": "Vredeveld",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "list_number": 5,
+        "list_name": "De Stemunie",
+        "list_seats": 2,
+        "preferential_nomination_columns": [
+          {
+            "list_seat_number": 1,
+            "candidate": {
+              "number": 1,
+              "initials": "C.P.M.",
+              "first_name": "Charèl",
+              "last_name_prefix": "van der",
+              "last_name": "Spek",
+              "locality": "Heemdamseburg",
+              "gender": "Female"
+            },
+            "votes": 40000
+          },
+          {
+            "list_seat_number": 2,
+            "candidate": {
+              "number": 2,
+              "initials": "W.P.",
+              "first_name": "Tjeu",
+              "last_name": "Arets",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 20000
+          }
+        ],
+        "other_nomination_columns": [],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "C.P.M.",
+            "first_name": "Charèl",
+            "last_name_prefix": "van der",
+            "last_name": "Spek",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "W.P.",
+            "first_name": "Tjeu",
+            "last_name": "Arets",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 4,
+            "initials": "F.M.",
+            "first_name": "Frédérique",
+            "last_name_prefix": "van den",
+            "last_name": "Eijnden",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 3,
+            "initials": "X.T.",
+            "first_name": "Xuan",
+            "last_name_prefix": "van den",
+            "last_name": "Arets",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "list_number": 6,
+        "list_name": "Stemalliantie",
+        "list_seats": 0,
+        "preferential_nomination_columns": [],
+        "other_nomination_columns": [],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "M.O.",
+            "first_name": "Marcela",
+            "last_name": "Gopal",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "G.W.",
+            "first_name": "Giovani",
+            "last_name": "Wolfswinkel",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "list_number": 7,
+        "list_name": "Lijst De Partij",
+        "list_seats": 6,
+        "preferential_nomination_columns": [
+          {
+            "list_seat_number": 1,
+            "candidate": {
+              "number": 1,
+              "initials": "A.B.C.",
+              "first_name": "Annemieke",
+              "last_name": "Oorschot",
+              "locality": "Heemdamseburg",
+              "country_code": "NL",
+              "gender": "Female"
+            },
+            "votes": 120000
+          },
+          {
+            "list_seat_number": 2,
+            "candidate": {
+              "number": 12,
+              "initials": "A.",
+              "first_name": "Arendina",
+              "last_name": "Cornelis",
+              "locality": "Heemdamseburg",
+              "gender": "Female"
+            },
+            "votes": 42400
+          },
+          {
+            "list_seat_number": 3,
+            "candidate": {
+              "number": 2,
+              "initials": "K.",
+              "first_name": "Krisje",
+              "last_name_prefix": "de",
+              "last_name": "Blikkert",
+              "locality": "Heemdamseburgsebuurt",
+              "gender": "Female"
+            },
+            "votes": 40000
+          },
+          {
+            "list_seat_number": 4,
+            "candidate": {
+              "number": 3,
+              "initials": "G.H.O.",
+              "first_name": "George",
+              "last_name_prefix": "van",
+              "last_name": "Jaspers-Gezen",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 20000
+          }
+        ],
+        "other_nomination_columns": [
+          {
+            "list_seat_number": 5,
+            "candidate": {
+              "number": 4,
+              "initials": "T.M.",
+              "first_name": "Teun",
+              "last_name": "Meulenkolk",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 3600
+          },
+          {
+            "list_seat_number": 6,
+            "candidate": {
+              "number": 5,
+              "initials": "L.",
+              "first_name": "Luc",
+              "last_name": "Katsma",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 3200
+          }
+        ],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "A.B.C.",
+            "first_name": "Annemieke",
+            "last_name": "Oorschot",
+            "locality": "Heemdamseburg",
+            "country_code": "NL",
+            "gender": "Female"
+          },
+          {
+            "number": 12,
+            "initials": "A.",
+            "first_name": "Arendina",
+            "last_name": "Cornelis",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "K.",
+            "first_name": "Krisje",
+            "last_name_prefix": "de",
+            "last_name": "Blikkert",
+            "locality": "Heemdamseburgsebuurt",
+            "gender": "Female"
+          },
+          {
+            "number": 3,
+            "initials": "G.H.O.",
+            "first_name": "George",
+            "last_name_prefix": "van",
+            "last_name": "Jaspers-Gezen",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 4,
+            "initials": "T.M.",
+            "first_name": "Teun",
+            "last_name": "Meulenkolk",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 5,
+            "initials": "L.",
+            "first_name": "Luc",
+            "last_name": "Katsma",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 6,
+            "initials": "M.",
+            "first_name": "Christine",
+            "last_name": "Blankenvoorde",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 7,
+            "initials": "S",
+            "first_name": "Salomon",
+            "last_name_prefix": "den",
+            "last_name": "Mateman",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 8,
+            "initials": "F.G.P.",
+            "first_name": "Fabio",
+            "last_name": "Oudenalder",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 9,
+            "initials": "I.",
+            "first_name": "Ishana",
+            "last_name_prefix": "den",
+            "last_name": "Wolbert",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 10,
+            "initials": "P.A.",
+            "first_name": "Patrik",
+            "last_name": "Hoven",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 11,
+            "initials": "J.M.H.",
+            "first_name": "Jorian",
+            "last_name": "Vredeveld",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "list_number": 8,
+        "list_name": "Het Stembiljet",
+        "list_seats": 3,
+        "preferential_nomination_columns": [
+          {
+            "list_seat_number": 1,
+            "candidate": {
+              "number": 1,
+              "initials": "C.P.M.",
+              "first_name": "Charèl",
+              "last_name_prefix": "van der",
+              "last_name": "Spek",
+              "locality": "Heemdamseburg",
+              "gender": "Female"
+            },
+            "votes": 104000
+          }
+        ],
+        "other_nomination_columns": [
+          {
+            "list_seat_number": 2,
+            "candidate": {
+              "number": 2,
+              "initials": "W.P.",
+              "first_name": "Tjeu",
+              "last_name": "Arets",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 8000
+          },
+          {
+            "list_seat_number": 3,
+            "candidate": {
+              "number": 3,
+              "initials": "X.T.",
+              "first_name": "Xuan",
+              "last_name_prefix": "van den",
+              "last_name": "Arets",
+              "locality": "Heemdamseburg",
+              "gender": "Male"
+            },
+            "votes": 6000
+          }
+        ],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "C.P.M.",
+            "first_name": "Charèl",
+            "last_name_prefix": "van der",
+            "last_name": "Spek",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "W.P.",
+            "first_name": "Tjeu",
+            "last_name": "Arets",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 3,
+            "initials": "X.T.",
+            "first_name": "Xuan",
+            "last_name_prefix": "van den",
+            "last_name": "Arets",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          },
+          {
+            "number": 4,
+            "initials": "F.M.",
+            "first_name": "Frédérique",
+            "last_name_prefix": "van den",
+            "last_name": "Eijnden",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          }
+        ]
+      },
+      {
+        "list_number": 9,
+        "list_name": "Partij voor de Opkomst",
+        "list_seats": 0,
+        "preferential_nomination_columns": [],
+        "other_nomination_columns": [],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "M.O.",
+            "first_name": "Marcela",
+            "last_name": "Gopal",
+            "locality": "Heemdamseburg",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "G.W.",
+            "first_name": "Giovani",
+            "last_name": "Wolfswinkel",
+            "locality": "Heemdamseburg",
+            "gender": "Male"
+          }
+        ]
+      }
+    ],
+    "chosen_candidates": [
+      {
+        "number": 2,
+        "initials": "W.P.",
+        "first_name": "Tjeu",
+        "last_name": "Arets",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 5,
+        "list_name": "De Stemunie"
+      },
+      {
+        "number": 2,
+        "initials": "W.P.",
+        "first_name": "Tjeu",
+        "last_name": "Arets",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 8,
+        "list_name": "Het Stembiljet"
+      },
+      {
+        "number": 3,
+        "initials": "X.T.",
+        "first_name": "Xuan",
+        "last_name_prefix": "van den",
+        "last_name": "Arets",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 8,
+        "list_name": "Het Stembiljet"
+      },
+      {
+        "number": 6,
+        "initials": "M.",
+        "first_name": "Christine",
+        "last_name": "Blankenvoorde",
+        "locality": "Heemdamseburg",
+        "gender": "Female",
+        "list_number": 1,
+        "list_name": "Partijdige Partij"
+      },
+      {
+        "number": 6,
+        "initials": "M.",
+        "first_name": "Christine",
+        "last_name": "Blankenvoorde",
+        "locality": "Heemdamseburg",
+        "gender": "Female",
+        "list_number": 4,
+        "list_name": "STEM"
+      },
+      {
+        "number": 2,
+        "initials": "K.",
+        "first_name": "Krisje",
+        "last_name_prefix": "de",
+        "last_name": "Blikkert",
+        "locality": "Heemdamseburgsebuurt",
+        "gender": "Female",
+        "list_number": 1,
+        "list_name": "Partijdige Partij"
+      },
+      {
+        "number": 2,
+        "initials": "K.",
+        "first_name": "Krisje",
+        "last_name_prefix": "de",
+        "last_name": "Blikkert",
+        "locality": "Heemdamseburgsebuurt",
+        "gender": "Female",
+        "list_number": 4,
+        "list_name": "STEM"
+      },
+      {
+        "number": 2,
+        "initials": "K.",
+        "first_name": "Krisje",
+        "last_name_prefix": "de",
+        "last_name": "Blikkert",
+        "locality": "Heemdamseburgsebuurt",
+        "gender": "Female",
+        "list_number": 7,
+        "list_name": "Lijst De Partij"
+      },
+      {
+        "number": 12,
+        "initials": "A.",
+        "first_name": "Arendina",
+        "last_name": "Cornelis",
+        "locality": "Heemdamseburg",
+        "gender": "Female",
+        "list_number": 1,
+        "list_name": "Partijdige Partij"
+      },
+      {
+        "number": 12,
+        "initials": "A.",
+        "first_name": "Arendina",
+        "last_name": "Cornelis",
+        "locality": "Heemdamseburg",
+        "gender": "Female",
+        "list_number": 4,
+        "list_name": "STEM"
+      },
+      {
+        "number": 12,
+        "initials": "A.",
+        "first_name": "Arendina",
+        "last_name": "Cornelis",
+        "locality": "Heemdamseburg",
+        "gender": "Female",
+        "list_number": 7,
+        "list_name": "Lijst De Partij"
+      },
+      {
+        "number": 3,
+        "initials": "G.H.O.",
+        "first_name": "George",
+        "last_name_prefix": "van",
+        "last_name": "Jaspers-Gezen",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 1,
+        "list_name": "Partijdige Partij"
+      },
+      {
+        "number": 3,
+        "initials": "G.H.O.",
+        "first_name": "George",
+        "last_name_prefix": "van",
+        "last_name": "Jaspers-Gezen",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 4,
+        "list_name": "STEM"
+      },
+      {
+        "number": 3,
+        "initials": "G.H.O.",
+        "first_name": "George",
+        "last_name_prefix": "van",
+        "last_name": "Jaspers-Gezen",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 7,
+        "list_name": "Lijst De Partij"
+      },
+      {
+        "number": 5,
+        "initials": "L.",
+        "first_name": "Luc",
+        "last_name": "Katsma",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 1,
+        "list_name": "Partijdige Partij"
+      },
+      {
+        "number": 5,
+        "initials": "L.",
+        "first_name": "Luc",
+        "last_name": "Katsma",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 4,
+        "list_name": "STEM"
+      },
+      {
+        "number": 5,
+        "initials": "L.",
+        "first_name": "Luc",
+        "last_name": "Katsma",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 7,
+        "list_name": "Lijst De Partij"
+      },
+      {
+        "number": 4,
+        "initials": "T.M.",
+        "first_name": "Teun",
+        "last_name": "Meulenkolk",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 1,
+        "list_name": "Partijdige Partij"
+      },
+      {
+        "number": 4,
+        "initials": "T.M.",
+        "first_name": "Teun",
+        "last_name": "Meulenkolk",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 4,
+        "list_name": "STEM"
+      },
+      {
+        "number": 4,
+        "initials": "T.M.",
+        "first_name": "Teun",
+        "last_name": "Meulenkolk",
+        "locality": "Heemdamseburg",
+        "gender": "Male",
+        "list_number": 7,
+        "list_name": "Lijst De Partij"
+      },
+      {
+        "number": 1,
+        "initials": "A.B.C.",
+        "first_name": "Annemieke",
+        "last_name": "Oorschot",
+        "locality": "Heemdamseburg",
+        "country_code": "NL",
+        "gender": "Female",
+        "list_number": 1,
+        "list_name": "Partijdige Partij"
+      },
+      {
+        "number": 1,
+        "initials": "A.B.C.",
+        "first_name": "Annemieke",
+        "last_name": "Oorschot",
+        "locality": "Heemdamseburg",
+        "country_code": "NL",
+        "gender": "Female",
+        "list_number": 4,
+        "list_name": "STEM"
+      },
+      {
+        "number": 1,
+        "initials": "A.B.C.",
+        "first_name": "Annemieke",
+        "last_name": "Oorschot",
+        "locality": "Heemdamseburg",
+        "country_code": "NL",
+        "gender": "Female",
+        "list_number": 7,
+        "list_name": "Lijst De Partij"
+      },
+      {
+        "number": 1,
+        "initials": "C.P.M.",
+        "first_name": "Charèl",
+        "last_name_prefix": "van der",
+        "last_name": "Spek",
+        "locality": "Heemdamseburg",
+        "gender": "Female",
+        "list_number": 2,
+        "list_name": "Partij voor de Stemmer"
+      },
+      {
+        "number": 1,
+        "initials": "C.P.M.",
+        "first_name": "Charèl",
+        "last_name_prefix": "van der",
+        "last_name": "Spek",
+        "locality": "Heemdamseburg",
+        "gender": "Female",
+        "list_number": 5,
+        "list_name": "De Stemunie"
+      },
+      {
+        "number": 1,
+        "initials": "C.P.M.",
+        "first_name": "Charèl",
+        "last_name_prefix": "van der",
+        "last_name": "Spek",
+        "locality": "Heemdamseburg",
+        "gender": "Female",
+        "list_number": 8,
+        "list_name": "Het Stembiljet"
+      }
+    ]
+  },
+  "seat_assignment": {
+    "quota": {
+      "integer": 46153,
+      "numerator": 22,
+      "denominator": 26
+    },
+    "list_seat_assignment": [
+      {
+        "number": 1,
+        "name": "Partijdige Partij",
+        "total": 319996,
+        "initial_full_seats": 6
+      },
+      {
+        "number": 2,
+        "name": "Partij voor de Stemmer",
+        "total": 56000,
+        "initial_full_seats": 1
+      },
+      {
+        "number": 3,
+        "name": "Stemmmers 22",
+        "total": 24000,
+        "initial_full_seats": 0
+      },
+      {
+        "number": 4,
+        "name": "STEM",
+        "total": 280004,
+        "initial_full_seats": 6
+      },
+      {
+        "number": 5,
+        "name": "De Stemunie",
+        "total": 84000,
+        "initial_full_seats": 1
+      },
+      {
+        "number": 6,
+        "name": "Stemalliantie",
+        "total": 36000,
+        "initial_full_seats": 0
+      },
+      {
+        "number": 7,
+        "name": "Lijst De Partij",
+        "total": 240000,
+        "initial_full_seats": 5
+      },
+      {
+        "number": 8,
+        "name": "Het Stembiljet",
+        "total": 128000,
+        "initial_full_seats": 2
+      },
+      {
+        "number": 9,
+        "name": "Partij voor de Opkomst",
+        "total": 32000,
+        "initial_full_seats": 0
+      }
+    ],
+    "initial_highest_average_steps": [
+      {
+        "residual_seat_number": 1,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 1,
+          "list_options": [
+            1
+          ],
+          "list_assigned": [
+            1
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 45713,
+            "numerator": 5,
+            "denominator": 7
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 319996,
+            "remainder_votes": {
+              "integer": 43072,
+              "numerator": 24,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 45713,
+              "numerator": 5,
+              "denominator": 7
+            },
+            "full_seats": 6,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 56000,
+            "remainder_votes": {
+              "integer": 9846,
+              "numerator": 4,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 28000,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 24000,
+            "remainder_votes": {
+              "integer": 24000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 24000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 280004,
+            "remainder_votes": {
+              "integer": 3080,
+              "numerator": 24,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 40000,
+              "numerator": 4,
+              "denominator": 7
+            },
+            "full_seats": 6,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 84000,
+            "remainder_votes": {
+              "integer": 37846,
+              "numerator": 4,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 42000,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 36000,
+            "remainder_votes": {
+              "integer": 36000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 36000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 240000,
+            "remainder_votes": {
+              "integer": 9230,
+              "numerator": 20,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 40000,
+              "numerator": 0,
+              "denominator": 6
+            },
+            "full_seats": 5,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 128000,
+            "remainder_votes": {
+              "integer": 35692,
+              "numerator": 8,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 42666,
+              "numerator": 2,
+              "denominator": 3
+            },
+            "full_seats": 2,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 9,
+            "votes_cast": 32000,
+            "remainder_votes": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 2,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 8,
+          "list_options": [
+            8
+          ],
+          "list_assigned": [
+            8
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 42666,
+            "numerator": 2,
+            "denominator": 3
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 319996,
+            "remainder_votes": {
+              "integer": 43072,
+              "numerator": 24,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 39999,
+              "numerator": 4,
+              "denominator": 8
+            },
+            "full_seats": 6,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 56000,
+            "remainder_votes": {
+              "integer": 9846,
+              "numerator": 4,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 28000,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 24000,
+            "remainder_votes": {
+              "integer": 24000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 24000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 280004,
+            "remainder_votes": {
+              "integer": 3080,
+              "numerator": 24,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 40000,
+              "numerator": 4,
+              "denominator": 7
+            },
+            "full_seats": 6,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 84000,
+            "remainder_votes": {
+              "integer": 37846,
+              "numerator": 4,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 42000,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 36000,
+            "remainder_votes": {
+              "integer": 36000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 36000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 240000,
+            "remainder_votes": {
+              "integer": 9230,
+              "numerator": 20,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 40000,
+              "numerator": 0,
+              "denominator": 6
+            },
+            "full_seats": 5,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 128000,
+            "remainder_votes": {
+              "integer": 35692,
+              "numerator": 8,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 42666,
+              "numerator": 2,
+              "denominator": 3
+            },
+            "full_seats": 2,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 9,
+            "votes_cast": 32000,
+            "remainder_votes": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 3,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 5,
+          "list_options": [
+            5
+          ],
+          "list_assigned": [
+            5
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 42000,
+            "numerator": 0,
+            "denominator": 2
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 319996,
+            "remainder_votes": {
+              "integer": 43072,
+              "numerator": 24,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 39999,
+              "numerator": 4,
+              "denominator": 8
+            },
+            "full_seats": 6,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 56000,
+            "remainder_votes": {
+              "integer": 9846,
+              "numerator": 4,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 28000,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 24000,
+            "remainder_votes": {
+              "integer": 24000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 24000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 280004,
+            "remainder_votes": {
+              "integer": 3080,
+              "numerator": 24,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 40000,
+              "numerator": 4,
+              "denominator": 7
+            },
+            "full_seats": 6,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 84000,
+            "remainder_votes": {
+              "integer": 37846,
+              "numerator": 4,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 42000,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 36000,
+            "remainder_votes": {
+              "integer": 36000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 36000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 240000,
+            "remainder_votes": {
+              "integer": 9230,
+              "numerator": 20,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 40000,
+              "numerator": 0,
+              "denominator": 6
+            },
+            "full_seats": 5,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 128000,
+            "remainder_votes": {
+              "integer": 35692,
+              "numerator": 8,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 4
+            },
+            "full_seats": 2,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 9,
+            "votes_cast": 32000,
+            "remainder_votes": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 4,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 4,
+          "list_options": [
+            4
+          ],
+          "list_assigned": [
+            4
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 40000,
+            "numerator": 4,
+            "denominator": 7
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 319996,
+            "remainder_votes": {
+              "integer": 43072,
+              "numerator": 24,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 39999,
+              "numerator": 4,
+              "denominator": 8
+            },
+            "full_seats": 6,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 56000,
+            "remainder_votes": {
+              "integer": 9846,
+              "numerator": 4,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 28000,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 24000,
+            "remainder_votes": {
+              "integer": 24000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 24000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 280004,
+            "remainder_votes": {
+              "integer": 3080,
+              "numerator": 24,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 40000,
+              "numerator": 4,
+              "denominator": 7
+            },
+            "full_seats": 6,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 84000,
+            "remainder_votes": {
+              "integer": 37846,
+              "numerator": 4,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 28000,
+              "numerator": 0,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 36000,
+            "remainder_votes": {
+              "integer": 36000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 36000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 240000,
+            "remainder_votes": {
+              "integer": 9230,
+              "numerator": 20,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 40000,
+              "numerator": 0,
+              "denominator": 6
+            },
+            "full_seats": 5,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 128000,
+            "remainder_votes": {
+              "integer": 35692,
+              "numerator": 8,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 4
+            },
+            "full_seats": 2,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 9,
+            "votes_cast": 32000,
+            "remainder_votes": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 5,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 7,
+          "list_options": [
+            7
+          ],
+          "list_assigned": [
+            7
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 40000,
+            "numerator": 0,
+            "denominator": 6
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 319996,
+            "remainder_votes": {
+              "integer": 43072,
+              "numerator": 24,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 39999,
+              "numerator": 4,
+              "denominator": 8
+            },
+            "full_seats": 6,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 56000,
+            "remainder_votes": {
+              "integer": 9846,
+              "numerator": 4,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 28000,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 24000,
+            "remainder_votes": {
+              "integer": 24000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 24000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 280004,
+            "remainder_votes": {
+              "integer": 3080,
+              "numerator": 24,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 35000,
+              "numerator": 4,
+              "denominator": 8
+            },
+            "full_seats": 6,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 84000,
+            "remainder_votes": {
+              "integer": 37846,
+              "numerator": 4,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 28000,
+              "numerator": 0,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 36000,
+            "remainder_votes": {
+              "integer": 36000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 36000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 240000,
+            "remainder_votes": {
+              "integer": 9230,
+              "numerator": 20,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 40000,
+              "numerator": 0,
+              "denominator": 6
+            },
+            "full_seats": 5,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 128000,
+            "remainder_votes": {
+              "integer": 35692,
+              "numerator": 8,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 4
+            },
+            "full_seats": 2,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 9,
+            "votes_cast": 32000,
+            "remainder_votes": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 26
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 32000,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      }
+    ],
+    "initial_total_full_seats": 21,
+    "initial_total_residual_seats": 5
+  },
+  "hash": "dedf 17b4 684e 1214 fcab b770 925d c75c 624b e338 0bd3 4647 29c3 7a80 a379 40ad",
+  "creation_date_time": "19-03-2023 17:07:00"
+}

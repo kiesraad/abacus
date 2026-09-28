@@ -288,6 +288,11 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-p-22-2-variations/lt-19-seats-and-p15-drawing-lots.json",
     },
     ModelVariant {
+        name: "model-p-22-2-WS",
+        model: "model-p-22-2",
+        input: "model-p-22-2-variations/model-p-22-2-WS.json",
+    },
+    ModelVariant {
         name: "model-p-22-2-bijlage-1",
         model: "model-p-22-2-bijlage-1",
         input: "model-p-22-2-bijlage-1.json",

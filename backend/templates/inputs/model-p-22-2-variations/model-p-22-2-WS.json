@@ -1,10 +1,10 @@
 {
   "committee_session": {
-    "id": 1,
+    "id": 2,
     "number": 1,
-    "election_id": 1,
+    "election_id": 13,
     "location": "Pannerdam",
-    "start_date_time": "2026-03-18T21:34:00",
+    "start_date_time": "2023-03-16T10:12:00",
     "status": "completed"
   },
   "summary": {
@@ -80,7 +80,7 @@
     }
   },
   "election": {
-    "id": 1,
+    "id": 13,
     "name": "Waterschap Rivier en Polder 2023",
     "official_name": "Algemeen bestuur van het waterschap Rivier en Polder 2023",
     "committee_category": "CSB",

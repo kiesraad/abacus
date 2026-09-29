@@ -47,7 +47,7 @@ use crate::{
         election_repo, polling_station_repo,
         user_repo::UserId,
     },
-    service::create_sub_committee,
+    service::create_sub_committee, 
     test_data_gen::{GenerateElectionArgs, RandomRange, error::GenerateError},
 };
 
@@ -415,7 +415,12 @@ fn generate_election(
             None => String::new(),
         };
         official_name = format!("Algemeen bestuur van het {}", lowercased_name);
-        seats_range = RandomRange(19..31)
+        // Water Authority number of seats should be >= 19 and <= 30
+        if seats_range.0.end > 19 {
+            seats_range = RandomRange(seats_range.0.start.max(19)..seats_range.0.end.min(31));
+        } else {
+            seats_range = RandomRange(seats_range.0.start.max(19)..31);
+        }
     }
 
     info!("Election has name '{name}'");

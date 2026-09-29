@@ -1,9 +1,11 @@
+use async_zip::base::read::mem::ZipFileReader;
 use axum::{
     Json,
-    extract::{Path, State},
+    extract::{FromRequest, Multipart, Path, Request, State},
 };
 use chrono::NaiveDate;
 use eml_nl::{
+    EMLError,
     documents::election_count::ElectionCount,
     io::{EMLParsingMode, EMLRead},
 };
@@ -20,14 +22,55 @@ use crate::{
         sub_committee::SubCommittee,
     },
     eml::{EMLImportError, RedactedEmlHash},
+    error::ErrorReference,
     repository::{committee_session_repo, election_repo, sub_committee_repo},
 };
 
-#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Debug, ToSchema)]
 pub struct CSBDataEntryImportValidateRequest {
     hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
-    data: String,
+    #[schema(value_type = String, format = Binary)]
+    data: Vec<u8>,
+}
+
+impl<S: Send + Sync> FromRequest<S> for CSBDataEntryImportValidateRequest {
+    type Rejection = APIError;
+
+    async fn from_request(request: Request, state: &S) -> Result<Self, Self::Rejection> {
+        let mut multipart = Multipart::from_request(request, state).await?;
+        let mut hash = None;
+        let mut data = None;
+
+        while let Some(field) = multipart.next_field().await? {
+            match field.name() {
+                Some("hash") => {
+                    let json = field.text().await?;
+                    let chunks = serde_json::from_str(&json).map_err(|err| {
+                        APIError::BadRequest(
+                            format!("Invalid hash: {err}"),
+                            ErrorReference::InvalidData,
+                        )
+                    })?;
+                    hash = Some(chunks);
+                }
+                Some("data") => data = Some(field.bytes().await?.into()),
+                name => {
+                    let name = name.unwrap_or_default();
+                    return Err(APIError::BadRequest(
+                        format!("Unexpected field \"{name}\""),
+                        ErrorReference::InvalidData,
+                    ));
+                }
+            }
+        }
+
+        Ok(Self {
+            hash,
+            data: data.ok_or_else(|| {
+                APIError::BadRequest("Missing zip file".to_string(), ErrorReference::InvalidData)
+            })?,
+        })
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -40,16 +83,17 @@ pub struct CSBDataEntryImportValidateResponse {
     sub_committee: SubCommittee,
 }
 
-/// Uploads data entry results, validates it and returns a redacted hash
+/// Validates uploaded data entry results
 #[utoipa::path(
     post,
     path = "/api/elections/{election_id}/data_entry/import/validate",
-    request_body = CSBDataEntryImportValidateRequest,
+    request_body(content = CSBDataEntryImportValidateRequest, content_type = "multipart/form-data"),
     responses(
         (status = 200, description = "Election count validated", body = CSBDataEntryImportValidateResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 413, description = "Payload too large", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -59,11 +103,11 @@ pub struct CSBDataEntryImportValidateResponse {
 pub async fn election_data_entry_import_validate(
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
-    Json(request): Json<CSBDataEntryImportValidateRequest>,
+    request: CSBDataEntryImportValidateRequest,
 ) -> Result<Json<CSBDataEntryImportValidateResponse>, APIError> {
-    check_hash(request.data.as_bytes(), request.hash.as_ref())?;
-
-    let definition = ElectionCount::parse_eml(&request.data, EMLParsingMode::Strict).ok()?;
+    let eml = read_eml_from_zip(request.data).await?;
+    check_hash(eml.as_bytes(), request.hash.as_ref())?;
+    let definition = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict).ok()?;
 
     let election_identifier = &definition.count.election.identifier;
     let eml_election_id = election_identifier.id.value()?;
@@ -111,9 +155,56 @@ pub async fn election_data_entry_import_validate(
     }
 
     Ok(Json(CSBDataEntryImportValidateResponse {
-        hash: RedactedEmlHash::from(request.data.as_bytes()),
+        hash: RedactedEmlHash::from(eml.as_bytes()),
         election_name: election.name,
         election_date: election.election_date,
         sub_committee,
     }))
+}
+
+/// Read the contents of the single `*.eml.xml` file that is expected in the ZIP-file.
+/// If the ZIP file does not contain exactly one `*.eml.xml` file, an error is returned.
+async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
+    // TODO #4024 Validate signature
+    let reader = ZipFileReader::new(zip_data)
+        .await
+        .map_err(EMLImportError::InvalidZipFile)?;
+
+    let files = reader.file().entries().iter().enumerate();
+    let mut eml_files = files.filter(|(_, entry)| {
+        entry
+            .filename()
+            .as_str()
+            .is_ok_and(|name| name.to_ascii_lowercase().ends_with(".eml.xml"))
+    });
+
+    let (index, entry) = eml_files
+        .next()
+        .ok_or(EMLImportError::MissingEmlFileInZip)?;
+    if eml_files.next().is_some() {
+        return Err(EMLImportError::MultipleEmlFilesInZip.into());
+    }
+
+    // Protect against ZIP bombs, max 128 MB
+    let max_size = 128 * 1024 * 1024;
+    if entry.uncompressed_size() > max_size {
+        return Err(APIError::ContentTooLarge(
+            "EML file too large".to_string(),
+            ErrorReference::RequestPayloadTooLarge,
+        ));
+    }
+
+    let mut eml_data = Vec::new();
+    reader
+        .reader_with_entry(index)
+        .await
+        .map_err(EMLImportError::InvalidZipFile)?
+        .read_to_end_checked(&mut eml_data)
+        .await
+        .map_err(EMLImportError::InvalidZipFile)?;
+
+    let eml_string =
+        String::from_utf8(eml_data).map_err(|_| EMLError::custom("EML file is not valid UTF-8"))?;
+
+    Ok(eml_string)
 }

@@ -2,7 +2,10 @@ use std::{any::Any, error::Error, fmt::Debug};
 
 use axum::{
     Json,
-    extract::rejection::JsonRejection,
+    extract::{
+        multipart::{MultipartError, MultipartRejection},
+        rejection::JsonRejection,
+    },
     http::StatusCode,
     response::{IntoResponse, Response},
 };
@@ -323,6 +326,28 @@ impl IntoResponse for APIError {
 impl From<JsonRejection> for APIError {
     fn from(rejection: JsonRejection) -> Self {
         APIError::JsonRejection(rejection)
+    }
+}
+
+impl From<MultipartRejection> for APIError {
+    fn from(rejection: MultipartRejection) -> Self {
+        APIError::BadRequest(rejection.body_text(), ErrorReference::InvalidData)
+    }
+}
+
+impl From<MultipartError> for APIError {
+    fn from(err: MultipartError) -> Self {
+        if err.status() == StatusCode::PAYLOAD_TOO_LARGE {
+            APIError::ContentTooLarge(
+                MAX_BODY_SIZE_MB.to_string(),
+                ErrorReference::RequestPayloadTooLarge,
+            )
+        } else {
+            APIError::BadRequest(
+                format!("Invalid form data: {}", err.body_text()),
+                ErrorReference::InvalidData,
+            )
+        }
     }
 }
 

@@ -246,7 +246,6 @@ export interface ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_PARAMS {
 }
 export type ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_PATH =
   `/api/elections/${ElectionId}/data_entry/import/validate`;
-export type ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_BODY = CSBDataEntryImportValidateRequest;
 
 // /api/elections/{election_id}/dismiss_public_key_upload_reminder
 export interface DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PARAMS {

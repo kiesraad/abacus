@@ -3222,7 +3222,7 @@
     },
     "/api/elections/{election_id}/data_entry/import/validate": {
       "post": {
-        "summary": "Uploads data entry results, validates it and returns a redacted hash (coordinator_csb)",
+        "summary": "Validates uploaded data entry results (coordinator_csb)",
         "operationId": "election_data_entry_import_validate",
         "parameters": [
           {
@@ -3237,7 +3237,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "$ref": "#/components/schemas/CSBDataEntryImportValidateRequest"
               }
@@ -3278,6 +3278,16 @@
           },
           "403": {
             "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large",
             "content": {
               "application/json": {
                 "schema": {
@@ -6560,7 +6570,8 @@
         ],
         "properties": {
           "data": {
-            "type": "string"
+            "type": "string",
+            "format": "binary"
           },
           "hash": {
             "type": [
@@ -6571,8 +6582,7 @@
               "type": "string"
             }
           }
-        },
-        "additionalProperties": false
+        }
       },
       "CSBDataEntryImportValidateResponse": {
         "type": "object",

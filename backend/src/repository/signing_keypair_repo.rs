@@ -3,33 +3,18 @@ use zeroize::Zeroizing;
 
 use crate::domain::election::ElectionId;
 
-pub async fn get_certificate(
+/// Get the stored certificate (PEM) and private key (DER) for an election
+pub async fn get_keypair(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-) -> Result<Option<String>, sqlx::Error> {
-    sqlx::query_scalar!(
-        r#"SELECT certificate FROM signing_keypair WHERE election_id = $1"#,
+) -> Result<Option<(String, Zeroizing<Vec<u8>>)>, sqlx::Error> {
+    let row = sqlx::query!(
+        r#"SELECT certificate, private_key FROM signing_keypair WHERE election_id = $1"#,
         election_id
     )
     .fetch_optional(conn)
-    .await
-}
-
-pub async fn get_private_key(
-    conn: &mut SqliteConnection,
-    election_id: ElectionId,
-) -> Result<Option<Zeroizing<Vec<u8>>>, sqlx::Error> {
-    if let Some(key) = sqlx::query_scalar!(
-        r#"SELECT private_key FROM signing_keypair WHERE election_id = $1"#,
-        election_id
-    )
-    .fetch_optional(conn)
-    .await?
-    {
-        Ok(Some(Zeroizing::new(key)))
-    } else {
-        Ok(None)
-    }
+    .await?;
+    Ok(row.map(|row| (row.certificate, Zeroizing::new(row.private_key))))
 }
 
 pub async fn get_show_reminder(
@@ -94,8 +79,7 @@ mod tests {
     async fn test_get_before_create(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let election_id = ElectionId::from(1);
-        assert_eq!(get_certificate(&mut conn, election_id).await.unwrap(), None);
-        assert_eq!(get_private_key(&mut conn, election_id).await.unwrap(), None);
+        assert_eq!(get_keypair(&mut conn, election_id).await.unwrap(), None);
         assert_eq!(
             get_show_reminder(&mut conn, election_id).await.unwrap(),
             None
@@ -120,12 +104,8 @@ mod tests {
         .unwrap();
 
         assert_eq!(
-            get_certificate(&mut conn, election_id).await.unwrap(),
-            Some(certificate)
-        );
-        assert_eq!(
-            get_private_key(&mut conn, election_id).await.unwrap(),
-            Some(private_key)
+            get_keypair(&mut conn, election_id).await.unwrap(),
+            Some((certificate, private_key))
         );
         assert_eq!(
             get_show_reminder(&mut conn, election_id).await.unwrap(),

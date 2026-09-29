@@ -139,10 +139,7 @@ pub async fn certificate_details(
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
 
-    let certificate_pem = get_election_certificate(&mut conn, &audit_service, &election).await?;
-
-    let certificate = eml_signature::Certificate::from_pem(certificate_pem.as_bytes())
-        .map_err(|e| APIError::DataIntegrityError(e.to_string()))?;
+    let certificate = get_election_certificate(&mut conn, &audit_service, &election).await?;
 
     Ok(Json(certificate.into()))
 }
@@ -177,7 +174,7 @@ pub async fn certificate(
 
     let certificate = get_election_certificate(&mut conn, &audit_service, &election).await?;
 
-    let attachment = Attachment::new(certificate)
+    let attachment = Attachment::new(certificate.to_pem())
         .content_type("application/x-pem-file".to_string())
         .filename(public_key_filename(&election)?);
     Ok(attachment)

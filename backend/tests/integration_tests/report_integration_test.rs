@@ -4,6 +4,7 @@ use std::net::SocketAddr;
 
 use async_zip::base::read::mem::ZipFileReader;
 use axum::http::{HeaderValue, StatusCode};
+use eml_signature::{Certificate, Signature};
 use sha2::Digest;
 use sqlx::SqlitePool;
 use test_log::test;
@@ -70,6 +71,32 @@ pub async fn assert_zip_download_conflict(cookie: &HeaderValue, url: &str) {
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
+pub async fn download_certificate(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+) -> Certificate {
+    let response = reqwest::Client::new()
+        .get(format!(
+            "http://{addr}/api/elections/{election_id}/certificate"
+        ))
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    Certificate::from_pem(&response.bytes().await.unwrap()).unwrap()
+}
+
+/// Read the EML and its signature from the inner ZIP of a results download
+pub async fn read_signed_eml(xml_zip: Vec<u8>, eml_filename: &str) -> (Vec<u8>, Vec<u8>) {
+    let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
+    assert_eq!(xml_archive.file().entries().len(), 2);
+    let eml = read_zip_entry(&xml_archive, 0, eml_filename).await;
+    let signature = read_zip_entry(&xml_archive, 1, &format!("{eml_filename}.signature")).await;
+    (eml, signature)
+}
+
 pub async fn read_zip_entry(
     archive: &ZipFileReader,
     index: usize,
@@ -106,11 +133,7 @@ async fn test_gsb_cso_election_first_session_zip_download_works(pool: SqlitePool
     let pdf_hash1 = sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_Na31-2.pdf").await);
     let xml_zip = read_zip_entry(&archive, 1, "Telling_GR2024_Heemdamseburg.zip").await;
     let csv = read_zip_entry(&archive, 2, "osv4-3_telling_gr2024_heemdamseburg.csv").await;
-    let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
-    assert_eq!(xml_archive.file().entries().len(), 1);
-    let eml_hash1 = sha2::Sha256::digest(
-        read_zip_entry(&xml_archive, 0, "Telling_GR2024_Heemdamseburg.eml.xml").await,
-    );
+    let (eml1, signature1) = read_signed_eml(xml_zip, "Telling_GR2024_Heemdamseburg.eml.xml").await;
 
     let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
     let archive2 = ZipFileReader::new(bytes2).await.unwrap();
@@ -119,14 +142,21 @@ async fn test_gsb_cso_election_first_session_zip_download_works(pool: SqlitePool
     let xml_zip2 = read_zip_entry(&archive2, 1, "Telling_GR2024_Heemdamseburg.zip").await;
     let csv2 = read_zip_entry(&archive2, 2, "osv4-3_telling_gr2024_heemdamseburg.csv").await;
     assert_eq!(csv, csv2, "CSV count files should be the same");
-    let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
-    assert_eq!(xml_archive2.file().entries().len(), 1);
-    let eml_hash2 = sha2::Sha256::digest(
-        read_zip_entry(&xml_archive2, 0, "Telling_GR2024_Heemdamseburg.eml.xml").await,
-    );
+    let (eml2, signature2) =
+        read_signed_eml(xml_zip2, "Telling_GR2024_Heemdamseburg.eml.xml").await;
 
     assert_eq!(pdf_hash1, pdf_hash2, "PDF files should have the same hash");
-    assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
+    assert_eq!(eml1, eml2, "EML files should be the same");
+    assert_eq!(signature1, signature2, "EML signatures should be the same");
+
+    // The signature verifies against the certificate the administrator downloads
+    let admin_cookie = login(&addr, Admin).await;
+    let certificate = download_certificate(&addr, &admin_cookie, election_id).await;
+    let signature = Signature::from_der(&signature1).unwrap();
+    certificate
+        .public_key()
+        .verify(&eml1, &signature)
+        .expect("signature should verify");
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso", "users"))))]
@@ -149,11 +179,7 @@ async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool
     let pdf_hash1 = sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_Na31-1.pdf").await);
     let xml_zip = read_zip_entry(&archive, 1, "Telling_AB2026_Heemdamseburg.zip").await;
     let csv = read_zip_entry(&archive, 2, "osv4-3_telling_ab2026_heemdamseburg.csv").await;
-    let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
-    assert_eq!(xml_archive.file().entries().len(), 1);
-    let eml_hash1 = sha2::Sha256::digest(
-        read_zip_entry(&xml_archive, 0, "Telling_AB2026_Heemdamseburg.eml.xml").await,
-    );
+    let (eml1, signature1) = read_signed_eml(xml_zip, "Telling_AB2026_Heemdamseburg.eml.xml").await;
 
     let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
     let archive2 = ZipFileReader::new(bytes2).await.unwrap();
@@ -162,14 +188,12 @@ async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool
     let xml_zip2 = read_zip_entry(&archive2, 1, "Telling_AB2026_Heemdamseburg.zip").await;
     let csv2 = read_zip_entry(&archive2, 2, "osv4-3_telling_ab2026_heemdamseburg.csv").await;
     assert_eq!(csv, csv2, "CSV count files should be the same");
-    let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
-    assert_eq!(xml_archive2.file().entries().len(), 1);
-    let eml_hash2 = sha2::Sha256::digest(
-        read_zip_entry(&xml_archive2, 0, "Telling_AB2026_Heemdamseburg.eml.xml").await,
-    );
+    let (eml2, signature2) =
+        read_signed_eml(xml_zip2, "Telling_AB2026_Heemdamseburg.eml.xml").await;
 
     assert_eq!(pdf_hash1, pdf_hash2, "PDF files should have the same hash");
-    assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
+    assert_eq!(eml1, eml2, "EML files should be the same");
+    assert_eq!(signature1, signature2, "EML signatures should be the same");
 }
 
 #[test(sqlx::test(fixtures(
@@ -205,11 +229,7 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
     let pdf_hash1 = sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_Na14-2.pdf").await);
     let xml_zip = read_zip_entry(&archive, 1, "Telling_GR2026_Juinen.zip").await;
     let csv = read_zip_entry(&archive, 2, "osv4-3_telling_gr2026_juinen.csv").await;
-    let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
-    assert_eq!(xml_archive.file().entries().len(), 1);
-    let eml_hash1 = sha2::Sha256::digest(
-        read_zip_entry(&xml_archive, 0, "Telling_GR2026_Juinen.eml.xml").await,
-    );
+    let (eml1, signature1) = read_signed_eml(xml_zip, "Telling_GR2026_Juinen.eml.xml").await;
     let pdf_overview_hash1 =
         sha2::Sha256::digest(read_zip_entry(&archive, 3, "Leeg_Model_P2a.pdf").await);
 
@@ -220,16 +240,13 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
     let xml_zip2 = read_zip_entry(&archive2, 1, "Telling_GR2026_Juinen.zip").await;
     let csv2 = read_zip_entry(&archive2, 2, "osv4-3_telling_gr2026_juinen.csv").await;
     assert_eq!(csv, csv2, "CSV count files should be the same");
-    let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
-    assert_eq!(xml_archive2.file().entries().len(), 1);
-    let eml_hash2 = sha2::Sha256::digest(
-        read_zip_entry(&xml_archive2, 0, "Telling_GR2026_Juinen.eml.xml").await,
-    );
+    let (eml2, signature2) = read_signed_eml(xml_zip2, "Telling_GR2026_Juinen.eml.xml").await;
     let pdf_overview_hash2 =
         sha2::Sha256::digest(read_zip_entry(&archive2, 3, "Leeg_Model_P2a.pdf").await);
 
     assert_eq!(pdf_hash1, pdf_hash2, "PDF files should have the same hash");
-    assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
+    assert_eq!(eml1, eml2, "EML files should be the same");
+    assert_eq!(signature1, signature2, "EML signatures should be the same");
     assert_eq!(
         pdf_overview_hash1, pdf_overview_hash2,
         "PDF overview files should have the same hash"

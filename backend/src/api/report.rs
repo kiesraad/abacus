@@ -4,7 +4,7 @@ use axum::{
     response::IntoResponse,
 };
 use chrono::{DateTime, Datelike, Local};
-use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
+use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_files, zip_single_file};
 use sqlx::{SqliteConnection, SqlitePool};
 use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -159,6 +159,17 @@ pub async fn election_download_zip_results_gsb(
     let created_at = files.created_at().with_timezone(&Local);
     let download_zip_filename = download_zip_filename(base_name, &election, created_at);
 
+    // The EML is always generated and stored together with its signature
+    let results_eml = match (files.results_eml, files.results_eml_signature) {
+        (Some(eml), Some(signature)) => Some((eml, signature)),
+        (None, None) => None,
+        _ => {
+            return Err(APIError::DataIntegrityError(
+                "GSB results EML and its signature should both be present".to_string(),
+            ));
+        }
+    };
+
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
     tokio::spawn(async move {
@@ -166,9 +177,10 @@ pub async fn election_download_zip_results_gsb(
             zip_writer.add_file(&pdf_file.name, &pdf_file.data).await?;
         }
 
-        if let Some(eml_file) = files.results_eml {
-            let xml_zip_filename = with_zip_extension(&eml_file.name);
-            let xml_zip = zip_single_file(&eml_file.name, &eml_file.data).await?;
+        if let Some((eml, signature)) = results_eml {
+            let xml_zip_filename = with_zip_extension(&eml.name);
+            let xml_zip =
+                zip_files(&[(&eml.name, &eml.data), (&signature.name, &signature.data)]).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
 

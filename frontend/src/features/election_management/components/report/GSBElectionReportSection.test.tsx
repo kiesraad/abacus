@@ -66,6 +66,40 @@ describe("GSBElectionReportSection", () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ committeeSessionId: "1" });
   });
 
+  test("For the first committee session, page refers to the PV and the signed digital results", async () => {
+    const router = renderPage();
+    const electionData = getElectionMockData(
+      {},
+      { number: 1, status: "completed", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+    );
+
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await router.navigate("/elections/1/report/committee-session/1/download");
+
+    rtlRender(<Providers router={router} />);
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Telresultaten eerste zitting gemeentelijk stembureau Heemdamseburg",
+      }),
+    ).toBeVisible();
+
+    expect(await screen.findByText("In het ZIP-bestand zitten de volgende documenten:")).toBeInTheDocument();
+    expect(await screen.findByText("PDF-document met het proces-verbaal.")).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        "EML- en CSV-bestanden met digitale telresultaten, en een digitale handtekening van het EML-bestand.",
+      ),
+    ).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
+  });
+
   test("If there is an investigation with corrections, page refers to three documents in the zip", async () => {
     const router = renderPage();
     const electionData = getElectionMockData(
@@ -107,7 +141,11 @@ describe("GSBElectionReportSection", () => {
     expect(
       await screen.findByText("Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF-document."),
     ).toBeInTheDocument();
-    expect(await screen.findByText("EML- en CSV-bestanden met digitale telresultaten.")).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        "EML- en CSV-bestanden met digitale telresultaten, en een digitale handtekening van het EML-bestand.",
+      ),
+    ).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 

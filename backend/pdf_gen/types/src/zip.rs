@@ -66,10 +66,7 @@ impl ZipResponseWriter {
 
     /// Add a file with the given name and contents to the archive.
     pub async fn add_file(&mut self, name: &str, data: &[u8]) -> Result<(), ZipResponseError> {
-        let builder = ZipEntryBuilder::new(slugify_filename(name).into(), Compression::Deflate)
-            .last_modification_date(ZipDateTime::from(chrono::Utc::now()));
-
-        Ok(self.inner.write_entry_whole(builder, data).await?)
+        Ok(self.inner.write_entry_whole(zip_entry(name), data).await?)
     }
 
     /// Finish writing the archive and flush the underlying stream.
@@ -101,16 +98,28 @@ impl From<async_zip::error::ZipError> for ZipResponseError {
     }
 }
 
+/// A compressed ZIP entry with a slugified name, last modified now
+fn zip_entry(name: &str) -> ZipEntryBuilder {
+    ZipEntryBuilder::new(slugify_filename(name).into(), Compression::Deflate)
+        .last_modification_date(ZipDateTime::from(chrono::Utc::now()))
+}
+
 pub async fn zip_single_file(name: &str, content: &[u8]) -> Result<Vec<u8>, ZipResponseError> {
+    zip_files(&[(name, content)]).await
+}
+
+/// Create an in-memory ZIP file containing the given `(name, content)` files
+pub async fn zip_files(files: &[(&str, &[u8])]) -> Result<Vec<u8>, ZipResponseError> {
     let cursor = Cursor::new(Vec::<u8>::new());
     let async_cursor = cursor.compat_write();
 
     let mut zip_writer = ZipFileWriter::new(async_cursor);
 
-    let builder = ZipEntryBuilder::new(slugify_filename(name).into(), Compression::Deflate)
-        .last_modification_date(ZipDateTime::from(chrono::Utc::now()));
-
-    zip_writer.write_entry_whole(builder, content).await?;
+    for (name, content) in files {
+        zip_writer
+            .write_entry_whole(zip_entry(name), content)
+            .await?;
+    }
 
     let cursor = zip_writer.close().await?;
 
@@ -123,7 +132,7 @@ mod tests {
     use http_body_util::BodyExt;
     use tokio::io::{AsyncWriteExt, BufWriter};
 
-    use super::ZipResponse;
+    use super::{ZipResponse, zip_files};
 
     /// Build a ZIP archive using the library itself to obtain the expected bytes.
     async fn expected_zip_bytes(files: &[(String, Vec<u8>)]) -> Vec<u8> {
@@ -230,6 +239,37 @@ mod tests {
         assert!(
             add_err.is_some(),
             "expected writing to fail once connection closed"
+        );
+    }
+
+    /// Test that all files end up in the archive, in order and with slugified names.
+    #[tokio::test]
+    async fn zip_files_contains_all_files() {
+        let zip = zip_files(&[
+            ("first file.xml", b"first"),
+            ("second.signature", b"second"),
+        ])
+        .await
+        .unwrap();
+
+        let archive = async_zip::base::read::mem::ZipFileReader::new(zip)
+            .await
+            .unwrap();
+        let mut entries = Vec::new();
+        for index in 0..archive.file().entries().len() {
+            let mut reader = archive.reader_with_entry(index).await.unwrap();
+            let name = reader.entry().filename().as_str().unwrap().to_string();
+            let mut data = Vec::new();
+            reader.read_to_end_checked(&mut data).await.unwrap();
+            entries.push((name, data));
+        }
+
+        assert_eq!(
+            entries,
+            [
+                ("first_file.xml".to_string(), b"first".to_vec()),
+                ("second.signature".to_string(), b"second".to_vec()),
+            ]
         );
     }
 }

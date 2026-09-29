@@ -9,7 +9,7 @@ use crate::domain::{
     election::{ElectionWithPoliticalGroups, InvalidElectionError, VoteCountingMethod},
     file::FileType::{
         CsbAttachmentPdf, CsbCsvCounts, CsbResultsEml, CsbResultsPdf, CsbTotalCountsEml,
-        GsbCsvCounts, GsbOverviewPdf, GsbResultsEml, GsbResultsPdf,
+        GsbCsvCounts, GsbOverviewPdf, GsbResultsEml, GsbResultsEmlSignature, GsbResultsPdf,
     },
     identifier::id,
     report::structs::{csv_filename, election_filename},
@@ -24,6 +24,8 @@ id!(FileId);
 pub enum FileType {
     /// GSB results EML (510b)
     GsbResultsEml,
+    /// Signature of the GSB results EML
+    GsbResultsEmlSignature,
     /// GSB results PDF (Model Na 31-2 for first session, Model Na 14-2 for next session)
     GsbResultsPdf,
     /// GSB overview PDF for next session (Model P 2a)
@@ -49,6 +51,7 @@ impl FileType {
         match self {
             CsbCsvCounts | GsbCsvCounts => "text/csv",
             GsbResultsEml | CsbResultsEml | CsbTotalCountsEml => "text/xml",
+            GsbResultsEmlSignature => "application/pkcs7-signature",
             GsbResultsPdf | GsbOverviewPdf | CsbResultsPdf | CsbAttachmentPdf => "application/pdf",
         }
     }
@@ -60,6 +63,12 @@ impl FileType {
     ) -> Result<String, InvalidElectionError> {
         let filename = match self {
             GsbResultsEml => election_filename(election, "Telling", "eml.xml"),
+            GsbResultsEmlSignature => {
+                format!(
+                    "{}.signature",
+                    GsbResultsEml.filename(committee_session, election)?
+                )
+            }
             GsbResultsPdf => {
                 if committee_session.is_next_session() {
                     "Model Na14-2.pdf".to_string()

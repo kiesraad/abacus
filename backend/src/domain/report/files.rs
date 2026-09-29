@@ -1,5 +1,6 @@
 use apportionment::ApportionmentOutput;
 use chrono::{Local, Utc};
+use eml_signature::SigningKeyPair;
 use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
@@ -9,7 +10,7 @@ use crate::{
         report::ReportApiError,
     },
     domain::{
-        committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
+        committee_session::{CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         file::{File, FileType},
         report::structs::{
@@ -21,9 +22,9 @@ use crate::{
     repository::{
         committee_session_repo::{self},
         data_entry_repo::are_results_complete_for_committee_session,
-        file_repo,
+        election_repo, file_repo,
     },
-    service::{get_apportionment_state, list_polling_stations_for_session},
+    service::{get_apportionment_state, get_signing_keypair, list_polling_stations_for_session},
 };
 
 struct FileSaver<'a> {
@@ -52,13 +53,15 @@ impl FileSaver<'_> {
     }
 }
 
+/// Generate and save the GSB files of a committee session, signing the EML with the keypair
 async fn generate_and_save_files_gsb_election(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
-    committee_session: CommitteeSession,
+    committee_session_id: CommitteeSessionId,
     corrections: bool,
+    keypair: &SigningKeyPair,
 ) -> Result<GsbFiles, APIError> {
-    let gsb_input = ResultsInputGSB::new(conn, committee_session.id, Local::now()).await?;
+    let gsb_input = ResultsInputGSB::new(conn, committee_session_id, Local::now()).await?;
     let input_data = &gsb_input.data;
 
     let mut saver = FileSaver {
@@ -69,24 +72,27 @@ async fn generate_and_save_files_gsb_election(
 
     let mut files = GsbFiles {
         results_eml: None,
+        results_eml_signature: None,
         results_pdf: None,
         overview_pdf: None,
         results_csv: None,
     };
 
-    let generated_files = gsb_input.generate_gsb_files().await?;
+    // For the first session, or if there are corrections, we store the signed EML, CSV and
+    // results PDF. For next sessions without corrections, we don't store these.
+    if GsbFiles::stores_results(&input_data.committee_session, corrections) {
+        let generated_files = gsb_input.generate_gsb_results_files(keypair).await?;
 
-    // For the first session, or if there are corrections, we also store the EML and count PDF
-    // For next sessions without corrections, we don't store these
-    if !committee_session.is_next_session() || corrections {
         files.results_eml = Some(saver.save(generated_files.results_eml).await?);
+        files.results_eml_signature =
+            Some(saver.save(generated_files.results_eml_signature).await?);
         files.results_csv = Some(saver.save(generated_files.results_csv).await?);
-
         files.results_pdf = Some(saver.save(generated_files.results_pdf).await?);
     }
 
-    // Store the overview PDF for next sessions
-    if let Some(overview_pdf) = generated_files.overview_pdf {
+    // Only generated for next sessions
+    let overview_pdf = gsb_input.generate_gsb_overview_pdf().await?;
+    if let Some(overview_pdf) = overview_pdf {
         files.overview_pdf = Some(saver.save(overview_pdf).await?)
     }
 
@@ -146,6 +152,12 @@ async fn get_existing_gsb_files(
     use FileType::*;
     Ok(GsbFiles {
         results_eml: file_repo::get_for_session(conn, committee_session_id, GsbResultsEml).await?,
+        results_eml_signature: file_repo::get_for_session(
+            conn,
+            committee_session_id,
+            GsbResultsEmlSignature,
+        )
+        .await?,
         results_pdf: file_repo::get_for_session(conn, committee_session_id, GsbResultsPdf).await?,
         overview_pdf: file_repo::get_for_session(conn, committee_session_id, GsbOverviewPdf)
             .await?,
@@ -174,35 +186,37 @@ pub async fn get_files_gsb_election(
     audit_service: AuditService,
     committee_session_id: CommitteeSessionId,
 ) -> Result<GsbFiles, APIError> {
-    let mut conn = pool.acquire().await?;
-    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let session_pss = list_polling_stations_for_session(&mut conn, &committee_session).await?;
+    let mut tx = pool.begin_immediate().await?;
+    let committee_session = committee_session_repo::get(&mut tx, committee_session_id).await?;
+    let session_pss = list_polling_stations_for_session(&mut tx, &committee_session).await?;
     let corrections = session_pss.has_corrections();
 
     // Only generate files if the committee session is completed and has all the data needed
     if committee_session.status != CommitteeSessionStatus::Completed
         || committee_session.start_date_time.is_none()
-        || !are_results_complete_for_committee_session(&mut conn, committee_session.id).await?
+        || !are_results_complete_for_committee_session(&mut tx, committee_session.id).await?
     {
         return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
     }
 
     // Check if files exist, if so, get files from database
-    let mut files = get_existing_gsb_files(&mut conn, committee_session.id).await?;
-    drop(conn);
+    let mut files = get_existing_gsb_files(&mut tx, committee_session.id).await?;
 
     // If one of the files doesn't exist, generate all and save them to the database
     if files.needs_generation(&committee_session, corrections) {
-        let mut tx = pool.begin_immediate().await?;
+        let election = election_repo::get(&mut tx, committee_session.election_id).await?;
+        let keypair = get_signing_keypair(&mut tx, &audit_service, &election).await?;
+
         files = generate_and_save_files_gsb_election(
             &mut tx,
             &audit_service,
-            committee_session,
+            committee_session.id,
             corrections,
+            &keypair,
         )
         .await?;
-        tx.commit().await?;
     }
+    tx.commit().await?;
 
     Ok(files)
 }
@@ -248,6 +262,7 @@ mod tests {
     use std::assert_matches;
 
     use chrono::NaiveDateTime;
+    use eml_signature::{Certificate, Signature};
     use test_log::test;
 
     use super::*;
@@ -262,7 +277,7 @@ mod tests {
         infra::audit_log::list_event_names,
         repository::{
             committee_session_repo::{self, change_status},
-            investigation_repo,
+            investigation_repo, signing_keypair_repo,
         },
         service::update_apportionment_state,
     };
@@ -320,20 +335,44 @@ mod tests {
                     .await
                     .expect("should return files");
             let eml = files.results_eml.expect("should have generated eml");
+            let signature = files
+                .results_eml_signature
+                .expect("should have generated signature");
             let csv = files.results_csv.expect("should have generated csv");
             let pdf = files.results_pdf.expect("should have generated pdf");
 
             assert_eq!(eml.name, "Telling_GR2026_Juinen.eml.xml");
             assert_eq!(eml.id, FileId::from(1));
+            assert_eq!(signature.name, "Telling_GR2026_Juinen.eml.xml.signature");
+            assert_eq!(signature.id, FileId::from(2));
             assert_eq!(csv.name, "osv4-3_telling_gr2026_juinen.csv");
-            assert_eq!(csv.id, FileId::from(2));
+            assert_eq!(csv.id, FileId::from(3));
             assert_eq!(pdf.name, "Model_Na31-2.pdf");
-            assert_eq!(pdf.id, FileId::from(3));
+            assert_eq!(pdf.id, FileId::from(4));
             assert!(files.overview_pdf.is_none());
+
+            // The signature verifies against the stored certificate of the election
+            let (certificate, _) =
+                signing_keypair_repo::get_keypair(&mut conn, ElectionId::from(5))
+                    .await
+                    .unwrap()
+                    .expect("keypair should have been generated");
+            let certificate = Certificate::from_pem(certificate.as_bytes()).unwrap();
+            let der_signature = Signature::from_der(&signature.data).unwrap();
+            certificate
+                .public_key()
+                .verify(&eml.data, &der_signature)
+                .expect("signature should verify");
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
-                ["FileCreated", "FileCreated", "FileCreated"]
+                [
+                    "SigningKeypairCreated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated"
+                ]
             );
         }
     }
@@ -353,20 +392,31 @@ mod tests {
                     .await
                     .expect("should return files");
             let eml = files.results_eml.expect("should have generated eml");
+            let signature = files
+                .results_eml_signature
+                .expect("should have generated signature");
             let csv = files.results_csv.expect("should have generated csv");
             let pdf = files.results_pdf.expect("should have generated pdf");
 
             assert_eq!(eml.name, "Telling_AB2026_Juinen.eml.xml");
             assert_eq!(eml.id, FileId::from(1));
+            assert_eq!(signature.name, "Telling_AB2026_Juinen.eml.xml.signature");
+            assert_eq!(signature.id, FileId::from(2));
             assert_eq!(csv.name, "osv4-3_telling_ab2026_juinen.csv");
-            assert_eq!(csv.id, FileId::from(2));
+            assert_eq!(csv.id, FileId::from(3));
             assert_eq!(pdf.name, "Model_Na31-1.pdf");
-            assert_eq!(pdf.id, FileId::from(3));
+            assert_eq!(pdf.id, FileId::from(4));
             assert!(files.overview_pdf.is_none());
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
-                ["FileCreated", "FileCreated", "FileCreated"]
+                [
+                    "SigningKeypairCreated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated"
+                ]
             );
         }
     }
@@ -384,22 +434,34 @@ mod tests {
                     .expect("should return files");
 
             let eml = files.results_eml.expect("should have generated eml");
+            let signature = files
+                .results_eml_signature
+                .expect("should have generated signature");
             let csv = files.results_csv.expect("should have generated csv");
             let pdf = files.results_pdf.expect("should have generated pdf");
             let overview = files.overview_pdf.expect("should have generated overview");
 
             assert_eq!(eml.name, "Telling_GR2026_GroteStad.eml.xml");
             assert_eq!(eml.id, FileId::from(1));
+            assert_eq!(signature.name, "Telling_GR2026_GroteStad.eml.xml.signature");
+            assert_eq!(signature.id, FileId::from(2));
             assert_eq!(csv.name, "osv4-3_telling_gr2026_grotestad.csv");
-            assert_eq!(csv.id, FileId::from(2));
+            assert_eq!(csv.id, FileId::from(3));
             assert_eq!(pdf.name, "Model_Na14-2.pdf");
-            assert_eq!(pdf.id, FileId::from(3));
+            assert_eq!(pdf.id, FileId::from(4));
             assert_eq!(overview.name, "Leeg_Model_P2a.pdf");
-            assert_eq!(overview.id, FileId::from(4));
+            assert_eq!(overview.id, FileId::from(5));
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
-                ["FileCreated", "FileCreated", "FileCreated", "FileCreated"]
+                [
+                    "SigningKeypairCreated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated"
+                ]
             );
         }
     }
@@ -438,7 +500,10 @@ mod tests {
             assert_eq!(overview.name, "Leeg_Model_P2a.pdf");
             assert_eq!(overview.id, FileId::from(1));
 
-            assert_eq!(list_event_names(&mut conn).await.unwrap(), ["FileCreated"]);
+            assert_eq!(
+                list_event_names(&mut conn).await.unwrap(),
+                ["SigningKeypairCreated", "FileCreated"]
+            );
         }
     }
 

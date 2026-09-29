@@ -51,7 +51,7 @@ pub fn slugify(part: &str) -> String {
         .collect()
 }
 
-/// Format a DateTime to append to a filename: yymmdd-hhmmss
+/// Format a DateTime to append to a filename: yyyymmdd-hhmmss
 pub fn format_datetime(datetime: DateTime<Local>) -> String {
     datetime.format("%Y%m%d-%H%M%S").to_string()
 }

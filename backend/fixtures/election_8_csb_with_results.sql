@@ -462,4 +462,4 @@ VALUES (801,
         '2026-03-20 17:07:31');
 
 INSERT INTO sub_committees (id, committee_session_id, data_entry_id, name, number, category, authority_id, authority_name)
-VALUES (811, 801, 801, 'Juinen', 0035, 'GSB', '0035', 'Juinen');
+VALUES (811, 801, 801, 'Juinen', 35, 'GSB', '0035', 'Juinen');

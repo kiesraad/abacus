@@ -74,7 +74,7 @@ const variants: TestVariant[] = [
     candidateDefinition: eml230b_AB_more_than_45_candidates,
     regionName: "Rivier en Polder",
     electionName: "Waterschap Rivier en Polder 2023",
-    filename: "ab2023_rivierenpolder_gemeente_rivier-en-polder",
+    filename: "ab2023_rivierenpolder_waterschap_rivier-en-polder",
     dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntryGSB,
     subCommittees: [
       { number: 123, name: "Heemdamseburg" },

@@ -9,11 +9,6 @@ use axum_extra::response::Attachment;
 use tokio::io::{AsyncWriteExt, DuplexStream};
 use tokio_util::{compat::TokioAsyncWriteCompatExt, io::ReaderStream};
 
-/// Slugify a filename by replacing spaces with underscores and slashes with dashes.
-pub fn slugify_filename(filename: &str) -> String {
-    filename.replace(" ", "_").replace("/", "-")
-}
-
 /// A ZIP file response, that streams its contents to the client every time a file is added
 pub struct ZipResponse {
     inner: ReaderStream<DuplexStream>,
@@ -66,7 +61,7 @@ impl ZipResponseWriter {
 
     /// Add a file with the given name and contents to the archive.
     pub async fn add_file(&mut self, name: &str, data: &[u8]) -> Result<(), ZipResponseError> {
-        let builder = ZipEntryBuilder::new(slugify_filename(name).into(), Compression::Deflate)
+        let builder = ZipEntryBuilder::new(name.into(), Compression::Deflate)
             .last_modification_date(ZipDateTime::from(chrono::Utc::now()));
 
         Ok(self.inner.write_entry_whole(builder, data).await?)
@@ -107,7 +102,7 @@ pub async fn zip_single_file(name: &str, content: &[u8]) -> Result<Vec<u8>, ZipR
 
     let mut zip_writer = ZipFileWriter::new(async_cursor);
 
-    let builder = ZipEntryBuilder::new(slugify_filename(name).into(), Compression::Deflate)
+    let builder = ZipEntryBuilder::new(name.into(), Compression::Deflate)
         .last_modification_date(ZipDateTime::from(chrono::Utc::now()));
 
     zip_writer.write_entry_whole(builder, content).await?;

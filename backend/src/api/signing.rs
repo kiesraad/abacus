@@ -19,6 +19,7 @@ use crate::{
     api::middleware::authentication::RouteAuthorization,
     domain::{
         election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
+        filename::hyphenate,
         role::Role,
     },
     error::ErrorReference,
@@ -186,42 +187,16 @@ pub async fn certificate(
 fn public_key_filename(election: &ElectionWithPoliticalGroups) -> Result<String, APIError> {
     match election.committee_category {
         CommitteeCategory::GSB => Ok(format!(
-            "public_key_abacus_{}_gemeente_{}.crt",
+            "public_key_abacus_{}_{}_{}.crt",
             election.election_id.to_lowercase(),
-            region_name(&election.authority_region)
+            election.region_category(),
+            hyphenate(&election.authority_region)
         )),
 
         CommitteeCategory::CSB => Err(APIError::DataIntegrityError(
             "Signing not supported for CSB".to_string(),
         )),
     }
-}
-
-/// Map Dutch lowercase characters with diacritics to their base character
-/// <https://nl.wikipedia.org/wiki/Accenttekens_in_de_Nederlandse_spelling#Frequentie>
-fn strip_diacritic(c: char) -> char {
-    match c {
-        'à' | 'á' | 'â' | 'ä' | 'å' => 'a',
-        'è' | 'é' | 'ê' | 'ë' => 'e',
-        'ì' | 'í' | 'î' | 'ï' => 'i',
-        'ò' | 'ó' | 'ô' | 'ö' => 'o',
-        'ù' | 'ú' | 'û' | 'ü' => 'u',
-        'ý' | 'ŷ' | 'ÿ' => 'y',
-        'ç' => 'c',
-        'ñ' => 'n',
-        other => other,
-    }
-}
-
-/// Remove diacritics, preserve inner hyphens, spaces become "-", all lowercase
-fn region_name(authority_region: &str) -> String {
-    authority_region
-        .to_lowercase()
-        .chars()
-        .map(strip_diacritic)
-        .map(|c| if c == ' ' { '-' } else { c })
-        .filter(|c| c.is_alphabetic() || *c == '-')
-        .collect()
 }
 
 #[cfg(test)]
@@ -236,23 +211,6 @@ mod tests {
         domain::election::{ElectionCategory, tests::election_fixture},
         repository::user_repo::{User, UserId},
     };
-
-    #[test]
-    fn test_region_name() {
-        #[rustfmt::skip]
-        let test_cases = [
-            ("Utrecht", "utrecht"),
-            ("'s-Hertogenbosch", "s-hertogenbosch"),
-            ("Reusel-De Mierden", "reusel-de-mierden"),
-            ("Nuenen, Gerwen en Nederwetten", "nuenen-gerwen-en-nederwetten"),
-            ("Nuenen c.a.", "nuenen-ca"),
-            ("Súdwest-Fryslân", "sudwest-fryslan"),
-        ];
-
-        for (region, expected) in test_cases {
-            assert_eq!(region_name(region), expected);
-        }
-    }
 
     #[test]
     fn test_public_key_filename_gsb() {

@@ -3,8 +3,8 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
-use chrono::{DateTime, Datelike, Local};
-use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
+use chrono::{DateTime, Local};
+use pdf_gen::zip::{ZipResponse, ZipResponseError, zip_single_file};
 use sqlx::{SqliteConnection, SqlitePool};
 use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -15,6 +15,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         election::{ElectionId, ElectionWithPoliticalGroups},
+        filename::{format_datetime, hyphenate},
         report::files::{get_files_csb_election, get_files_gsb_election},
         role::Role,
     },
@@ -72,18 +73,14 @@ pub fn download_zip_filename(
     election: &ElectionWithPoliticalGroups,
     created_at: DateTime<Local>,
 ) -> String {
-    let location = election.location.to_lowercase();
-    let location_without_whitespace: String = location.split_whitespace().collect();
-    slugify_filename(&format!(
-        "{} {}{} {} gemeente {}-{}-{}.zip",
+    format!(
+        "{}_{}_{}_{}-{}.zip",
         base,
-        election.category.to_eml_code().to_lowercase(),
-        election.election_date.year(),
-        location_without_whitespace,
-        location.replace(" ", "-"),
-        created_at.date_naive().format("%Y%m%d"),
-        created_at.time().format("%H%M%S"),
-    ))
+        election.election_id.to_lowercase(),
+        election.region_category(),
+        hyphenate(&election.authority_region),
+        format_datetime(created_at),
+    )
 }
 
 /// Replaces the extension of the given filename with .zip

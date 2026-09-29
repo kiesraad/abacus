@@ -152,6 +152,84 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
   },
 ];
 
+export const electionStatusesCSBMock: ElectionStatusResponseEntry[] = [
+  {
+    data_entry_id: 1203,
+    source: {
+      type: "SubCommittee",
+      committee_session_id: 802,
+      id: 812,
+      number: 1,
+      name: "Juinen",
+      category: "GSB",
+      data_entry_id: 1203,
+      authority_id: "0001",
+      authority_name: "Juinen",
+    },
+    status: "empty",
+  },
+  {
+    data_entry_id: 1204,
+    source: {
+      type: "SubCommittee",
+      committee_session_id: 802,
+      id: 813,
+      number: 2,
+      name: "'s-Gravenveen",
+      category: "GSB",
+      data_entry_id: 1204,
+      authority_id: "0002",
+      authority_name: "'s-Gravenveen",
+    },
+    status: "empty",
+  },
+  {
+    data_entry_id: 1205,
+    source: {
+      type: "SubCommittee",
+      committee_session_id: 802,
+      id: 814,
+      number: 3,
+      name: "Eksterlo",
+      category: "GSB",
+      data_entry_id: 1205,
+      authority_id: "0003",
+      authority_name: "Eksterlo",
+    },
+    status: "empty",
+  },
+  {
+    data_entry_id: 1206,
+    source: {
+      type: "SubCommittee",
+      committee_session_id: 802,
+      id: 815,
+      number: 4,
+      name: "Hovenerwoud",
+      category: "GSB",
+      data_entry_id: 1206,
+      authority_id: "0004",
+      authority_name: "Hovenerwoud",
+    },
+    status: "empty",
+  },
+  {
+    data_entry_id: 1207,
+    source: {
+      type: "SubCommittee",
+      committee_session_id: 802,
+      id: 816,
+      number: 5,
+      name: "Bloemstede",
+      category: "GSB",
+      data_entry_id: 1207,
+      authority_id: "0005",
+      authority_name: "Bloemstede",
+    },
+    status: "empty",
+  },
+];
+
 /**
  * Return an ElectionStatusResponse with the given statuses supplemented with data_entry_id, source
  * @param statuses array with ElectionStatusResponseEntry objects where only the status is mandatory
@@ -171,4 +249,8 @@ export const getElectionStatusMockData = (
 
 export const statusResponseMock: ElectionStatusResponse = {
   statuses: electionStatusesMock,
+};
+
+export const CSBStatusResponseMock: ElectionStatusResponse = {
+  statuses: electionStatusesCSBMock,
 };

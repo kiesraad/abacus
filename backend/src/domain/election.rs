@@ -516,6 +516,15 @@ pub enum CommitteeCategory {
     CSB,
 }
 
+impl CommitteeCategory {
+    pub fn supports_signing(&self) -> bool {
+        match self {
+            CommitteeCategory::CSB => false,
+            CommitteeCategory::GSB => true,
+        }
+    }
+}
+
 #[derive(
     Serialize,
     Deserialize,

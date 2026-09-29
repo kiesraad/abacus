@@ -205,6 +205,16 @@ export function GenerateTestElectionForm() {
                 return null;
               }
 
+              // Only show polling stations field for GSBs
+              if (field.key === "polling_stations" && formState.committee_category !== "GSB") {
+                return null;
+              }
+
+              let hint = RANGE_HINT;
+              if (field.key === "seats") {
+                hint += ". Voor WS is het aantal zetels beperkt tot 19..=30.";
+              }
+
               const input = (
                 <InputField
                   id={field.key}
@@ -214,7 +224,7 @@ export function GenerateTestElectionForm() {
                   placeholder={field.placeholder}
                   value={formState[field.key]}
                   onChange={updateRangeField(field.key)}
-                  hint={RANGE_HINT}
+                  hint={hint}
                   fieldWidth="full"
                 />
               );

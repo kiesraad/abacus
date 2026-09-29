@@ -13,7 +13,11 @@ import {
   getCSBElectionMockData,
   getElectionMockData,
 } from "@/testing/api-mocks/ElectionMockData";
-import { getElectionStatusMockData, statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
+import {
+  CSBStatusResponseMock,
+  getElectionStatusMockData,
+  statusResponseMock,
+} from "@/testing/api-mocks/ElectionStatusMockData";
 import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { renderReturningRouter, screen, within } from "@/testing/test-utils";
@@ -25,6 +29,7 @@ import {
   type ElectionDetailsResponse,
   type ElectionStatusResponse,
 } from "@/types/generated/openapi";
+import { sortList } from "@/utils/sorting";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
 async function renderDataEntryHomePage(
@@ -44,7 +49,10 @@ async function renderDataEntryHomePage(
   server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
 
   const refetch = vi.fn();
-  vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({ statuses, refetch });
+  vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({
+    statuses: sortList(statuses, (item) => item.source),
+    refetch,
+  });
 
   const router = renderReturningRouter(
     <ElectionProvider electionId={1}>
@@ -147,14 +155,23 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Show only expanded list for CSB", async () => {
-    await renderDataEntryHomePage("CSB");
+    await renderDataEntryHomePage("CSB", {}, CSBStatusResponseMock);
 
     // Picker and collapsed list not rendered
     expect(screen.queryByLabelText("Voer het nummer in:")).not.toBeInTheDocument();
     expect(screen.queryByTestId("openList")).not.toBeInTheDocument();
 
-    // List is shown
+    // List is shown, sorted alphabetically on name
     expect(await screen.findByRole("heading", { name: "Kies het stembureau" })).toBeVisible();
-    expect(await screen.findByRole("table")).toBeVisible();
+    const table = await screen.findByRole("table");
+    expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Nummer", "Stembureau"],
+      ["0005", "Bloemstede 1e invoer"],
+      ["0003", "Eksterlo 1e invoer"],
+      ["0002", "'s-Gravenveen 1e invoer"],
+      ["0004", "Hovenerwoud 1e invoer"],
+      ["0001", "Juinen 1e invoer"],
+    ]);
   });
 });

@@ -14,6 +14,7 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
+import type { ElectionDetailsResponse } from "@/types/generated/openapi";
 
 async function renderPage() {
   render(
@@ -59,8 +60,11 @@ describe("ElectionCertificatePage", () => {
     expect(downloadLink).toHaveAttribute("href", "/api/elections/1/certificate");
   });
 
-  test("renders keypair reminder when showKeypairReminder is true", async () => {
-    overrideOnce("get", "/api/elections/1", 200, { ...getElectionMockData(), show_keypair_reminder: true });
+  test("renders keypair reminder when showKeypairReminder is defined", async () => {
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData(),
+      show_keypair_reminder: "Dismissable",
+    } satisfies ElectionDetailsResponse);
 
     await renderPage();
     expect(
@@ -76,8 +80,8 @@ describe("ElectionCertificatePage", () => {
     expect(screen.getByText("Doe dit uiterlijk twee dagen voor de dag van stemming.")).toBeVisible();
   });
 
-  test("does not render keypair reminder when showKeypairReminder is false", async () => {
-    overrideOnce("get", "/api/elections/1", 200, { ...getElectionMockData(), show_keypair_reminder: false });
+  test("does not render keypair reminder when showKeypairReminder is not set", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData());
 
     await renderPage();
     expect(screen.getByRole("heading", { level: 2, name: "Publieke sleutel Abacus-instantie GSB Heemdamseburg" }));
@@ -91,6 +95,53 @@ describe("ElectionCertificatePage", () => {
     expect(screen.queryByText("Doe dit uiterlijk twee dagen voor de dag van stemming.")).not.toBeInTheDocument();
   });
 
+  test("dismiss button is disabled when the certificate is not yet retrieved", async () => {
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData(),
+      show_keypair_reminder: "NonDismissable",
+    } satisfies ElectionDetailsResponse);
+    overrideOnce("get", "/api/elections/1/certificate_details", 200, null, "infinite");
+
+    await renderPage();
+
+    expect(screen.getByRole("button", { name: "Ik heb dit gedaan" })).toBeDisabled();
+  });
+
+  test("dismiss button is enabled once the certificate is retrieved", async () => {
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData(),
+      show_keypair_reminder: "Dismissable",
+    } satisfies ElectionDetailsResponse);
+
+    await renderPage();
+
+    const button = screen.getByRole("button", { name: "Ik heb dit gedaan" });
+    await waitFor(() => {
+      expect(button).toBeEnabled();
+    });
+  });
+
+  test("dismiss button is disabled when the dismiss request is in progress", async () => {
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData(),
+      show_keypair_reminder: "Dismissable",
+    } satisfies ElectionDetailsResponse);
+    overrideOnce("put", "/api/elections/1/dismiss_public_key_upload_reminder", 204, null, "infinite");
+    const user = userEvent.setup();
+
+    await renderPage();
+
+    const button = screen.getByRole("button", { name: "Ik heb dit gedaan" });
+    await waitFor(() => {
+      expect(button).toBeEnabled();
+    });
+    await user.click(button);
+
+    await waitFor(() => {
+      expect(button).toBeDisabled();
+    });
+  });
+
   test("confirming the upload updates the reminder, sets a message and navigates to election home page", async () => {
     const navigate = vi.fn();
     const pushMessage = vi.fn();
@@ -101,7 +152,10 @@ describe("ElectionCertificatePage", () => {
       hasMessages: vi.fn(() => false),
     });
     const dismissReminder = spyOnHandler(DismissPublicKeyUploadReminderRequestHandler);
-    overrideOnce("get", "/api/elections/1", 200, { ...getElectionMockData(), show_keypair_reminder: true });
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData(),
+      show_keypair_reminder: "Dismissable",
+    } satisfies ElectionDetailsResponse);
     const user = userEvent.setup();
 
     await renderPage();

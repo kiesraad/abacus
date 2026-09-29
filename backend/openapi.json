@@ -8017,7 +8017,7 @@
             }
           },
           "show_keypair_reminder": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/KeypairReminder"
           }
         },
         "additionalProperties": false
@@ -8928,6 +8928,13 @@
               }
             }
           }
+        ]
+      },
+      "KeypairReminder": {
+        "type": "string",
+        "enum": [
+          "Dismissable",
+          "NonDismissable"
         ]
       },
       "LargestRemainderAssignedSeat": {
@@ -10603,6 +10610,7 @@
           "F310",
           "F311",
           "F312",
+          "F313",
           "F401",
           "F402",
           "F403",

@@ -119,7 +119,6 @@ test.describe("resume data entry flow", () => {
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-      await differencesPage.differenceCompletelyAccountedForYes.check();
       await expect(differencesPage.fieldset).toBeVisible();
       await differencesPage.next.click();
 
@@ -367,7 +366,6 @@ test.describe("resume data entry flow", () => {
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-      await differencesPage.differenceCompletelyAccountedForYes.check();
       await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, 0, "Partijdige Partij");
@@ -556,7 +554,6 @@ test.describe("resume data entry flow", () => {
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-      await differencesPage.differenceCompletelyAccountedForYes.check();
       await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, 0, "Partijdige Partij");

@@ -42,8 +42,8 @@ use crate::{
         polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, user_repo::User},
-    service::{create_sub_committee, get_show_keypair_reminder, list_polling_stations_for_session},
+    repository::{committee_session_repo, election_repo, signing_keypair_repo, user_repo::User},
+    service::{create_sub_committee, list_polling_stations_for_session},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -84,7 +84,7 @@ pub struct ElectionDetailsResponse {
     pub investigations: Vec<PollingStationInvestigation>,
     #[serde(skip_serializing_if = "Option::is_none", default)]
     #[schema(nullable = false)]
-    pub show_keypair_reminder: Option<bool>,
+    pub show_keypair_reminder: Option<KeypairReminder>,
 }
 
 #[derive(Serialize)]
@@ -173,6 +173,33 @@ pub async fn election_list(
         committee_sessions,
         elections,
     }))
+}
+
+#[derive(Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub enum KeypairReminder {
+    Dismissable,
+    NonDismissable,
+}
+
+async fn get_show_keypair_reminder(
+    conn: &mut SqliteConnection,
+    election: &ElectionWithPoliticalGroups,
+) -> Result<Option<KeypairReminder>, sqlx::Error> {
+    if !election.committee_category.supports_signing() {
+        // Don't show a reminder if signing is not supported
+        return Ok(None);
+    }
+
+    signing_keypair_repo::get_show_reminder(conn, election.id)
+        .await
+        .map(|show_reminder| match show_reminder {
+            // Certificate is generated and reminder should be shown dismissable
+            Some(true) => Some(KeypairReminder::Dismissable),
+            // Certificate is generated and reminder is dismissed
+            Some(false) => None,
+            // Certificate is not generated yet, so the reminder should be shown non-dismissable
+            None => Some(KeypairReminder::NonDismissable),
+        })
 }
 
 /// Get election details including the election's candidate list (political groups),
@@ -809,6 +836,62 @@ mod tests {
         },
         repository::user_repo::UserId,
     };
+
+    mod get_show_keypair_reminder {
+        use crate::repository::{election_repo::get, signing_keypair_repo::set_show_reminder};
+
+        use super::*;
+        use test_log::test;
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
+        async fn none_when_signing_not_supported(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let election = get(&mut conn, ElectionId::from(9)).await.unwrap();
+            let show_reminder = get_show_keypair_reminder(&mut conn, &election)
+                .await
+                .unwrap();
+            assert_eq!(show_reminder, None);
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1"))))]
+        async fn non_dismissable_when_certificate_not_generated(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let election = get(&mut conn, ElectionId::from(1)).await.unwrap();
+            let show_reminder = get_show_keypair_reminder(&mut conn, &election)
+                .await
+                .unwrap();
+            assert_eq!(show_reminder, Some(KeypairReminder::NonDismissable));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_1", "signing_keypair")
+        )))]
+        async fn dismissable_when_certificate_generated(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let election = get(&mut conn, ElectionId::from(1)).await.unwrap();
+            let show_reminder = get_show_keypair_reminder(&mut conn, &election)
+                .await
+                .unwrap();
+            assert_eq!(show_reminder, Some(KeypairReminder::Dismissable));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_1", "signing_keypair")
+        )))]
+        async fn none_when_dismissed(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let election = get(&mut conn, ElectionId::from(1)).await.unwrap();
+            set_show_reminder(&mut conn, election.id, false)
+                .await
+                .unwrap();
+            let show_reminder = get_show_keypair_reminder(&mut conn, &election)
+                .await
+                .unwrap();
+            assert_eq!(show_reminder, None);
+        }
+    }
 
     async fn call_handlers(
         pool: SqlitePool,

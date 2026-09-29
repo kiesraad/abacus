@@ -818,6 +818,9 @@ mod tests {
                 .differences_counts
                 .compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
+            results
+                .differences_counts
+                .difference_completely_accounted_for = YesNo::default();
         }
 
         let results = ps

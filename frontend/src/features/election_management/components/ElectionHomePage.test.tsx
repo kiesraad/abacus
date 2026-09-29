@@ -655,14 +655,14 @@ describe("ElectionHomePage", () => {
     });
 
     describe("Certificate registration alert", () => {
-      test("Shows alert for administrator and hides it after confirming", async () => {
+      test("Shows dismissable alert for administrator and hides it after confirming", async () => {
         const user = userEvent.setup();
         const dismissReminder = spyOnHandler(DismissPublicKeyUploadReminderRequestHandler);
         server.use(ElectionRequestHandler, DismissPublicKeyUploadReminderRequestHandler);
         server.use(
           http.get("/api/elections/1", () =>
             HttpResponse.json(
-              { ...getElectionMockData(), show_keypair_reminder: true } satisfies ElectionDetailsResponse,
+              { ...getElectionMockData(), show_keypair_reminder: "Dismissable" } satisfies ElectionDetailsResponse,
               { status: 200 },
             ),
           ),
@@ -684,7 +684,7 @@ describe("ElectionHomePage", () => {
           "Nog niet geregistreerd",
         );
 
-        overrideOnce("get", "/api/elections/1", 200, { ...getElectionMockData(), show_keypair_reminder: false });
+        overrideOnce("get", "/api/elections/1", 200, getElectionMockData());
         await user.click(within(alert).getByRole("button", { name: "Ik heb dit al gedaan" }));
         expect(alert).not.toBeInTheDocument();
         expect(dismissReminder).toHaveBeenCalledOnce();
@@ -693,11 +693,44 @@ describe("ElectionHomePage", () => {
         );
       });
 
+      test("Disables dismiss button when non-dismissable", async () => {
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(
+              { ...getElectionMockData(), show_keypair_reminder: "NonDismissable" } satisfies ElectionDetailsResponse,
+              { status: 200 },
+            ),
+          ),
+        );
+        await renderGSBPage("administrator");
+
+        const alert = await screen.findByRole("alert");
+        expect(within(alert).getByText("Publieke sleutel registreren", { selector: "strong" })).toBeVisible();
+        expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+          "Je moet de publieke sleutel van dit gemeentelijk stembureau registreren. Doe dit door de sleutel te uploaden naar het overdrachtsplatform van Kiesraad. Doe dit uiterlijk twee dagen voor de dag van stemming.",
+        );
+        expect(within(alert).getByRole("link", { name: "Publieke sleutel registreren" })).toHaveAttribute(
+          "href",
+          "/certificate",
+        );
+        expect(within(alert).getByRole("button", { name: "Ik heb dit al gedaan" })).toBeDisabled();
+      });
+
+      test("Does not show alert for administrator when no reminder is set", async () => {
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(getElectionMockData() satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+        await renderGSBPage("administrator");
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      });
+
       test("Does not show alert for coordinator", async () => {
         server.use(
           http.get("/api/elections/1", () =>
             HttpResponse.json(
-              { ...getElectionMockData(), show_keypair_reminder: true } satisfies ElectionDetailsResponse,
+              { ...getElectionMockData(), show_keypair_reminder: "Dismissable" } satisfies ElectionDetailsResponse,
               { status: 200 },
             ),
           ),

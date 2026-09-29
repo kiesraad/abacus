@@ -320,9 +320,9 @@ for (const variant of variants) {
         const dataEntryHomePage = new DataEntryHomePage(page);
         await expect(dataEntryHomePage.fieldset).toBeVisible();
         const rowsVisible = variant.subCommittees.length - idx; // Row is removed after data entry completed.
-        await expect(dataEntryHomePage.pollingStations).toHaveCount(rowsVisible);
+        await expect(dataEntryHomePage.dataEntries).toHaveCount(rowsVisible);
 
-        await dataEntryHomePage.clickPollingStationFromList(subCommittee.number);
+        await dataEntryHomePage.clickDataEntryFromList(subCommittee.number);
 
         await fillDataEntryPagesAndSave(page, variant.dataEntry);
         await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
@@ -346,9 +346,9 @@ for (const variant of variants) {
         const dataEntryHomePage = new DataEntryHomePage(page);
         await expect(dataEntryHomePage.fieldset).toBeVisible();
         const rowsVisible = variant.subCommittees.length - idx; // Row is removed after data entry completed.
-        await expect(dataEntryHomePage.pollingStations).toHaveCount(rowsVisible);
+        await expect(dataEntryHomePage.dataEntries).toHaveCount(rowsVisible);
 
-        await dataEntryHomePage.clickPollingStationFromList(subCommittee.number);
+        await dataEntryHomePage.clickDataEntryFromList(subCommittee.number);
 
         await fillDataEntryPagesAndSave(page, variant.dataEntry);
         await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();

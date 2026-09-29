@@ -125,6 +125,8 @@ pub enum ValidationResultCode {
     F311,
     /// CSB: totaal aantal kiezers <> totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
     F312,
+    /// GSB CSO, GSB DSO: (Als D = H) Verklaring voor verschil 'ja' en/of 'nee' aangevinkt
+    F313,
 
     /// GSB CSO, GSB DSO, CSB: 'Kandidaten en lijsttotalen': Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0
     F401,

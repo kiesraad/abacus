@@ -47,7 +47,7 @@ use crate::{
         election_repo, polling_station_repo,
         user_repo::UserId,
     },
-    service::create_sub_committee, 
+    service::create_sub_committee,
     test_data_gen::{GenerateElectionArgs, RandomRange, error::GenerateError},
 };
 

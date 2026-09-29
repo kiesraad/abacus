@@ -97,12 +97,7 @@ async fn election_download_n_10_1(
     }
     drop(conn);
 
-    let zip_filename = format!(
-        "{}{}_{}_n_10_1.zip",
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        election.location
-    );
+    let zip_filename = format!("{}_n_10_1.zip", election.election_id);
     let candidates_tables = CandidatesTables::new(&election)?;
     let models = polling_stations
         .iter()
@@ -187,12 +182,7 @@ async fn election_download_n_10_1_inlegvel(
     }
     drop(conn);
 
-    let zip_filename = format!(
-        "{}{}_{}_n_10_1_Inlegvel.zip",
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        election.location
-    );
+    let zip_filename = format!("{}_n_10_1_Inlegvel.zip", election.election_id);
 
     let models = polling_stations
         .iter()
@@ -276,12 +266,7 @@ async fn election_download_n_10_2(
     }
     drop(conn);
 
-    let zip_filename = format!(
-        "{}{}_{}_n_10_2.zip",
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        election.location
-    );
+    let zip_filename = format!("{}_n_10_2.zip", election.election_id);
 
     let models = polling_stations
         .iter()
@@ -367,12 +352,7 @@ async fn election_download_na_14_1_versie1(
     }
     drop(conn);
 
-    let zip_filename = format!(
-        "{}{}_{}_na_14_1_versie1.zip",
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        election.location
-    );
+    let zip_filename = format!("{}_na_14_1_versie1.zip", election.election_id);
     let candidates_tables = CandidatesTables::new(&election)?;
     let models = polling_stations
         .iter()
@@ -513,12 +493,7 @@ async fn election_download_na_31_2_bijlage1(
     }
     drop(conn);
 
-    let zip_filename = format!(
-        "{}{}_{}_na_31_2_bijlage1.zip",
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        election.location
-    );
+    let zip_filename = format!("{}_na_31_2_bijlage1.zip", election.election_id);
     let candidates_tables = CandidatesTables::new(&election)?;
     let models = polling_stations
         .iter()

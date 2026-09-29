@@ -2,8 +2,6 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json")
 
-#let is_municipality = (municipal, public_body) => is_municipality(input.election.authority_region, municipal, public_body)
-#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_id #input.election.authority_region]
 #let location_type = [centraal stembureau]
 #let subcommittee_type = [gemeentelijk stembureau]
 #let LARGE_COUNCIL_THRESHOLD = 19
@@ -25,9 +23,9 @@
 #set heading(numbering: none)
 
 #title_page(
-  is_municipality[#input.election.authority_id #input.election.authority_region][#input.election.authority_region],
+  [#input.election.authority_id #input.election.authority_region],
   [Centraal Stembureau],
-  [#input.election.name - #format_date(input.election.election_date)],
+  [#get_election_title(input.election), #format_date(input.election.election_date)],
   [
     Verslag, uitslag en zetelverdeling – Model P 22-2
   ],
@@ -77,13 +75,21 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #pagebreak(weak: true)
 
-== Verslag van controlewerkzaamheden
+== Meldingen van belangstellenden
 
-=== Zijn er controlewerkzaamheden uitgevoerd vanwege telverschillen of andere mogelijke fouten?
+=== Hebben belangstellenden meldingen van mogelijke fouten in de processen-verbaal van stembureaus gedaan bij het #location_type?
 
 #checkbox()[Nee]
 
 #checkbox()[Ja, *#sym.arrow.r Zie bijlage 2*]
+
+== Verslag van controlewerkzaamheden
+
+=== Heeft het #location_type bij de controlewerkzaamheden telverschillen of andere mogelijke fouten geconstateerd?
+
+#checkbox()[Nee]
+
+#checkbox()[Ja, *#sym.arrow.r Zie bijlage 3*]
 
 == Bezwaren
 
@@ -91,7 +97,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #checkbox()[Geen bezwaren ingebracht]
 
-#checkbox()[Bezwaren ingebracht. Deze staan in bijlage 3 bij dit proces-verbaal. De reactie van het #location_type staat daar ook bij.]
+#checkbox()[Bezwaren ingebracht. Deze staan in bijlage 4 bij dit proces-verbaal. De reactie van het #location_type staat daar ook bij.]
 
 #pagebreak(weak: true)
 
@@ -242,7 +248,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   table.header(
     table.cell(header_text([Lijst])),
     table.cell(align: right, header_text([Aantal stemmen])),
-    table.cell(stroke: none, align: center, header_text([÷ Kiesdeler])),
+    table.cell(stroke: none, align: center, header_text([÷ Kiesdeler =])),
     table.cell(stroke: none, align: right, header_text([Volle zetels])),
   ),
   table.hline(stroke: 1pt + black),
@@ -367,7 +373,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 
     === Verdeling van de restzetels
 
-    De resterende restzetels zijn verdeeld via het systeem van de grootste gemiddelden. De lijst die na toewijzing van een restzetel het hoogste gemiddeld aantal stemmen per zetel zou hebben, krijgt een restzetel. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
+    Als na bovenstaande verdeling volgens het systeem van grootste overschotten nog restzetels overblijven, worden deze resterende restzetels verdeeld via het systeem van de grootste gemiddelden. De lijst die na toewijzing van een restzetel het hoogste gemiddeld aantal stemmen per zetel zou hebben, krijgt een restzetel. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
 
     #table(
       columns: (1fr, 9em, 13em, 8em),
@@ -463,7 +469,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
   emph_block[*Kandidaten die gekozen zijn vanwege hun positie op de lijst*]
   if list_candidate_nomination.other_nomination_columns.len() > 0 {
-    [Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel, maar hebben een zetel toegewezen vanwege hun positie op de lijst.]
+    [Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel, maar hebben een zetel toegewezen gekregen vanwege hun positie op de lijst.]
 
     candidates_with_seat_table(true, false, list_candidate_nomination.other_nomination_columns)
   } else {
@@ -492,7 +498,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
       table.hline(stroke: 1pt + black),
       ..unelected_candidates_ranking.enumerate().map(((idx, unelected_candidate)) => {
         (
-          table.cell(align: right, str(idx + 1)),
+          table.cell(align: right, str(list_candidate_nomination.list_seats + idx + 1)),
           table.cell([#candidate_name(unelected_candidate)]),
           table.cell([#candidate_location(unelected_candidate)]),
           table.cell(align: right, [#unelected_candidate.number]),
@@ -546,7 +552,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 === Is voor de invoer gebruik gemaakt van de bestanden die zijn uitgewisseld via het platform ‘Teluitslagen’?
 
 #checkbox()[Ja]
-#checkbox()[Nee, de resultaten van de papieren processen-verbaal twee keer handmatig ingevoerd in de uitslagensoftware]
+#checkbox()[Nee, de resultaten van de papieren processen-verbaal zijn twee keer handmatig ingevoerd in de uitslagensoftware]
 
 === Heeft het #subcommittee_type verschillen geconstateerd bij de uitvoering van het controleprotocol?
 

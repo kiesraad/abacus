@@ -1,5 +1,4 @@
 use chrono::{DateTime, Utc};
-use pdf_gen::zip::slugify_filename;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
@@ -11,8 +10,8 @@ use crate::domain::{
         CsbAttachmentPdf, CsbCsvCounts, CsbResultsEml, CsbResultsPdf, CsbTotalCountsEml,
         GsbCsvCounts, GsbOverviewPdf, GsbResultsEml, GsbResultsEmlSignature, GsbResultsPdf,
     },
+    filename::slugify,
     identifier::id,
-    report::structs::{csv_filename, election_filename},
 };
 
 id!(FileId);
@@ -38,9 +37,9 @@ pub enum FileType {
     CsbResultsPdf,
     /// CSB attachment PDF (Model P 22-2 Bijlage 1)
     CsbAttachmentPdf,
-    /// CSB CSV counts file (OSV4-3)
+    /// CSB CSV counts file
     CsbCsvCounts,
-    /// GSB CSV counts file (OSV4-3)
+    /// GSB CSV counts file
     GsbCsvCounts,
 }
 
@@ -62,7 +61,14 @@ impl FileType {
         election: &ElectionWithPoliticalGroups,
     ) -> Result<String, InvalidElectionError> {
         let filename = match self {
-            GsbResultsEml => election_filename(election, "Telling", "eml.xml"),
+            GsbResultsEml => {
+                format!(
+                    "Telling_{}_{}_{}.eml.xml",
+                    election.election_id,
+                    election.region_category(),
+                    slugify(&election.authority_region)
+                )
+            }
             GsbResultsEmlSignature => {
                 format!(
                     "{}.signature",
@@ -71,11 +77,11 @@ impl FileType {
             }
             GsbResultsPdf => {
                 if committee_session.is_next_session() {
-                    "Model Na14-2.pdf".to_string()
+                    "Model_Na14-2.pdf".to_string()
                 } else {
                     match election.counting_method {
-                        Some(VoteCountingMethod::CSO) => "Model Na31-2.pdf".to_string(),
-                        Some(VoteCountingMethod::DSO) => "Model Na31-1.pdf".to_string(),
+                        Some(VoteCountingMethod::CSO) => "Model_Na31-2.pdf".to_string(),
+                        Some(VoteCountingMethod::DSO) => "Model_Na31-1.pdf".to_string(),
                         None => {
                             return Err(InvalidElectionError(
                                 "GSB election needs to have a vote counting method".to_string(),
@@ -84,15 +90,23 @@ impl FileType {
                     }
                 }
             }
-            GsbOverviewPdf => "Leeg Model P2a.pdf".to_string(),
-            CsbResultsEml => election_filename(election, "Resultaat", "eml.xml"),
-            CsbTotalCountsEml => election_filename(election, "Totaaltelling", "eml.xml"),
-            CsbResultsPdf => "Model P22-2.pdf".to_string(),
-            CsbAttachmentPdf => "Model P22-2 bijlage.pdf".to_string(),
-            CsbCsvCounts => csv_filename(election),
-            GsbCsvCounts => csv_filename(election),
+            GsbOverviewPdf => "Leeg_Model_P2a.pdf".to_string(),
+            CsbResultsEml => format!("Resultaat_{}.eml.xml", election.election_id),
+            CsbTotalCountsEml => {
+                format!(
+                    "Totaaltelling_{}_{}_{}.eml.xml",
+                    election.election_id,
+                    election.region_category(),
+                    slugify(&election.authority_region)
+                )
+            }
+            CsbResultsPdf => "Model_P22-2.pdf".to_string(),
+            CsbAttachmentPdf => "Model_P22-2_bijlage.pdf".to_string(),
+            CsbCsvCounts | GsbCsvCounts => {
+                format!("abacus_telling_{}.csv", election.election_id.to_lowercase())
+            }
         };
-        Ok(slugify_filename(&filename))
+        Ok(filename)
     }
 }
 

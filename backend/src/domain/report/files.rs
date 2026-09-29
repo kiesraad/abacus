@@ -341,11 +341,14 @@ mod tests {
             let csv = files.results_csv.expect("should have generated csv");
             let pdf = files.results_pdf.expect("should have generated pdf");
 
-            assert_eq!(eml.name, "Telling_GR2026_Juinen.eml.xml");
+            assert_eq!(eml.name, "Telling_GR2026_Juinen_gemeente_Juinen.eml.xml");
             assert_eq!(eml.id, FileId::from(1));
-            assert_eq!(signature.name, "Telling_GR2026_Juinen.eml.xml.signature");
+            assert_eq!(
+                signature.name,
+                "Telling_GR2026_Juinen_gemeente_Juinen.eml.xml.signature"
+            );
             assert_eq!(signature.id, FileId::from(2));
-            assert_eq!(csv.name, "osv4-3_telling_gr2026_juinen.csv");
+            assert_eq!(csv.name, "abacus_telling_gr2026_juinen.csv");
             assert_eq!(csv.id, FileId::from(3));
             assert_eq!(pdf.name, "Model_Na31-2.pdf");
             assert_eq!(pdf.id, FileId::from(4));
@@ -398,11 +401,14 @@ mod tests {
             let csv = files.results_csv.expect("should have generated csv");
             let pdf = files.results_pdf.expect("should have generated pdf");
 
-            assert_eq!(eml.name, "Telling_AB2026_Juinen.eml.xml");
+            assert_eq!(eml.name, "Telling_AB2026_Juinen_gemeente_Juinen.eml.xml");
             assert_eq!(eml.id, FileId::from(1));
-            assert_eq!(signature.name, "Telling_AB2026_Juinen.eml.xml.signature");
+            assert_eq!(
+                signature.name,
+                "Telling_AB2026_Juinen_gemeente_Juinen.eml.xml.signature"
+            );
             assert_eq!(signature.id, FileId::from(2));
-            assert_eq!(csv.name, "osv4-3_telling_ab2026_juinen.csv");
+            assert_eq!(csv.name, "abacus_telling_ab2026_juinen.csv");
             assert_eq!(csv.id, FileId::from(3));
             assert_eq!(pdf.name, "Model_Na31-1.pdf");
             assert_eq!(pdf.id, FileId::from(4));
@@ -441,11 +447,17 @@ mod tests {
             let pdf = files.results_pdf.expect("should have generated pdf");
             let overview = files.overview_pdf.expect("should have generated overview");
 
-            assert_eq!(eml.name, "Telling_GR2026_GroteStad.eml.xml");
+            assert_eq!(
+                eml.name,
+                "Telling_GR2026_GroteStad_gemeente_Grote_Stad.eml.xml"
+            );
             assert_eq!(eml.id, FileId::from(1));
-            assert_eq!(signature.name, "Telling_GR2026_GroteStad.eml.xml.signature");
+            assert_eq!(
+                signature.name,
+                "Telling_GR2026_GroteStad_gemeente_Grote_Stad.eml.xml.signature"
+            );
             assert_eq!(signature.id, FileId::from(2));
-            assert_eq!(csv.name, "osv4-3_telling_gr2026_grotestad.csv");
+            assert_eq!(csv.name, "abacus_telling_gr2026_grotestad.csv");
             assert_eq!(csv.id, FileId::from(3));
             assert_eq!(pdf.name, "Model_Na14-2.pdf");
             assert_eq!(pdf.id, FileId::from(4));
@@ -620,7 +632,10 @@ mod tests {
             assert_eq!(eml_results.name, "Resultaat_GR2024_Juinen.eml.xml");
             assert_eq!(eml_results.id, FileId::from(1));
 
-            assert_eq!(eml_total_counts.name, "Totaaltelling_GR2024_Juinen.eml.xml");
+            assert_eq!(
+                eml_total_counts.name,
+                "Totaaltelling_GR2024_Juinen_gemeente_Juinen.eml.xml"
+            );
             assert_eq!(eml_total_counts.id, FileId::from(2));
 
             assert_eq!(pdf.name, "Model_P22-2.pdf");
@@ -629,7 +644,7 @@ mod tests {
             assert_eq!(attachment_pdf.name, "Model_P22-2_bijlage.pdf");
             assert_eq!(attachment_pdf.id, FileId::from(4));
 
-            assert_eq!(csv_counts.name, "osv4-3_telling_gr2024_juinen.csv");
+            assert_eq!(csv_counts.name, "abacus_telling_gr2024_juinen.csv");
             assert_eq!(csv_counts.id, FileId::from(5));
 
             assert_eq!(

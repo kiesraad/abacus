@@ -1,5 +1,5 @@
 use apportionment::ApportionmentDetails;
-use chrono::{DateTime, Datelike, Local, Utc};
+use chrono::{DateTime, Local, Utc};
 use eml_nl::{EMLError, documents::election_count::ElectionCount, io::EMLWrite};
 use eml_signature::SigningKeyPair;
 use pdf_gen::generate_pdf;
@@ -143,32 +143,6 @@ impl CsbFiles {
             || self.attachment_pdf.is_none()
             || self.csv_counts.is_none()
     }
-}
-
-/// Generates a filename for the given election and file extension
-/// E.g. "{base}_GR2026_GemeenteNaam.{ext}"
-pub fn election_filename(election: &ElectionWithPoliticalGroups, base: &str, ext: &str) -> String {
-    let location_without_whitespace: String = election.location.split_whitespace().collect();
-
-    format!(
-        "{base} {}{} {}.{ext}",
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        location_without_whitespace,
-    )
-}
-
-pub fn csv_filename(election: &ElectionWithPoliticalGroups) -> String {
-    format!(
-        "osv4-3_telling_{}{}_{}.csv",
-        election.category.to_eml_code().to_lowercase(),
-        election.election_date.year(),
-        election
-            .location
-            .split_whitespace()
-            .collect::<String>()
-            .to_lowercase(),
-    )
 }
 
 #[derive(Debug)]

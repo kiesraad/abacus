@@ -9,11 +9,6 @@ use axum_extra::response::Attachment;
 use tokio::io::{AsyncWriteExt, DuplexStream};
 use tokio_util::{compat::TokioAsyncWriteCompatExt, io::ReaderStream};
 
-/// Slugify a filename by replacing spaces with underscores and slashes with dashes.
-pub fn slugify_filename(filename: &str) -> String {
-    filename.replace(" ", "_").replace("/", "-")
-}
-
 /// A ZIP file response, that streams its contents to the client every time a file is added
 pub struct ZipResponse {
     inner: ReaderStream<DuplexStream>,
@@ -98,9 +93,9 @@ impl From<async_zip::error::ZipError> for ZipResponseError {
     }
 }
 
-/// A compressed ZIP entry with a slugified name, last modified now
+/// A compressed ZIP entry, last modified now
 fn zip_entry(name: &str) -> ZipEntryBuilder {
-    ZipEntryBuilder::new(slugify_filename(name).into(), Compression::Deflate)
+    ZipEntryBuilder::new(name.into(), Compression::Deflate)
         .last_modification_date(ZipDateTime::from(chrono::Utc::now()))
 }
 
@@ -242,15 +237,12 @@ mod tests {
         );
     }
 
-    /// Test that all files end up in the archive, in order and with slugified names.
+    /// Test that all files end up in the archive, in order.
     #[tokio::test]
     async fn zip_files_contains_all_files() {
-        let zip = zip_files(&[
-            ("first file.xml", b"first"),
-            ("second.signature", b"second"),
-        ])
-        .await
-        .unwrap();
+        let zip = zip_files(&[("first.xml", b"first"), ("second.signature", b"second")])
+            .await
+            .unwrap();
 
         let archive = async_zip::base::read::mem::ZipFileReader::new(zip)
             .await
@@ -267,7 +259,7 @@ mod tests {
         assert_eq!(
             entries,
             [
-                ("first_file.xml".to_string(), b"first".to_vec()),
+                ("first.xml".to_string(), b"first".to_vec()),
                 ("second.signature".to_string(), b"second".to_vec()),
             ]
         );

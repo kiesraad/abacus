@@ -1,11 +1,12 @@
 #![cfg(test)]
 
+use std::net::SocketAddr;
+
 use abacus::eml::polling_stations_from_eml_str;
 use async_zip::base::read::mem::ZipFileReader;
 use axum::http::{HeaderValue, StatusCode};
 use reqwest::Response;
 use sqlx::SqlitePool;
-use std::net::SocketAddr;
 use test_log::test;
 
 use crate::{
@@ -1366,7 +1367,7 @@ async fn test_export_works(pool: SqlitePool) {
     let election_id = 11;
 
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/export");
-    let prefix = "\"abacus-exporteren_stemgebieden-algemeen_bestuur_van_het_waterschap_rivier_en_polder_2026-eml_110b_stembureaus-";
+    let prefix = "abacus-exporteren_stemgebieden-algemeen_bestuur_van_het_waterschap_s-lansbregen_2026-eml_110b_stembureaus-";
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let archive = ZipFileReader::new(bytes).await.unwrap();
@@ -1375,7 +1376,7 @@ async fn test_export_works(pool: SqlitePool) {
     let entry = read_zip_entry(
         &archive,
         0,
-        "Stembureaus_AB2026_RivierenPolder_Heemdamseburg.eml.xml",
+        "Stembureaus_AB2026_sLansbregen_Heemdamseburg.eml.xml",
     )
     .await;
     let xml = String::from_utf8(entry).unwrap();

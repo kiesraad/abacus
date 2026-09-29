@@ -46,12 +46,15 @@ use crate::{
     service::{create_sub_committee, list_polling_stations_for_session},
 };
 
+mod handlers;
+
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
     const ALL_ROLES: &[Role] = Role::VARIANTS;
     const ADMIN: &[Role] = &[Administrator];
     const ADMIN_GSB_COORDINATOR: &[Role] = &[Administrator, CoordinatorGSB];
+    const CSB_COORDINATOR: &[Role] = &[CoordinatorCSB];
 
     OpenApiRouter::default()
         .routes(routes!(election_import_validate).authorize(ADMIN))
@@ -59,6 +62,10 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_list).authorize(ALL_ROLES))
         .routes(routes!(election_details).authorize(ALL_ROLES))
         .routes(routes!(election_number_of_voters_change).authorize(ADMIN_GSB_COORDINATOR))
+        .routes(
+            routes!(handlers::data_entry_import::election_data_entry_import_validate)
+                .authorize(CSB_COORDINATOR),
+        )
 }
 
 /// Election list response
@@ -691,7 +698,7 @@ async fn import_csb_election(
 }
 
 /// Check if the user's entered hash matches the hash of given data
-fn check_hash(
+pub fn check_hash(
     data: &[u8],
     user_hash: Option<&[String; crate::eml::hash::CHUNK_COUNT]>,
 ) -> Result<[String; crate::eml::hash::CHUNK_COUNT], APIError> {

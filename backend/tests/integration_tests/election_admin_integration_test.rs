@@ -5,7 +5,7 @@ use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
-    shared::{FixtureUser::*, get_election_details, login},
+    shared::{FixtureUser::*, get_election_details, get_statuses, login},
     utils::serve_api,
 };
 
@@ -107,7 +107,7 @@ async fn test_csb_election_validate_valid(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
-async fn test_csb_election_validate_with_candidates(pool: SqlitePool) {
+async fn test_csb_municipal_election_validate_with_candidates(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
@@ -136,6 +136,48 @@ async fn test_csb_election_validate_with_candidates(pool: SqlitePool) {
     assert_eq!(body["election"]["committee_category"], "CSB");
     // CSB responses don't have number_of_voters field
     assert!(body.get("number_of_voters").is_none());
+}
+
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
+async fn test_csb_water_authority_election_validate_with_candidates(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/import/validate");
+    let admin_cookie = login(&addr, Admin).await;
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", admin_cookie)
+        .json(&serde_json::json!({
+            "committee_category": "CSB",
+            "election_hash": [
+                "f958", "1366", "c63f", "b36e",
+                "2989", "bf4e", "4bb2", "e6a8",
+                "ba2f", "e9b6", "9d40", "7ac6",
+                "f546", "863c", "6a6c", "d0f4",
+            ],
+            "election_data": include_str!("../../src/eml/tests/eml110a_test_AB.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test_AB.eml.xml"),
+        }))
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["committee_category"], "CSB");
+    assert_eq!(body["election"]["authority_id"], "CSB");
+    assert_eq!(body["election"]["authority_name"], "Rivier en Polder");
+    assert_eq!(body["election"]["category"], "WaterAuthority");
+    assert_eq!(body["election"]["committee_category"], "CSB");
+    assert_eq!(body["election"]["district"]["district"], "None");
+    assert_eq!(body["election"]["name"], "Waterschap Rivier en Polder 2023");
+    assert_eq!(
+        body["election"]["official_name"],
+        "Algemeen bestuur van het waterschap Rivier en Polder 2023"
+    );
+    // CSB responses don't have these GSB-specific fields.
+    assert!(body.get("number_of_voters").is_none());
+    assert!(body.get("gsb_list").is_none());
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
@@ -172,12 +214,9 @@ async fn test_csb_municipal_election_import_save(pool: SqlitePool) {
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["committee_category"], "CSB");
     assert!(body["counting_method"].is_null());
-    let election_details = get_election_details(
-        &addr,
-        &admin_cookie,
-        u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
-    )
-    .await;
+
+    let election_id = u32::try_from(body["id"].as_u64().unwrap()).unwrap();
+    let election_details = get_election_details(&addr, &admin_cookie, election_id).await;
     assert_eq!(election_details["election"]["committee_category"], "CSB");
     assert!(election_details["election"]["counting_method"].is_null());
     assert_eq!(election_details["election"]["number_of_voters"], 1);
@@ -185,6 +224,17 @@ async fn test_csb_municipal_election_import_save(pool: SqlitePool) {
         election_details["current_committee_session"]["status"],
         "in_preparation"
     );
+
+    // CSB for GR has exactly one sub committee (the GSB of the municipality itself).
+    let statuses = get_statuses(&addr, &admin_cookie, election_id).await;
+    assert_eq!(statuses.len(), 1);
+    let sub_committee = &statuses.values().next().unwrap()["source"];
+    assert_eq!(sub_committee["authority_id"], "0000");
+    assert_eq!(sub_committee["authority_name"], "Test");
+    assert_eq!(sub_committee["category"], "GSB");
+    assert_eq!(sub_committee["name"], "Test");
+    assert_eq!(sub_committee["number"], 0);
+    assert_eq!(sub_committee["type"], "SubCommittee");
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
@@ -221,12 +271,9 @@ async fn test_csb_water_authority_election_import_save(pool: SqlitePool) {
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["committee_category"], "CSB");
     assert!(body["counting_method"].is_null());
-    let election_details = get_election_details(
-        &addr,
-        &admin_cookie,
-        u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
-    )
-    .await;
+
+    let election_id = u32::try_from(body["id"].as_u64().unwrap()).unwrap();
+    let election_details = get_election_details(&addr, &admin_cookie, election_id).await;
     assert_eq!(election_details["election"]["committee_category"], "CSB");
     assert!(election_details["election"]["counting_method"].is_null());
     assert_eq!(election_details["election"]["number_of_voters"], 1);
@@ -234,6 +281,17 @@ async fn test_csb_water_authority_election_import_save(pool: SqlitePool) {
         election_details["current_committee_session"]["status"],
         "in_preparation"
     );
+
+    // CSB for WS has a sub committee for each GSB.
+    let statuses = get_statuses(&addr, &admin_cookie, election_id).await;
+    assert_eq!(statuses.len(), 4);
+    let heemdamseburg = &statuses.values().next().unwrap()["source"]; // First sub committee in the EML
+    assert_eq!(heemdamseburg["authority_id"], "0123");
+    assert_eq!(heemdamseburg["authority_name"], "Heemdamseburg");
+    assert_eq!(heemdamseburg["category"], "GSB");
+    assert_eq!(heemdamseburg["name"], "Heemdamseburg");
+    assert_eq!(heemdamseburg["number"], 123);
+    assert_eq!(heemdamseburg["type"], "SubCommittee");
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]

@@ -24,26 +24,30 @@ fn strip_diacritic(c: char) -> char {
     }
 }
 
-/// Remove diacritics, preserve inner hyphens, spaces become "-", all lowercase
+/// Hyphenate a part of the filename:
+/// - to lowercase
+/// - remove diacritics
+/// - replace spaces with hyphens
+/// - remove all characters that are not ASCII alphanumeric or hyphen
 pub fn hyphenate(authority_region: &str) -> String {
     authority_region
         .to_lowercase()
         .chars()
         .map(strip_diacritic)
         .map(|c| if c == ' ' { '-' } else { c })
-        .filter(|c| c.is_alphanumeric() || *c == '-')
+        .filter(|c| c.is_ascii_alphanumeric() || *c == '-')
         .collect()
 }
 
 /// Slugify a part of the filename:
 /// - remove diacritics
 /// - replace spaces with underscores
-/// - remove all characters that are not alphanumeric or hyphen or underscore
+/// - remove all characters that are not ASCII alphanumeric or hyphen or underscore
 pub fn slugify(part: &str) -> String {
     part.chars()
         .map(strip_diacritic)
         .map(|c| if c == ' ' { '_' } else { c })
-        .filter(|c| c.is_alphanumeric() || *c == '-' || *c == '_')
+        .filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_')
         .collect()
 }
 

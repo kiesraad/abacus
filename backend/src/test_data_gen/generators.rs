@@ -415,7 +415,7 @@ fn generate_election(
             None => String::new(),
         };
         official_name = format!("Algemeen bestuur van het {}", lowercased_name);
-        seats_range = RandomRange(19..30)
+        seats_range = RandomRange(19..31)
     }
 
     info!("Election has name '{name}'");

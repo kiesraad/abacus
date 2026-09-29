@@ -416,11 +416,9 @@ fn generate_election(
         };
         official_name = format!("Algemeen bestuur van het {}", lowercased_name);
         // Water Authority number of seats should be >= 19 and <= 30
-        if seats_range.0.end > 19 {
-            seats_range = RandomRange(seats_range.0.start.max(19)..seats_range.0.end.min(31));
-        } else {
-            seats_range = RandomRange(seats_range.0.start.max(19)..31);
-        }
+        let start = seats_range.0.start.clamp(19, 30);
+        let end = seats_range.0.end.clamp(start + 1, 31);
+        seats_range = RandomRange(start..end);
     }
 
     info!("Election has name '{name}'");

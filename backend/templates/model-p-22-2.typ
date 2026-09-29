@@ -25,7 +25,7 @@
 #title_page(
   [#input.election.authority_id #input.election.authority_region],
   [Centraal Stembureau],
-  [#input.election.name - #format_date(input.election.election_date)],
+  [#get_election_title(input.election), #format_date(input.election.election_date)],
   [
     Verslag, uitslag en zetelverdeling – Model P 22-2
   ],

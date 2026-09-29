@@ -2,7 +2,7 @@
   "committee_session": {
     "id": 2,
     "number": 1,
-    "election_id": 11,
+    "election_id": 12,
     "location": "Juinen",
     "start_date_time": "2026-03-19T10:12:00",
     "status": "completed"
@@ -74,7 +74,7 @@
     }
   },
   "election": {
-    "id": 11,
+    "id": 12,
     "name": "Drawing lots >= 19 seats, AbsoluteMajority & List Exhaustion and Deceased Candidates",
     "official_name": "Gemeenteraad Juinen 2026",
     "committee_category": "CSB",

@@ -100,12 +100,12 @@ mod tests {
 
         reader = BufReader::new(
             File::open(
-                "templates/inputs/model-p-22-2-variations/lt-19-seats-and-p7-drawing-lots.json",
+                "templates/inputs/model-p-22-2-variations/lt-19-seats-and-p8-drawing-lots.json",
             )
             .unwrap(),
         );
         serde_json::from_reader::<_, ModelP22_2Input>(reader).expect(
-            "lt-19-seats-and-p7-drawing-lots.json should deserialize to struct ModelP22_2Input",
+            "lt-19-seats-and-p8-drawing-lots.json should deserialize to struct ModelP22_2Input",
         );
 
         reader = BufReader::new(
@@ -141,6 +141,12 @@ mod tests {
         serde_json::from_reader::<_, ModelP22_2Input>(reader).expect(
             "lt-19-seats-and-p15-drawing-lots.json should deserialize to struct ModelP22_2Input",
         );
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-p-22-2-variations/model-p-22-2-WS.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader)
+            .expect("model-p-22-2-WS.json should deserialize to struct ModelP22_2Input");
     }
 
     #[test]

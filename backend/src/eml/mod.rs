@@ -44,11 +44,11 @@ use crate::{
         data_entry::DataEntrySourceNumber,
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
-            ElectionCategory, ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber,
-            RegionKey, RegisteredPoliticalGroup,
+            ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
+            RegisteredPoliticalGroup,
         },
         results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
-        tabulation::{CommitteeSpecificTotals, ElectionTotals, GSBTotals},
+        tabulation::{CommitteeSpecificTotals, ElectionTotals},
     },
     eml::committees::ElectionTreeDetails,
 };
@@ -67,10 +67,10 @@ fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
 /// Format the EML election name for Abacus
 ///
 /// For water authority, the prefix is removed and the first letter capitalized
-fn format_election_name(name: &str, category: ElectionCategory) -> String {
+fn format_election_name(name: &str, category: crate::domain::election::ElectionCategory) -> String {
     let name = name.trim();
 
-    if category != ElectionCategory::WaterAuthority {
+    if category != crate::domain::election::ElectionCategory::WaterAuthority {
         return name.to_string();
     }
 
@@ -92,8 +92,9 @@ impl NewElection {
     fn get_category_or_err(
         category: eml_nl::utils::ElectionCategory,
     ) -> Result<crate::domain::election::ElectionCategory, EMLImportError> {
-        use crate::domain::election::ElectionCategory as Domain;
         use eml_nl::utils::ElectionCategory as Eml;
+
+        use crate::domain::election::ElectionCategory as Domain;
         let category = match category {
             Eml::AB => Domain::WaterAuthority,
             Eml::GR => Domain::Municipal,
@@ -106,10 +107,10 @@ impl NewElection {
     fn get_sub_category_or_err(
         sub_category: eml_nl::utils::ElectionSubcategory,
     ) -> Result<crate::domain::election::ElectionSubCategory, EMLImportError> {
-        use crate::domain::election::ElectionSubCategory as Domain;
         use eml_nl::utils::ElectionSubcategory as Eml;
+
+        use crate::domain::election::ElectionSubCategory as Domain;
         let sub_category = match sub_category {
-            Eml::AB1 => Domain::AB1,
             Eml::AB2 => Domain::AB2,
             Eml::GR1 => Domain::GR1,
             Eml::GR2 => Domain::GR2,
@@ -124,8 +125,7 @@ impl NewElection {
         category: crate::domain::election::ElectionCategory,
         sub_category: crate::domain::election::ElectionSubCategory,
     ) -> bool {
-        use crate::domain::election::ElectionCategory;
-        use crate::domain::election::ElectionSubCategory;
+        use crate::domain::election::{ElectionCategory, ElectionSubCategory};
         match category {
             ElectionCategory::WaterAuthority => {
                 sub_category == ElectionSubCategory::AB1 || sub_category == ElectionSubCategory::AB2
@@ -469,8 +469,9 @@ impl ElectionDomain {
 impl ElectionWithPoliticalGroups {
     /// Get the EML election category for this election.
     pub fn get_eml_category(&self) -> eml_nl::utils::ElectionCategory {
-        use crate::domain::election::ElectionCategory as Domain;
         use eml_nl::utils::ElectionCategory as Eml;
+
+        use crate::domain::election::ElectionCategory as Domain;
         match self.category {
             Domain::Municipal => Eml::GR,
             Domain::Provincial => Eml::PS,
@@ -480,8 +481,9 @@ impl ElectionWithPoliticalGroups {
 
     /// Get the EML election sub category for this election.
     pub fn get_eml_sub_category(&self) -> eml_nl::utils::ElectionSubcategory {
-        use crate::domain::election::ElectionSubCategory as Domain;
         use eml_nl::utils::ElectionSubcategory as Eml;
+
+        use crate::domain::election::ElectionSubCategory as Domain;
         match self.sub_category {
             Domain::AB1 => Eml::AB1,
             Domain::AB2 => Eml::AB2,
@@ -1011,6 +1013,7 @@ fn add_reporting_unit_investigations(
     data_source: &crate::domain::data_entry::DataEntrySource,
     gsb_totals: &crate::domain::tabulation::GSBTotals,
 ) -> ReportingUnitVotesBuilder {
+    use crate::domain::tabulation::GSBTotals;
     if !committee_session.is_next_session() {
         let DataEntrySourceNumber::PollingStation(ref number) = data_source.number() else {
             unreachable!()

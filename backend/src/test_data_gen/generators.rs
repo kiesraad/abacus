@@ -407,6 +407,7 @@ fn generate_election(
     let cleaned_up_locality = domain.name.replace(" ", "_").replace("'", "");
     let election_id = format!("{category}{year}_{cleaned_up_locality}");
     let mut official_name = format_election_name(rng, args.election_category, &domain.name, year);
+    let mut seats_range = args.seats.clone();
     if args.election_category == ElectionCategory::WaterAuthority {
         let mut chars = official_name.chars();
         let lowercased_name = match chars.next() {
@@ -414,11 +415,15 @@ fn generate_election(
             None => String::new(),
         };
         official_name = format!("Algemeen bestuur van het {}", lowercased_name);
+        // Water Authority number of seats should be >= 19 and <= 30
+        let start = seats_range.0.start.clamp(19, 30);
+        let end = seats_range.0.end.clamp(start + 1, 31);
+        seats_range = RandomRange(start..end);
     }
 
     info!("Election has name '{name}'");
 
-    let number_of_seats = rng.random_range(args.seats.clone());
+    let number_of_seats = rng.random_range(seats_range);
 
     let counting_method = match args.committee_category {
         CommitteeCategory::GSB => Some(args.counting_method.unwrap_or(VoteCountingMethod::CSO)),

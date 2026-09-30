@@ -461,7 +461,10 @@ async fn test_committee_session_status_change_works(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_2", "signing_keypair", "users")
+)))]
 async fn test_committee_session_status_change_completed_to_data_entry_deletes_files(
     pool: SqlitePool,
 ) {

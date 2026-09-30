@@ -152,7 +152,10 @@ pub async fn read_zip_entry(
     buf
 }
 
-#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_2", "signing_keypair", "users")
+)))]
 async fn test_gsb_cso_election_first_session_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorGSB).await;
@@ -205,7 +208,10 @@ async fn test_gsb_cso_election_first_session_zip_download_works(pool: SqlitePool
         .expect("signature should verify");
 }
 
-#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_11_dso", "signing_keypair", "users")
+)))]
 async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorGSB).await;
@@ -239,7 +245,7 @@ async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool
 
 #[test(sqlx::test(fixtures(
     path = "../../fixtures",
-    scripts("election_5_with_results", "users")
+    scripts("election_5_with_results", "signing_keypair", "users")
 )))]
 async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;

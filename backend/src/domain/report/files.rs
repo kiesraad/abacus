@@ -282,7 +282,10 @@ mod tests {
         service::update_apportionment_state,
     };
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(
+        path = "../../../fixtures",
+        scripts("election_5_with_results", "signing_keypair")
+    )))]
     async fn test_error_get_files_gsb_election_not_completed(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
@@ -382,7 +385,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures(
         path = "../../../fixtures",
-        scripts("election_12_dso_with_results")
+        scripts("election_12_dso_with_results", "signing_keypair")
     )))]
     async fn test_get_files_gsb_dso_election_first_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
@@ -416,18 +419,15 @@ mod tests {
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
-                [
-                    "SigningKeypairCreated",
-                    "FileCreated",
-                    "FileCreated",
-                    "FileCreated",
-                    "FileCreated"
-                ]
+                ["FileCreated", "FileCreated", "FileCreated", "FileCreated"]
             );
         }
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(
+        path = "../../../fixtures",
+        scripts("election_7_four_sessions", "signing_keypair")
+    )))]
     async fn test_get_files_gsb_election_next_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
@@ -467,7 +467,6 @@ mod tests {
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
                 [
-                    "SigningKeypairCreated",
                     "FileCreated",
                     "FileCreated",
                     "FileCreated",
@@ -478,7 +477,10 @@ mod tests {
         }
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(
+        path = "../../../fixtures",
+        scripts("election_7_four_sessions", "signing_keypair")
+    )))]
     async fn test_get_files_gsb_election_next_session_without_corrections(pool: SqlitePool) {
         let audit_service = AuditService::new(None, None);
         let mut conn = pool.acquire().await.unwrap();
@@ -512,10 +514,7 @@ mod tests {
             assert_eq!(overview.name, "Leeg_Model_P2a.pdf");
             assert_eq!(overview.id, FileId::from(1));
 
-            assert_eq!(
-                list_event_names(&mut conn).await.unwrap(),
-                ["SigningKeypairCreated", "FileCreated"]
-            );
+            assert_eq!(list_event_names(&mut conn).await.unwrap(), ["FileCreated"]);
         }
     }
 

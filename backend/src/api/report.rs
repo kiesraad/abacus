@@ -478,7 +478,10 @@ mod tests {
         assert_committee_category_authorization_err(results).await;
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_5_with_results", "signing_keypair")
+    )))]
     async fn test_gsb_election_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers_gsb(pool, Role::CoordinatorGSB, ElectionId::from(5)).await;
         assert_committee_category_authorization_ok(results);

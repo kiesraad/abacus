@@ -680,14 +680,6 @@ pub struct DataEntryGetResponse {
     pub source: DataEntrySource,
 }
 
-fn get_user_id(first_entry_origin: &DataEntryOrigin) -> Option<UserId> {
-    if let DataEntryOrigin::Typist(user_id) = first_entry_origin {
-        Some(*user_id)
-    } else {
-        None
-    }
-}
-
 /// Get data entry with validation results
 #[utoipa::path(
     get,
@@ -716,42 +708,42 @@ async fn data_entry_get(
 
     Ok(Json(match state.clone() {
         FirstEntryInProgress(first_entry_in_progress_state) => DataEntryGetResponse {
-            user_id: Some(first_entry_in_progress_state.first_entry_user_id),
+            user_id: state.get_first_entry_user_id(),
             data: first_entry_in_progress_state.first_entry,
             status: state.status_name(),
             validation_results: ValidationResults::default(),
             source: context.source,
         },
         FirstEntryCorrection(first_entry_correction_state) => DataEntryGetResponse {
-            user_id: Some(first_entry_correction_state.first_entry_user_id),
+            user_id: state.get_first_entry_user_id(),
             data: first_entry_correction_state.first_entry,
             status: state.status_name(),
             validation_results: ValidationResults::default(),
             source: context.source,
         },
         FirstEntryHasErrors(first_entry_has_errors_state) => DataEntryGetResponse {
-            user_id: Some(first_entry_has_errors_state.first_entry_user_id),
+            user_id: state.get_first_entry_user_id(),
             data: first_entry_has_errors_state.finalised_first_entry,
             status: state.status_name(),
             validation_results: state.start_validate(&context.election)?,
             source: context.source,
         },
         FirstEntryFinalised(first_entry_finalised_state) => DataEntryGetResponse {
-            user_id: get_user_id(&first_entry_finalised_state.first_entry_origin),
+            user_id: state.get_first_entry_user_id(),
             data: first_entry_finalised_state.finalised_first_entry,
             status: state.status_name(),
             validation_results: state.start_validate(&context.election)?,
             source: context.source,
         },
         SecondEntryInProgress(second_entry_in_progress_state) => DataEntryGetResponse {
-            user_id: Some(second_entry_in_progress_state.second_entry_user_id),
+            user_id: state.get_second_entry_user_id(),
             data: second_entry_in_progress_state.second_entry,
             status: state.status_name(),
             validation_results: ValidationResults::default(),
             source: context.source,
         },
         SecondEntryCorrection(second_entry_correction_state) => DataEntryGetResponse {
-            user_id: Some(second_entry_correction_state.second_entry_user_id),
+            user_id: state.get_second_entry_user_id(),
             data: second_entry_correction_state.second_entry,
             status: state.status_name(),
             validation_results: ValidationResults::default(),

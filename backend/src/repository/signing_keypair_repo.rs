@@ -3,6 +3,19 @@ use zeroize::Zeroizing;
 
 use crate::domain::election::ElectionId;
 
+/// Get the stored certificate (PEM) for an election, without its private key
+pub async fn get_certificate(
+    conn: &mut SqliteConnection,
+    election_id: ElectionId,
+) -> Result<Option<String>, sqlx::Error> {
+    sqlx::query_scalar!(
+        r#"SELECT certificate FROM signing_keypair WHERE election_id = $1"#,
+        election_id
+    )
+    .fetch_optional(conn)
+    .await
+}
+
 /// Get the stored certificate (PEM) and private key (DER) for an election
 pub async fn get_keypair(
     conn: &mut SqliteConnection,
@@ -79,6 +92,7 @@ mod tests {
     async fn test_get_before_create(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let election_id = ElectionId::from(1);
+        assert_eq!(get_certificate(&mut conn, election_id).await.unwrap(), None);
         assert_eq!(get_keypair(&mut conn, election_id).await.unwrap(), None);
         assert_eq!(
             get_show_reminder(&mut conn, election_id).await.unwrap(),
@@ -103,6 +117,10 @@ mod tests {
         .await
         .unwrap();
 
+        assert_eq!(
+            get_certificate(&mut conn, election_id).await.unwrap(),
+            Some(certificate.clone())
+        );
         assert_eq!(
             get_keypair(&mut conn, election_id).await.unwrap(),
             Some((certificate, private_key))

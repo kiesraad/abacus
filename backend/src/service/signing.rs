@@ -65,8 +65,16 @@ pub async fn get_election_certificate(
     audit_service: &AuditService,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<Certificate, APIError> {
-    let keypair = get_signing_keypair(conn, audit_service, election).await?;
-    Ok(keypair.certificate().clone())
+    ensure_supports_signing(election)?;
+
+    match signing_keypair_repo::get_certificate(conn, election.id).await? {
+        Some(certificate) => Certificate::from_pem(certificate.as_bytes())
+            .map_err(|e| APIError::DataIntegrityError(e.to_string())),
+        None => {
+            let keypair = create_keypair(conn, audit_service, election).await?;
+            Ok(keypair.certificate().clone())
+        }
+    }
 }
 
 /// Get the signing keypair of an election, generating and storing it if it does not exist yet
@@ -253,6 +261,30 @@ mod tests {
             .expect("should be able to list audit events");
 
         assert_eq!(audit_events.len(), 1);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1"))))]
+    async fn get_election_certificate_invalid_stored_certificate(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+
+        let audit_service = get_audit_service();
+
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]);
+
+        signing_keypair_repo::create(
+            &mut conn,
+            election.id,
+            String::from("not a certificate"),
+            Zeroizing::new(Vec::from("not a key")),
+        )
+        .await
+        .unwrap();
+
+        let err = get_election_certificate(&mut conn, &audit_service, &election)
+            .await
+            .expect_err("should return error");
+
+        assert_matches!(err, APIError::DataIntegrityError(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1"))))]

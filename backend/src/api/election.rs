@@ -66,6 +66,10 @@ pub fn router() -> OpenApiRouter<AppState> {
             routes!(handlers::data_entry_import::election_data_entry_import_validate)
                 .authorize(CSB_COORDINATOR),
         )
+        .routes(
+            routes!(handlers::data_entry_import::election_data_entry_import)
+                .authorize(CSB_COORDINATOR),
+        )
 }
 
 /// Election list response

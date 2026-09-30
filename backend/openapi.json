@@ -3220,6 +3220,102 @@
         ]
       }
     },
+    "/api/elections/{election_id}/data_entry/import": {
+      "post": {
+        "summary": "Imports uploaded data entry results (coordinator_csb)",
+        "operationId": "election_data_entry_import",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CSBDataEntryImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Election count imported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CSBDataEntryImportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/data_entry/import/validate": {
       "post": {
         "summary": "Validates uploaded data entry results (coordinator_csb)",
@@ -6559,6 +6655,46 @@
           },
           "postal_code": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBDataEntryImportRequest": {
+        "type": "object",
+        "required": [
+          "hash",
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string",
+            "format": "binary"
+          },
+          "hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CSBDataEntryImportResponse": {
+        "type": "object",
+        "required": [
+          "election_name",
+          "election_date",
+          "sub_committee"
+        ],
+        "properties": {
+          "election_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "election_name": {
+            "type": "string"
+          },
+          "sub_committee": {
+            "$ref": "#/components/schemas/SubCommittee"
           }
         },
         "additionalProperties": false

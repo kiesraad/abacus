@@ -240,6 +240,12 @@ export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/status`;
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
 
+// /api/elections/{election_id}/data_entry/import
+export interface ELECTION_DATA_ENTRY_IMPORT_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DATA_ENTRY_IMPORT_REQUEST_PATH = `/api/elections/${ElectionId}/data_entry/import`;
+
 // /api/elections/{election_id}/data_entry/import/validate
 export interface ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -614,6 +620,17 @@ export interface BasePollingStation {
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
+}
+
+export interface CSBDataEntryImportRequest {
+  data: string;
+  hash: string[];
+}
+
+export interface CSBDataEntryImportResponse {
+  election_date: string;
+  election_name: string;
+  sub_committee: SubCommittee;
 }
 
 export interface CSBDataEntryImportValidateRequest {

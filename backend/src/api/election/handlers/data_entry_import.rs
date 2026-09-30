@@ -6,20 +6,23 @@ use axum::{
 use chrono::NaiveDate;
 use eml_nl::{
     EMLError,
+    common::AuthorityIdentifier,
     documents::election_count::ElectionCount,
     io::{EMLParsingMode, EMLRead},
 };
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
+use sqlx::{SqliteConnection, SqlitePool};
 use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
     api::election::check_hash,
     domain::{
+        committee_session::{CommitteeSessionError, CommitteeSessionId},
+        committee_session_status::CommitteeSessionStatus,
         data_entry::{DataEntrySource, DataEntryStatus},
-        election::ElectionId,
-        sub_committee::SubCommittee,
+        election::{ElectionId, ElectionWithPoliticalGroups},
+        sub_committee::{SubCommittee, SubCommitteeFirstSession},
     },
     eml::{EMLImportError, RedactedEmlHash},
     error::ErrorReference,
@@ -37,40 +40,61 @@ impl<S: Send + Sync> FromRequest<S> for CSBDataEntryImportValidateRequest {
     type Rejection = APIError;
 
     async fn from_request(request: Request, state: &S) -> Result<Self, Self::Rejection> {
-        let mut multipart = Multipart::from_request(request, state).await?;
-        let mut hash = None;
-        let mut data = None;
+        let (hash, data) = read_form_data(request, state).await?;
+        Ok(Self { hash, data })
+    }
+}
 
-        while let Some(field) = multipart.next_field().await? {
-            match field.name() {
-                Some("hash") => {
-                    let json = field.text().await?;
-                    let chunks = serde_json::from_str(&json).map_err(|err| {
-                        APIError::BadRequest(
-                            format!("Invalid hash: {err}"),
-                            ErrorReference::InvalidData,
-                        )
-                    })?;
-                    hash = Some(chunks);
-                }
-                Some("data") => data = Some(field.bytes().await?.into()),
-                name => {
-                    let name = name.unwrap_or_default();
-                    return Err(APIError::BadRequest(
-                        format!("Unexpected field \"{name}\""),
-                        ErrorReference::InvalidData,
-                    ));
-                }
+#[derive(Debug, ToSchema)]
+pub struct CSBDataEntryImportRequest {
+    hash: [String; crate::eml::hash::CHUNK_COUNT],
+    #[schema(value_type = String, format = Binary)]
+    data: Vec<u8>,
+}
+
+impl<S: Send + Sync> FromRequest<S> for CSBDataEntryImportRequest {
+    type Rejection = APIError;
+
+    async fn from_request(request: Request, state: &S) -> Result<Self, Self::Rejection> {
+        let (hash, data) = read_form_data(request, state).await?;
+        let hash = hash.ok_or_else(|| invalid_form_data("Missing hash"))?;
+        Ok(Self { hash, data })
+    }
+}
+
+/// Read the ZIP file and hash from the multipart form data
+async fn read_form_data<S: Send + Sync>(
+    request: Request,
+    state: &S,
+) -> Result<(Option<[String; crate::eml::hash::CHUNK_COUNT]>, Vec<u8>), APIError> {
+    let mut multipart = Multipart::from_request(request, state).await?;
+    let mut hash = None;
+    let mut data = None;
+
+    while let Some(field) = multipart.next_field().await? {
+        match field.name() {
+            Some("hash") => {
+                let json = field.text().await?;
+                let chunks = serde_json::from_str(&json)
+                    .map_err(|err| invalid_form_data(format!("Invalid hash: {err}")))?;
+                hash = Some(chunks);
+            }
+            Some("data") => data = Some(field.bytes().await?.into()),
+            name => {
+                let name = name.unwrap_or_default();
+                return Err(invalid_form_data(format!("Unexpected field \"{name}\"")));
             }
         }
-
-        Ok(Self {
-            hash,
-            data: data.ok_or_else(|| {
-                APIError::BadRequest("Missing zip file".to_string(), ErrorReference::InvalidData)
-            })?,
-        })
     }
+
+    Ok((
+        hash,
+        data.ok_or_else(|| invalid_form_data("Missing ZIP file"))?,
+    ))
+}
+
+fn invalid_form_data(message: impl Into<String>) -> APIError {
+    APIError::BadRequest(message.into(), ErrorReference::InvalidData)
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -105,21 +129,82 @@ pub async fn election_data_entry_import_validate(
     Path(election_id): Path<ElectionId>,
     request: CSBDataEntryImportValidateRequest,
 ) -> Result<Json<CSBDataEntryImportValidateResponse>, APIError> {
-    let eml = read_eml_from_zip(request.data).await?;
-    check_hash(eml.as_bytes(), request.hash.as_ref())?;
+    let mut conn = pool.acquire().await?;
+    let import =
+        validate_import(&mut conn, election_id, request.data, request.hash.as_ref()).await?;
+
+    Ok(Json(CSBDataEntryImportValidateResponse {
+        hash: import.hash,
+        election_name: import.election.name,
+        election_date: import.election.election_date,
+        sub_committee: import.sub_committee.sub_committee,
+    }))
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CSBDataEntryImportResponse {
+    election_name: String,
+    #[schema(value_type = String, format = "date")]
+    election_date: NaiveDate,
+    sub_committee: SubCommittee,
+}
+
+/// Imports uploaded data entry results
+#[utoipa::path(
+    post,
+    path = "/api/elections/{election_id}/data_entry/import",
+    request_body(content = CSBDataEntryImportRequest, content_type = "multipart/form-data"),
+    responses(
+        (status = 200, description = "Election count imported", body = CSBDataEntryImportResponse),
+        (status = 400, description = "Bad request", body = ErrorResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 413, description = "Payload too large", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+    ),
+)]
+pub async fn election_data_entry_import(
+    State(pool): State<SqlitePool>,
+    Path(election_id): Path<ElectionId>,
+    request: CSBDataEntryImportRequest,
+) -> Result<Json<CSBDataEntryImportResponse>, APIError> {
+    let mut conn = pool.acquire().await?;
+    let import = validate_import(&mut conn, election_id, request.data, Some(&request.hash)).await?;
+
+    Ok(Json(CSBDataEntryImportResponse {
+        election_name: import.election.name,
+        election_date: import.election.election_date,
+        sub_committee: import.sub_committee.sub_committee,
+    }))
+}
+
+/// Information collected during validation
+struct ValidatedImport {
+    election: ElectionWithPoliticalGroups,
+    sub_committee: SubCommitteeFirstSession,
+    hash: RedactedEmlHash,
+}
+
+/// Validate uploaded data: hash, ZIP and EML
+async fn validate_import(
+    conn: &mut SqliteConnection,
+    election_id: ElectionId,
+    zip_data: Vec<u8>,
+    hash: Option<&[String; crate::eml::hash::CHUNK_COUNT]>,
+) -> Result<ValidatedImport, APIError> {
+    let eml = read_eml_from_zip(zip_data).await?;
+    check_hash(eml.as_bytes(), hash)?;
     let definition = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict).ok()?;
 
     let election_identifier = &definition.count.election.identifier;
     let eml_election_id = election_identifier.id.value()?;
     let eml_election_date = election_identifier.election_date.copied_value()?.date;
 
-    let authority_identifier = &definition.managing_authority.authority_identifier;
-    let authority_id = authority_identifier.id.value()?;
-    let authority_name = authority_identifier.name.as_deref();
-
-    let mut conn = pool.acquire().await?;
-
-    let election = election_repo::get(&mut conn, election_id).await?;
+    let election = election_repo::get(conn, election_id).await?;
     if election.election_id != eml_election_id.value() {
         return Err(APIError::EmlImportError(EMLImportError::MismatchElection));
     }
@@ -130,23 +215,14 @@ pub async fn election_data_entry_import_validate(
     }
 
     let committee_session =
-        committee_session_repo::get_election_committee_session(&mut conn, election_id).await?;
-    let (sub_committee, status) =
-        sub_committee_repo::list_first_session_with_status(&mut conn, committee_session.id)
-            .await?
-            .into_iter()
-            .find_map(|entry| match entry.source {
-                DataEntrySource::SubCommittee(source)
-                    if source.sub_committee.authority_id == authority_id.value()
-                        && authority_name
-                            .is_none_or(|name| source.sub_committee.authority_name == name) =>
-                {
-                    Some((source.sub_committee, entry.status))
-                }
-                _ => None,
-            })
-            .ok_or(EMLImportError::MismatchSubCommittee)?;
+        committee_session_repo::get_election_committee_session(conn, election_id).await?;
+    if committee_session.status == CommitteeSessionStatus::Completed {
+        return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
+    }
 
+    let authority_identifier = definition.managing_authority.authority_identifier;
+    let (sub_committee, status) =
+        find_sub_committee(conn, committee_session.id, &authority_identifier).await?;
     if status != DataEntryStatus::Empty {
         // TODO #3905 Throw different error when results have already been *imported*, otherwise the following one
         return Err(APIError::EmlImportError(
@@ -154,12 +230,36 @@ pub async fn election_data_entry_import_validate(
         ));
     }
 
-    Ok(Json(CSBDataEntryImportValidateResponse {
-        hash: RedactedEmlHash::from(eml.as_bytes()),
-        election_name: election.name,
-        election_date: election.election_date,
+    Ok(ValidatedImport {
+        election,
         sub_committee,
-    }))
+        hash: RedactedEmlHash::from(eml.as_bytes()),
+    })
+}
+
+/// Find the sub committee based on the managing authority
+async fn find_sub_committee(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+    authority: &AuthorityIdentifier,
+) -> Result<(SubCommitteeFirstSession, DataEntryStatus), APIError> {
+    let authority_id = authority.id.value()?;
+    let authority_name = authority.name.as_deref();
+
+    sub_committee_repo::list_first_session_with_status(conn, committee_session_id)
+        .await?
+        .into_iter()
+        .find_map(|entry| match entry.source {
+            DataEntrySource::SubCommittee(source)
+                if source.sub_committee.authority_id == authority_id.value()
+                    && authority_name
+                        .is_none_or(|name| source.sub_committee.authority_name == name) =>
+            {
+                Some((source, entry.status))
+            }
+            _ => None,
+        })
+        .ok_or_else(|| EMLImportError::MismatchSubCommittee.into())
 }
 
 /// Read the contents of the single `*.eml.xml` file that is expected in the ZIP-file.
@@ -185,7 +285,7 @@ async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
         return Err(EMLImportError::MultipleEmlFilesInZip.into());
     }
 
-    // Protect against ZIP bombs, max 128 MB
+    // Protect against ZIP bombs, max 128 MB after decompression
     let max_size = 128 * 1024 * 1024;
     if entry.uncompressed_size() > max_size {
         return Err(APIError::ContentTooLarge(

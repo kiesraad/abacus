@@ -7,7 +7,7 @@ pub mod hash;
 use apportionment::CandidateNominationDetails;
 use chrono::{DateTime, Local};
 use eml_nl::{
-    EMLError,
+    EMLError, EMLVersion,
     common::{
         AuthorityIdentifier, ContestIdentifier, ElectionTree, ManagingAuthority, PersonName,
         ReportingUnitIdentifier,
@@ -121,24 +121,6 @@ impl NewElection {
         Ok(sub_category)
     }
 
-    fn category_and_sub_category_match(
-        category: crate::domain::election::ElectionCategory,
-        sub_category: crate::domain::election::ElectionSubCategory,
-    ) -> bool {
-        use crate::domain::election::{ElectionCategory, ElectionSubCategory};
-        match category {
-            ElectionCategory::WaterAuthority => {
-                sub_category == ElectionSubCategory::AB1 || sub_category == ElectionSubCategory::AB2
-            }
-            ElectionCategory::Municipal => {
-                sub_category == ElectionSubCategory::GR1 || sub_category == ElectionSubCategory::GR2
-            }
-            ElectionCategory::Provincial => {
-                sub_category == ElectionSubCategory::PS1 || sub_category == ElectionSubCategory::PS2
-            }
-        }
-    }
-
     pub fn from_eml_str(
         election_definition_data: &str,
         selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
@@ -164,10 +146,6 @@ impl NewElection {
         let election_date = identifier.election_date.copied_value()?.date;
         let nomination_date = identifier.nomination_date.copied_value()?.date;
         let election_tree_details = ElectionTreeDetails::from_definition(definition)?;
-
-        if !Self::category_and_sub_category_match(category, sub_category) {
-            return Err(EMLImportError::MismatchElectionCategoryAndSubCategory);
-        }
 
         // we need the number of seats and it must be a valid u32
         let number_of_seats = election
@@ -530,6 +508,7 @@ impl ElectionWithPoliticalGroups {
         let timestamp = timestamp.unwrap_or_else(Local::now);
 
         CandidateLists::builder()
+            .version(EMLVersion::V1_2_2)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
@@ -576,6 +555,7 @@ impl ElectionWithPoliticalGroups {
         let timestamp = timestamp.unwrap_or_else(Local::now);
 
         ElectionDefinition::builder()
+            .version(EMLVersion::V1_2_2)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.authority_id)?)
@@ -618,6 +598,7 @@ impl ElectionWithPoliticalGroups {
         let timestamp = timestamp.unwrap_or_else(Local::now);
 
         PollingStations::builder()
+            .version(EMLVersion::V1_2_2)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.authority_id)?)
@@ -676,6 +657,7 @@ impl ElectionWithPoliticalGroups {
         timestamp: DateTime<Local>,
     ) -> Result<ElectionCount, EMLError> {
         ElectionCount::builder()
+            .version(EMLVersion::V1_2_2)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
@@ -889,6 +871,7 @@ impl ElectionWithPoliticalGroups {
             ));
         }
         ElectionResult::builder()
+            .version(EMLVersion::V1_2_2)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
@@ -1133,8 +1116,12 @@ pub fn polling_stations_eml_matches_election(
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use apportionment::Fraction;
-    use eml_nl::{documents::election_result::ElectionResultSelectionType, utils::StringValue};
+    use eml_nl::{
+        EMLErrorKind, documents::election_result::ElectionResultSelectionType, utils::StringValue,
+    };
 
     use super::*;
     use crate::domain::{
@@ -1192,10 +1179,7 @@ mod tests {
         );
         let res = NewElection::from_eml_str(data, None, false).unwrap_err();
         dbg!(&res);
-        assert!(matches!(
-            res,
-            EMLImportError::MismatchElectionCategoryAndSubCategory
-        ));
+        assert_matches!(res, EMLImportError::EMLError(e) if matches!(e.kind(), EMLErrorKind::InvalidElectionSubcategory));
     }
 
     #[test]

@@ -16,7 +16,7 @@ import {
 import { getRouter, type Router } from "@/testing/router";
 import { server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { renderReturningRouter, screen } from "@/testing/test-utils";
+import { renderReturningRouter, screen, within } from "@/testing/test-utils";
 import type { ElectionDetailsResponse } from "@/types/generated/openapi";
 
 import { ElectionReportPage } from "./ElectionReportPage";
@@ -135,17 +135,12 @@ describe("GSBElectionReportSection", () => {
     ).toBeVisible();
 
     expect(await screen.findByText("In het ZIP-bestand zitten de volgende documenten:")).toBeInTheDocument();
-    expect(
-      await screen.findByText("Het proces-verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document."),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText("Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF-document."),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(
-        "EML- en CSV-bestanden met digitale telresultaten, en een digitale handtekening van het EML-bestand.",
-      ),
-    ).toBeInTheDocument();
+    const documents = within(screen.getByRole("list")).getAllByRole("listitem");
+    expect(documents.map((item) => item.textContent)).toEqual([
+      "Het proces-verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document. Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.",
+      "Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF-document. Bevat de gecorrigeerde telresultaten van de gemeente.",
+      "EML- en CSV-bestanden met digitale telresultaten, en een digitale handtekening van het EML-bestand.",
+    ]);
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 
@@ -184,10 +179,10 @@ describe("GSBElectionReportSection", () => {
     ).toBeVisible();
 
     expect(await screen.findByText("In het ZIP-bestand zitten de volgende documenten:")).toBeInTheDocument();
-    expect(
-      await screen.findByText("Het proces-verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document."),
-    ).toBeInTheDocument();
-    expect(await screen.findByText("EML- en CSV-bestanden met digitale telresultaten.")).toBeInTheDocument();
+    const documents = within(screen.getByRole("list")).getAllByRole("listitem");
+    expect(documents.map((item) => item.textContent)).toEqual([
+      "Het proces-verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document. Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.",
+    ]);
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 });

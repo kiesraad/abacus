@@ -1,8 +1,9 @@
-import { stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { expect } from "@playwright/test";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntryPgObj";
+import { unzipSync } from "fflate";
 import { test } from "../fixtures";
 
 test.use({
@@ -38,5 +39,22 @@ test.describe("GSB election results zip", () => {
 
     expect(download.suggestedFilename()).toMatch(/definitieve-documenten_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/);
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+    const zip = unzipSync(await readFile(await download.path()));
+    expect(Object.keys(zip)).toStrictEqual([
+      "Model_Na31-2.pdf",
+      "Telling_GR2022_Test_gemeente_Test.zip",
+      "abacus_telling_gr2022_test.csv",
+    ]);
+
+    // The EML and signature are in a nested ZIP file
+    const emlZip = unzipSync(zip["Telling_GR2022_Test_gemeente_Test.zip"]!);
+    expect(Object.keys(emlZip)).toStrictEqual([
+      "Telling_GR2022_Test_gemeente_Test.eml.xml",
+      "Telling_GR2022_Test_gemeente_Test.eml.xml.signature",
+    ]);
+
+    const signature = emlZip["Telling_GR2022_Test_gemeente_Test.eml.xml.signature"]!;
+    expect(signature.length).toBeGreaterThan(1024);
   });
 });

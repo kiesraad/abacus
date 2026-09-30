@@ -12,6 +12,7 @@
     "first_entry": "Eerste invoer",
     "second_entry": "Tweede invoer"
   },
+  "imported_from_file": "geïmporteerd uit tellingbestand",
   "options": {
     "discard_both": "Geen van beide: alles opnieuw invoeren",
     "keep_first_and_discard_second": "Eerste invoer ({name})",

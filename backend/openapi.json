@@ -7473,7 +7473,7 @@
       "DataEntryGetDifferencesResponse": {
         "type": "object",
         "required": [
-          "first_entry_user_id",
+          "first_entry_origin",
           "first_entry",
           "first_entry_has_errors",
           "second_entry_user_id",
@@ -7488,8 +7488,8 @@
           "first_entry_has_errors": {
             "type": "boolean"
           },
-          "first_entry_user_id": {
-            "$ref": "#/components/schemas/UserId"
+          "first_entry_origin": {
+            "$ref": "#/components/schemas/DataEntryOrigin"
           },
           "second_entry": {
             "$ref": "#/components/schemas/Results"
@@ -7537,6 +7537,27 @@
         "type": "integer",
         "format": "int32",
         "minimum": 0
+      },
+      "DataEntryOrigin": {
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "Import"
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "Typist"
+            ],
+            "properties": {
+              "Typist": {
+                "$ref": "#/components/schemas/UserId"
+              }
+            }
+          }
+        ]
       },
       "DataEntrySource": {
         "oneOf": [
@@ -8231,11 +8252,9 @@
             "type": "string",
             "description": "Time when the data entry was finalised"
           },
-          "first_entry_user_id": {
-            "type": "integer",
-            "format": "int32",
-            "description": "First entry user id",
-            "minimum": 0
+          "first_entry_origin": {
+            "$ref": "#/components/schemas/DataEntryOrigin",
+            "description": "First entry origin (import or typist user id)"
           },
           "second_entry_user_id": {
             "type": "integer",
@@ -8245,7 +8264,7 @@
           },
           "source": {
             "$ref": "#/components/schemas/DataEntrySource",
-            "description": "Data entry source (polling station or sub committee)"
+            "description": "Data entry source (polling station or subcommittee)"
           },
           "status": {
             "$ref": "#/components/schemas/DataEntryStatusName",

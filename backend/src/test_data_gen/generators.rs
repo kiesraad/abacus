@@ -9,7 +9,8 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            DataEntryId, DataEntrySource, DataEntryStatus, Definitive, FirstEntryFinalised,
+            DataEntryId, DataEntryOrigin, DataEntrySource, DataEntryStatus, Definitive,
+            FirstEntryFinalised,
         },
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
@@ -668,7 +669,7 @@ async fn generate_gsb_data_entry(
             if rng.random_ratio(second_entry_chance, 100) {
                 // generate a definitive data entry
                 let state = DataEntryStatus::Definitive(Definitive {
-                    first_entry_user_id: UserId::from(5), // first typist from users in fixtures
+                    first_entry_origin: DataEntryOrigin::Typist(UserId::from(5)), // first typist from users in fixtures
                     second_entry_user_id: UserId::from(6), // second typist from users in fixtures
                     finished_at: ts,
                     finalised_with_warnings,
@@ -682,7 +683,7 @@ async fn generate_gsb_data_entry(
             } else {
                 // generate only a first data entry
                 let state = DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
-                    first_entry_user_id: UserId::from(5), // first typist from users in fixtures
+                    first_entry_origin: DataEntryOrigin::Typist(UserId::from(5)), // first typist from users in fixtures
                     finalised_first_entry: results.clone(),
                     first_entry_finished_at: ts,
                     finalised_with_warnings,
@@ -777,7 +778,7 @@ async fn generate_csb_data_entry(
         if rng.random_ratio(second_entry_chance, 100) {
             // generate a definitive data entry
             let state = DataEntryStatus::Definitive(Definitive {
-                first_entry_user_id: UserId::from(9), // first typist from users in fixtures
+                first_entry_origin: DataEntryOrigin::Typist(UserId::from(9)), // first typist from users in fixtures
                 second_entry_user_id: UserId::from(10), // second typist from users in fixtures
                 finished_at: ts,
                 finalised_with_warnings,
@@ -791,7 +792,7 @@ async fn generate_csb_data_entry(
         } else {
             // generate only a first data entry
             let state = DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
-                first_entry_user_id: UserId::from(9), // first typist from users in fixtures
+                first_entry_origin: DataEntryOrigin::Typist(UserId::from(9)), // first typist from users in fixtures
                 finalised_first_entry: results.clone(),
                 first_entry_finished_at: ts,
                 finalised_with_warnings,

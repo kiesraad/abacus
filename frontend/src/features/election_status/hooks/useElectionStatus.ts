@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import type { PercentageAndColorClass, ProgressBarColorClass } from "@/components/ui/ProgressBar/ProgressBar";
 import { useUsers } from "@/hooks/user/useUsers";
+import { t } from "@/i18n/translate";
 import type { DataEntryStatusName, ElectionStatusResponseEntry } from "@/types/generated/openapi";
 import { calculateProgressPercentage } from "@/utils/progressPercentage";
 
@@ -50,7 +51,9 @@ function getTypist(status: ElectionStatusResponseEntry | undefined): number | un
     case "first_entry_in_progress":
     case "first_entry_finalised":
     case "first_entry_correction":
-      return status.first_entry_user_id;
+      return status.first_entry_origin === undefined || status.first_entry_origin === "Import"
+        ? undefined
+        : status.first_entry_origin.Typist;
     case "second_entry_in_progress":
     case "second_entry_correction":
       return status.second_entry_user_id;
@@ -101,7 +104,7 @@ export function useElectionStatus(statuses: ElectionStatusResponseEntry[]): Elec
     () =>
       statuses.map((status) => ({
         entry: status,
-        typist: getName(getTypist(status)),
+        typist: status.first_entry_origin === "Import" ? t("imported") : getName(getTypist(status)),
       })),
     [statuses, getName],
   );

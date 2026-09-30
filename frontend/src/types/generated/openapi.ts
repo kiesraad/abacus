@@ -964,7 +964,7 @@ export interface DataEntry {
 export interface DataEntryGetDifferencesResponse {
   first_entry: Results;
   first_entry_has_errors: boolean;
-  first_entry_user_id: UserId;
+  first_entry_origin: DataEntryOrigin;
   second_entry: Results;
   second_entry_has_errors: boolean;
   second_entry_user_id: UserId;
@@ -980,6 +980,8 @@ export interface DataEntryGetResponse {
 }
 
 export type DataEntryId = number;
+
+export type DataEntryOrigin = "Import" | { Typist: UserId };
 
 export type DataEntrySource =
   | (PollingStationForSession & { type: "PollingStation" })
@@ -1199,11 +1201,11 @@ export interface ElectionStatusResponseEntry {
   finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
   finished_at?: string;
-  /** First entry user id */
-  first_entry_user_id?: number;
+  /** First entry origin (import or typist user id) */
+  first_entry_origin?: DataEntryOrigin;
   /** Second entry user id */
   second_entry_user_id?: number;
-  /** Data entry source (polling station or sub committee) */
+  /** Data entry source (polling station or subcommittee) */
   source: DataEntrySource;
   /** Data entry status */
   status: DataEntryStatusName;

@@ -15,14 +15,16 @@ use sqlx::{SqliteConnection, SqlitePool};
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, ErrorResponse,
+    APIError, ErrorResponse, SqlitePoolExt,
     api::election::check_hash,
     domain::{
         committee_session::{CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{DataEntrySource, DataEntryStatus},
         election::{ElectionId, ElectionWithPoliticalGroups},
+        results::{Results, gsb_results::GSBResults},
         sub_committee::{SubCommittee, SubCommitteeFirstSession},
+        validate::ValidateRoot,
     },
     eml::{EMLImportError, RedactedEmlHash},
     error::ErrorReference,
@@ -172,8 +174,13 @@ pub async fn election_data_entry_import(
     Path(election_id): Path<ElectionId>,
     request: CSBDataEntryImportRequest,
 ) -> Result<Json<CSBDataEntryImportResponse>, APIError> {
-    let mut conn = pool.acquire().await?;
-    let import = validate_import(&mut conn, election_id, request.data, Some(&request.hash)).await?;
+    let mut tx = pool.begin_immediate().await?;
+    let import = validate_import(&mut tx, election_id, request.data, Some(&request.hash)).await?;
+
+    // TODO #3905 Store origin of data entry
+    // TODO #3906 Save data entry results
+
+    tx.commit().await?;
 
     Ok(Json(CSBDataEntryImportResponse {
         election_name: import.election.name,
@@ -220,13 +227,21 @@ async fn validate_import(
         return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
     }
 
-    let authority_identifier = definition.managing_authority.authority_identifier;
+    let authority_identifier = &definition.managing_authority.authority_identifier;
     let (sub_committee, status) =
-        find_sub_committee(conn, committee_session.id, &authority_identifier).await?;
+        find_sub_committee(conn, committee_session.id, authority_identifier).await?;
     if status != DataEntryStatus::Empty {
         // TODO #3905 Throw different error when results have already been *imported*, otherwise the following one
         return Err(APIError::EmlImportError(
             EMLImportError::SubCommitteeDataEntryNotEmpty,
+        ));
+    }
+
+    let results = Results::GSB(GSBResults::from_eml_count(&definition)?);
+    let validation_results = results.start_validate(&election)?;
+    if validation_results.has_errors() {
+        return Err(APIError::EmlImportError(
+            EMLImportError::ResultsHaveValidationErrors,
         ));
     }
 

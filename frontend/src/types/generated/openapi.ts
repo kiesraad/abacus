@@ -554,6 +554,7 @@ export const auditEventTypeValues = [
   "DataEntryDiscarded",
   "DataEntryReset",
   "DataEntryFinalised",
+  "DataEntryImported",
   "DataEntryDiscardedFirst",
   "DataEntryReturnedFirst",
   "DataEntryKeptFirst",

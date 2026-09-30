@@ -44,6 +44,7 @@ pub enum EMLImportError {
         found: PGNumber,
     },
     PollingStationsWithoutContest,
+    ResultsHaveValidationErrors,
     SubCommitteeDataEntryNotEmpty,
     TooManyPoliticalGroups,
     UnknownCommittee,

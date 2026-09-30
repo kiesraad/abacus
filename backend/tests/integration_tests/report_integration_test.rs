@@ -4,6 +4,7 @@ use std::net::SocketAddr;
 
 use async_zip::base::read::mem::ZipFileReader;
 use axum::http::{HeaderValue, StatusCode};
+use eml_signature::{Certificate, Signature};
 use sqlx::SqlitePool;
 use test_log::test;
 
@@ -109,6 +110,32 @@ pub async fn assert_zip_download_conflict(cookie: &HeaderValue, url: &str) {
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
+pub async fn download_certificate(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+) -> Certificate {
+    let response = reqwest::Client::new()
+        .get(format!(
+            "http://{addr}/api/elections/{election_id}/certificate"
+        ))
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    Certificate::from_pem(&response.bytes().await.unwrap()).unwrap()
+}
+
+/// Read the EML and its signature from the inner ZIP of a results download
+pub async fn read_signed_eml(xml_zip: Vec<u8>, eml_filename: &str) -> (Vec<u8>, Vec<u8>) {
+    let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
+    assert_eq!(xml_archive.file().entries().len(), 2);
+    let eml = read_zip_entry(&xml_archive, 0, eml_filename).await;
+    let signature = read_zip_entry(&xml_archive, 1, &format!("{eml_filename}.signature")).await;
+    (eml, signature)
+}
+
 pub async fn read_zip_entry(
     archive: &ZipFileReader,
     index: usize,
@@ -140,13 +167,14 @@ async fn test_gsb_cso_election_first_session_zip_download_works(pool: SqlitePool
     let prefix = "definitieve-documenten_gr2024_heemdamseburg_gemeente_heemdamseburg-";
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
-    let files = get_files(bytes).await;
+    let files = get_files(bytes.clone()).await;
     assert_eq!(
         filenames(&files),
         [
             "Model_Na31-2.pdf",
             "Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.zip",
             "Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.zip/Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.eml.xml",
+            "Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.zip/Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.eml.xml.signature",
             "abacus_telling_gr2024_heemdamseburg.csv",
         ]
     );
@@ -154,6 +182,27 @@ async fn test_gsb_cso_election_first_session_zip_download_works(pool: SqlitePool
     let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
     let files2 = get_files(bytes2).await;
     assert_eq!(files, files2);
+
+    // The signature verifies against the certificate the administrator downloads
+    let archive = ZipFileReader::new(bytes).await.unwrap();
+    let xml_zip = read_zip_entry(
+        &archive,
+        1,
+        "Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.zip",
+    )
+    .await;
+    let (eml, signature) = read_signed_eml(
+        xml_zip,
+        "Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.eml.xml",
+    )
+    .await;
+    let admin_cookie = login(&addr, Admin).await;
+    let certificate = download_certificate(&addr, &admin_cookie, election_id).await;
+    let signature = Signature::from_der(&signature).unwrap();
+    certificate
+        .public_key()
+        .verify(&eml, &signature)
+        .expect("signature should verify");
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso", "users"))))]
@@ -178,6 +227,7 @@ async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool
             "Model_Na31-1.pdf",
             "Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.zip",
             "Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.zip/Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.eml.xml",
+            "Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.zip/Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.eml.xml.signature",
             "abacus_telling_ab2026_slansbregen.csv",
         ]
     );
@@ -222,6 +272,7 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
             "Model_Na14-2.pdf",
             "Telling_GR2026_Juinen_gemeente_Juinen.zip",
             "Telling_GR2026_Juinen_gemeente_Juinen.zip/Telling_GR2026_Juinen_gemeente_Juinen.eml.xml",
+            "Telling_GR2026_Juinen_gemeente_Juinen.zip/Telling_GR2026_Juinen_gemeente_Juinen.eml.xml.signature",
             "abacus_telling_gr2026_juinen.csv",
             "Leeg_Model_P2a.pdf",
         ]

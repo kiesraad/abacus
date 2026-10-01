@@ -1299,10 +1299,12 @@ mod tests {
             "election_5_with_results",
             "election_7_four_sessions",
             "election_8_csb_with_results",
-            "election_12_dso_with_results"
+            "election_12_dso_with_results",
+            "election_13_csb_ws_completed",
         )
     )))]
-    async fn test_fixture_data_entries_valid(pool: SqlitePool) {
+    async fn test_fixture_data_entry_results_valid(pool: SqlitePool) {
+        // This only validates the data entry results, not the data entry state for instance
         let mut conn = pool.acquire().await.unwrap();
 
         let elections = election_repo::list(&mut conn, None).await.unwrap();

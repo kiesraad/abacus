@@ -46,17 +46,22 @@ export function statusCount(entries: ElectionStatusResponseEntry[], category: St
   return entries.filter((s) => statusesForCategory[category].includes(s.status)).length;
 }
 
-function getTypist(status: ElectionStatusResponseEntry | undefined): number | undefined {
+function getTypist(
+  status: ElectionStatusResponseEntry | undefined,
+  getName: (userId?: number, fallback?: string) => string,
+): string | undefined {
   switch (status?.status) {
     case "first_entry_in_progress":
     case "first_entry_finalised":
     case "first_entry_correction":
-      return status.first_entry_origin === undefined || status.first_entry_origin === "Import"
+      return status.first_entry_origin === undefined
         ? undefined
-        : status.first_entry_origin.Typist;
+        : status.first_entry_origin === "Import"
+          ? t("imported")
+          : getName(status.first_entry_origin.Typist);
     case "second_entry_in_progress":
     case "second_entry_correction":
-      return status.second_entry_user_id;
+      return getName(status.second_entry_user_id);
     default:
       return undefined;
   }
@@ -104,7 +109,7 @@ export function useElectionStatus(statuses: ElectionStatusResponseEntry[]): Elec
     () =>
       statuses.map((status) => ({
         entry: status,
-        typist: status.first_entry_origin === "Import" ? t("imported") : getName(getTypist(status)),
+        typist: getTypist(status, getName),
       })),
     [statuses, getName],
   );

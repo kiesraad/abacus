@@ -511,15 +511,21 @@ impl DataEntryStatus {
                         }))
                     }
                 }
-                DataEntryOrigin::Import => Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
-                    first_entry_origin: state.first_entry_origin.clone(),
-                    finalised_first_entry: state.finalised_first_entry,
-                    first_entry_finished_at: state.first_entry_finished_at,
-                    progress: 0,
-                    second_entry_user_id: user_id,
-                    second_entry: initial_results,
-                    client_state: ClientState::default(),
-                })),
+                DataEntryOrigin::Import => {
+                    if !state.finalised_first_entry.is_same_model(&initial_results) {
+                        Err(DataEntryTransitionError::Invalid)
+                    } else {
+                        Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
+                            first_entry_origin: state.first_entry_origin.clone(),
+                            finalised_first_entry: state.finalised_first_entry,
+                            first_entry_finished_at: state.first_entry_finished_at,
+                            progress: 0,
+                            second_entry_user_id: user_id,
+                            second_entry: initial_results,
+                            client_state: ClientState::default(),
+                        }))
+                    }
+                }
             },
             DataEntryStatus::SecondEntryInProgress(_)
             | DataEntryStatus::SecondEntryCorrection(_) => {

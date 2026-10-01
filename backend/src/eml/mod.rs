@@ -45,7 +45,7 @@ use crate::{
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
             ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
-            RegisteredPoliticalGroup,
+            RegisteredPoliticalGroup, VoteCountingMethod,
         },
         results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
         tabulation::{CommitteeSpecificTotals, ElectionTotals},
@@ -656,7 +656,7 @@ impl ElectionWithPoliticalGroups {
         totals: &ElectionTotals,
         timestamp: DateTime<Local>,
     ) -> Result<ElectionCount, EMLError> {
-        ElectionCount::builder()
+        let mut builder = ElectionCount::builder()
             .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
@@ -672,8 +672,17 @@ impl ElectionWithPoliticalGroups {
                 CommitteeCategory::GSB => CountType::Municipal,
                 CommitteeCategory::CSB => CountType::Central,
             })
-            .contests([self.as_eml_count_contest(committee_session, results, totals)?])
-            .build()
+            .contests([self.as_eml_count_contest(committee_session, results, totals)?]);
+        match self.counting_method {
+            Some(VoteCountingMethod::CSO) => {
+                builder = builder.counting_method(eml_nl::common::CountingMethodCode::CSO)
+            }
+            Some(VoteCountingMethod::DSO) => {
+                builder = builder.counting_method(eml_nl::common::CountingMethodCode::DSO)
+            }
+            _ => {}
+        }
+        builder.build()
     }
 
     fn as_eml_count_contest(
@@ -1314,6 +1323,16 @@ mod tests {
                 .unwrap()
                 .value(),
             "0000"
+        );
+
+        assert_eq!(
+            eml_count
+                .count
+                .counting_method
+                .unwrap()
+                .copied_value()
+                .unwrap(),
+            eml_nl::common::CountingMethodCode::CSO
         );
     }
 

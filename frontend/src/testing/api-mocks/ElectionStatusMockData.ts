@@ -223,6 +223,42 @@ export const electionStatusesCSBMock: ElectionStatusResponseEntry[] = [
     },
     status: "empty",
   },
+  {
+    data_entry_id: 1208,
+    source: {
+      type: "SubCommittee",
+      committee_session_id: 802,
+      id: 817,
+      number: 6,
+      name: "Eemstricht",
+      category: "GSB",
+      data_entry_id: 1208,
+      authority_id: "0006",
+      authority_name: "Eemstricht",
+    },
+    status: "first_entry_finalised",
+    first_entry_origin: "Import",
+    finished_at: today.toISOString(),
+    finalised_with_warnings: false,
+  },
+  {
+    data_entry_id: 1209,
+    source: {
+      type: "SubCommittee",
+      committee_session_id: 802,
+      id: 818,
+      number: 7,
+      name: "Hoek van Zoom",
+      category: "GSB",
+      data_entry_id: 1209,
+      authority_id: "0007",
+      authority_name: "Hoek van Zoom",
+    },
+    status: "second_entry_in_progress",
+    first_entry_origin: "Import",
+    second_entry_user_id: 2,
+    data_entry_progress: 20,
+  },
 ];
 
 /**

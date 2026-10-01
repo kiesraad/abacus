@@ -168,6 +168,7 @@ describe("DataEntryHomePage", () => {
     expect(table).toHaveTableContent([
       ["Nummer", "Stembureau"],
       ["0005", "Bloemstede 1e invoer"],
+      ["0006", "Eemstricht 2e invoer"],
       ["0003", "Eksterlo 1e invoer"],
       ["0002", "'s-Gravenveen 1e invoer"],
       ["0004", "Hovenerwoud 1e invoer"],

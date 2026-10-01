@@ -699,3 +699,27 @@ pub async fn login_with_credentials(
     assert_eq!(response.status(), StatusCode::OK);
     response.headers().get("set-cookie").cloned().unwrap()
 }
+
+/// Sends a POST request with given data as multipart/form-data
+pub async fn post_multipart(url: &str, cookie: &HeaderValue, parts: &[(&str, &[u8])]) -> Response {
+    let mut body = Vec::new();
+
+    for (name, value) in parts {
+        body.extend_from_slice(
+            format!("--boundary_name\r\nContent-Disposition: form-data; name=\"{name}\"\r\n\r\n")
+                .as_bytes(),
+        );
+        body.extend_from_slice(value);
+        body.extend_from_slice(b"\r\n");
+    }
+    body.extend_from_slice(b"--boundary_name--\r\n");
+
+    reqwest::Client::new()
+        .post(url)
+        .header("cookie", cookie)
+        .header(CONTENT_TYPE, "multipart/form-data; boundary=boundary_name")
+        .body(body)
+        .send()
+        .await
+        .unwrap()
+}

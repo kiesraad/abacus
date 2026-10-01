@@ -628,12 +628,12 @@ mod tests {
                 .expect("should have generated attachment pdf");
             let csv_counts = files.csv_counts.expect("should have generated csv counts");
 
-            assert_eq!(eml_results.name, "Resultaat_GR2024_Juinen.eml.xml");
+            assert_eq!(eml_results.name, "Resultaat_GR2026_Juinen.eml.xml");
             assert_eq!(eml_results.id, FileId::from(1));
 
             assert_eq!(
                 eml_total_counts.name,
-                "Totaaltelling_GR2024_Juinen_gemeente_Juinen.eml.xml"
+                "Totaaltelling_GR2026_Juinen_gemeente_Juinen.eml.xml"
             );
             assert_eq!(eml_total_counts.id, FileId::from(2));
 
@@ -643,7 +643,7 @@ mod tests {
             assert_eq!(attachment_pdf.name, "Model_P22-2_bijlage.pdf");
             assert_eq!(attachment_pdf.id, FileId::from(4));
 
-            assert_eq!(csv_counts.name, "abacus_telling_gr2024_juinen.csv");
+            assert_eq!(csv_counts.name, "abacus_telling_gr2026_juinen.csv");
             assert_eq!(csv_counts.id, FileId::from(5));
 
             assert_eq!(

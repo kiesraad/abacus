@@ -333,3 +333,377 @@ async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
 
     Ok(eml_string)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use async_zip::{Compression, ZipEntryBuilder, tokio::write::ZipFileWriter};
+
+    /// Create a zip file in memory containing the given files
+    pub async fn zip_with_files(files: &[(&str, &[u8])]) -> Vec<u8> {
+        let mut writer = ZipFileWriter::with_tokio(Vec::new());
+        for (name, data) in files {
+            let entry = ZipEntryBuilder::new(name.to_string().into(), Compression::Deflate);
+            writer.write_entry_whole(entry, data).await.unwrap();
+        }
+        writer.close().await.unwrap().into_inner()
+    }
+
+    mod multipart_request {
+        use super::*;
+        use axum::{body::Body, http::header::CONTENT_TYPE};
+        use test_log::test;
+
+        /// Create a multipart request with the given form fields
+        fn multipart_request(fields: &[(&str, &[u8])]) -> Request {
+            let mut body = Vec::new();
+            for (name, value) in fields {
+                body.extend_from_slice(
+                    format!(
+                        "--boundary_test\r\nContent-Disposition: form-data; name=\"{name}\"\r\n\r\n"
+                    )
+                    .as_bytes(),
+                );
+                body.extend_from_slice(value);
+                body.extend_from_slice(b"\r\n");
+            }
+            body.extend_from_slice(b"--boundary_test--\r\n");
+
+            Request::builder()
+                .header(CONTENT_TYPE, "multipart/form-data; boundary=boundary_test")
+                .body(Body::from(body))
+                .unwrap()
+        }
+
+        #[test(tokio::test)]
+        async fn test_from_request() {
+            // Repeat abcd to fill all chunks
+            let hash = serde_json::to_vec(&vec!["abcd"; crate::eml::hash::CHUNK_COUNT]).unwrap();
+            let request = CSBDataEntryImportValidateRequest::from_request(
+                multipart_request(&[("hash", &hash), ("data", b"zip")]),
+                &(),
+            )
+            .await
+            .unwrap();
+
+            assert_eq!(
+                request.hash,
+                Some(std::array::from_fn(|_| "abcd".to_string()))
+            );
+            assert_eq!(request.data, b"zip");
+        }
+
+        #[test(tokio::test)]
+        async fn test_from_request_without_hash() {
+            let request = CSBDataEntryImportValidateRequest::from_request(
+                multipart_request(&[("data", b"zip")]),
+                &(),
+            )
+            .await
+            .unwrap();
+
+            assert_eq!(request.hash, None);
+        }
+
+        #[test(tokio::test)]
+        async fn test_from_request_import_without_hash() {
+            let request = multipart_request(&[("data", b"zip")]);
+
+            assert!(matches!(
+                CSBDataEntryImportRequest::from_request(request, &()).await,
+                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+            ));
+        }
+
+        #[test(tokio::test)]
+        async fn test_from_request_invalid_hash() {
+            // Missing chunks in the hash
+            let request = multipart_request(&[("hash", br#"["abcd"]"#), ("data", b"zip")]);
+
+            assert!(matches!(
+                CSBDataEntryImportValidateRequest::from_request(request, &()).await,
+                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+            ));
+        }
+
+        #[test(tokio::test)]
+        async fn test_from_request_without_data() {
+            let request = multipart_request(&[]);
+
+            assert!(matches!(
+                CSBDataEntryImportValidateRequest::from_request(request, &()).await,
+                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+            ));
+        }
+
+        #[test(tokio::test)]
+        async fn test_from_request_unexpected_field() {
+            let request = multipart_request(&[("data", b"zip"), ("other", b"value")]);
+
+            assert!(matches!(
+                CSBDataEntryImportValidateRequest::from_request(request, &()).await,
+                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+            ));
+        }
+    }
+
+    mod read_eml_from_zip {
+        use super::*;
+        use test_log::test;
+
+        #[test(tokio::test)]
+        async fn test_valid_zip() {
+            let zip = zip_with_files(&[
+                ("Telling_GR2026_Heemdamseburg.eml.xml", b"<EML/>"),
+                (
+                    "Telling_GR2026_Heemdamseburg.eml.xml.signature",
+                    b"signature",
+                ),
+            ])
+            .await;
+
+            assert_eq!(read_eml_from_zip(zip).await.unwrap(), "<EML/>");
+        }
+
+        #[test(tokio::test)]
+        async fn test_invalid_zip() {
+            assert!(matches!(
+                read_eml_from_zip(b"not a zip file".to_vec()).await,
+                Err(APIError::Unprocessable(_, ErrorReference::ZipError))
+            ));
+        }
+
+        #[test(tokio::test)]
+        async fn test_without_eml_file() {
+            let zip = zip_with_files(&[("Telling_GR2026_Heemdamseburg.xml", b"<EML/>")]).await;
+
+            assert!(matches!(
+                read_eml_from_zip(zip).await,
+                Err(APIError::Unprocessable(_, ErrorReference::ZipError))
+            ));
+        }
+
+        #[test(tokio::test)]
+        async fn test_with_multiple_eml_files() {
+            let zip = zip_with_files(&[
+                ("Telling_GR2026_Heemdamseburg.eml.xml", b"<EML/>"),
+                ("Telling_GR2026_Juinen.eml.xml", b"<EML/>"),
+            ])
+            .await;
+
+            assert!(matches!(
+                read_eml_from_zip(zip).await,
+                Err(APIError::Unprocessable(_, ErrorReference::ZipError))
+            ));
+        }
+
+        #[test(tokio::test)]
+        async fn test_too_large() {
+            let entry = ZipEntryBuilder::new("count.eml.xml".into(), Compression::Deflate)
+                .uncompressed_size(128 * 1024 * 1024 + 1u64);
+            let mut writer = ZipFileWriter::with_tokio(Vec::new());
+            writer
+                .write_entry_whole_precompressed(entry, b"")
+                .await
+                .unwrap();
+            let zip = writer.close().await.unwrap().into_inner();
+
+            assert!(matches!(
+                read_eml_from_zip(zip).await,
+                Err(APIError::ContentTooLarge(
+                    _,
+                    ErrorReference::RequestPayloadTooLarge
+                ))
+            ));
+        }
+    }
+
+    mod validate_import {
+        use chrono::Local;
+        use eml_nl::{
+            documents::election_count::UncountedVotesReason,
+            utils::{AuthorityId, StringValue},
+        };
+        use test_log::test;
+
+        use super::*;
+        use crate::{
+            domain::{data_entry::DataEntryId, tabulation::ElectionTotals},
+            eml::EmlHash,
+            repository::data_entry_repo,
+        };
+
+        /// Generate the count EML (510b) for the given election
+        async fn count_eml(conn: &mut SqliteConnection, election_id: ElectionId) -> String {
+            let election = election_repo::get(conn, election_id).await.unwrap();
+            let committee_session =
+                committee_session_repo::get_election_committee_session(conn, election_id)
+                    .await
+                    .unwrap();
+            let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
+            let count = election
+                .as_count_eml(None, &committee_session, &[], &totals, Local::now())
+                .unwrap();
+
+            String::try_from(count).unwrap()
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_valid_import(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let csb_election_id = ElectionId::from(8);
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+            let hash = EmlHash::from(eml.as_bytes()).chunks;
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            let import = validate_import(&mut conn, csb_election_id, zip, Some(&hash))
+                .await
+                .unwrap();
+
+            assert_eq!(import.election.id, csb_election_id);
+            assert_eq!(import.sub_committee.sub_committee.authority_id, "0035");
+            // TODO #3906 Compare results with empty GSB results
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_wrong_hash(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+            let wrong_hash = std::array::from_fn(|_| "0000".to_string());
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            assert!(matches!(
+                validate_import(&mut conn, ElectionId::from(8), zip, Some(&wrong_hash)).await,
+                Err(APIError::InvalidHashError)
+            ));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_10_csb")
+        )))]
+        async fn test_other_election(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            assert!(matches!(
+                validate_import(&mut conn, ElectionId::from(10), zip, None).await,
+                Err(APIError::EmlImportError(EMLImportError::MismatchElection))
+            ));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_unknown_sub_committee(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+            let mut count = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict)
+                .ok()
+                .unwrap();
+
+            // An authority that is not a sub committee of the CSB election
+            count.managing_authority.authority_identifier =
+                AuthorityIdentifier::new(AuthorityId::new("0001").unwrap());
+            let eml = String::try_from(count).unwrap();
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            assert!(matches!(
+                validate_import(&mut conn, ElectionId::from(8), zip, None).await,
+                Err(APIError::EmlImportError(EMLImportError::UnknownCommittee))
+            ));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_data_entry_not_empty(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            assert!(matches!(
+                validate_import(&mut conn, ElectionId::from(8), zip, None).await,
+                Err(APIError::Unprocessable(
+                    _,
+                    ErrorReference::DataEntryNotAllowed
+                ))
+            ));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_completed_committee_session(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+            committee_session_repo::change_status(
+                &mut conn,
+                CommitteeSessionId::from(801),
+                CommitteeSessionStatus::Completed,
+            )
+            .await
+            .unwrap();
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            assert!(matches!(
+                validate_import(&mut conn, ElectionId::from(8), zip, None).await,
+                Err(APIError::Unprocessable(
+                    _,
+                    ErrorReference::InvalidCommitteeSessionStatus
+                ))
+            ));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_results_with_validation_errors(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+
+            let mut count = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict)
+                .ok()
+                .unwrap();
+
+            // Insert wrong data
+            let contest = &mut count.count.election.contests[0];
+            let uncounted_votes = &mut contest.total_votes.as_mut().unwrap().uncounted_votes;
+            uncounted_votes.insert(
+                UncountedVotesReason::ValidPollCards,
+                StringValue::from_value(1),
+            );
+            let eml = String::try_from(count).unwrap();
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            assert!(matches!(
+                validate_import(&mut conn, ElectionId::from(8), zip, None).await,
+                Err(APIError::Unprocessable(
+                    _,
+                    ErrorReference::DataEntryValidationErrors
+                ))
+            ));
+        }
+    }
+}

@@ -332,7 +332,7 @@ async fn test_csb_election_zip_download_results_works(pool: SqlitePool) {
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results_csb"
     );
-    let prefix = "vaststelling-uitslag_gr2024_juinen_gemeente_juinen";
+    let prefix = "vaststelling-uitslag_gr2026_juinen_gemeente_juinen";
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let files = get_files(bytes).await;
@@ -340,8 +340,8 @@ async fn test_csb_election_zip_download_results_works(pool: SqlitePool) {
         filenames(&files),
         [
             "Model_P22-2.pdf",
-            "Resultaat_GR2024_Juinen.zip",
-            "Resultaat_GR2024_Juinen.zip/Resultaat_GR2024_Juinen.eml.xml",
+            "Resultaat_GR2026_Juinen.zip",
+            "Resultaat_GR2026_Juinen.zip/Resultaat_GR2026_Juinen.eml.xml",
         ]
     );
 
@@ -446,7 +446,7 @@ async fn test_csb_election_zip_download_attachment_works(pool: SqlitePool) {
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_attachment_csb"
     );
-    let prefix = "model-p22-2-bijlage_gr2024_juinen_gemeente_juinen";
+    let prefix = "model-p22-2-bijlage_gr2026_juinen_gemeente_juinen";
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let files = get_files(bytes).await;
@@ -522,16 +522,16 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_total_counts_csb"
     );
-    let prefix = "definitieve-documenten_gr2024_juinen_gemeente_juinen";
+    let prefix = "definitieve-documenten_gr2026_juinen_gemeente_juinen";
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let files = get_files(bytes).await;
     assert_eq!(
         filenames(&files),
         [
-            "abacus_telling_gr2024_juinen.csv",
-            "Totaaltelling_GR2024_Juinen_gemeente_Juinen.zip",
-            "Totaaltelling_GR2024_Juinen_gemeente_Juinen.zip/Totaaltelling_GR2024_Juinen_gemeente_Juinen.eml.xml",
+            "abacus_telling_gr2026_juinen.csv",
+            "Totaaltelling_GR2026_Juinen_gemeente_Juinen.zip",
+            "Totaaltelling_GR2026_Juinen_gemeente_Juinen.zip/Totaaltelling_GR2026_Juinen_gemeente_Juinen.eml.xml",
         ]
     );
 

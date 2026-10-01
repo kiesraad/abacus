@@ -129,6 +129,7 @@ export function CheckHash({
                 error={stub.error}
                 fieldSize="medium"
                 fieldWidth="full-field-with-narrow-input"
+                maxLength={4}
                 onFocus={() => {
                   highlightStub(stubIndex, true);
                 }}

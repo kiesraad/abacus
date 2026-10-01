@@ -247,7 +247,7 @@ async fn validate_import(
         return Err(DataEntryImportError::SubCommitteeDataEntryNotEmpty.into());
     }
 
-    let results = Results::GSB(GSBResults::from_eml_count(&definition)?);
+    let results = Results::GSB(GSBResults::from_eml_count(&definition, election.category)?);
     let validation_results = results.start_validate(&election)?;
     if validation_results.has_errors() {
         return Err(DataEntryImportError::ResultsHaveValidationErrors.into());

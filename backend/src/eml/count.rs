@@ -9,7 +9,7 @@ use eml_nl::{
 };
 
 use crate::domain::{
-    election::{CandidateNumber, PGNumber},
+    election::{CandidateNumber, ElectionCategory, PGNumber},
     results::{
         count::Count,
         gsb_differences_counts::GSBDifferencesCounts,
@@ -25,7 +25,10 @@ impl GSBResults {
     /// Create GSB results from the `TotalVotes` element in an EML_NL 510b count document.
     ///
     /// Only the first contest is used, as Abacus only supports elections with a single contest.
-    pub fn from_eml_count(count: &ElectionCount) -> Result<Self, EMLError> {
+    pub fn from_eml_count(
+        count: &ElectionCount,
+        election_category: ElectionCategory,
+    ) -> Result<Self, EMLError> {
         let contest = count
             .count
             .election
@@ -37,11 +40,14 @@ impl GSBResults {
             .as_ref()
             .ok_or_else(|| EMLError::custom("Missing the TotalVotes element"))?;
 
-        Self::from_eml_total_votes(total_votes)
+        Self::from_eml_total_votes(total_votes, election_category)
     }
 
     /// Create GSB results from the `TotalVotes` element of an EML_NL 510b count document.
-    pub fn from_eml_total_votes(total_votes: &TotalVotes) -> Result<Self, EMLError> {
+    pub fn from_eml_total_votes(
+        total_votes: &TotalVotes,
+        election_category: ElectionCategory,
+    ) -> Result<Self, EMLError> {
         let political_group_votes = total_votes
             .selections_per_affiliation()?
             .iter()
@@ -63,12 +69,15 @@ impl GSBResults {
                     total_votes,
                     UncountedVotesReason::ValidProxyCertificates,
                 )?,
-                // Voter cards only exist for non-local elections, so they are optional
+                // Voter card count only exists for non-local elections
+                // However, EMLs may still contain voter card counts with value 0
                 voter_card_count: total_votes
                     .uncounted_votes
                     .get(&UncountedVotesReason::ValidVoterCards)
                     .map(count_value)
-                    .transpose()?,
+                    .transpose()?
+                    // Only keep value if non-local election or > 0
+                    .filter(|&count| count > 0 || !election_category.is_local_election()),
                 total_admitted_voters_count: uncounted_votes(
                     total_votes,
                     UncountedVotesReason::AdmittedVoters,
@@ -184,7 +193,7 @@ mod tests {
     use crate::domain::{
         committee_session::committee_session_fixture,
         data_entry::{DataEntryId, DataEntrySource},
-        election::{CommitteeCategory, ElectionCategory, tests::election_fixture},
+        election::{CommitteeCategory, tests::election_fixture},
         results::Results,
         sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId},
         tabulation::ElectionTotals,
@@ -304,7 +313,10 @@ mod tests {
             .ok()
             .unwrap();
 
-        assert_eq!(GSBResults::from_eml_count(&count).unwrap(), results);
+        assert_eq!(
+            GSBResults::from_eml_count(&count, ElectionCategory::Municipal).unwrap(),
+            results
+        );
     }
 
     #[test]
@@ -312,12 +324,13 @@ mod tests {
         let mut count = count_document(gsb_results_fixture());
         count.count.election.contests[0].total_votes = None;
 
-        assert!(GSBResults::from_eml_count(&count).is_err());
+        assert!(GSBResults::from_eml_count(&count, ElectionCategory::Municipal).is_err());
     }
 
     #[test]
     fn test_from_eml_total_votes() {
-        let results = GSBResults::from_eml_total_votes(&total_votes()).unwrap();
+        let results =
+            GSBResults::from_eml_total_votes(&total_votes(), ElectionCategory::Municipal).unwrap();
 
         assert_eq!(
             results,
@@ -350,14 +363,33 @@ mod tests {
 
     #[test]
     fn test_from_eml_total_votes_with_voter_cards() {
-        let mut total_votes = total_votes();
-        total_votes.uncounted_votes.insert(
-            UncountedVotesReason::ValidVoterCards,
-            StringValue::from_value(25),
-        );
+        use ElectionCategory::*;
 
-        let results = GSBResults::from_eml_total_votes(&total_votes).unwrap();
-        assert_eq!(results.voters_counts.voter_card_count, Some(25));
+        // (election category, voter cards in EML, expected voter card count, expected validation result)
+        let cases = [
+            (Municipal, 0, None, true),
+            (Municipal, 42, Some(42), false),
+            (Provincial, 0, Some(0), true),
+            (Provincial, 42, Some(42), true),
+            (WaterAuthority, 0, Some(0), true),
+            (WaterAuthority, 42, Some(42), true),
+        ];
+
+        for (category, voter_cards, expected, accepted) in cases {
+            let case = format!("{category:?} with {voter_cards} voter cards");
+            let mut total_votes = total_votes();
+            total_votes.uncounted_votes.insert(
+                UncountedVotesReason::ValidVoterCards,
+                StringValue::from_value(voter_cards),
+            );
+
+            let results = GSBResults::from_eml_total_votes(&total_votes, category).unwrap();
+            assert_eq!(results.voters_counts.voter_card_count, expected, "{case}");
+
+            let election = election_fixture(category, CommitteeCategory::CSB, &[1]);
+            let validation = results.validate(&election, &"data".into());
+            assert_eq!(validation.is_ok(), accepted, "{case}");
+        }
     }
 
     #[test]
@@ -367,7 +399,9 @@ mod tests {
             .uncounted_votes
             .remove(&UncountedVotesReason::AdmittedVoters);
 
-        assert!(GSBResults::from_eml_total_votes(&total_votes).is_err());
+        assert!(
+            GSBResults::from_eml_total_votes(&total_votes, ElectionCategory::Municipal).is_err()
+        );
     }
 
     #[test]
@@ -375,7 +409,9 @@ mod tests {
         let mut total_votes = total_votes();
         total_votes.eligible_voter_count = StringValue::from_value(u64::from(u32::MAX) + 1);
 
-        assert!(GSBResults::from_eml_total_votes(&total_votes).is_err());
+        assert!(
+            GSBResults::from_eml_total_votes(&total_votes, ElectionCategory::Municipal).is_err()
+        );
     }
 
     #[test]
@@ -390,7 +426,9 @@ mod tests {
             .build()
             .unwrap();
 
-        assert!(GSBResults::from_eml_total_votes(&total_votes).is_err());
+        assert!(
+            GSBResults::from_eml_total_votes(&total_votes, ElectionCategory::Municipal).is_err()
+        );
     }
 
     /// Run validation and assert if GSBResults are valid
@@ -418,7 +456,7 @@ mod tests {
         )
         .ok()
         .unwrap();
-        let results = GSBResults::from_eml_count(&count).unwrap();
+        let results = GSBResults::from_eml_count(&count, ElectionCategory::Municipal).unwrap();
 
         assert_eq!(results.number_of_voters, 20599);
         assert_eq!(

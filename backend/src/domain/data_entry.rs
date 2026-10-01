@@ -462,8 +462,15 @@ impl DataEntryStatus {
                 client_state: ClientState::default(),
                 is_correction: false,
             })),
-            DataEntryStatus::FirstEntryInProgress(_) | DataEntryStatus::FirstEntryCorrection(_) => {
-                if user_id == self.get_first_entry_user_id().expect("user id is present") {
+            DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+                first_entry_user_id,
+                ..
+            })
+            | DataEntryStatus::FirstEntryCorrection(FirstEntryCorrection {
+                first_entry_user_id,
+                ..
+            }) => {
+                if user_id == first_entry_user_id {
                     Ok(self)
                 } else {
                     Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
@@ -1059,36 +1066,6 @@ impl DataEntryStatus {
             }
             DataEntryStatus::SecondEntryCorrection(state) => Some(state.first_entry_origin.clone()),
             DataEntryStatus::Definitive(state) => Some(state.first_entry_origin.clone()),
-        }
-    }
-
-    /// Get the user ID of the first entry typist
-    pub fn get_first_entry_user_id(&self) -> Option<UserId> {
-        match self {
-            DataEntryStatus::Empty => None,
-            DataEntryStatus::FirstEntryInProgress(state) => Some(state.first_entry_user_id),
-            DataEntryStatus::FirstEntryHasErrors(state) => Some(state.first_entry_user_id),
-            DataEntryStatus::FirstEntryFinalised(state) => match state.first_entry_origin {
-                DataEntryOrigin::Typist(user_id) => Some(user_id),
-                DataEntryOrigin::Import => None,
-            },
-            DataEntryStatus::SecondEntryInProgress(state) => match state.first_entry_origin {
-                DataEntryOrigin::Typist(user_id) => Some(user_id),
-                DataEntryOrigin::Import => None,
-            },
-            DataEntryStatus::EntriesDifferent(state) => match state.first_entry_origin {
-                DataEntryOrigin::Typist(user_id) => Some(user_id),
-                DataEntryOrigin::Import => None,
-            },
-            DataEntryStatus::FirstEntryCorrection(state) => Some(state.first_entry_user_id),
-            DataEntryStatus::SecondEntryCorrection(state) => match state.first_entry_origin {
-                DataEntryOrigin::Typist(user_id) => Some(user_id),
-                DataEntryOrigin::Import => None,
-            },
-            DataEntryStatus::Definitive(state) => match state.first_entry_origin {
-                DataEntryOrigin::Typist(user_id) => Some(user_id),
-                DataEntryOrigin::Import => None,
-            },
         }
     }
 
@@ -2391,24 +2368,6 @@ mod tests {
         );
         assert!(entries_different().get_first_entry_origin().is_some());
         assert!(definitive().get_first_entry_origin().is_some());
-    }
-
-    #[test]
-    fn check_first_entry_user_id() {
-        assert!(DataEntryStatus::Empty.get_first_entry_user_id().is_none());
-        assert!(
-            first_entry_in_progress()
-                .get_first_entry_user_id()
-                .is_some()
-        );
-        assert!(first_entry_finalised().get_first_entry_user_id().is_some());
-        assert!(
-            second_entry_in_progress()
-                .get_first_entry_user_id()
-                .is_some()
-        );
-        assert!(entries_different().get_first_entry_user_id().is_some());
-        assert!(definitive().get_first_entry_user_id().is_some());
     }
 
     #[test]

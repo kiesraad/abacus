@@ -696,6 +696,7 @@ pub struct DataEntryGetResponse {
         ("data_entry_id" = DataEntryId, description = "Data entry database id"),
     ),
 )]
+#[expect(clippy::too_many_lines, reason = "Written out cases take many lines")]
 async fn data_entry_get(
     user: User,
     State(pool): State<SqlitePool>,
@@ -708,28 +709,31 @@ async fn data_entry_get(
 
     Ok(Json(match state.clone() {
         FirstEntryInProgress(first_entry_in_progress_state) => DataEntryGetResponse {
-            user_id: state.get_first_entry_user_id(),
+            user_id: Some(first_entry_in_progress_state.first_entry_user_id),
             data: first_entry_in_progress_state.first_entry,
             status: state.status_name(),
             validation_results: ValidationResults::default(),
             source: context.source,
         },
         FirstEntryCorrection(first_entry_correction_state) => DataEntryGetResponse {
-            user_id: state.get_first_entry_user_id(),
+            user_id: Some(first_entry_correction_state.first_entry_user_id),
             data: first_entry_correction_state.first_entry,
             status: state.status_name(),
             validation_results: ValidationResults::default(),
             source: context.source,
         },
         FirstEntryHasErrors(first_entry_has_errors_state) => DataEntryGetResponse {
-            user_id: state.get_first_entry_user_id(),
+            user_id: Some(first_entry_has_errors_state.first_entry_user_id),
             data: first_entry_has_errors_state.finalised_first_entry,
             status: state.status_name(),
             validation_results: state.start_validate(&context.election)?,
             source: context.source,
         },
         FirstEntryFinalised(first_entry_finalised_state) => DataEntryGetResponse {
-            user_id: state.get_first_entry_user_id(),
+            user_id: match first_entry_finalised_state.first_entry_origin {
+                DataEntryOrigin::Import => None,
+                DataEntryOrigin::Typist(user_id) => Some(user_id),
+            },
             data: first_entry_finalised_state.finalised_first_entry,
             status: state.status_name(),
             validation_results: state.start_validate(&context.election)?,
@@ -756,7 +760,7 @@ async fn data_entry_get(
             validation_results: state.start_validate(&context.election)?,
             source: context.source,
         },
-        _ => Err(APIError::Conflict(
+        Empty | EntriesDifferent(_) => Err(APIError::Conflict(
             "Data entry is in the wrong state".to_string(),
             ErrorReference::DataEntryGetNotAllowed,
         ))?,

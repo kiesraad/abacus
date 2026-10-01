@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id,\n            committee_session_id,\n            data_entry_id AS \"data_entry_id!: _\",\n            number,\n            name,\n            category,\n            authority_id,\n            authority_name\n        FROM sub_committees\n        WHERE committee_session_id = $1\n        ",
+  "query": "\n        INSERT INTO sub_committees (\n            committee_session_id,\n            data_entry_id,\n            number,\n            name,\n            category,\n            authority_id,\n            authority_name\n        ) VALUES (?, ?, ?, ?, ?, ?, ?)\n        RETURNING\n            id AS \"id!: _\",\n            committee_session_id,\n            data_entry_id AS \"data_entry_id!: _\",\n            number,\n            name,\n            category,\n            authority_id,\n            authority_name,\n            certificates\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id",
+        "name": "id!: _",
         "ordinal": 0,
         "type_info": "Integer",
         "origin": {
@@ -90,12 +90,24 @@
             "name": "authority_name"
           }
         }
+      },
+      {
+        "name": "certificates",
+        "ordinal": 8,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "certificates"
+          }
+        }
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 7
     },
     "nullable": [
+      null,
       false,
       false,
       false,
@@ -106,5 +118,5 @@
       false
     ]
   },
-  "hash": "90197cae48ca824299259caddc4bd2fb6232394eac16b832456813871bb1fd4e"
+  "hash": "74c4dfb56b0824225f213a160cabb9d88c13cac70bd61b982de9dcd606481bf3"
 }

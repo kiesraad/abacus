@@ -26,6 +26,7 @@ describe("getDataEntrySourceNumber", () => {
     data_entry_id: 1,
     authority_id: "0035",
     authority_name: "Juinen",
+    certificates: [],
   };
 
   test.each([

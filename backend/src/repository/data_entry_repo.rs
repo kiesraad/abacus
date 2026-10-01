@@ -144,7 +144,8 @@ async fn try_fetch_sub_committee_for_source(
                 name,
                 category,
                 authority_id,
-                authority_name
+                authority_name,
+                certificates
             FROM sub_committees
             WHERE data_entry_id = $1
         "#,

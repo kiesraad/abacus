@@ -9,7 +9,9 @@ use crate::domain::{
         PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
         PollingStationNextSession, PollingStationNumber, PollingStationType,
     },
-    sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber},
+    sub_committee::{
+        Certificate, SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber,
+    },
 };
 
 pub trait PollingStationRowLike: Sized {
@@ -124,6 +126,7 @@ pub struct SubCommitteeRow {
     pub category: CommitteeCategory,
     pub authority_id: String,
     pub authority_name: String,
+    pub certificates: Json<Vec<Certificate>>,
 }
 
 pub trait SubCommitteeRowLike: Sized {
@@ -153,6 +156,7 @@ impl SubCommitteeRowLike for SubCommitteeRow {
             category: self.category,
             authority_id: self.authority_id.clone(),
             authority_name: self.authority_name.clone(),
+            certificates: self.certificates.0.clone(),
         }
     }
 

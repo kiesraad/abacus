@@ -74,6 +74,7 @@
 'data_entry_id' = "crate::domain::data_entry::DataEntryId"
 'number' = "crate::domain::sub_committee::SubCommitteeNumber"
 'category' = "crate::domain::election::CommitteeCategory"
+'certificates' = "sqlx::types::Json<Vec<crate::domain::sub_committee::Certificate>>"
 
 [macros.table-overrides.'apportionment']
 'committee_session_id' = "crate::domain::committee_session::CommitteeSessionId"

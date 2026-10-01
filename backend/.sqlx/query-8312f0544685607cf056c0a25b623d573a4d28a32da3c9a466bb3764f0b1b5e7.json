@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                id,\n                committee_session_id,\n                data_entry_id,\n                number,\n                name,\n                category,\n                authority_id,\n                authority_name\n            FROM sub_committees\n            WHERE data_entry_id = $1\n        ",
+  "query": "\n            SELECT\n                id,\n                committee_session_id,\n                data_entry_id,\n                number,\n                name,\n                category,\n                authority_id,\n                authority_name,\n                certificates\n            FROM sub_committees\n            WHERE data_entry_id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -90,6 +90,17 @@
             "name": "authority_name"
           }
         }
+      },
+      {
+        "name": "certificates",
+        "ordinal": 8,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "certificates"
+          }
+        }
       }
     ],
     "parameters": {
@@ -103,8 +114,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "621f4dfa0a3630c57e83eae9bf8aaf599b613088647e266ca8f30e22ecd643a7"
+  "hash": "8312f0544685607cf056c0a25b623d573a4d28a32da3c9a466bb3764f0b1b5e7"
 }

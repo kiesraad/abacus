@@ -53,7 +53,7 @@ describe("ElectionCertificatePage", () => {
         "Algemene naam: Gemeente Juinen",
         "Geldig vanaf: 1 januari 2026",
         "Geldig tot en met: 1 april 2026",
-        "Handtekeningalgoritme: SHA256withRSA",
+        "Handtekeningalgoritme: RSA 4096-bit",
       ].join(""),
     );
 

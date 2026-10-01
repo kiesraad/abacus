@@ -345,6 +345,12 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${ElectionId}/status`;
 
+// /api/elections/{election_id}/sub_committee_certificates
+export interface SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH = `/api/elections/${ElectionId}/sub_committee_certificates`;
+
 // /api/elections/{election_id}/voters
 export interface ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -721,6 +727,17 @@ export type CandidateNumber = number;
 export interface CandidateVotes {
   number: number;
   votes: number;
+}
+
+export interface Certificate {
+  common_name: string;
+  election_identifier: string;
+  not_after: string;
+  not_before: string;
+  organizational_unit: string;
+  /** TODO representation of public_key */
+  public_key: string;
+  signature_algorithm: string;
 }
 
 export interface CertificateDetailsResponse {
@@ -1954,6 +1971,7 @@ export interface SubCommittee {
   authority_id: string;
   authority_name: string;
   category: CommitteeCategory;
+  certificates: Certificate[];
   id: SubCommitteeId;
   name: string;
   number: number;

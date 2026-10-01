@@ -25,7 +25,8 @@ async fn list(
             name,
             category,
             authority_id,
-            authority_name
+            authority_name,
+            certificates
         FROM sub_committees
         WHERE committee_session_id = $1
         "#,
@@ -74,7 +75,8 @@ pub async fn create(
             name,
             category,
             authority_id,
-            authority_name
+            authority_name,
+            certificates
         "#,
         committee_session_id,
         data_entry_id,
@@ -104,6 +106,7 @@ pub async fn list_first_session_with_status(
             sc.category,
             sc.authority_id,
             sc.authority_name,
+            sc.certificates,
             de.state AS "state!: Json<DataEntryStatus>"
         FROM sub_committees AS sc
         JOIN data_entries AS de ON de.id = sc.data_entry_id
@@ -123,6 +126,7 @@ pub async fn list_first_session_with_status(
                 category: row.category,
                 authority_id: row.authority_id,
                 authority_name: row.authority_name,
+                certificates: row.certificates.0,
             },
         }),
         status: row.state.0,

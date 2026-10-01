@@ -134,6 +134,23 @@ impl PublicKey {
         })
     }
 
+    /// Read a public key from `SubjectPublicKeyInfo` PEM (`-----BEGIN PUBLIC KEY-----`).
+    pub fn from_pem(pem: &[u8]) -> Result<Self, EmlSignatureError> {
+        let (label, der) = pem::decode_vec(pem).map_err(invalid_public_key)?;
+        SubjectPublicKeyInfoOwned::validate_pem_label(label).map_err(invalid_public_key)?;
+        Self::from_der(&der)
+    }
+
+    /// The key as `SubjectPublicKeyInfo` PEM.
+    pub fn to_pem(&self) -> String {
+        pem::encode_string(
+            SubjectPublicKeyInfoOwned::PEM_LABEL,
+            LineEnding::LF,
+            &self.spki_der,
+        )
+        .expect("PEM encoding valid DER does not fail")
+    }
+
     /// The key as `SubjectPublicKeyInfo` DER. This is also what OSV2020-U
     /// stores when a `.crt` is imported.
     pub fn to_der(&self) -> Vec<u8> {
@@ -247,6 +264,11 @@ pub(crate) fn invalid_certificate(e: der::Error) -> EmlSignatureError {
     EmlSignatureError::InvalidCertificate(e.to_string())
 }
 
+/// Wrap a PEM error as [`EmlSignatureError::InvalidPublicKey`].
+fn invalid_public_key(e: impl std::fmt::Display) -> EmlSignatureError {
+    EmlSignatureError::InvalidPublicKey(e.to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use der::{Any, asn1::BitString};
@@ -319,6 +341,19 @@ mod tests {
         ));
         assert!(matches!(
             PublicKey::from_der(&[0xff; 8]),
+            Err(EmlSignatureError::InvalidPublicKey(_))
+        ));
+        assert!(matches!(
+            PublicKey::from_pem(b"not a pem"),
+            Err(EmlSignatureError::InvalidPublicKey(_))
+        ));
+    }
+
+    #[test]
+    fn rejects_public_key_pem_with_wrong_label() {
+        // A certificate instead of a bare public key
+        assert!(matches!(
+            PublicKey::from_pem(include_bytes!("../tests/fixtures/osv2020_nieuwstrand.crt")),
             Err(EmlSignatureError::InvalidPublicKey(_))
         ));
     }

@@ -1981,6 +1981,7 @@ export interface SubCommittee {
  */
 export interface SubCommitteeFirstSession {
   authority_id: string;
+  authority_name: string;
   committee_session_id: CommitteeSessionId;
   data_entry_id: DataEntryId;
   id: SubCommitteeId;

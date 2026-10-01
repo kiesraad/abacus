@@ -10558,10 +10558,14 @@
           "number",
           "name",
           "authority_id",
+          "authority_name",
           "data_entry_id"
         ],
         "properties": {
           "authority_id": {
+            "type": "string"
+          },
+          "authority_name": {
             "type": "string"
           },
           "committee_session_id": {

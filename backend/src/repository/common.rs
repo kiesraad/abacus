@@ -172,6 +172,7 @@ impl SubCommitteeRowLike for SubCommitteeRow {
             number: self.number,
             name: self.name.clone(),
             authority_id: self.authority_id.clone(),
+            authority_name: self.authority_name.clone(),
         }
     }
 }

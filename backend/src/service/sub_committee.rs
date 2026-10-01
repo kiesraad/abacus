@@ -74,6 +74,7 @@ mod tests {
         assert_eq!(created.name, "Test GSB");
         assert_eq!(created.committee_session_id, committee_session_id);
         assert_eq!(created.authority_id, "0042");
+        assert_eq!(created.authority_name, "Test GSB");
 
         // List and verify
         let list = list_for_first_session(&mut conn, committee_session_id)

@@ -24,6 +24,7 @@ describe("getDataEntrySourceNumber", () => {
     committee_session_id: 1,
     data_entry_id: 1,
     authority_id: "0035",
+    authority_name: "Juinen",
   };
 
   test.each([

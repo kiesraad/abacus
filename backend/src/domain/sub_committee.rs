@@ -60,5 +60,6 @@ pub struct SubCommitteeFirstSession {
     pub number: SubCommitteeNumber,
     pub name: String,
     pub authority_id: String,
+    pub authority_name: String,
     pub data_entry_id: DataEntryId,
 }

@@ -134,6 +134,7 @@ pub async fn list_first_session_with_status(
             number: row.number,
             name: row.name,
             authority_id: row.authority_id,
+            authority_name: row.authority_name,
         }),
         status: row.state.0,
     })

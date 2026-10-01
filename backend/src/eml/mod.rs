@@ -31,8 +31,8 @@ use eml_nl::{
     io::{EMLParsingMode, EMLRead as _},
     utils::{
         AffiliationId, AffiliationType, AuthorityId, CandidateId, ElectionDomainId, ElectionId,
-        Gender, ReportingUnitIdentifierId, StringValue, StringValueData, VotingChannelType,
-        VotingMethod,
+        Gender, GenderAnnex, ReportingUnitIdentifierId, StringValue, StringValueData,
+        VotingChannelType, VotingMethod,
     },
 };
 pub use error::EMLImportError;
@@ -86,6 +86,39 @@ fn format_election_name(name: &str, category: crate::domain::election::ElectionC
         Some(first) => first.to_uppercase().chain(chars).collect(),
         None => String::new(),
     }
+}
+
+/// Maps Gender or GenderAnnex to a CandidateGender
+/// Uses `gender_annex` when available, falls back to gender otherwise
+fn candidate_gender(
+    gender: &Option<StringValue<Gender>>,
+    gender_annex: &Option<StringValue<GenderAnnex>>,
+) -> Result<Option<CandidateGender>, EMLImportError> {
+    // First try to find a `GenderAnnex`
+    Ok(match &gender_annex {
+        Some(gender_annex) => {
+            let gender_annex = gender_annex.copied_value()?;
+            match gender_annex {
+                GenderAnnex::Male => Some(CandidateGender::Male),
+                GenderAnnex::Female => Some(CandidateGender::Female),
+                GenderAnnex::Other => Some(CandidateGender::X),
+            }
+        }
+        None => {
+            // If `GenderAnnex` is not found, fall back to `Gender`
+            match &gender {
+                None => None,
+                Some(gender) => {
+                    let gender = gender.copied_value()?;
+                    match gender {
+                        Gender::Male => Some(CandidateGender::Male),
+                        Gender::Female => Some(CandidateGender::Female),
+                        Gender::Unknown => None,
+                    }
+                }
+            }
+        }
+    })
 }
 
 impl NewElection {
@@ -384,17 +417,7 @@ impl Candidate {
                 .as_ref()
                 .and_then(|qa| qa.country_name_code())
                 .map(|code| code.value.to_string()),
-            gender: match &can.gender {
-                None => None,
-                Some(gender) => {
-                    let gender = gender.copied_value()?;
-                    match gender {
-                        Gender::Male => Some(CandidateGender::Male),
-                        Gender::Female => Some(CandidateGender::Female),
-                        Gender::Unknown => None,
-                    }
-                }
-            },
+            gender: candidate_gender(&can.gender, &can.gender_annex)?,
         })
     }
 
@@ -967,10 +990,10 @@ fn build_candidate_result(
                 );
 
             if let Some(gender) = can.gender {
-                builder = builder.gender(match gender {
-                    CandidateGender::Female => Gender::Female,
-                    CandidateGender::Male => Gender::Male,
-                    CandidateGender::X => Gender::Unknown,
+                builder = builder.gender_annex(match gender {
+                    CandidateGender::Female => GenderAnnex::Female,
+                    CandidateGender::Male => GenderAnnex::Male,
+                    CandidateGender::X => GenderAnnex::Other,
                 });
             }
 

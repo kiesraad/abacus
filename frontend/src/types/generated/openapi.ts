@@ -1351,6 +1351,7 @@ export const errorReferenceValues = [
   "InternalServerError",
   "InvalidApportionmentState",
   "InvalidCommitteeSessionStatus",
+  "InvalidCountType",
   "InvalidData",
   "InvalidDistrict",
   "InvalidHash",

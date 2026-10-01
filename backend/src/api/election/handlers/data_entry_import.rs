@@ -7,7 +7,7 @@ use chrono::NaiveDate;
 use eml_nl::{
     EMLError,
     common::AuthorityIdentifier,
-    documents::election_count::ElectionCount,
+    documents::election_count::{CountType, ElectionCount},
     io::{EMLParsingMode, EMLRead},
 };
 use serde::{Deserialize, Serialize};
@@ -227,6 +227,11 @@ async fn validate_import(
     let eml = read_eml_from_zip(zip_data).await?;
     check_hash(eml.as_bytes(), hash)?;
     let definition = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict).ok()?;
+
+    // We only support 510b counts for now
+    if definition.count_type != CountType::Municipal {
+        return Err(EMLImportError::InvalidCountType.into());
+    }
 
     let election_identifier = &definition.count.election.identifier;
     let eml_election_id = election_identifier.id.value()?;
@@ -604,6 +609,38 @@ mod tests {
                 .await,
                 Err(APIError::InvalidHashError)
             ));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_invalid_count_type(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+            let mut count = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict)
+                .ok()
+                .unwrap();
+
+            // Only count type municipal (510b) is allowed for now
+            for count_type in [
+                CountType::PollingStation,
+                CountType::District,
+                CountType::Central,
+            ] {
+                count.count_type = count_type;
+                let eml = String::try_from(count.clone()).unwrap();
+                let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+                assert!(
+                    matches!(
+                        validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
+                        Err(APIError::EmlImportError(EMLImportError::InvalidCountType))
+                    ),
+                    "{count_type:?}"
+                );
+            }
         }
 
         #[test(sqlx::test(fixtures(

@@ -71,6 +71,7 @@ pub enum ErrorReference {
     InternalServerError,
     InvalidApportionmentState,
     InvalidCommitteeSessionStatus,
+    InvalidCountType,
     InvalidData,
     InvalidDistrict,
     InvalidHash,
@@ -287,6 +288,17 @@ impl APIError {
                     ErrorResponse::new(
                         "Internal server error",
                         ErrorReference::InternalServerError,
+                        false,
+                    ),
+                )
+            }
+            APIError::EmlImportError(EMLImportError::InvalidCountType) => {
+                error!("Error importing EML file: Invalid count type");
+                (
+                    StatusCode::BAD_REQUEST,
+                    ErrorResponse::new(
+                        "EML import error".to_string(),
+                        ErrorReference::InvalidCountType,
                         false,
                     ),
                 )

@@ -8649,6 +8649,7 @@
           "InternalServerError",
           "InvalidApportionmentState",
           "InvalidCommitteeSessionStatus",
+          "InvalidCountType",
           "InvalidData",
           "InvalidDistrict",
           "InvalidHash",

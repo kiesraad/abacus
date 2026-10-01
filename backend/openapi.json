@@ -6880,8 +6880,7 @@
             "type": "string"
           },
           "public_key": {
-            "type": "string",
-            "description": "TODO representation of public_key"
+            "type": "string"
           },
           "signature_algorithm": {
             "type": "string"

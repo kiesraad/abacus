@@ -735,7 +735,6 @@ export interface Certificate {
   not_after: string;
   not_before: string;
   organizational_unit: string;
-  /** TODO representation of public_key */
   public_key: string;
   signature_algorithm: string;
 }

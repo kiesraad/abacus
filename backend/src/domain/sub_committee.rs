@@ -34,7 +34,6 @@ pub struct Certificate {
     pub not_before: DateTime<Utc>,
     pub not_after: DateTime<Utc>,
     pub signature_algorithm: String,
-    /// TODO representation of public_key
     pub public_key: String,
 }
 

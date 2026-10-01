@@ -18,7 +18,6 @@ describe("getDataEntrySourceNumber", () => {
 
   const dataEntrySourceSubCommittee: DataEntrySource = {
     type: "SubCommittee",
-    category: "GSB",
     id: 1,
     name: "Juinen",
     number: 1,

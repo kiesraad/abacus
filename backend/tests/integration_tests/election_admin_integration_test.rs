@@ -231,7 +231,6 @@ async fn test_csb_municipal_election_import_save(pool: SqlitePool) {
     let sub_committee = &statuses.values().next().unwrap()["source"];
     assert_eq!(sub_committee["authority_id"], "0000");
     assert_eq!(sub_committee["authority_name"], "Test");
-    assert_eq!(sub_committee["category"], "GSB");
     assert_eq!(sub_committee["name"], "Test");
     assert_eq!(sub_committee["number"], 0);
     assert_eq!(sub_committee["type"], "SubCommittee");
@@ -288,7 +287,6 @@ async fn test_csb_water_authority_election_import_save(pool: SqlitePool) {
     let heemdamseburg = &statuses.values().next().unwrap()["source"]; // First sub committee in the EML
     assert_eq!(heemdamseburg["authority_id"], "0123");
     assert_eq!(heemdamseburg["authority_name"], "Heemdamseburg");
-    assert_eq!(heemdamseburg["category"], "GSB");
     assert_eq!(heemdamseburg["name"], "Heemdamseburg");
     assert_eq!(heemdamseburg["number"], 123);
     assert_eq!(heemdamseburg["type"], "SubCommittee");

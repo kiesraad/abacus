@@ -144,7 +144,8 @@ async fn try_fetch_sub_committee_for_source(
                 name,
                 category,
                 authority_id,
-                authority_name
+                authority_name,
+                certificates
             FROM sub_committees
             WHERE data_entry_id = $1
         "#,
@@ -291,7 +292,7 @@ async fn list_results_for_csb_committee_session(
         sub_committee_repo::list_first_session(conn, committee_session_id)
             .await?
             .into_iter()
-            .map(|sc| (sc.sub_committee.id, sc))
+            .map(|sc| (sc.id, sc))
             .collect();
 
     let results = query!(

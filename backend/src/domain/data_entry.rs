@@ -106,9 +106,7 @@ impl DataEntrySource {
             DataEntrySource::PollingStation(source) => {
                 DataEntrySourceId::PollingStation(source.id())
             }
-            DataEntrySource::SubCommittee(source) => {
-                DataEntrySourceId::SubCommittee(source.sub_committee.id)
-            }
+            DataEntrySource::SubCommittee(source) => DataEntrySourceId::SubCommittee(source.id),
         }
     }
 
@@ -118,7 +116,7 @@ impl DataEntrySource {
                 DataEntrySourceNumber::PollingStation(source.number())
             }
             DataEntrySource::SubCommittee(source) => {
-                DataEntrySourceNumber::SubCommittee(source.sub_committee.number)
+                DataEntrySourceNumber::SubCommittee(source.number)
             }
         }
     }
@@ -132,7 +130,7 @@ impl DataEntrySource {
                     source.polling_station().postal_code
                 )
             }
-            DataEntrySource::SubCommittee(source) => source.sub_committee.name.clone(),
+            DataEntrySource::SubCommittee(source) => source.name.clone(),
         }
     }
 
@@ -141,7 +139,7 @@ impl DataEntrySource {
             DataEntrySource::PollingStation(source) => {
                 format!("{authority_id}::SB{}", source.number())
             }
-            DataEntrySource::SubCommittee(source) => format!("{:04}", source.sub_committee.number),
+            DataEntrySource::SubCommittee(source) => format!("{:04}", source.number),
         }
     }
 

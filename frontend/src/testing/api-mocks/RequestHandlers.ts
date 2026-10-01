@@ -341,7 +341,7 @@ export const ElectionCertificateDetailsRequestHandler = http.get<
     election_identifier: "AB2027_Aardenboezem",
     organizational_unit: "Abacus 1.2.0",
     common_name: "Gemeente Juinen",
-    signature_algorithm: "SHA256withRSA",
+    signature_algorithm: "RSA 4096-bit",
     not_before: "2026-01-01T00:00:00Z",
     not_after: "2026-04-01T00:00:00Z",
   };

@@ -11,7 +11,7 @@ const defaultFormState: ResolveDifferencesFormState = {
   setCorrectEntry: fn(),
   wrongEntryAction: undefined,
   setWrongEntryAction: fn(),
-  correctionBlocked: false,
+  correctionBlocked: undefined,
   correctEntryError: undefined,
   wrongEntryError: undefined,
 };
@@ -127,18 +127,18 @@ export const FirstEntrySelected: Story = {
   },
 };
 
-export const SecondEntryHasErrors: Story = {
+export const FirstEntryHasErrors: Story = {
   ...Default,
   args: {
-    formState: { ...defaultFormState, correctEntry: "second", correctionBlocked: true },
+    formState: { ...defaultFormState, correctEntry: "first", correctionBlocked: "first_entry_has_errors" },
   },
   play: async ({ canvas }) => {
     await expect(
       canvas.getByText(
-        "Uit de tweede invoer blijkt dat er waarschijnlijk fouten in het papieren proces-verbaal zijn gemaakt. " +
-          "Daarom kan je de eerste invoer nu niet laten herstellen door de oorspronkelijke invoerder. " +
+        "Uit de eerste invoer blijkt dat er waarschijnlijk fouten in het papieren proces-verbaal zijn gemaakt. " +
+          "Daarom kan je de tweede invoer nu niet laten herstellen door de oorspronkelijke invoerder. " +
           "Eerst moet het papieren proces-verbaal worden gecontroleerd. Dat doen we in de volgende stap. " +
-          "De eerste invoer wordt verwijderd.",
+          "De tweede invoer wordt verwijderd.",
       ),
     ).toBeVisible();
 
@@ -156,18 +156,46 @@ export const SecondEntryHasErrors: Story = {
   },
 };
 
-export const FirstEntryHasErrors: Story = {
+export const FirstEntryImported: Story = {
   ...Default,
   args: {
-    formState: { ...defaultFormState, correctEntry: "first", correctionBlocked: true },
+    formState: { ...defaultFormState, correctEntry: "second", correctionBlocked: "first_entry_imported" },
   },
   play: async ({ canvas }) => {
     await expect(
       canvas.getByText(
-        "Uit de eerste invoer blijkt dat er waarschijnlijk fouten in het papieren proces-verbaal zijn gemaakt. " +
-          "Daarom kan je de tweede invoer nu niet laten herstellen door de oorspronkelijke invoerder. " +
+        "De eerste invoer is geïmporteerd uit een tellingbestand. " +
+          "Afwijkingen met het papieren proces-verbaal kunnen daarin niet worden hersteld. " +
+          "Er is tweede handmatige invoer nodig vanaf het papieren proces-verbaal.",
+      ),
+    ).toBeVisible();
+
+    const correctWrongEntry = canvas.getByRole("radio", {
+      name: "Verschillen laten herstellen door de oorspronkelijke invoerder",
+    });
+    const discardWrongEntry = canvas.getByRole("radio", { name: "Hele proces-verbaal opnieuw laten invoeren" });
+    await expect(correctWrongEntry).toBeDisabled();
+    await expect(correctWrongEntry).not.toBeChecked();
+    await expect(discardWrongEntry).toBeDisabled();
+    await expect(discardWrongEntry).toBeChecked();
+
+    // The submit button announces that resolving the errors is the next step
+    await expect(canvas.getByRole("button", { name: "Verder naar fouten oplossen" })).toBeVisible();
+  },
+};
+
+export const SecondEntryHasErrors: Story = {
+  ...Default,
+  args: {
+    formState: { ...defaultFormState, correctEntry: "second", correctionBlocked: "second_entry_has_errors" },
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByText(
+        "Uit de tweede invoer blijkt dat er waarschijnlijk fouten in het papieren proces-verbaal zijn gemaakt. " +
+          "Daarom kan je de eerste invoer nu niet laten herstellen door de oorspronkelijke invoerder. " +
           "Eerst moet het papieren proces-verbaal worden gecontroleerd. Dat doen we in de volgende stap. " +
-          "De tweede invoer wordt verwijderd.",
+          "De eerste invoer wordt verwijderd.",
       ),
     ).toBeVisible();
 

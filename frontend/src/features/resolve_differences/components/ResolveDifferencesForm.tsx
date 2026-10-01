@@ -4,26 +4,12 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
-
-import { type CorrectEntry, effectiveWrongEntryAction, type ResolveDifferencesFormState } from "../utils/differences";
-
-// Explains why the kept entry blocks correcting the other one.
-function correctionBlockedMessage(correctEntry: CorrectEntry | undefined): string | undefined {
-  if (correctEntry === "first") {
-    return t("resolve_differences.correction_blocked.first_entry_has_errors");
-  }
-  if (correctEntry === "second") {
-    return t("resolve_differences.correction_blocked.second_entry_has_errors");
-  }
-  return undefined;
-}
+import { effectiveWrongEntryAction, type ResolveDifferencesFormState } from "../utils/differences";
 
 // Renders nothing when correcting the other entry is not blocked
-function CorrectionBlockedAlert({
-  correctEntry,
-  correctionBlocked,
-}: Pick<ResolveDifferencesFormState, "correctEntry" | "correctionBlocked">) {
-  const message = correctionBlocked ? correctionBlockedMessage(correctEntry) : undefined;
+// otherwise explains why the kept entry blocks correcting the other one.
+function CorrectionBlockedAlert({ correctionBlocked }: Pick<ResolveDifferencesFormState, "correctionBlocked">) {
+  const message = correctionBlocked ? t(`resolve_differences.correction_blocked.${correctionBlocked}`) : undefined;
 
   if (!message) {
     return null;
@@ -57,8 +43,8 @@ export function ResolveDifferencesForm({
   },
   onSubmit,
 }: ResolveDifferencesFormProps) {
-  const wrongEntryDisabled = (correctEntry !== "first" && correctEntry !== "second") || correctionBlocked;
-  const checkedAction = effectiveWrongEntryAction(correctEntry, wrongEntryAction, correctionBlocked);
+  const wrongEntryDisabled = (correctEntry !== "first" && correctEntry !== "second") || correctionBlocked !== undefined;
+  const checkedAction = effectiveWrongEntryAction(correctEntry, wrongEntryAction, correctionBlocked !== undefined);
 
   return (
     <Form
@@ -104,7 +90,7 @@ export function ResolveDifferencesForm({
           </ChoiceList>
         </FormLayout.Section>
         <FormLayout.Section title={tx("resolve_differences.wrong_entry_question")}>
-          <CorrectionBlockedAlert correctEntry={correctEntry} correctionBlocked={correctionBlocked} />
+          <CorrectionBlockedAlert correctionBlocked={correctionBlocked} />
           <ChoiceList disabled={wrongEntryDisabled}>
             {wrongEntryError && (
               <ChoiceList.Error id="resolve-differences-wrong-entry-error">{wrongEntryError}</ChoiceList.Error>

@@ -493,40 +493,23 @@ impl DataEntryStatus {
         initial_results: Results,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
-            DataEntryStatus::FirstEntryFinalised(state) => match state.first_entry_origin {
-                DataEntryOrigin::Typist(first_entry_user_id) => {
-                    if first_entry_user_id == user_id {
-                        Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
-                    } else if !state.finalised_first_entry.is_same_model(&initial_results) {
-                        Err(DataEntryTransitionError::Invalid)
-                    } else {
-                        Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
-                            first_entry_origin: state.first_entry_origin.clone(),
-                            finalised_first_entry: state.finalised_first_entry,
-                            first_entry_finished_at: state.first_entry_finished_at,
-                            progress: 0,
-                            second_entry_user_id: user_id,
-                            second_entry: initial_results,
-                            client_state: ClientState::default(),
-                        }))
-                    }
+            DataEntryStatus::FirstEntryFinalised(state) => {
+                if state.first_entry_origin == DataEntryOrigin::Typist(user_id) {
+                    Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
+                } else if !state.finalised_first_entry.is_same_model(&initial_results) {
+                    Err(DataEntryTransitionError::Invalid)
+                } else {
+                    Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
+                        first_entry_origin: state.first_entry_origin,
+                        finalised_first_entry: state.finalised_first_entry,
+                        first_entry_finished_at: state.first_entry_finished_at,
+                        progress: 0,
+                        second_entry_user_id: user_id,
+                        second_entry: initial_results,
+                        client_state: ClientState::default(),
+                    }))
                 }
-                DataEntryOrigin::Import => {
-                    if !state.finalised_first_entry.is_same_model(&initial_results) {
-                        Err(DataEntryTransitionError::Invalid)
-                    } else {
-                        Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
-                            first_entry_origin: state.first_entry_origin.clone(),
-                            finalised_first_entry: state.finalised_first_entry,
-                            first_entry_finished_at: state.first_entry_finished_at,
-                            progress: 0,
-                            second_entry_user_id: user_id,
-                            second_entry: initial_results,
-                            client_state: ClientState::default(),
-                        }))
-                    }
-                }
-            },
+            }
             DataEntryStatus::SecondEntryInProgress(_)
             | DataEntryStatus::SecondEntryCorrection(_) => {
                 if user_id == self.get_second_entry_user_id().expect("user id is present") {
@@ -937,7 +920,8 @@ impl DataEntryStatus {
                             first_entry_finished_at: state.first_entry_finished_at,
                         }))
                     } else {
-                        panic!("imported first entry cannot have errors")
+                        // Imported first entry cannot have errors
+                        Err(DataEntryTransitionError::Invalid)
                     }
                 } else {
                     Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
@@ -2113,6 +2097,26 @@ mod tests {
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry,
             first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
+            second_entry,
+            second_entry_user_id: UserId::from(0),
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
+        });
+
+        assert_eq!(
+            initial.correct_first_entry(&election()),
+            Err(DataEntryTransitionError::CorrectionNotAllowed)
+        );
+    }
+
+    #[test]
+    fn entries_different_keep_second_and_correct_first_imported_entry_is_rejected() {
+        let first_entry = example_results();
+        let second_entry = example_results();
+
+        let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry,
+            first_entry_origin: DataEntryOrigin::Import,
             second_entry,
             second_entry_user_id: UserId::from(0),
             first_entry_finished_at: Utc::now(),

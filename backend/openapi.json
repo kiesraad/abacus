@@ -3286,8 +3286,28 @@
               }
             }
           },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "413": {
             "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Import not possible",
             "content": {
               "application/json": {
                 "schema": {
@@ -3382,8 +3402,28 @@
               }
             }
           },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "413": {
             "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Import not possible",
             "content": {
               "application/json": {
                 "schema": {
@@ -6476,7 +6516,6 @@
           "DataEntryDiscarded",
           "DataEntryReset",
           "DataEntryFinalised",
-          "DataEntryImported",
           "DataEntryDiscardedFirst",
           "DataEntryReturnedFirst",
           "DataEntryKeptFirst",
@@ -8604,6 +8643,7 @@
           "DataEntryCannotBeReset",
           "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
+          "DataEntryValidationErrors",
           "EmlImportError",
           "EmlError",
           "EntryNotFound",
@@ -8633,11 +8673,12 @@
           "PasswordRejectionTooShort",
           "PdfGenerationError",
           "PollingStationRepeated",
-          "PollingStationValidationErrors",
           "RequestPayloadTooLarge",
           "Unauthorized",
+          "UnknownCommittee",
           "UsernameNotUnique",
-          "UserNotFound"
+          "UserNotFound",
+          "ZipError"
         ]
       },
       "ErrorResponse": {

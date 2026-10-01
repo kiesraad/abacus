@@ -18,7 +18,7 @@ use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
     api::election::check_hash,
     domain::{
-        committee_session::{CommitteeSessionError, CommitteeSessionId},
+        committee_session::CommitteeSessionId,
         committee_session_status::CommitteeSessionStatus,
         data_entry::{DataEntrySource, DataEntryStatus},
         election::{ElectionId, ElectionWithPoliticalGroups},
@@ -30,6 +30,14 @@ use crate::{
     error::ErrorReference,
     repository::{committee_session_repo, election_repo, sub_committee_repo},
 };
+
+#[derive(Debug)]
+pub enum DataEntryImportError {
+    EmlZipError(String),
+    CommitteeSessionAlreadyCompleted,
+    SubCommitteeDataEntryNotEmpty,
+    ResultsHaveValidationErrors,
+}
 
 #[derive(Debug, ToSchema)]
 pub struct CSBDataEntryImportValidateRequest {
@@ -119,7 +127,9 @@ pub struct CSBDataEntryImportValidateResponse {
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Election not found", body = ErrorResponse),
         (status = 413, description = "Payload too large", body = ErrorResponse),
+        (status = 422, description = "Import not possible", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -162,7 +172,9 @@ pub struct CSBDataEntryImportResponse {
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Election not found", body = ErrorResponse),
         (status = 413, description = "Payload too large", body = ErrorResponse),
+        (status = 422, description = "Import not possible", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -224,7 +236,7 @@ async fn validate_import(
     let committee_session =
         committee_session_repo::get_election_committee_session(conn, election_id).await?;
     if committee_session.status == CommitteeSessionStatus::Completed {
-        return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
+        return Err(DataEntryImportError::CommitteeSessionAlreadyCompleted.into());
     }
 
     let authority_identifier = &definition.managing_authority.authority_identifier;
@@ -232,17 +244,13 @@ async fn validate_import(
         find_sub_committee(conn, committee_session.id, authority_identifier).await?;
     if status != DataEntryStatus::Empty {
         // TODO #3905 Throw different error when results have already been *imported*, otherwise the following one
-        return Err(APIError::EmlImportError(
-            EMLImportError::SubCommitteeDataEntryNotEmpty,
-        ));
+        return Err(DataEntryImportError::SubCommitteeDataEntryNotEmpty.into());
     }
 
     let results = Results::GSB(GSBResults::from_eml_count(&definition)?);
     let validation_results = results.start_validate(&election)?;
     if validation_results.has_errors() {
-        return Err(APIError::EmlImportError(
-            EMLImportError::ResultsHaveValidationErrors,
-        ));
+        return Err(DataEntryImportError::ResultsHaveValidationErrors.into());
     }
 
     Ok(ValidatedImport {
@@ -274,7 +282,7 @@ async fn find_sub_committee(
             }
             _ => None,
         })
-        .ok_or_else(|| EMLImportError::MismatchSubCommittee.into())
+        .ok_or_else(|| EMLImportError::UnknownCommittee.into())
 }
 
 /// Read the contents of the single `*.eml.xml` file that is expected in the ZIP-file.
@@ -283,7 +291,7 @@ async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
     // TODO #4024 Validate signature
     let reader = ZipFileReader::new(zip_data)
         .await
-        .map_err(EMLImportError::InvalidZipFile)?;
+        .map_err(|_| DataEntryImportError::EmlZipError("Failed to read ZIP file".to_string()))?;
 
     let files = reader.file().entries().iter().enumerate();
     let mut eml_files = files.filter(|(_, entry)| {
@@ -293,11 +301,13 @@ async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
             .is_ok_and(|name| name.to_ascii_lowercase().ends_with(".eml.xml"))
     });
 
-    let (index, entry) = eml_files
-        .next()
-        .ok_or(EMLImportError::MissingEmlFileInZip)?;
+    let (index, entry) = eml_files.next().ok_or(DataEntryImportError::EmlZipError(
+        "Missing EML file in ZIP".to_string(),
+    ))?;
     if eml_files.next().is_some() {
-        return Err(EMLImportError::MultipleEmlFilesInZip.into());
+        return Err(
+            DataEntryImportError::EmlZipError("Multiple EML files in ZIP".to_string()).into(),
+        );
     }
 
     // Protect against ZIP bombs, max 128 MB after decompression
@@ -313,10 +323,10 @@ async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
     reader
         .reader_with_entry(index)
         .await
-        .map_err(EMLImportError::InvalidZipFile)?
+        .map_err(|_| DataEntryImportError::EmlZipError("Invalid ZIP file".to_string()))?
         .read_to_end_checked(&mut eml_data)
         .await
-        .map_err(EMLImportError::InvalidZipFile)?;
+        .map_err(|_| DataEntryImportError::EmlZipError("Invalid ZIP file".to_string()))?;
 
     let eml_string =
         String::from_utf8(eml_data).map_err(|_| EMLError::custom("EML file is not valid UTF-8"))?;

@@ -46,7 +46,7 @@ use crate::{
     service::{create_sub_committee, list_polling_stations_for_session},
 };
 
-mod handlers;
+pub mod handlers;
 
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;

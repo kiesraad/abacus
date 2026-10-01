@@ -554,7 +554,6 @@ export const auditEventTypeValues = [
   "DataEntryDiscarded",
   "DataEntryReset",
   "DataEntryFinalised",
-  "DataEntryImported",
   "DataEntryDiscardedFirst",
   "DataEntryReturnedFirst",
   "DataEntryKeptFirst",
@@ -1343,6 +1342,7 @@ export const errorReferenceValues = [
   "DataEntryCannotBeReset",
   "DataEntryGetNotAllowed",
   "DataEntryNotAllowed",
+  "DataEntryValidationErrors",
   "EmlImportError",
   "EmlError",
   "EntryNotFound",
@@ -1372,11 +1372,12 @@ export const errorReferenceValues = [
   "PasswordRejectionTooShort",
   "PdfGenerationError",
   "PollingStationRepeated",
-  "PollingStationValidationErrors",
   "RequestPayloadTooLarge",
   "Unauthorized",
+  "UnknownCommittee",
   "UsernameNotUnique",
   "UserNotFound",
+  "ZipError",
 ] as const;
 export type ErrorReference = (typeof errorReferenceValues)[number];
 

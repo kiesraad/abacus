@@ -88,7 +88,7 @@ impl ElectionTotals {
                         data_source.number(),
                         validation_results
                     ),
-                    ErrorReference::PollingStationValidationErrors,
+                    ErrorReference::DataEntryValidationErrors,
                 ));
             }
 

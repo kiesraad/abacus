@@ -508,7 +508,7 @@ impl ElectionWithPoliticalGroups {
         let timestamp = timestamp.unwrap_or_else(Local::now);
 
         CandidateLists::builder()
-            .version(EMLVersion::V1_2_2)
+            .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
@@ -555,7 +555,7 @@ impl ElectionWithPoliticalGroups {
         let timestamp = timestamp.unwrap_or_else(Local::now);
 
         ElectionDefinition::builder()
-            .version(EMLVersion::V1_2_2)
+            .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.authority_id)?)
@@ -598,7 +598,7 @@ impl ElectionWithPoliticalGroups {
         let timestamp = timestamp.unwrap_or_else(Local::now);
 
         PollingStations::builder()
-            .version(EMLVersion::V1_2_2)
+            .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.authority_id)?)
@@ -657,7 +657,7 @@ impl ElectionWithPoliticalGroups {
         timestamp: DateTime<Local>,
     ) -> Result<ElectionCount, EMLError> {
         ElectionCount::builder()
-            .version(EMLVersion::V1_2_2)
+            .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
@@ -871,7 +871,7 @@ impl ElectionWithPoliticalGroups {
             ));
         }
         ElectionResult::builder()
-            .version(EMLVersion::V1_2_2)
+            .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)

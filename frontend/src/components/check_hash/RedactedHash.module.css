@@ -20,7 +20,7 @@
 .stub {
   font-weight: 700;
   color: var(--base-white);
-  background-color: var(--gray-600);
+  background-color: var(--base-black);
   text-align: center;
 }
 

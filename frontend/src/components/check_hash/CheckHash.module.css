@@ -5,7 +5,7 @@
   position: relative;
   max-width: 51rem;
   width: fit-content;
-  color: var(--gray-600);
+  color: var(--base-black);
 
   section {
     display: inline-flex;
@@ -17,7 +17,7 @@
     > p {
       margin: 0;
       width: 100%;
-      color: var(--gray-600);
+      color: var(--base-black);
     }
 
     > div {

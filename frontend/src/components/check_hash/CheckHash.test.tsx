@@ -31,6 +31,9 @@ function renderPage(error = false) {
       title={"Gemeenteraad Test 2022"}
       header={"Controleer bestand"}
       description={"Het bestand <naam bestand> is geïmporteerd etc etc"}
+      instructions={"Vul ter controle de afgeschermde delen in."}
+      errorTitle={"Controle digitale vingerafdruk niet gelukt"}
+      errorDescription={"Controleer of de ingevulde controle-delen overeenkomen."}
       redactedHash={{
         chunks: hashChunks,
         redacted_indexes: [4, 11],

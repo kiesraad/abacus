@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
+import { CheckHash } from "@/components/check_hash/CheckHash";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { Form } from "@/components/ui/Form/Form";
@@ -13,9 +14,7 @@ import type {
   ElectionDefinitionValidateResponse,
 } from "@/types/generated/openapi";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
-
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import { CheckHash } from "./CheckHash";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UploadElectionDefinition() {
@@ -98,6 +97,9 @@ export function UploadElectionDefinition() {
             return <strong>{state.electionDefinitionFileName}</strong>;
           },
         })}
+        instructions={t("election.check_eml.check_hash_instructions")}
+        errorTitle={t("election.check_eml.error.title")}
+        errorDescription={t("election.check_eml.error.description")}
         redactedHash={state.electionDefinitionRedactedHash}
         error={error}
         onSubmit={(chunks) => void onSubmit(chunks)}

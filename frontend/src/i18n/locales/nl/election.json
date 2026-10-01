@@ -15,11 +15,7 @@
   "check_eml": {
     "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de volgende kandidaten:",
     "candidates_title": "Controleer kandidatenlijsten",
-    "check_hash": {
-      "description": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
-      "hint": "Vul 4 karakters in",
-      "label": "Controle deel {stub}"
-    },
+    "check_hash_instructions": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
     "election_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
     "election_title": "Controleer verkiezingsdefinitie",
     "error": {

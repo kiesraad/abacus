@@ -16,13 +16,27 @@ interface CheckHashProps {
   title: string;
   header: string;
   description: ReactNode;
+  instructions: string;
+  errorTitle: string;
+  errorDescription: string;
   redactedHash: RedactedEmlHash;
   error: ReactNode | undefined;
   onSubmit: (chunks: string[]) => void;
 }
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
-export function CheckHash({ date, title, header, description, redactedHash, error, onSubmit }: CheckHashProps) {
+export function CheckHash({
+  date,
+  title,
+  header,
+  description,
+  instructions,
+  errorTitle,
+  errorDescription,
+  redactedHash,
+  error,
+  onSubmit,
+}: CheckHashProps) {
   const [changed, setChanged] = useState<boolean>(true);
   const [stubs, setStubs] = useState<Stub[]>(
     redactedHash.redacted_indexes.map((redacted_index: number) => ({
@@ -58,7 +72,7 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
       if (newStub) {
         newStub.error = "";
         if (typeof value !== "string" || value.length !== 4) {
-          newStub.error = t("election.check_eml.check_hash.hint");
+          newStub.error = t("check_hash_hint");
           stubsAreValid = false;
         } else {
           completeHash[stub.index] = value.toLowerCase();
@@ -81,8 +95,8 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
         <FormLayout>
           <FormLayout.Section>
             {(stubs.some((stub) => stub.error.length > 0) || error) && (
-              <Alert type="error" title={t("election.check_eml.error.title")} inline>
-                <p> {t("election.check_eml.error.description")} </p>
+              <Alert type="error" title={errorTitle} inline>
+                <p> {errorDescription} </p>
               </Alert>
             )}
             <p>{description}</p>
@@ -101,7 +115,7 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
                 </div>
               </section>
             </div>
-            <p>{t("election.check_eml.check_hash.description")}</p>
+            <p>{instructions}</p>
 
             {stubs.map((stub, stubIndex) => (
               <InputField
@@ -110,11 +124,12 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
                 key={stub.index}
                 name={stub.index.toString()}
                 type="text"
-                label={t("election.check_eml.check_hash.label", { stub: stubIndex + 1 })}
-                hint={t("election.check_eml.check_hash.hint")}
+                label={t("check_hash_label", { stub: stubIndex + 1 })}
+                hint={t("check_hash_hint")}
                 error={stub.error}
                 fieldSize="medium"
                 fieldWidth="full-field-with-narrow-input"
+                maxLength={4}
                 onFocus={() => {
                   highlightStub(stubIndex, true);
                 }}

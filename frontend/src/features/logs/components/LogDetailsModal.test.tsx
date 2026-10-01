@@ -9,26 +9,27 @@ describe("LogDetailsModal", () => {
     // Expect missing translation keys
     vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    const someEvent: AuditLogEvent = logMockResponse.events[0]!;
+    const someEvent: AuditLogEvent = {
+      ...logMockResponse.events[0]!,
+      event: {
+        // primitives
+        number: 3,
+        true: true,
+        false: false,
+        null: null,
+        undefined: undefined,
 
-    someEvent.event = {
-      // primitives
-      number: 3,
-      true: true,
-      false: false,
-      null: null,
-      undefined: undefined,
+        // translated
+        role: "administrator",
+        reference: "EntryNotFound",
+        dataEntryStatus: "in_progress",
+        level: "warning",
 
-      // translated
-      role: "administrator",
-      reference: "EntryNotFound",
-      dataEntryStatus: "in_progress",
-      level: "warning",
-
-      // objects
-      object: { value: 42 },
-      array: [1, 2, 3],
-      function: (x: number) => x + 1,
+        // objects
+        object: { value: 42 },
+        array: [1, 2, 3],
+        function: (x: number) => x + 1,
+      },
     };
 
     render(<LogDetailsModal setDetails={() => {}} details={someEvent} />);

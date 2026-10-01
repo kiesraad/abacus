@@ -220,7 +220,7 @@ export const CSBElectionStatusNoLinks: StoryObj<StoryProps> = {
         ]);
       });
 
-      await step("Definitive", async () => {
+      await step("Not started", async () => {
         await expect(headings[2]).toHaveTextContent("Werkvoorraad (5)");
         await expect(tables[2]).toHaveTableContent([
           ["Nummer", "Stembureau"],

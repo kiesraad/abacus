@@ -6750,10 +6750,7 @@
             "format": "binary"
           },
           "hash": {
-            "type": [
-              "array",
-              "null"
-            ],
+            "type": "array",
             "items": {
               "type": "string"
             }

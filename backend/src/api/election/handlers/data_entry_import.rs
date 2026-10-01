@@ -28,7 +28,7 @@ use crate::{
     },
     eml::{EMLImportError, RedactedEmlHash},
     error::ErrorReference,
-    repository::{committee_session_repo, election_repo, sub_committee_repo},
+    repository::{committee_session_repo, election_repo, sub_committee_repo, user_repo::User},
 };
 
 #[derive(Debug)]
@@ -41,9 +41,11 @@ pub enum DataEntryImportError {
 
 #[derive(Debug, ToSchema)]
 pub struct CSBDataEntryImportValidateRequest {
-    hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = Option<Vec<String>>, nullable = false)]
+    pub hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
     #[schema(value_type = String, format = Binary)]
-    data: Vec<u8>,
+    pub data: Vec<u8>,
 }
 
 impl<S: Send + Sync> FromRequest<S> for CSBDataEntryImportValidateRequest {
@@ -57,9 +59,9 @@ impl<S: Send + Sync> FromRequest<S> for CSBDataEntryImportValidateRequest {
 
 #[derive(Debug, ToSchema)]
 pub struct CSBDataEntryImportRequest {
-    hash: [String; crate::eml::hash::CHUNK_COUNT],
+    pub hash: [String; crate::eml::hash::CHUNK_COUNT],
     #[schema(value_type = String, format = Binary)]
-    data: Vec<u8>,
+    pub data: Vec<u8>,
 }
 
 impl<S: Send + Sync> FromRequest<S> for CSBDataEntryImportRequest {
@@ -137,13 +139,14 @@ pub struct CSBDataEntryImportValidateResponse {
     ),
 )]
 pub async fn election_data_entry_import_validate(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     request: CSBDataEntryImportValidateRequest,
 ) -> Result<Json<CSBDataEntryImportValidateResponse>, APIError> {
     let mut conn = pool.acquire().await?;
-    let import =
-        validate_import(&mut conn, election_id, request.data, request.hash.as_ref()).await?;
+    let hash = request.hash.as_ref();
+    let import = validate_import(&mut conn, &user, election_id, request.data, hash).await?;
 
     Ok(Json(CSBDataEntryImportValidateResponse {
         hash: import.hash,
@@ -182,12 +185,14 @@ pub struct CSBDataEntryImportResponse {
     ),
 )]
 pub async fn election_data_entry_import(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     request: CSBDataEntryImportRequest,
 ) -> Result<Json<CSBDataEntryImportResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
-    let import = validate_import(&mut tx, election_id, request.data, Some(&request.hash)).await?;
+    let hash = Some(&request.hash);
+    let import = validate_import(&mut tx, &user, election_id, request.data, hash).await?;
 
     // TODO #3905 Store origin of data entry
     // TODO #3906 Save data entry results
@@ -211,10 +216,14 @@ struct ValidatedImport {
 /// Validate uploaded data: hash, ZIP and EML
 async fn validate_import(
     conn: &mut SqliteConnection,
+    user: &User,
     election_id: ElectionId,
     zip_data: Vec<u8>,
     hash: Option<&[String; crate::eml::hash::CHUNK_COUNT]>,
 ) -> Result<ValidatedImport, APIError> {
+    let election = election_repo::get(conn, election_id).await?;
+    user.role().is_authorized(election.committee_category)?;
+
     let eml = read_eml_from_zip(zip_data).await?;
     check_hash(eml.as_bytes(), hash)?;
     let definition = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict).ok()?;
@@ -223,7 +232,6 @@ async fn validate_import(
     let eml_election_id = election_identifier.id.value()?;
     let eml_election_date = election_identifier.election_date.copied_value()?.date;
 
-    let election = election_repo::get(conn, election_id).await?;
     if election.election_id != eml_election_id.value() {
         return Err(APIError::EmlImportError(EMLImportError::MismatchElection));
     }
@@ -528,9 +536,9 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::{data_entry::DataEntryId, tabulation::ElectionTotals},
+            domain::{data_entry::DataEntryId, role::Role, tabulation::ElectionTotals},
             eml::EmlHash,
-            repository::data_entry_repo,
+            repository::{data_entry_repo, user_repo::UserId},
         };
 
         /// Generate the count EML (510b) for the given election
@@ -554,6 +562,7 @@ mod tests {
         )))]
         async fn test_valid_import(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
             let csb_election_id = ElectionId::from(8);
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
             let hash = EmlHash::from(eml.as_bytes()).chunks;
@@ -564,7 +573,7 @@ mod tests {
                 .await
                 .unwrap();
 
-            let import = validate_import(&mut conn, csb_election_id, zip, Some(&hash))
+            let import = validate_import(&mut conn, &user, csb_election_id, zip, Some(&hash))
                 .await
                 .unwrap();
 
@@ -579,12 +588,20 @@ mod tests {
         )))]
         async fn test_wrong_hash(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
             let wrong_hash = std::array::from_fn(|_| "0000".to_string());
             let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
             assert!(matches!(
-                validate_import(&mut conn, ElectionId::from(8), zip, Some(&wrong_hash)).await,
+                validate_import(
+                    &mut conn,
+                    &user,
+                    ElectionId::from(8),
+                    zip,
+                    Some(&wrong_hash)
+                )
+                .await,
                 Err(APIError::InvalidHashError)
             ));
         }
@@ -595,11 +612,12 @@ mod tests {
         )))]
         async fn test_other_election(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
             let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
             assert!(matches!(
-                validate_import(&mut conn, ElectionId::from(10), zip, None).await,
+                validate_import(&mut conn, &user, ElectionId::from(10), zip, None).await,
                 Err(APIError::EmlImportError(EMLImportError::MismatchElection))
             ));
         }
@@ -610,6 +628,7 @@ mod tests {
         )))]
         async fn test_unknown_sub_committee(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
             let mut count = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict)
                 .ok()
@@ -622,7 +641,7 @@ mod tests {
             let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
             assert!(matches!(
-                validate_import(&mut conn, ElectionId::from(8), zip, None).await,
+                validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::EmlImportError(EMLImportError::UnknownCommittee))
             ));
         }
@@ -633,11 +652,12 @@ mod tests {
         )))]
         async fn test_data_entry_not_empty(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
             let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
             assert!(matches!(
-                validate_import(&mut conn, ElectionId::from(8), zip, None).await,
+                validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
                     _,
                     ErrorReference::DataEntryNotAllowed
@@ -651,6 +671,7 @@ mod tests {
         )))]
         async fn test_completed_committee_session(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
             committee_session_repo::change_status(
                 &mut conn,
@@ -662,7 +683,7 @@ mod tests {
             let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
             assert!(matches!(
-                validate_import(&mut conn, ElectionId::from(8), zip, None).await,
+                validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
                     _,
                     ErrorReference::InvalidCommitteeSessionStatus
@@ -676,6 +697,7 @@ mod tests {
         )))]
         async fn test_results_with_validation_errors(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
 
             let mut count = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict)
@@ -698,7 +720,7 @@ mod tests {
                 .unwrap();
 
             assert!(matches!(
-                validate_import(&mut conn, ElectionId::from(8), zip, None).await,
+                validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
                     _,
                     ErrorReference::DataEntryValidationErrors

@@ -635,7 +635,7 @@ export interface CSBDataEntryImportResponse {
 
 export interface CSBDataEntryImportValidateRequest {
   data: string;
-  hash?: string[] | null;
+  hash?: string[];
 }
 
 export interface CSBDataEntryImportValidateResponse {

@@ -842,8 +842,15 @@ mod tests {
 
     use super::*;
     use crate::{
-        api::tests::{
-            assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
+        api::{
+            election::handlers::data_entry_import::{
+                CSBDataEntryImportRequest, CSBDataEntryImportValidateRequest,
+                election_data_entry_import, election_data_entry_import_validate,
+            },
+            tests::{
+                assert_committee_category_authorization_err,
+                assert_committee_category_authorization_ok,
+            },
         },
         repository::user_repo::UserId,
     };
@@ -911,11 +918,14 @@ mod tests {
         let user = User::test_user(coordinator_role, UserId::from(1));
         let audit = AuditService::new(Some(user.clone()), None);
         let election_id = ElectionId::from(2);
+        let import_hash = std::array::from_fn(|_| String::new());
 
         #[rustfmt::skip]
         let results = vec![
             ("details", election_details(user.clone(), State(pool.clone()), Path(election_id)).await.into_response()),
             ("voters", election_number_of_voters_change(user.clone(), State(pool.clone()), audit.clone(), Path(election_id), Json(ElectionNumberOfVotersChangeRequest { number_of_voters: 1000 })).await.into_response()),
+            ("import_validate", election_data_entry_import_validate(user.clone(), State(pool.clone()), Path(election_id), CSBDataEntryImportValidateRequest { hash: None, data: vec![] }).await.into_response()),
+            ("import", election_data_entry_import(user.clone(), State(pool.clone()), Path(election_id), CSBDataEntryImportRequest { hash: import_hash, data: vec![] }).await.into_response()),
         ];
         results
     }

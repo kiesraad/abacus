@@ -9,8 +9,7 @@ use crate::{
     repository::common::{SubCommitteeRow, SubCommitteeRowLike},
 };
 
-/// List all sub electoral committees for a committee session
-async fn list(
+async fn list_rows(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<SubCommitteeRow>, sqlx::Error> {
@@ -36,12 +35,24 @@ async fn list(
     .await
 }
 
+/// List all sub electoral committees for a committee session
+pub async fn list(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<SubCommittee>, sqlx::Error> {
+    Ok(list_rows(conn, committee_session_id)
+        .await?
+        .into_iter()
+        .map(SubCommitteeRow::into_sub_committee)
+        .collect())
+}
+
 /// List all sub electoral committees for a first committee session
 pub async fn list_first_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<SubCommitteeFirstSession>, sqlx::Error> {
-    Ok(list(conn, committee_session_id)
+    Ok(list_rows(conn, committee_session_id)
         .await?
         .into_iter()
         .map(SubCommitteeRow::into_sub_committee_first_session)
@@ -119,15 +130,10 @@ pub async fn list_first_session_with_status(
         source: DataEntrySource::SubCommittee(SubCommitteeFirstSession {
             committee_session_id,
             data_entry_id: row.data_entry_id,
-            sub_committee: SubCommittee {
-                id: row.id,
-                number: row.number,
-                name: row.name,
-                category: row.category,
-                authority_id: row.authority_id,
-                authority_name: row.authority_name,
-                certificates: row.certificates.0,
-            },
+            id: row.id,
+            number: row.number,
+            name: row.name,
+            authority_id: row.authority_id,
         }),
         status: row.state.0,
     })

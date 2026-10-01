@@ -56,7 +56,10 @@ pub struct NewSubCommittee {
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SubCommitteeFirstSession {
     pub committee_session_id: CommitteeSessionId,
-    #[serde(flatten)]
-    pub sub_committee: SubCommittee,
+    pub id: SubCommitteeId,
+    #[schema(value_type = u32)]
+    pub number: SubCommitteeNumber,
+    pub name: String,
+    pub authority_id: String,
     pub data_entry_id: DataEntryId,
 }

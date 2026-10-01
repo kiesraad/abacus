@@ -1980,10 +1980,14 @@ export interface SubCommittee {
 /**
  * Sub electoral committee in a first committee session.
  */
-export type SubCommitteeFirstSession = SubCommittee & {
+export interface SubCommitteeFirstSession {
+  authority_id: string;
   committee_session_id: CommitteeSessionId;
   data_entry_id: DataEntryId;
-};
+  id: SubCommitteeId;
+  name: string;
+  number: number;
+}
 
 export type SubCommitteeId = number;
 

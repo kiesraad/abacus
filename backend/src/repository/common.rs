@@ -132,6 +132,10 @@ pub struct SubCommitteeRow {
 pub trait SubCommitteeRowLike: Sized {
     fn as_sub_committee(&self) -> SubCommittee;
 
+    fn into_sub_committee(self) -> SubCommittee {
+        self.as_sub_committee()
+    }
+
     fn as_sub_committee_first_session(&self) -> SubCommitteeFirstSession;
 
     fn into_sub_committee_first_session(self) -> SubCommitteeFirstSession {
@@ -164,7 +168,10 @@ impl SubCommitteeRowLike for SubCommitteeRow {
         SubCommitteeFirstSession {
             committee_session_id: self.committee_session_id,
             data_entry_id: self.data_entry_id,
-            sub_committee: self.as_sub_committee(),
+            id: self.id,
+            number: self.number,
+            name: self.name.clone(),
+            authority_id: self.authority_id.clone(),
         }
     }
 }

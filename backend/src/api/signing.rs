@@ -25,8 +25,8 @@ use crate::{
     },
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, signing_keypair_repo},
-    service::{get_election_certificate, list_sub_committees_for_first_session},
+    repository::{committee_session_repo, election_repo, signing_keypair_repo, sub_committee_repo},
+    service::get_election_certificate,
 };
 
 #[derive(Serialize)]
@@ -221,12 +221,7 @@ pub async fn sub_committee_certificates(
     let committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election_id).await?;
 
-    let sub_committees: Vec<_> =
-        list_sub_committees_for_first_session(&mut conn, committee_session.id)
-            .await?
-            .into_iter()
-            .map(|sc| sc.sub_committee)
-            .collect();
+    let sub_committees: Vec<_> = sub_committee_repo::list(&mut conn, committee_session.id).await?;
 
     Ok(Json(sub_committees))
 }

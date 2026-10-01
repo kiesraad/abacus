@@ -10551,27 +10551,38 @@
         "additionalProperties": false
       },
       "SubCommitteeFirstSession": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/SubCommittee"
-          },
-          {
-            "type": "object",
-            "required": [
-              "committee_session_id",
-              "data_entry_id"
-            ],
-            "properties": {
-              "committee_session_id": {
-                "$ref": "#/components/schemas/CommitteeSessionId"
-              },
-              "data_entry_id": {
-                "$ref": "#/components/schemas/DataEntryId"
-              }
-            }
-          }
+        "type": "object",
+        "description": "Sub electoral committee in a first committee session.",
+        "required": [
+          "committee_session_id",
+          "id",
+          "number",
+          "name",
+          "authority_id",
+          "data_entry_id"
         ],
-        "description": "Sub electoral committee in a first committee session."
+        "properties": {
+          "authority_id": {
+            "type": "string"
+          },
+          "committee_session_id": {
+            "$ref": "#/components/schemas/CommitteeSessionId"
+          },
+          "data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/SubCommitteeId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
       },
       "SubCommitteeId": {
         "type": "integer",

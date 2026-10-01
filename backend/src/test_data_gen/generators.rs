@@ -761,7 +761,7 @@ async fn generate_csb_data_entry(
                     if vr.has_errors() {
                         panic!(
                             "Generated invalid results for sub committee number {}: {:?}",
-                            sub_committee_first_session.sub_committee.number, vr.errors
+                            sub_committee_first_session.number, vr.errors
                         );
                     }
                     vr.has_warnings()
@@ -769,7 +769,7 @@ async fn generate_csb_data_entry(
                 Err(e) => {
                     panic!(
                         "Failed to validate generated results for sub committee number {}: {}",
-                        sub_committee_first_session.sub_committee.number, e
+                        sub_committee_first_session.number, e
                     );
                 }
             };

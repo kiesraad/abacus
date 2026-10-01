@@ -42,10 +42,11 @@ pub async fn list_for_first_session(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::domain::election::CommitteeCategory;
     use sqlx::SqlitePool;
     use test_log::test;
+
+    use super::*;
+    use crate::domain::election::CommitteeCategory;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_create_and_list(pool: SqlitePool) {
@@ -69,12 +70,10 @@ mod tests {
         .await
         .unwrap();
 
-        assert_eq!(created.sub_committee.number, 42);
-        assert_eq!(created.sub_committee.name, "Test GSB");
-        assert_eq!(created.sub_committee.category, CommitteeCategory::GSB);
+        assert_eq!(created.number, 42);
+        assert_eq!(created.name, "Test GSB");
         assert_eq!(created.committee_session_id, committee_session_id);
-        assert_eq!(created.sub_committee.authority_id, "0042");
-        assert_eq!(created.sub_committee.authority_name, "Test GSB");
+        assert_eq!(created.authority_id, "0042");
 
         // List and verify
         let list = list_for_first_session(&mut conn, committee_session_id)
@@ -82,9 +81,8 @@ mod tests {
             .unwrap();
 
         assert_eq!(list.len(), 2);
-        assert_eq!(list[1].sub_committee.id, created.sub_committee.id);
-        assert_eq!(list[1].sub_committee.name, "Test GSB");
-        assert_eq!(list[1].sub_committee.category, CommitteeCategory::GSB);
+        assert_eq!(list[1].id, created.id);
+        assert_eq!(list[1].name, "Test GSB");
         assert_eq!(list[1].data_entry_id, created.data_entry_id);
     }
 }

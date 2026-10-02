@@ -4729,6 +4729,110 @@
             ]
           }
         ]
+      },
+      "post": {
+        "summary": "Validate a certificate and add it to the sub committee it belongs to (administrator)",
+        "operationId": "sub_committee_certificate_add",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddSubCommitteeCertificateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Certificate added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddSubCommitteeCertificateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid certificate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Public key already added or committee session completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Certificate is for another election or an unknown sub committee",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/voters": {
@@ -6187,6 +6291,43 @@
         },
         "additionalProperties": false
       },
+      "AddSubCommitteeCertificateRequest": {
+        "type": "object",
+        "description": "Request to add a sub committee certificate",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AddSubCommitteeCertificateResponse": {
+        "type": "object",
+        "description": "The certificate that was added, with the sub committee it was added to",
+        "required": [
+          "sub_committee_id",
+          "authority_name",
+          "certificate",
+          "expired"
+        ],
+        "properties": {
+          "authority_name": {
+            "type": "string"
+          },
+          "certificate": {
+            "$ref": "#/components/schemas/Certificate"
+          },
+          "expired": {
+            "type": "boolean"
+          },
+          "sub_committee_id": {
+            "$ref": "#/components/schemas/SubCommitteeId"
+          }
+        }
+      },
       "ApportionmentState": {
         "oneOf": [
           {
@@ -6365,6 +6506,7 @@
           "ApplicationStarted",
           "DatabaseBackupCreated",
           "SigningKeypairCreated",
+          "SubCommitteeCertificateAdded",
           "ApiError",
           "ApiWarning",
           "UnknownEvent"
@@ -8424,6 +8566,9 @@
           "ApportionmentNotCompleted",
           "ApportionmentCommitteeSessionNotCompleted",
           "ApportionmentInvalidLotDrawing",
+          "CertificateAlreadyAdded",
+          "CertificateUnknownSubCommittee",
+          "CertificateWrongElection",
           "CommitteeSessionPaused",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
@@ -8438,6 +8583,7 @@
           "Forbidden",
           "InternalServerError",
           "InvalidApportionmentState",
+          "InvalidCertificate",
           "InvalidCommitteeSessionStatus",
           "InvalidData",
           "InvalidDistrict",

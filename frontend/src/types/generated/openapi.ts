@@ -350,6 +350,11 @@ export interface SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS {
   election_id: ElectionId;
 }
 export type SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH = `/api/elections/${ElectionId}/sub_committee_certificates`;
+export interface SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH = `/api/elections/${ElectionId}/sub_committee_certificates`;
+export type SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY = AddSubCommitteeCertificateRequest;
 
 // /api/elections/{election_id}/voters
 export interface ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
@@ -489,6 +494,23 @@ export interface AccountUpdateRequest {
   username: string;
 }
 
+/**
+ * Request to add a sub committee certificate
+ */
+export interface AddSubCommitteeCertificateRequest {
+  data: string;
+}
+
+/**
+ * The certificate that was added, with the sub committee it was added to
+ */
+export interface AddSubCommitteeCertificateResponse {
+  authority_name: string;
+  certificate: Certificate;
+  expired: boolean;
+  sub_committee_id: SubCommitteeId;
+}
+
 export type ApportionmentState =
   | { type: "Uninitialised" }
   | { deceased_candidates: DeceasedCandidate[]; type: "RegisteringDeceasedCandidates" }
@@ -559,6 +581,7 @@ export const auditEventTypeValues = [
   "ApplicationStarted",
   "DatabaseBackupCreated",
   "SigningKeypairCreated",
+  "SubCommitteeCertificateAdded",
   "ApiError",
   "ApiWarning",
   "UnknownEvent",
@@ -1315,6 +1338,9 @@ export const errorReferenceValues = [
   "ApportionmentNotCompleted",
   "ApportionmentCommitteeSessionNotCompleted",
   "ApportionmentInvalidLotDrawing",
+  "CertificateAlreadyAdded",
+  "CertificateUnknownSubCommittee",
+  "CertificateWrongElection",
   "CommitteeSessionPaused",
   "DatabaseError",
   "DataEntryAlreadyClaimed",
@@ -1329,6 +1355,7 @@ export const errorReferenceValues = [
   "Forbidden",
   "InternalServerError",
   "InvalidApportionmentState",
+  "InvalidCertificate",
   "InvalidCommitteeSessionStatus",
   "InvalidData",
   "InvalidDistrict",

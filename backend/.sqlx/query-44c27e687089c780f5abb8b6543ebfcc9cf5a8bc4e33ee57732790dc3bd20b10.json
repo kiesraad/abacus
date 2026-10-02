@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        UPDATE sub_committees\n        SET certificates = ?\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "44c27e687089c780f5abb8b6543ebfcc9cf5a8bc4e33ee57732790dc3bd20b10"
+}

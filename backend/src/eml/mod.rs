@@ -1566,4 +1566,45 @@ mod tests {
         assert_eq!(second.polling_station.id.raw(), "32");
         assert_eq!(&second.polling_station.data[..], "2000");
     }
+
+    #[test]
+    fn test_candidate_gender() {
+        let cases = [
+            // Happy path
+            (Some(Gender::Male), None, Some(CandidateGender::Male)),
+            (Some(Gender::Female), None, Some(CandidateGender::Female)),
+            (Some(Gender::Unknown), None, None),
+            (None, Some(GenderAnnex::Male), Some(CandidateGender::Male)),
+            (
+                None,
+                Some(GenderAnnex::Female),
+                Some(CandidateGender::Female),
+            ),
+            (None, Some(GenderAnnex::Other), Some(CandidateGender::X)),
+            (None, None, None),
+            // Prefer GenderAnnex
+            (
+                Some(Gender::Male),
+                Some(GenderAnnex::Female),
+                Some(CandidateGender::Female),
+            ),
+            (
+                Some(Gender::Unknown),
+                Some(GenderAnnex::Male),
+                Some(CandidateGender::Male),
+            ),
+            (
+                Some(Gender::Female),
+                Some(GenderAnnex::Other),
+                Some(CandidateGender::X),
+            ),
+        ];
+
+        for (gender, gender_annex, expected) in cases {
+            let gender = gender.map(StringValue::from_value);
+            let gender_annex = gender_annex.map(StringValue::from_value);
+            let actual = candidate_gender(&gender, &gender_annex).unwrap();
+            assert_eq!(expected, actual);
+        }
+    }
 }

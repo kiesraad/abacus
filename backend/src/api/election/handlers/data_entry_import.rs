@@ -357,28 +357,23 @@ mod tests {
 
     mod multipart_request {
         use super::*;
-        use axum::{body::Body, http::header::CONTENT_TYPE};
+        use axum::body::Body;
+        use reqwest::multipart::{Form, Part};
         use test_log::test;
 
         /// Create a multipart request with the given form fields
         fn multipart_request(fields: &[(&str, &[u8])]) -> Request {
-            let mut body = Vec::new();
-            for (name, value) in fields {
-                body.extend_from_slice(
-                    format!(
-                        "--boundary_test\r\nContent-Disposition: form-data; name=\"{name}\"\r\n\r\n"
-                    )
-                    .as_bytes(),
-                );
-                body.extend_from_slice(value);
-                body.extend_from_slice(b"\r\n");
-            }
-            body.extend_from_slice(b"--boundary_test--\r\n");
+            let form = fields.iter().fold(Form::new(), |form, (name, value)| {
+                form.part(name.to_string(), Part::bytes(value.to_vec()))
+            });
 
-            Request::builder()
-                .header(CONTENT_TYPE, "multipart/form-data; boundary=boundary_test")
-                .body(Body::from(body))
-                .unwrap()
+            let request = reqwest::Client::new()
+                .post("http://localhost")
+                .multipart(form)
+                .build()
+                .unwrap();
+
+            Request::try_from(request).unwrap().map(Body::new)
         }
 
         #[test(tokio::test)]

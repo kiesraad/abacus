@@ -124,7 +124,7 @@ zeroize.workspace = true
 
 [dev-dependencies]
 http-body-util.workspace = true
-reqwest = { version = "0.13", default-features = false, features = ["json"] }
+reqwest = { version = "0.13", default-features = false, features = ["json", "multipart"] }
 test-log.workspace = true
 tempfile = "3"
 

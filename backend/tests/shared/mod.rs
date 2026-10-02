@@ -5,7 +5,10 @@ use std::{collections::BTreeMap, net::SocketAddr};
 use abacus::domain::election::{CommitteeCategory, VoteCountingMethod};
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
-use reqwest::Response;
+use reqwest::{
+    Response,
+    multipart::{Form, Part},
+};
 use serde::Serialize;
 
 pub fn differences_counts_zero() -> serde_json::Value {
@@ -702,23 +705,14 @@ pub async fn login_with_credentials(
 
 /// Sends a POST request with given data as multipart/form-data
 pub async fn post_multipart(url: &str, cookie: &HeaderValue, parts: &[(&str, &[u8])]) -> Response {
-    let mut body = Vec::new();
-
-    for (name, value) in parts {
-        body.extend_from_slice(
-            format!("--boundary_name\r\nContent-Disposition: form-data; name=\"{name}\"\r\n\r\n")
-                .as_bytes(),
-        );
-        body.extend_from_slice(value);
-        body.extend_from_slice(b"\r\n");
-    }
-    body.extend_from_slice(b"--boundary_name--\r\n");
+    let form = parts.iter().fold(Form::new(), |form, (name, value)| {
+        form.part(name.to_string(), Part::bytes(value.to_vec()))
+    });
 
     reqwest::Client::new()
         .post(url)
         .header("cookie", cookie)
-        .header(CONTENT_TYPE, "multipart/form-data; boundary=boundary_name")
-        .body(body)
+        .multipart(form)
         .send()
         .await
         .unwrap()

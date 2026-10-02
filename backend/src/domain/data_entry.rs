@@ -36,8 +36,8 @@ pub enum DataEntryTransitionError {
     CannotTransitionUsingDifferentUser,
     /// The second data entry needs to be claimed by a user other than the one who claimed the first entry
     SecondEntryNeedsDifferentUser,
-    /// Correction is not allowed because the entry to be kept has errors
-    CorrectionNotAllowed,
+    /// Correction is not allowed for a given reason
+    CorrectionNotAllowed(String),
     ValidatorError(DataError),
     ValidationError(ValidationResults),
 }
@@ -976,7 +976,9 @@ impl DataEntryStatus {
         match &self {
             DataEntryStatus::EntriesDifferent(state) => {
                 if state.second_entry.start_validate(election)?.has_errors() {
-                    return Err(DataEntryTransitionError::CorrectionNotAllowed);
+                    return Err(DataEntryTransitionError::CorrectionNotAllowed(
+                        "the entry to be kept has errors".to_string(),
+                    ));
                 }
 
                 if let DataEntryOrigin::Typist(user_id) = state.first_entry_origin {
@@ -991,7 +993,9 @@ impl DataEntryStatus {
                     }))
                 } else {
                     // If first entry was imported, correction is not allowed
-                    Err(DataEntryTransitionError::CorrectionNotAllowed)
+                    Err(DataEntryTransitionError::CorrectionNotAllowed(
+                        "the entry to be corrected is imported".to_string(),
+                    ))
                 }
             }
             _ => Err(DataEntryTransitionError::Invalid),
@@ -1007,7 +1011,9 @@ impl DataEntryStatus {
         match &self {
             DataEntryStatus::EntriesDifferent(state) => {
                 if state.first_entry.start_validate(election)?.has_errors() {
-                    return Err(DataEntryTransitionError::CorrectionNotAllowed);
+                    return Err(DataEntryTransitionError::CorrectionNotAllowed(
+                        "the entry to be kept has errors".to_string(),
+                    ));
                 }
 
                 Ok(Self::SecondEntryCorrection(SecondEntryCorrection {
@@ -1262,8 +1268,8 @@ impl Display for DataEntryTransitionError {
                 )
             }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
-            DataEntryTransitionError::CorrectionNotAllowed => {
-                write!(f, "Correction not allowed: the entry to be kept has errors")
+            DataEntryTransitionError::CorrectionNotAllowed(reason) => {
+                write!(f, "Correction not allowed: {reason}")
             }
             DataEntryTransitionError::ValidatorError(data_error) => {
                 write!(f, "Validator error: {data_error}")
@@ -2031,7 +2037,9 @@ mod tests {
 
         assert_eq!(
             initial.correct_second_entry(&election()),
-            Err(DataEntryTransitionError::CorrectionNotAllowed)
+            Err(DataEntryTransitionError::CorrectionNotAllowed(
+                "the entry to be kept has errors".to_string()
+            ))
         );
     }
 
@@ -2106,7 +2114,9 @@ mod tests {
 
         assert_eq!(
             initial.correct_first_entry(&election()),
-            Err(DataEntryTransitionError::CorrectionNotAllowed)
+            Err(DataEntryTransitionError::CorrectionNotAllowed(
+                "the entry to be kept has errors".to_string()
+            ))
         );
     }
 
@@ -2126,7 +2136,9 @@ mod tests {
 
         assert_eq!(
             initial.correct_first_entry(&election()),
-            Err(DataEntryTransitionError::CorrectionNotAllowed)
+            Err(DataEntryTransitionError::CorrectionNotAllowed(
+                "the entry to be corrected is imported".to_string()
+            ))
         );
     }
 

@@ -22,7 +22,7 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         data_entry::{DataEntrySource, DataEntryStatus},
         election::{ElectionId, ElectionWithPoliticalGroups},
-        sub_committee::{SubCommittee, SubCommitteeFirstSession},
+        sub_committee::SubCommitteeFirstSession,
     },
     eml::{EMLImportError, RedactedEmlHash},
     error::ErrorReference,
@@ -113,7 +113,7 @@ pub struct CSBDataEntryImportValidateResponse {
     election_name: String,
     #[schema(value_type = String, format = "date")]
     election_date: NaiveDate,
-    sub_committee: SubCommittee,
+    sub_committee: SubCommitteeFirstSession,
 }
 
 /// Validates uploaded data entry results
@@ -149,7 +149,7 @@ pub async fn election_data_entry_import_validate(
         hash: import.hash,
         election_name: import.election.name,
         election_date: import.election.election_date,
-        sub_committee: import.sub_committee.sub_committee,
+        sub_committee: import.sub_committee,
     }))
 }
 
@@ -159,7 +159,7 @@ pub struct CSBDataEntryImportResponse {
     election_name: String,
     #[schema(value_type = String, format = "date")]
     election_date: NaiveDate,
-    sub_committee: SubCommittee,
+    sub_committee: SubCommitteeFirstSession,
 }
 
 /// Imports uploaded data entry results
@@ -199,7 +199,7 @@ pub async fn election_data_entry_import(
     Ok(Json(CSBDataEntryImportResponse {
         election_name: import.election.name,
         election_date: import.election.election_date,
-        sub_committee: import.sub_committee.sub_committee,
+        sub_committee: import.sub_committee,
     }))
 }
 
@@ -279,12 +279,11 @@ async fn find_sub_committee(
         .await?
         .into_iter()
         .find_map(|entry| match entry.source {
-            DataEntrySource::SubCommittee(source)
-                if source.sub_committee.authority_id == authority_id.value()
-                    && authority_name
-                        .is_none_or(|name| source.sub_committee.authority_name == name) =>
+            DataEntrySource::SubCommittee(sc)
+                if sc.authority_id == authority_id.value()
+                    && authority_name.is_none_or(|name| sc.authority_name == name) =>
             {
-                Some((source, entry.status))
+                Some((sc, entry.status))
             }
             _ => None,
         })
@@ -568,7 +567,7 @@ mod tests {
                 .unwrap();
 
             assert_eq!(import.election.id, csb_election_id);
-            assert_eq!(import.sub_committee.sub_committee.authority_id, "0035");
+            assert_eq!(import.sub_committee.authority_id, "0035");
             // TODO #3906 Compare results with empty GSB results
         }
 

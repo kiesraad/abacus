@@ -6803,7 +6803,7 @@
             "type": "string"
           },
           "sub_committee": {
-            "$ref": "#/components/schemas/SubCommittee"
+            "$ref": "#/components/schemas/SubCommitteeFirstSession"
           }
         },
         "additionalProperties": false
@@ -6846,7 +6846,7 @@
             "$ref": "#/components/schemas/RedactedEmlHash"
           },
           "sub_committee": {
-            "$ref": "#/components/schemas/SubCommittee"
+            "$ref": "#/components/schemas/SubCommitteeFirstSession"
           }
         },
         "additionalProperties": false

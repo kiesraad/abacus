@@ -636,7 +636,7 @@ export interface CSBDataEntryImportRequest {
 export interface CSBDataEntryImportResponse {
   election_date: string;
   election_name: string;
-  sub_committee: SubCommittee;
+  sub_committee: SubCommitteeFirstSession;
 }
 
 export interface CSBDataEntryImportValidateRequest {
@@ -648,7 +648,7 @@ export interface CSBDataEntryImportValidateResponse {
   election_date: string;
   election_name: string;
   hash: RedactedEmlHash;
-  sub_committee: SubCommittee;
+  sub_committee: SubCommitteeFirstSession;
 }
 
 export interface CSBElectionCreationRequest {

@@ -32,7 +32,10 @@ Both the first and second entries can have errors in the `EntriesDifferent` stat
   introduce errors in second entry -> `EntriesDifferent` with errors in second entry.
 
 ### Imported data entries
-When the first entry is imported, and it is deemed incorrect while resolving differences, it is discarded and a new manual data entry is required.
+
+Only a first data entry can be imported. During the import, the data entry is validated for errors. If the data entry contains errors, it's not possible to complete the import.
+
+When a first entry has been imported, and it is deemed incorrect while resolving differences, it is discarded and a new manual data entry is required.
 An imported first entry cannot be corrected.
 
 

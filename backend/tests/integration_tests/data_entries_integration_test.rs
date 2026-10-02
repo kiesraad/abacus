@@ -469,16 +469,18 @@ async fn test_election_details_status(pool: SqlitePool) {
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
     assert_eq!(statuses[&211]["status"], "first_entry_finalised");
+    assert_eq!(statuses[&211]["first_entry_origin"]["type"], "Typist");
     assert_eq!(
-        statuses[&211]["first_entry_origin"]["Typist"],
+        statuses[&211]["first_entry_origin"]["user_id"],
         typist_user_id
     );
     assert!(statuses[&211]["second_entry_user_id"].is_null());
     assert!(statuses[&211]["data_entry_progress"].is_null());
 
     assert_eq!(statuses[&212]["status"], "first_entry_in_progress");
+    assert_eq!(statuses[&212]["first_entry_origin"]["type"], "Typist");
     assert_eq!(
-        statuses[&212]["first_entry_origin"]["Typist"],
+        statuses[&212]["first_entry_origin"]["user_id"],
         typist_user_id
     );
     assert!(statuses[&212]["second_entry_user_id"].is_null());
@@ -507,16 +509,18 @@ async fn test_election_details_status(pool: SqlitePool) {
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
     assert_eq!(statuses[&211]["status"], "second_entry_in_progress");
+    assert_eq!(statuses[&211]["first_entry_origin"]["type"], "Typist");
     assert_eq!(
-        statuses[&211]["first_entry_origin"]["Typist"],
+        statuses[&211]["first_entry_origin"]["user_id"],
         typist_user_id
     );
     assert_eq!(statuses[&211]["second_entry_user_id"], typist2_user_id);
     assert_eq!(statuses[&211]["data_entry_progress"], 60);
 
     assert_eq!(statuses[&212]["status"], "first_entry_in_progress");
+    assert_eq!(statuses[&212]["first_entry_origin"]["type"], "Typist");
     assert_eq!(
-        statuses[&212]["first_entry_origin"]["Typist"],
+        statuses[&212]["first_entry_origin"]["user_id"],
         typist_user_id
     );
     assert!(statuses[&212]["second_entry_user_id"].is_null());
@@ -536,16 +540,18 @@ async fn test_election_details_status(pool: SqlitePool) {
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
     assert_eq!(statuses[&211]["status"], "definitive");
+    assert_eq!(statuses[&211]["first_entry_origin"]["type"], "Typist");
     assert_eq!(
-        statuses[&211]["first_entry_origin"]["Typist"],
+        statuses[&211]["first_entry_origin"]["user_id"],
         typist_user_id
     );
     assert_eq!(statuses[&211]["second_entry_user_id"], typist2_user_id);
     assert!(statuses[&211]["data_entry_progress"].is_null());
 
     assert_eq!(statuses[&212]["status"], "first_entry_in_progress");
+    assert_eq!(statuses[&212]["first_entry_origin"]["type"], "Typist");
     assert_eq!(
-        statuses[&212]["first_entry_origin"]["Typist"],
+        statuses[&212]["first_entry_origin"]["user_id"],
         typist_user_id
     );
     assert!(statuses[&212]["second_entry_user_id"].is_null());

@@ -7541,18 +7541,33 @@
       "DataEntryOrigin": {
         "oneOf": [
           {
-            "type": "string",
-            "enum": [
-              "Import"
-            ]
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Import"
+                ]
+              }
+            }
           },
           {
             "type": "object",
             "required": [
-              "Typist"
+              "user_id",
+              "type"
             ],
             "properties": {
-              "Typist": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Typist"
+                ]
+              },
+              "user_id": {
                 "$ref": "#/components/schemas/UserId"
               }
             }

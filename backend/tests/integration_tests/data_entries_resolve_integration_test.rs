@@ -275,7 +275,8 @@ async fn test_data_entry_get_differences(pool: SqlitePool) {
     assert_eq!(res.status(), StatusCode::OK);
     let result: serde_json::Value = res.json().await.unwrap();
 
-    assert_eq!(result["first_entry_origin"]["Typist"], 5);
+    assert_eq!(result["first_entry_origin"]["type"], "Typist");
+    assert_eq!(result["first_entry_origin"]["user_id"], 5);
     assert_eq!(result["second_entry_user_id"], 6);
     assert_ne!(
         result["first_entry"]["voters_counts"]["poll_card_count"],

@@ -196,6 +196,7 @@ impl From<SubCommitteeFirstSession> for DataEntrySource {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+#[serde(tag = "type", content = "user_id", deny_unknown_fields)]
 pub enum DataEntryOrigin {
     Import,
     Typist(UserId),

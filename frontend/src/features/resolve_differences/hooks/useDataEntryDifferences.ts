@@ -50,14 +50,15 @@ function resolvedUserIds(
 ): { keptUserId: number | undefined; wrongUserId: number | undefined } {
   if (differences && correctEntry === "first") {
     return {
-      keptUserId: differences.first_entry_origin === "Import" ? undefined : differences.first_entry_origin.Typist,
+      keptUserId: differences.first_entry_origin.type === "Import" ? undefined : differences.first_entry_origin.user_id,
       wrongUserId: differences.second_entry_user_id,
     };
   }
   if (differences && correctEntry === "second") {
     return {
       keptUserId: differences.second_entry_user_id,
-      wrongUserId: differences.first_entry_origin === "Import" ? undefined : differences.first_entry_origin.Typist,
+      wrongUserId:
+        differences.first_entry_origin.type === "Import" ? undefined : differences.first_entry_origin.user_id,
     };
   }
   return { keptUserId: undefined, wrongUserId: undefined };

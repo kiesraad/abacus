@@ -25,8 +25,8 @@ function determineUserStatus(
     case "first_entry_correction":
       if (
         statusEntry.first_entry_origin &&
-        statusEntry.first_entry_origin !== "Import" &&
-        statusEntry.first_entry_origin.Typist === userId
+        statusEntry.first_entry_origin.type === "Typist" &&
+        statusEntry.first_entry_origin.user_id === userId
       ) {
         return DataEntryUserStatus.InProgressCurrentUser;
       } else {
@@ -35,8 +35,8 @@ function determineUserStatus(
     case "first_entry_finalised":
       if (
         statusEntry.first_entry_origin &&
-        statusEntry.first_entry_origin !== "Import" &&
-        statusEntry.first_entry_origin.Typist === userId
+        statusEntry.first_entry_origin.type === "Typist" &&
+        statusEntry.first_entry_origin.user_id === userId
       ) {
         return DataEntryUserStatus.SecondEntryNotAllowed;
       } else {

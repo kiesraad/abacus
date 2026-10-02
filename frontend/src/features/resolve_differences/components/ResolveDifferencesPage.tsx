@@ -135,9 +135,9 @@ export function ResolveDifferencesPage() {
           />
           <ResolveDifferencesForm
             firstEntryName={
-              first_entry_origin === "Import"
-                ? t("resolve_differences.imported_from_file")
-                : getName(first_entry_origin.Typist)
+              first_entry_origin.type === "Typist"
+                ? getName(first_entry_origin.user_id)
+                : t("resolve_differences.imported_from_file")
             }
             secondEntryName={getName(second_entry_user_id)}
             formState={formState}

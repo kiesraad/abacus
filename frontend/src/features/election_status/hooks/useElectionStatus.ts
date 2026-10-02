@@ -56,9 +56,9 @@ function getTypist(
     case "first_entry_correction":
       return status.first_entry_origin === undefined
         ? undefined
-        : status.first_entry_origin === "Import"
-          ? t("imported")
-          : getName(status.first_entry_origin.Typist);
+        : status.first_entry_origin.type === "Typist"
+          ? getName(status.first_entry_origin.user_id)
+          : t("imported");
     case "second_entry_in_progress":
     case "second_entry_correction":
       return getName(status.second_entry_user_id);

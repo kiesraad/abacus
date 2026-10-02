@@ -12,7 +12,7 @@ import { ElectionStatus } from "./ElectionStatus";
 const today = new Date();
 today.setHours(10, 20);
 const mockStatuses = [...electionStatusesMock];
-mockStatuses[5]!.first_entry_origin = { Typist: 1 };
+mockStatuses[5]!.first_entry_origin = { type: "Typist", user_id: 1 };
 
 interface StoryProps {
   addLinks: boolean;

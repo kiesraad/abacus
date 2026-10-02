@@ -11,8 +11,8 @@ describe("UnfinishedEntriesList component", () => {
   test("Resume input visible when some are unfinished", async () => {
     const entries = getDataEntryWithStatusList({
       ...getElectionStatusMockData([
-        { status: "first_entry_in_progress", first_entry_origin: { Typist: user.user_id } },
-        { status: "first_entry_in_progress", first_entry_origin: { Typist: user.user_id } },
+        { status: "first_entry_in_progress", first_entry_origin: { type: "Typist", user_id: user.user_id } },
+        { status: "first_entry_in_progress", first_entry_origin: { type: "Typist", user_id: user.user_id } },
       ]),
       user,
     });

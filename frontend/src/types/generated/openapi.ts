@@ -981,7 +981,7 @@ export interface DataEntryGetResponse {
 
 export type DataEntryId = number;
 
-export type DataEntryOrigin = "Import" | { Typist: UserId };
+export type DataEntryOrigin = { type: "Import" } | { type: "Typist"; user_id: UserId };
 
 export type DataEntrySource =
   | (PollingStationForSession & { type: "PollingStation" })

@@ -1840,7 +1840,7 @@ mod tests {
             serde_json::json!({
                 "data_entry_id": 201,
                 "data_entry_status": "first_entry_has_errors",
-                "first_entry_origin": {"Typist": 1},
+                "first_entry_origin": {"type": "Typist", "user_id": 1},
             })
         );
     }

@@ -4894,6 +4894,75 @@
         ]
       }
     },
+    "/api/elections/{election_id}/sub_committee_certificates": {
+      "get": {
+        "summary": "Get all the subcommittee certificates for an election (administrator)",
+        "operationId": "sub_committee_certificates",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Election certificate details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubCommittee"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/voters": {
       "put": {
         "summary": "Change the number of voters of an [Election]. (administrator, coordinator_gsb)",
@@ -7095,6 +7164,43 @@
           }
         },
         "additionalProperties": false
+      },
+      "Certificate": {
+        "type": "object",
+        "required": [
+          "election_identifier",
+          "organizational_unit",
+          "common_name",
+          "not_before",
+          "not_after",
+          "signature_algorithm",
+          "public_key"
+        ],
+        "properties": {
+          "common_name": {
+            "type": "string"
+          },
+          "election_identifier": {
+            "type": "string"
+          },
+          "not_after": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "not_before": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organizational_unit": {
+            "type": "string"
+          },
+          "public_key": {
+            "type": "string"
+          },
+          "signature_algorithm": {
+            "type": "string"
+          }
+        }
       },
       "CertificateDetailsResponse": {
         "type": "object",
@@ -10728,7 +10834,8 @@
           "name",
           "category",
           "authority_id",
-          "authority_name"
+          "authority_name",
+          "certificates"
         ],
         "properties": {
           "authority_id": {
@@ -10739,6 +10846,12 @@
           },
           "category": {
             "$ref": "#/components/schemas/CommitteeCategory"
+          },
+          "certificates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Certificate"
+            }
           },
           "id": {
             "$ref": "#/components/schemas/SubCommitteeId"
@@ -10755,27 +10868,42 @@
         "additionalProperties": false
       },
       "SubCommitteeFirstSession": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/SubCommittee"
-          },
-          {
-            "type": "object",
-            "required": [
-              "committee_session_id",
-              "data_entry_id"
-            ],
-            "properties": {
-              "committee_session_id": {
-                "$ref": "#/components/schemas/CommitteeSessionId"
-              },
-              "data_entry_id": {
-                "$ref": "#/components/schemas/DataEntryId"
-              }
-            }
-          }
+        "type": "object",
+        "description": "Sub electoral committee in a first committee session.",
+        "required": [
+          "committee_session_id",
+          "id",
+          "number",
+          "name",
+          "authority_id",
+          "authority_name",
+          "data_entry_id"
         ],
-        "description": "Sub electoral committee in a first committee session."
+        "properties": {
+          "authority_id": {
+            "type": "string"
+          },
+          "authority_name": {
+            "type": "string"
+          },
+          "committee_session_id": {
+            "$ref": "#/components/schemas/CommitteeSessionId"
+          },
+          "data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/SubCommitteeId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
       },
       "SubCommitteeId": {
         "type": "integer",

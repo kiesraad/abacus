@@ -21,10 +21,11 @@ use crate::{
         election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
         filename::hyphenate,
         role::Role,
+        sub_committee::SubCommittee,
     },
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{election_repo, signing_keypair_repo},
+    repository::{committee_session_repo, election_repo, signing_keypair_repo, sub_committee_repo},
     service::get_election_certificate,
 };
 
@@ -45,6 +46,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(certificate).authorize(ADMIN))
         .routes(routes!(certificate_details).authorize(ADMIN))
+        .routes(routes!(sub_committee_certificates).authorize(ADMIN))
         .routes(routes!(dismiss_public_key_upload_reminder).authorize(ADMIN))
 }
 
@@ -196,6 +198,34 @@ fn public_key_filename(election: &ElectionWithPoliticalGroups) -> Result<String,
     }
 }
 
+/// Get all the subcommittee certificates for an election
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/sub_committee_certificates",
+    responses(
+        (status = 200, description = "Election certificate details", body = Vec<SubCommittee>),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "Not Found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+    ),
+)]
+pub async fn sub_committee_certificates(
+    State(pool): State<SqlitePool>,
+    Path(election_id): Path<ElectionId>,
+) -> Result<Json<Vec<SubCommittee>>, APIError> {
+    let mut conn = pool.acquire().await?;
+
+    let committee_session =
+        committee_session_repo::get_election_committee_session(&mut conn, election_id).await?;
+
+    let sub_committees: Vec<_> = sub_committee_repo::list(&mut conn, committee_session.id).await?;
+
+    Ok(Json(sub_committees))
+}
+
 #[cfg(test)]
 mod tests {
     use std::assert_matches;
@@ -272,5 +302,40 @@ mod tests {
 
         let body = response.into_body().collect().await.unwrap().to_bytes();
         assert!(body.starts_with("-----BEGIN CERTIFICATE-----\n".as_bytes()));
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
+    async fn test_sub_committee_no_certificates(pool: SqlitePool) {
+        let election_id = ElectionId::from(9);
+        let result = sub_committee_certificates(State(pool), Path(election_id)).await;
+
+        let sub_committees = result.expect("should be ok").0;
+        assert_eq!(sub_committees.len(), 1);
+        assert_eq!(sub_committees[0].certificates.len(), 0);
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_9_csb", "sub_committee_certificate")
+    )))]
+    async fn test_sub_committee_certificates(pool: SqlitePool) {
+        let election_id = ElectionId::from(9);
+        let result = sub_committee_certificates(State(pool), Path(election_id)).await;
+
+        let sub_committees = result.expect("should be ok").0;
+        assert_eq!(sub_committees.len(), 1);
+
+        let sub_committee = &sub_committees[0];
+        assert_eq!(sub_committee.certificates.len(), 1);
+        assert_eq!(sub_committee.authority_name, "Test Location");
+        assert_eq!(sub_committee.certificates.len(), 1);
+
+        let certificate = &sub_committees[0].certificates[0];
+        assert_eq!(certificate.common_name, "Test Location");
+        assert!(
+            certificate
+                .public_key
+                .starts_with("-----BEGIN PUBLIC KEY-----\n")
+        );
     }
 }

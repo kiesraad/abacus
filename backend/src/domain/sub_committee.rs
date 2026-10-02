@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -12,7 +13,7 @@ pub type SubCommitteeNumber = u32;
 
 /// Sub electoral committee base entity, independent
 /// of the election, committee session and data entry.
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct SubCommittee {
     pub id: SubCommitteeId,
@@ -22,6 +23,18 @@ pub struct SubCommittee {
     pub category: CommitteeCategory,
     pub authority_id: String,
     pub authority_name: String,
+    pub certificates: Vec<Certificate>,
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, PartialEq)]
+pub struct Certificate {
+    pub election_identifier: String,
+    pub organizational_unit: String,
+    pub common_name: String,
+    pub not_before: DateTime<Utc>,
+    pub not_after: DateTime<Utc>,
+    pub signature_algorithm: String,
+    pub public_key: String,
 }
 
 /// Struct for creating a new subcommittee in Abacus.
@@ -42,7 +55,11 @@ pub struct NewSubCommittee {
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SubCommitteeFirstSession {
     pub committee_session_id: CommitteeSessionId,
-    #[serde(flatten)]
-    pub sub_committee: SubCommittee,
+    pub id: SubCommitteeId,
+    #[schema(value_type = u32)]
+    pub number: SubCommitteeNumber,
+    pub name: String,
+    pub authority_id: String,
+    pub authority_name: String,
     pub data_entry_id: DataEntryId,
 }

@@ -9,8 +9,7 @@ use crate::{
     repository::common::{SubCommitteeRow, SubCommitteeRowLike},
 };
 
-/// List all sub electoral committees for a committee session
-async fn list(
+async fn list_rows(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<SubCommitteeRow>, sqlx::Error> {
@@ -25,7 +24,8 @@ async fn list(
             name,
             category,
             authority_id,
-            authority_name
+            authority_name,
+            certificates
         FROM sub_committees
         WHERE committee_session_id = $1
         "#,
@@ -35,12 +35,24 @@ async fn list(
     .await
 }
 
+/// List all sub electoral committees for a committee session
+pub async fn list(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<SubCommittee>, sqlx::Error> {
+    Ok(list_rows(conn, committee_session_id)
+        .await?
+        .into_iter()
+        .map(SubCommitteeRow::into_sub_committee)
+        .collect())
+}
+
 /// List all sub electoral committees for a first committee session
 pub async fn list_first_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<SubCommitteeFirstSession>, sqlx::Error> {
-    Ok(list(conn, committee_session_id)
+    Ok(list_rows(conn, committee_session_id)
         .await?
         .into_iter()
         .map(SubCommitteeRow::into_sub_committee_first_session)
@@ -74,7 +86,8 @@ pub async fn create(
             name,
             category,
             authority_id,
-            authority_name
+            authority_name,
+            certificates
         "#,
         committee_session_id,
         data_entry_id,
@@ -104,6 +117,7 @@ pub async fn list_first_session_with_status(
             sc.category,
             sc.authority_id,
             sc.authority_name,
+            sc.certificates,
             de.state AS "state!: Json<DataEntryStatus>"
         FROM sub_committees AS sc
         JOIN data_entries AS de ON de.id = sc.data_entry_id
@@ -116,14 +130,11 @@ pub async fn list_first_session_with_status(
         source: DataEntrySource::SubCommittee(SubCommitteeFirstSession {
             committee_session_id,
             data_entry_id: row.data_entry_id,
-            sub_committee: SubCommittee {
-                id: row.id,
-                number: row.number,
-                name: row.name,
-                category: row.category,
-                authority_id: row.authority_id,
-                authority_name: row.authority_name,
-            },
+            id: row.id,
+            number: row.number,
+            name: row.name,
+            authority_id: row.authority_id,
+            authority_name: row.authority_name,
         }),
         status: row.state.0,
     })

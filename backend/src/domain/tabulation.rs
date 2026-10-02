@@ -466,7 +466,7 @@ mod tests {
             next_session_results::NextSessionResults,
             yes_no::YesNo,
         },
-        sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId},
+        sub_committee::{SubCommitteeFirstSession, SubCommitteeId},
         valid_default::ValidDefault,
     };
 
@@ -1087,14 +1087,11 @@ mod tests {
                 (
                     DataEntrySource::SubCommittee(SubCommitteeFirstSession {
                         committee_session_id: CommitteeSessionId::from(0),
-                        sub_committee: SubCommittee {
-                            id: SubCommitteeId::from(1),
-                            number: 1,
-                            name: "A".to_string(),
-                            category: GSB,
-                            authority_id: format!("{:0>4}", 1),
-                            authority_name: "A".to_string(),
-                        },
+                        id: SubCommitteeId::from(1),
+                        number: 1,
+                        name: "A".to_string(),
+                        authority_id: format!("{:0>4}", 1),
+                        authority_name: "A".to_string(),
                         data_entry_id: DataEntryId::from(0),
                     }),
                     gsb1_result,
@@ -1102,14 +1099,11 @@ mod tests {
                 (
                     DataEntrySource::SubCommittee(SubCommitteeFirstSession {
                         committee_session_id: CommitteeSessionId::from(0),
-                        sub_committee: SubCommittee {
-                            id: SubCommitteeId::from(2),
-                            number: 2,
-                            name: "B".to_string(),
-                            category: GSB,
-                            authority_id: format!("{:0>4}", 2),
-                            authority_name: "B".to_string(),
-                        },
+                        id: SubCommitteeId::from(2),
+                        number: 2,
+                        name: "B".to_string(),
+                        authority_id: format!("{:0>4}", 2),
+                        authority_name: "B".to_string(),
                         data_entry_id: DataEntryId::from(1),
                     }),
                     gsb2_result,

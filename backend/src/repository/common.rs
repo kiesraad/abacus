@@ -9,7 +9,9 @@ use crate::domain::{
         PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
         PollingStationNextSession, PollingStationNumber, PollingStationType,
     },
-    sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber},
+    sub_committee::{
+        Certificate, SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber,
+    },
 };
 
 pub trait PollingStationRowLike: Sized {
@@ -124,10 +126,15 @@ pub struct SubCommitteeRow {
     pub category: CommitteeCategory,
     pub authority_id: String,
     pub authority_name: String,
+    pub certificates: Json<Vec<Certificate>>,
 }
 
 pub trait SubCommitteeRowLike: Sized {
     fn as_sub_committee(&self) -> SubCommittee;
+
+    fn into_sub_committee(self) -> SubCommittee {
+        self.as_sub_committee()
+    }
 
     fn as_sub_committee_first_session(&self) -> SubCommitteeFirstSession;
 
@@ -153,6 +160,7 @@ impl SubCommitteeRowLike for SubCommitteeRow {
             category: self.category,
             authority_id: self.authority_id.clone(),
             authority_name: self.authority_name.clone(),
+            certificates: self.certificates.0.clone(),
         }
     }
 
@@ -160,7 +168,11 @@ impl SubCommitteeRowLike for SubCommitteeRow {
         SubCommitteeFirstSession {
             committee_session_id: self.committee_session_id,
             data_entry_id: self.data_entry_id,
-            sub_committee: self.as_sub_committee(),
+            id: self.id,
+            number: self.number,
+            name: self.name.clone(),
+            authority_id: self.authority_id.clone(),
+            authority_name: self.authority_name.clone(),
         }
     }
 }

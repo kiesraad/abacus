@@ -17,7 +17,7 @@ discard one entry. In this case, the remaining entry will from then on be the fi
 Instead of discarding an entry, the coordinator can also have it corrected by the typist who entered it. That is only
 possible when the entry that is kept has no errors. Keeping an entry that has errors while correcting the other one is
 not allowed: the coordinator has to resolve the errors first, so the only option is to discard the other entry, which
-transitions the state to `FirstEntryHasErrors`.
+transitions the state to `FirstEntryHasErrors`. 
 
 Both the first and second entries can have errors in the `EntriesDifferent` state:
 - the first entry through `Empty` -> `FirstEntryInProgress` -> `FirstEntryFinalised` -> `SecondEntryInProgress` ->
@@ -26,10 +26,14 @@ Both the first and second entries can have errors in the `EntriesDifferent` stat
 - the second entry through `Empty` -> `FirstEntryInProgress` -> `FirstEntryFinalised` -> `SecondEntryInProgress` ->
   introduce errors in second entry -> `EntriesDifferent` with errors in second entry.
 
+When the first entry is imported, and it is deemed incorrect while resolving differences, it is discarded and a new manual data entry is required.
+An imported first entry cannot be corrected.
+
 ```mermaid
 stateDiagram-v2
   [*] --> Empty
   Empty --> FirstEntryInProgress: claim
+  Empty --> FirstEntryFinalised: import
 
   state first_has_errors <<choice>>
   FirstEntryInProgress --> first_has_errors: finalise

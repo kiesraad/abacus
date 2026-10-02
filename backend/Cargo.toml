@@ -21,7 +21,7 @@ pdf_gen = { path = "./pdf_gen/wrapper" }
 pdf_gen_impl = { path = "./pdf_gen/impl" }
 pdf_gen_types = { path = "./pdf_gen/types" }
 async_zip = { version = "0.0.18", features = ["tokio", "deflate", "chrono"] }
-axum = { version = "0.8", features = ["macros", "tracing", "tokio"] }
+axum = { version = "0.8", features = ["macros", "multipart", "tracing", "tokio"] }
 axum-extra = { version = "0.12", default-features = false, features = [
     "attachment",
     "cookie",
@@ -84,6 +84,7 @@ name = "gen-pdf"
 [dependencies]
 apportionment = { path = "./apportionment" }
 pdf_gen.workspace = true
+async_zip.workspace = true
 axum.workspace = true
 axum-extra.workspace = true
 chrono.workspace = true
@@ -122,9 +123,8 @@ axum-server = { workspace = true, optional = true }
 zeroize.workspace = true
 
 [dev-dependencies]
-async_zip.workspace = true
 http-body-util.workspace = true
-reqwest = { version = "0.13", default-features = false, features = ["json"] }
+reqwest = { version = "0.13", default-features = false, features = ["json", "multipart"] }
 test-log.workspace = true
 tempfile = "3"
 

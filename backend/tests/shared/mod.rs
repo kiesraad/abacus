@@ -5,7 +5,10 @@ use std::{collections::BTreeMap, net::SocketAddr};
 use abacus::domain::election::{CommitteeCategory, VoteCountingMethod};
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
-use reqwest::Response;
+use reqwest::{
+    Response,
+    multipart::{Form, Part},
+};
 use serde::Serialize;
 
 pub fn differences_counts_zero() -> serde_json::Value {
@@ -698,4 +701,19 @@ pub async fn login_with_credentials(
 
     assert_eq!(response.status(), StatusCode::OK);
     response.headers().get("set-cookie").cloned().unwrap()
+}
+
+/// Sends a POST request with given data as multipart/form-data
+pub async fn post_multipart(url: &str, cookie: &HeaderValue, parts: &[(&str, &[u8])]) -> Response {
+    let form = parts.iter().fold(Form::new(), |form, (name, value)| {
+        form.part(name.to_string(), Part::bytes(value.to_vec()))
+    });
+
+    reqwest::Client::new()
+        .post(url)
+        .header("cookie", cookie)
+        .multipart(form)
+        .send()
+        .await
+        .unwrap()
 }

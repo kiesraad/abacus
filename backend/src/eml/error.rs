@@ -11,6 +11,7 @@ pub enum EMLImportError {
     CommitteeCategoryForElectionCategoryNotSupported,
     EMLError(eml_nl::EMLError),
     InvalidCandidate,
+    InvalidCountType,
     InvalidDateFormat,
     InvalidDistrict,
     InvalidPollingStation,

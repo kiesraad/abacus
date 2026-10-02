@@ -672,6 +672,11 @@ impl ElectionWithPoliticalGroups {
                 CommitteeCategory::GSB => CountType::Municipal,
                 CommitteeCategory::CSB => CountType::Central,
             })
+            .phase(if committee_session.is_next_session() {
+                eml_nl::common::PhaseCode::Corrigendum
+            } else {
+                eml_nl::common::PhaseCode::FirstSession
+            })
             .contests([self.as_eml_count_contest(committee_session, results, totals)?]);
         match self.counting_method {
             Some(VoteCountingMethod::CSO) => {
@@ -1333,6 +1338,11 @@ mod tests {
                 .copied_value()
                 .unwrap(),
             eml_nl::common::CountingMethodCode::CSO
+        );
+
+        assert_eq!(
+            eml_count.count.phase.unwrap().copied_value().unwrap(),
+            eml_nl::common::PhaseCode::FirstSession
         );
     }
 

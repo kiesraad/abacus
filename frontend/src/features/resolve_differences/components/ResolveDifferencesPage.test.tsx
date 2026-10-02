@@ -365,7 +365,7 @@ describe("ResolveDifferencesPage", () => {
     const resolve = spyOnHandler(DataEntryResolveDifferencesHandler);
     overrideOnce("get", "/api/data_entries/3/resolve_differences", 200, {
       ...dataEntryStatusDifferences,
-      first_entry_origin: "Import",
+      first_entry_origin: { type: "Import" },
     });
 
     await renderPage();

@@ -35,7 +35,7 @@ export function isCorrectionBlocked(
   if (correctEntry === "second" && differences) {
     return differences.second_entry_has_errors
       ? "second_entry_has_errors"
-      : differences.first_entry_origin === "Import"
+      : differences.first_entry_origin.type === "Import"
         ? "first_entry_imported"
         : undefined;
   }

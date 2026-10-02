@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn } from "storybook/test";
-import { t } from "../../../i18n/translate";
+import { t } from "@/i18n/translate";
 import type { CorrectEntry, ResolveDifferencesFormState, WrongEntryAction } from "../utils/differences";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesForm } from "./ResolveDifferencesForm";

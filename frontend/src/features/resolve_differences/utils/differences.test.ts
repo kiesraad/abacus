@@ -199,7 +199,9 @@ describe("isCorrectionBlocked", () => {
       ...dataEntryStatusDifferences,
       first_entry_has_errors: firstHasErrors,
       second_entry_has_errors: secondHasErrors,
-      first_entry_origin: firstEntryImported ? "Import" : ({ Typist: 1 } as DataEntryOrigin),
+      first_entry_origin: firstEntryImported
+        ? ({ type: "Import" } as DataEntryOrigin)
+        : ({ type: "Typist", user_id: 1 } as DataEntryOrigin),
     };
 
     expect(isCorrectionBlocked(correctEntry, differences)).toBe(expected);

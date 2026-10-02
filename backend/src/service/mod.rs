@@ -25,6 +25,7 @@ pub use polling_station::{
 };
 pub use signing::{SigningServiceError, get_election_certificate, get_signing_keypair};
 pub use sub_committee::{
-    SubCommitteeServiceError, create as create_sub_committee,
+    SubCommitteeServiceError, add_certificate as add_sub_committee_certificate,
+    create as create_sub_committee,
     list_for_first_session as list_sub_committees_for_first_session,
 };

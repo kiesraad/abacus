@@ -9,8 +9,9 @@ use axum::{
 use axum_extra::response::Attachment;
 use chrono::{DateTime, Utc};
 use eml_signature;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
+use tracing::info;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -21,13 +22,48 @@ use crate::{
         election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
         filename::hyphenate,
         role::Role,
-        sub_committee::SubCommittee,
+        sub_committee::{
+            Certificate, SubCommittee, SubCommitteeCertificateError, SubCommitteeId,
+            signature_algorithm,
+        },
     },
-    error::ErrorReference,
+    error::{ApiErrorResponse, ErrorReference},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{committee_session_repo, election_repo, signing_keypair_repo, sub_committee_repo},
-    service::get_election_certificate,
+    service::{add_sub_committee_certificate, get_election_certificate},
 };
+
+impl ApiErrorResponse for SubCommitteeCertificateError {
+    fn log(&self) {
+        info!("Sub committee certificate rejected: {:?}", self);
+    }
+
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        let (status, message, reference) = match self {
+            SubCommitteeCertificateError::InvalidCertificate(_) => (
+                StatusCode::BAD_REQUEST,
+                "Invalid certificate",
+                ErrorReference::InvalidCertificate,
+            ),
+            SubCommitteeCertificateError::WrongElection => (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                "Certificate is for another election",
+                ErrorReference::CertificateWrongElection,
+            ),
+            SubCommitteeCertificateError::UnknownSubCommittee => (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                "Certificate is for an unknown sub committee",
+                ErrorReference::CertificateUnknownSubCommittee,
+            ),
+            SubCommitteeCertificateError::AlreadyAdded => (
+                StatusCode::CONFLICT,
+                "Public key was already added",
+                ErrorReference::CertificateAlreadyAdded,
+            ),
+        };
+        (status, ErrorResponse::new(message, reference, false))
+    }
+}
 
 #[derive(Serialize)]
 struct PublicKeyUploadReminderDismissedAuditData {
@@ -46,7 +82,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(certificate).authorize(ADMIN))
         .routes(routes!(certificate_details).authorize(ADMIN))
-        .routes(routes!(sub_committee_certificates).authorize(ADMIN))
+        .routes(routes!(sub_committee_certificates, sub_committee_certificate_add).authorize(ADMIN))
         .routes(routes!(dismiss_public_key_upload_reminder).authorize(ADMIN))
 }
 
@@ -115,7 +151,7 @@ impl From<eml_signature::Certificate> for CertificateDetailsResponse {
             common_name: subject.common_name,
             not_before: certificate.not_before(),
             not_after: certificate.not_after(),
-            signature_algorithm: format!("RSA {}-bit", eml_signature::RSA_KEY_BITS),
+            signature_algorithm: signature_algorithm(),
         }
     }
 }
@@ -226,18 +262,135 @@ pub async fn sub_committee_certificates(
     Ok(Json(sub_committees))
 }
 
+/// Request to add a sub committee certificate
+#[derive(Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct AddSubCommitteeCertificateRequest {
+    pub data: String,
+}
+
+/// The certificate that was added, with the sub committee it was added to
+#[derive(Serialize, ToSchema, Debug)]
+pub struct AddSubCommitteeCertificateResponse {
+    pub sub_committee_id: SubCommitteeId,
+    pub authority_name: String,
+    pub certificate: Certificate,
+    pub expired: bool,
+}
+
+/// Validate a certificate and add it to the sub committee it belongs to
+#[utoipa::path(
+    post,
+    path = "/api/elections/{election_id}/sub_committee_certificates",
+    request_body = AddSubCommitteeCertificateRequest,
+    responses(
+        (status = 201, description = "Certificate added", body = AddSubCommitteeCertificateResponse),
+        (status = 400, description = "Invalid certificate", body = ErrorResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 404, description = "Not Found", body = ErrorResponse),
+        (status = 409, description = "Public key already added or committee session completed", body = ErrorResponse),
+        (status = 422, description = "Certificate is for another election or an unknown sub committee", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+    ),
+)]
+pub async fn sub_committee_certificate_add(
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Path(election_id): Path<ElectionId>,
+    Json(request): Json<AddSubCommitteeCertificateRequest>,
+) -> Result<(StatusCode, Json<AddSubCommitteeCertificateResponse>), APIError> {
+    let certificate = eml_signature::Certificate::from_pem(request.data.as_bytes())
+        .map_err(SubCommitteeCertificateError::InvalidCertificate)?;
+
+    let mut tx = pool.begin_immediate().await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
+
+    let (sub_committee, certificate) =
+        add_sub_committee_certificate(&mut tx, &audit_service, &election, &certificate).await?;
+
+    tx.commit().await?;
+
+    Ok((
+        StatusCode::CREATED,
+        Json(AddSubCommitteeCertificateResponse {
+            sub_committee_id: sub_committee.id,
+            authority_name: sub_committee.authority_name,
+            expired: certificate.is_expired(Utc::now()),
+            certificate,
+        }),
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use std::assert_matches;
 
     use http_body_util::BodyExt;
+    use serde_json::json;
     use test_log::test;
 
     use super::*;
     use crate::{
         domain::election::{ElectionCategory, tests::election_fixture},
+        infra::audit_log::{AuditEventLevel, assert_last_event, list_event_names},
         repository::user_repo::{User, UserId},
     };
+
+    // Test-only GSB certificates matching the GSB of election 9 (`election_9_csb.sql`).
+    //
+    // ```sh
+    // cargo run -p eml_signature --example create -- GR2026_TestLocation 9101 "Test Location" 2026-10-01 2026-03-18
+    // cargo run -p eml_signature --example create -- GR2026_TestLocation 9101 "Test Location" 2026-01-01 2026-03-18
+    // cargo run -p eml_signature --example create -- GR2026_TestLocation 9999 "Unknown Location" 2026-10-01 2026-03-18
+    // ```
+
+    /// Abacus certificate for `GR2026_TestLocation`, GSB 9101.
+    const PSB9101: &str = include_str!("../../fixtures/certificates/psb9101.crt");
+    /// Certificate for another key of GSB 9101, expired on 2026-06-18.
+    const PSB9101_EXPIRED: &str = include_str!("../../fixtures/certificates/psb9101_expired.crt");
+    /// Certificate for GSB 9999, which election 9 doesn't have.
+    const PSB9999: &str = include_str!("../../fixtures/certificates/psb9999.crt");
+    const OSV2020_NIEUWSTRAND: &str =
+        include_str!("../../eml_signature/tests/fixtures/osv2020_nieuwstrand.crt");
+
+    async fn add_certificate(
+        pool: SqlitePool,
+        pem: &str,
+    ) -> Result<(StatusCode, Json<AddSubCommitteeCertificateResponse>), APIError> {
+        let user = User::test_user(Role::Administrator, UserId::from(1));
+        sub_committee_certificate_add(
+            State(pool),
+            AuditService::new(Some(user), None),
+            Path(ElectionId::from(9)),
+            Json(AddSubCommitteeCertificateRequest {
+                data: pem.to_string(),
+            }),
+        )
+        .await
+    }
+
+    async fn add_certificate_error(pool: SqlitePool, pem: &str) -> (StatusCode, ErrorReference) {
+        let response = add_certificate(pool, pem)
+            .await
+            .expect_err("should fail")
+            .into_response();
+        let status = response.status();
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let error: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        (status, error.reference)
+    }
+
+    async fn stored_certificates(pool: SqlitePool) -> Vec<Certificate> {
+        let Json(mut sub_committees) =
+            sub_committee_certificates(State(pool), Path(ElectionId::from(9)))
+                .await
+                .expect("should be ok");
+        assert_eq!(sub_committees.len(), 1);
+        sub_committees.remove(0).certificates
+    }
 
     #[test]
     fn test_public_key_filename_gsb() {
@@ -336,6 +489,149 @@ mod tests {
             certificate
                 .public_key
                 .starts_with("-----BEGIN PUBLIC KEY-----\n")
+        );
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
+    async fn test_sub_committee_certificate_add(pool: SqlitePool) {
+        let (status, Json(response)) = add_certificate(pool.clone(), PSB9101)
+            .await
+            .expect("should be ok");
+        assert_eq!(status, StatusCode::CREATED);
+        assert_eq!(response.sub_committee_id, SubCommitteeId::from(911));
+        assert_eq!(response.authority_name, "Test Location");
+
+        let certificate = &response.certificate;
+        assert_eq!(certificate.election_identifier, "GR2026_TestLocation");
+        assert_eq!(certificate.organizational_unit, "Abacus 1.1.0");
+        assert_eq!(certificate.common_name, "Gemeente Test Location");
+        assert_eq!(certificate.signature_algorithm, "RSA 4096-bit");
+        assert!(
+            certificate
+                .public_key
+                .starts_with("-----BEGIN PUBLIC KEY-----\n")
+        );
+
+        assert_eq!(
+            stored_certificates(pool.clone()).await,
+            vec![certificate.clone()]
+        );
+
+        let mut conn = pool.acquire().await.unwrap();
+        assert_last_event(
+            &mut conn,
+            AuditEventType::SubCommitteeCertificateAdded,
+            AuditEventLevel::Success,
+            json!({
+                "election_id": 9,
+                "sub_committee_id": 911,
+                "authority_id": "9101",
+                "organizational_unit": "Abacus 1.1.0",
+                "common_name": "Gemeente Test Location",
+                "not_before": certificate.not_before,
+                "not_after": certificate.not_after,
+            }),
+        )
+        .await;
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
+    async fn test_sub_committee_certificate_add_second_key(pool: SqlitePool) {
+        assert!(add_certificate(pool.clone(), PSB9101).await.is_ok());
+
+        // Another key for the same GSB is added, even though its certificate has expired
+        let (status, Json(response)) = add_certificate(pool.clone(), PSB9101_EXPIRED)
+            .await
+            .expect("should be ok");
+        assert_eq!(status, StatusCode::CREATED);
+        assert!(response.expired);
+
+        assert_eq!(stored_certificates(pool).await.len(), 2);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
+    async fn test_sub_committee_certificate_add_duplicate(pool: SqlitePool) {
+        assert!(add_certificate(pool.clone(), PSB9101).await.is_ok());
+
+        assert_eq!(
+            add_certificate_error(pool.clone(), PSB9101).await,
+            (
+                StatusCode::CONFLICT,
+                ErrorReference::CertificateAlreadyAdded
+            )
+        );
+        assert_eq!(stored_certificates(pool).await.len(), 1);
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_9_csb", "sub_committee_certificate")
+    )))]
+    async fn test_sub_committee_certificate_add_to_existing(pool: SqlitePool) {
+        assert!(add_certificate(pool.clone(), PSB9101).await.is_ok());
+        assert_eq!(stored_certificates(pool).await.len(), 2);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
+    async fn test_sub_committee_certificate_add_rejected(pool: SqlitePool) {
+        // A bare public key is not a certificate
+        let public_key = eml_signature::Certificate::from_pem(PSB9101.as_bytes())
+            .unwrap()
+            .public_key()
+            .to_pem();
+
+        for (pem, status, reference) in [
+            (
+                "not a certificate",
+                StatusCode::BAD_REQUEST,
+                ErrorReference::InvalidCertificate,
+            ),
+            (
+                public_key.as_str(),
+                StatusCode::BAD_REQUEST,
+                ErrorReference::InvalidCertificate,
+            ),
+            (
+                OSV2020_NIEUWSTRAND,
+                StatusCode::UNPROCESSABLE_ENTITY,
+                ErrorReference::CertificateWrongElection,
+            ),
+            (
+                PSB9999,
+                StatusCode::UNPROCESSABLE_ENTITY,
+                ErrorReference::CertificateUnknownSubCommittee,
+            ),
+        ] {
+            assert_eq!(
+                add_certificate_error(pool.clone(), pem).await,
+                (status, reference)
+            );
+        }
+        assert!(stored_certificates(pool).await.is_empty());
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
+    async fn test_sub_committee_certificate_add_completed_session(pool: SqlitePool) {
+        sqlx::query("UPDATE committee_sessions SET status = 'completed' WHERE id = 901")
+            .execute(&pool)
+            .await
+            .unwrap();
+
+        assert_eq!(
+            add_certificate_error(pool.clone(), PSB9101).await,
+            (
+                StatusCode::CONFLICT,
+                ErrorReference::InvalidCommitteeSessionStatus
+            )
+        );
+        assert!(stored_certificates(pool.clone()).await.is_empty());
+
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(
+            !list_event_names(&mut conn)
+                .await
+                .unwrap()
+                .contains(&"SubCommitteeCertificateAdded".to_string())
         );
     }
 }

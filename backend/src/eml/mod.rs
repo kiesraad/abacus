@@ -88,6 +88,16 @@ fn format_election_name(name: &str, category: crate::domain::election::ElectionC
     }
 }
 
+impl From<CandidateGender> for GenderAnnex {
+    fn from(candidate_gender: CandidateGender) -> Self {
+        match candidate_gender {
+            CandidateGender::Male => Self::Male,
+            CandidateGender::Female => Self::Female,
+            CandidateGender::X => Self::Other,
+        }
+    }
+}
+
 /// Maps Gender or GenderAnnex to a CandidateGender
 /// Uses `gender_annex` when available, falls back to gender otherwise
 fn candidate_gender(
@@ -422,7 +432,7 @@ impl Candidate {
     }
 
     fn as_candidate_lists_candidate(&self) -> Result<CandidateListsCandidate, EMLError> {
-        CandidateListsCandidate::builder()
+        let mut candidate_list_candidate = CandidateListsCandidate::builder()
             .identifier(CandidateId::from_str(
                 &self.number.as_internal_u32().to_string(),
             )?)
@@ -439,8 +449,13 @@ impl Candidate {
             .qualifying_address(QualifyingAddress::new(
                 &self.locality[..],
                 self.country_code.as_deref(),
-            ))
-            .build()
+            ));
+
+        if let Some(candidate_gender) = self.gender {
+            candidate_list_candidate = candidate_list_candidate.gender_annex(candidate_gender);
+        };
+
+        candidate_list_candidate.build()
     }
 }
 
@@ -990,11 +1005,7 @@ fn build_candidate_result(
                 );
 
             if let Some(gender) = can.gender {
-                builder = builder.gender_annex(match gender {
-                    CandidateGender::Female => GenderAnnex::Female,
-                    CandidateGender::Male => GenderAnnex::Male,
-                    CandidateGender::X => GenderAnnex::Other,
-                });
+                builder = builder.gender_annex(gender);
             }
 
             builder = builder.locality_name(can.locality.clone());

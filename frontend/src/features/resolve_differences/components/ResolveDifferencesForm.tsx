@@ -117,7 +117,9 @@ export function ResolveDifferencesForm({
         </FormLayout.Section>
         <FormLayout.Controls>
           <Button type="submit">
-            {correctionBlocked ? t("resolve_differences.continue_to_resolve_errors") : t("save")}
+            {correctionBlocked === "first_entry_has_errors" || correctionBlocked === "second_entry_has_errors"
+              ? t("resolve_differences.continue_to_resolve_errors")
+              : t("save")}
           </Button>
         </FormLayout.Controls>
       </FormLayout>

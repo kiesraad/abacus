@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn } from "storybook/test";
-
+import { t } from "../../../i18n/translate";
 import type { CorrectEntry, ResolveDifferencesFormState, WrongEntryAction } from "../utils/differences";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesForm } from "./ResolveDifferencesForm";
@@ -159,6 +159,7 @@ export const FirstEntryHasErrors: Story = {
 export const FirstEntryImported: Story = {
   ...Default,
   args: {
+    firstEntryName: t("resolve_differences.imported_from_file"),
     formState: { ...defaultFormState, correctEntry: "second", correctionBlocked: "first_entry_imported" },
   },
   play: async ({ canvas }) => {
@@ -179,8 +180,8 @@ export const FirstEntryImported: Story = {
     await expect(discardWrongEntry).toBeDisabled();
     await expect(discardWrongEntry).toBeChecked();
 
-    // The submit button announces that resolving the errors is the next step
-    await expect(canvas.getByRole("button", { name: "Verder naar fouten oplossen" })).toBeVisible();
+    // The save button is visible
+    await expect(canvas.getByRole("button", { name: "Opslaan" })).toBeVisible();
   },
 };
 

@@ -382,7 +382,7 @@ describe("ResolveDifferencesPage", () => {
       await screen.findByRole("radio", { name: "Verschillen laten herstellen door de oorspronkelijke invoerder" }),
     ).toBeDisabled();
 
-    await user.click(await screen.findByRole("button", { name: "Verder naar fouten oplossen" }));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
     expect(resolve).toHaveBeenCalledWith("keep_second_and_discard_first");
   });
 

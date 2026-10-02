@@ -2,7 +2,7 @@
   "continue_to_resolve_errors": "Verder naar fouten oplossen",
   "correction_blocked": {
     "first_entry_has_errors": "Uit de eerste invoer blijkt dat er waarschijnlijk fouten in het papieren proces-verbaal zijn gemaakt. Daarom kan je de tweede invoer nu niet laten herstellen door de oorspronkelijke invoerder. Eerst moet het papieren proces-verbaal worden gecontroleerd. Dat doen we in de volgende stap. De tweede invoer wordt verwijderd.",
-    "first_entry_imported": "De eerste invoer is geïmporteerd uit een tellingbestand. Afwijkingen met het papieren proces-verbaal kunnen daarin niet worden hersteld. Er is tweede handmatige invoer nodig vanaf het papieren proces-verbaal.",
+    "first_entry_imported": "De eerste invoer is geïmporteerd uit een tellingsbestand. Afwijkingen met het papieren proces-verbaal kunnen daarin niet worden hersteld. Er is tweede handmatige invoer nodig vanaf het papieren proces-verbaal.",
     "second_entry_has_errors": "Uit de tweede invoer blijkt dat er waarschijnlijk fouten in het papieren proces-verbaal zijn gemaakt. Daarom kan je de eerste invoer nu niet laten herstellen door de oorspronkelijke invoerder. Eerst moet het papieren proces-verbaal worden gecontroleerd. Dat doen we in de volgende stap. De eerste invoer wordt verwijderd."
   },
   "form_content": "De resultaten van dit stembureau zijn pas definitief als er twee gelijke invoeren zijn. Kies de invoer die overeenkomt met het papieren proces-verbaal.",
@@ -13,7 +13,7 @@
     "first_entry": "Eerste invoer",
     "second_entry": "Tweede invoer"
   },
-  "imported_from_file": "geïmporteerd uit tellingbestand",
+  "imported_from_file": "geïmporteerd uit tellingsbestand",
   "options": {
     "discard_both": "Geen van beide: alles opnieuw invoeren",
     "keep_first_and_discard_second": "Eerste invoer ({name})",

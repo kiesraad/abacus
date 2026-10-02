@@ -165,7 +165,7 @@ export const FirstEntryImported: Story = {
   play: async ({ canvas }) => {
     await expect(
       canvas.getByText(
-        "De eerste invoer is geïmporteerd uit een tellingbestand. " +
+        "De eerste invoer is geïmporteerd uit een tellingsbestand. " +
           "Afwijkingen met het papieren proces-verbaal kunnen daarin niet worden hersteld. " +
           "Er is tweede handmatige invoer nodig vanaf het papieren proces-verbaal.",
       ),

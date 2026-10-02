@@ -369,11 +369,14 @@ describe("ResolveDifferencesPage", () => {
     });
 
     await renderPage();
+    expect(
+      await screen.findByRole("radio", { name: "Eerste invoer (geïmporteerd uit tellingsbestand)" }),
+    ).toBeVisible();
     await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
 
     expect(
       await screen.findByText(
-        "De eerste invoer is geïmporteerd uit een tellingbestand. " +
+        "De eerste invoer is geïmporteerd uit een tellingsbestand. " +
           "Afwijkingen met het papieren proces-verbaal kunnen daarin niet worden hersteld. " +
           "Er is tweede handmatige invoer nodig vanaf het papieren proces-verbaal.",
       ),

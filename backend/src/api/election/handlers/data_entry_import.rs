@@ -22,7 +22,9 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         data_entry::{DataEntrySource, DataEntryStatus},
         election::{ElectionId, ElectionWithPoliticalGroups},
+        results::{Results, gsb_results::GSBResults},
         sub_committee::SubCommitteeFirstSession,
+        validate::ValidateRoot,
     },
     eml::{EMLImportError, RedactedEmlHash},
     error::ErrorReference,
@@ -34,6 +36,7 @@ pub enum DataEntryImportError {
     EmlZipError(String),
     CommitteeSessionAlreadyCompleted,
     SubCommitteeDataEntryNotEmpty,
+    ResultsHaveValidationErrors,
 }
 
 #[derive(Debug, ToSchema)]
@@ -257,7 +260,11 @@ async fn validate_import(
         return Err(DataEntryImportError::SubCommitteeDataEntryNotEmpty.into());
     }
 
-    // TODO #4063 Map data into GSBResults and validate
+    let results = Results::GSB(GSBResults::from_eml_count(&definition, election.category)?);
+    let validation_results = results.start_validate(&election)?;
+    if validation_results.has_errors() {
+        return Err(DataEntryImportError::ResultsHaveValidationErrors.into());
+    }
 
     Ok(ValidatedImport {
         election,
@@ -520,7 +527,10 @@ mod tests {
 
     mod validate_import {
         use chrono::Local;
-        use eml_nl::utils::AuthorityId;
+        use eml_nl::{
+            documents::election_count::UncountedVotesReason,
+            utils::{AuthorityId, StringValue},
+        };
         use test_log::test;
 
         use super::*;
@@ -708,6 +718,43 @@ mod tests {
                 Err(APIError::Unprocessable(
                     _,
                     ErrorReference::InvalidCommitteeSessionStatus
+                ))
+            ));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_results_with_validation_errors(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+
+            let mut count = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict)
+                .ok()
+                .unwrap();
+
+            // Insert wrong data
+            let contest = &mut count.count.election.contests[0];
+            let uncounted_votes = &mut contest.total_votes.as_mut().unwrap().uncounted_votes;
+            uncounted_votes.insert(
+                UncountedVotesReason::ValidPollCards,
+                StringValue::from_value(1),
+            );
+            let eml = String::try_from(count).unwrap();
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            assert!(matches!(
+                validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
+                Err(APIError::Unprocessable(
+                    _,
+                    ErrorReference::DataEntryValidationErrors
                 ))
             ));
         }

@@ -477,6 +477,10 @@ impl From<DataEntryImportError> for APIError {
                 "Sub committee data entry not empty".into(),
                 ErrorReference::DataEntryNotAllowed,
             ),
+            DataEntryImportError::ResultsHaveValidationErrors => APIError::Unprocessable(
+                "Results have validation errors".into(),
+                ErrorReference::DataEntryValidationErrors,
+            ),
         }
     }
 }

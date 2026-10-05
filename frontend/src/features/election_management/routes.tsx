@@ -6,6 +6,7 @@ import { t } from "@/i18n/translate";
 import { ElectionHomePage } from "./components/ElectionHomePage";
 import { ElectionReportPage } from "./components/report/ElectionReportPage";
 import { FinishDataEntryPage } from "./components/report/FinishDataEntryPage";
+import { SubCommitteeKeysOverviewPage } from "./components/sub_committee_keys/SubCommitteeKeysOverviewPage";
 import { CommitteeSessionDetailsPage } from "./components/update/CommitteeSessionDetailsPage";
 import { NumberOfVotersPage } from "./components/update/NumberOfVotersPage";
 
@@ -24,6 +25,11 @@ export const electionManagementRoutes: RouteObject[] = [
   {
     path: "certificate",
     Component: ElectionCertificatePage,
+    handle: { roles: ["administrator"] },
+  },
+  {
+    path: "sub-committees",
+    Component: SubCommitteeKeysOverviewPage,
     handle: { roles: ["administrator"] },
   },
   {

@@ -25,8 +25,8 @@ describe("CollapsibleDataEntryList component", () => {
     const user = userEvent.setup();
     renderComponent(
       getElectionStatusMockData([
-        { status: "first_entry_in_progress", first_entry_user_id: typist.user_id },
-        { status: "first_entry_finalised", first_entry_user_id: typist.user_id },
+        { status: "first_entry_in_progress", first_entry_origin: { type: "Typist", user_id: typist.user_id } },
+        { status: "first_entry_finalised", first_entry_origin: { type: "Typist", user_id: typist.user_id } },
       ]),
     );
 
@@ -66,7 +66,9 @@ describe("CollapsibleDataEntryList component", () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
 
     renderComponent(
-      getElectionStatusMockData([{ status: "first_entry_finalised", first_entry_user_id: typist.user_id }]),
+      getElectionStatusMockData([
+        { status: "first_entry_finalised", first_entry_origin: { type: "Typist", user_id: typist.user_id } },
+      ]),
     );
 
     // Open the list

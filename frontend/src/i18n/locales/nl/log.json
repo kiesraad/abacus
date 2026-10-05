@@ -86,7 +86,7 @@
     "filename": "Bestandsnaam",
     "findings": "Bevindingen",
     "finished_at": "Afgerond op",
-    "first_entry_user_id": "Gebruikers-ID eerste invoer",
+    "first_entry_origin": "Eerste invoer (import of Gebruikers-ID)",
     "fullname": "Volledige naam",
     "import_election_id": "Verkiezings-ID",
     "import_file_name": "Bestandsnaam",

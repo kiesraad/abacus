@@ -12,7 +12,7 @@ import { ElectionStatus } from "./ElectionStatus";
 const today = new Date();
 today.setHours(10, 20);
 const mockStatuses = [...electionStatusesMock];
-mockStatuses[5]!.first_entry_user_id = 1;
+mockStatuses[5]!.first_entry_origin = { type: "Typist", user_id: 1 };
 
 interface StoryProps {
   addLinks: boolean;
@@ -48,11 +48,11 @@ export const GSBElectionStatusNoLinks: StoryObj<StoryProps> = {
     });
 
     await step("Progress section", async () => {
-      const pollinStationsPerStatus = canvas.getByTestId("polling-stations-per-status");
+      const pollingStationsPerStatus = canvas.getByTestId("polling-stations-per-status");
       await expect(
-        within(pollinStationsPerStatus).getByRole("heading", { level: 3, name: "Stembureaus per status" }),
+        within(pollingStationsPerStatus).getByRole("heading", { level: 3, name: "Stembureaus per status" }),
       ).toBeVisible();
-      const items = pollinStationsPerStatus.children;
+      const items = pollingStationsPerStatus.children;
       // items[0] is the heading, which we have already checked
       await expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (2)");
       await expect(items[2]).toHaveTextContent("Invoer bezig (2)");
@@ -163,15 +163,15 @@ export const CSBElectionStatusNoLinks: StoryObj<StoryProps> = {
     });
 
     await step("Progress section", async () => {
-      const pollinStationsPerStatus = canvas.getByTestId("polling-stations-per-status");
+      const pollingStationsPerStatus = canvas.getByTestId("polling-stations-per-status");
       await expect(
-        within(pollinStationsPerStatus).getByRole("heading", { level: 3, name: "Stembureaus per status" }),
+        within(pollingStationsPerStatus).getByRole("heading", { level: 3, name: "Stembureaus per status" }),
       ).toBeVisible();
-      const items = pollinStationsPerStatus.children;
+      const items = pollingStationsPerStatus.children;
       // items[0] is the heading, which we have already checked
       await expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (0)");
-      await expect(items[2]).toHaveTextContent("Invoer bezig (0)");
-      await expect(items[3]).toHaveTextContent("Eerste invoer klaar (0)");
+      await expect(items[2]).toHaveTextContent("Invoer bezig (1)");
+      await expect(items[3]).toHaveTextContent("Eerste invoer klaar (1)");
       await expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
       await expect(items[5]).toHaveTextContent("Werkvoorraad (5)");
 
@@ -181,10 +181,10 @@ export const CSBElectionStatusNoLinks: StoryObj<StoryProps> = {
       const bars = canvas.getByTestId("multi-outer-bar").children;
       const expectedData = [
         { index: 0, percentage: 0, class: "definitive" },
-        { index: 1, percentage: 0, class: "first-entry-finished" },
-        { index: 2, percentage: 0, class: "in-progress" },
+        { index: 1, percentage: 14, class: "first-entry-finished" },
+        { index: 2, percentage: 14, class: "in-progress" },
         { index: 3, percentage: 0, class: "errors-and-warnings" },
-        { index: 4, percentage: 100, class: "not-started" },
+        { index: 4, percentage: 71, class: "not-started" },
       ];
 
       for (const data of expectedData) {
@@ -198,12 +198,31 @@ export const CSBElectionStatusNoLinks: StoryObj<StoryProps> = {
       const tablesRoot = canvas.getByRole("article");
       const headings = within(tablesRoot).getAllByRole("heading", { level: 3 });
       const tables = within(tablesRoot).getAllByRole("table");
-      await expect(headings.length).toBe(1);
-      await expect(tables.length).toBe(1);
+      await expect(headings.length).toBe(3);
+      await expect(tables.length).toBe(3);
 
-      await step("Definitive", async () => {
-        await expect(headings[0]).toHaveTextContent("Werkvoorraad (5)");
+      await step("Data entry in progress", async () => {
+        await expect(headings[0]).toHaveTextContent("Invoer bezig (1)");
         await expect(tables[0]).toHaveTableContent([
+          ["Nummer", "Stembureau", "Invoerder", "Voortgang"],
+          ["0007", "Hoek van Zoom 2e invoer", "Jayden Ahmen", "20%"],
+        ]);
+
+        const inProgressRows = within(tables[0]!).getAllByRole("row");
+        await expect(within(inProgressRows[1]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "20");
+      });
+
+      await step("First entry finished", async () => {
+        await expect(headings[1]).toHaveTextContent("Eerste invoer klaar (1)");
+        await expect(tables[1]).toHaveTableContent([
+          ["Nummer", "Stembureau", "Invoerder", "Afgerond"],
+          ["0006", "Eemstricht", "Geïmporteerd", "vandaag om 10:20"],
+        ]);
+      });
+
+      await step("Not started", async () => {
+        await expect(headings[2]).toHaveTextContent("Werkvoorraad (5)");
+        await expect(tables[2]).toHaveTableContent([
           ["Nummer", "Stembureau"],
           ["0005", "Bloemstede"],
           ["0003", "Eksterlo"],
@@ -320,11 +339,11 @@ export const Empty: StoryObj<StoryProps> = {
       await canvas.findByText("Er zijn nog geen stembureaus toegevoegd voor deze verkiezing."),
     ).toBeVisible();
 
-    const pollinStationsPerStatus = canvas.getByTestId("polling-stations-per-status");
+    const pollingStationsPerStatus = canvas.getByTestId("polling-stations-per-status");
     await expect(
-      within(pollinStationsPerStatus).getByRole("heading", { level: 3, name: "Stembureaus per status" }),
+      within(pollingStationsPerStatus).getByRole("heading", { level: 3, name: "Stembureaus per status" }),
     ).toBeVisible();
-    const items = pollinStationsPerStatus.children;
+    const items = pollingStationsPerStatus.children;
     // items[0] is the heading, which we have already checked
     await expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (0)");
     await expect(items[2]).toHaveTextContent("Invoer bezig (0)");

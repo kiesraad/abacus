@@ -109,7 +109,7 @@ export function ResolveDifferencesPage() {
     return <Loader />;
   }
 
-  const { first_entry, first_entry_user_id, second_entry, second_entry_user_id, source } = differences;
+  const { first_entry, first_entry_origin, second_entry, second_entry_user_id, source } = differences;
 
   return (
     <>
@@ -134,7 +134,11 @@ export function ResolveDifferencesPage() {
             correctEntry={formState.correctEntry}
           />
           <ResolveDifferencesForm
-            firstEntryName={getName(first_entry_user_id)}
+            firstEntryName={
+              first_entry_origin.type === "Typist"
+                ? getName(first_entry_origin.user_id)
+                : t("resolve_differences.imported_from_file")
+            }
             secondEntryName={getName(second_entry_user_id)}
             formState={formState}
             onSubmit={onSubmit}

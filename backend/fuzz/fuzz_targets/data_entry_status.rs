@@ -290,7 +290,7 @@ fn is_as_expected(
             if second_entry.has_errors() {
                 matches!(
                     resulting_state,
-                    Err(DataEntryTransitionError::CorrectionNotAllowed)
+                    Err(DataEntryTransitionError::CorrectionNotAllowed(_))
                 )
             } else {
                 matches!(
@@ -304,7 +304,7 @@ fn is_as_expected(
             if first_entry.has_errors() {
                 matches!(
                     resulting_state,
-                    Err(DataEntryTransitionError::CorrectionNotAllowed)
+                    Err(DataEntryTransitionError::CorrectionNotAllowed(_))
                 )
             } else {
                 matches!(

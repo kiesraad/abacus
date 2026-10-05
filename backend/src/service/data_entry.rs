@@ -47,7 +47,7 @@ fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResp
         data_entry_id: entry.data_entry_id,
         source: entry.source,
         status: status.status_name(),
-        first_entry_user_id: status.get_first_entry_user_id(),
+        first_entry_origin: status.get_first_entry_origin(),
         second_entry_user_id: status.get_second_entry_user_id(),
         data_entry_progress: status.get_data_entry_progress(),
         finished_at,
@@ -94,7 +94,7 @@ pub async fn create_definitive_data_entry(
     };
 
     let state = DataEntryStatus::Definitive(Definitive {
-        first_entry_user_id: UserId::from(5),
+        first_entry_origin: crate::domain::data_entry::DataEntryOrigin::Typist(UserId::from(5)),
         second_entry_user_id: UserId::from(6),
         finished_at: chrono::Utc::now(),
         finalised_with_warnings: false,

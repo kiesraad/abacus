@@ -207,6 +207,7 @@ pub async fn election_data_entry_import(
 }
 
 /// Information collected during validation
+#[derive(Debug)]
 struct ValidatedImport {
     election: ElectionWithPoliticalGroups,
     sub_committee: SubCommitteeFirstSession,
@@ -350,6 +351,7 @@ async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
 mod tests {
     use super::*;
     use async_zip::{Compression, ZipEntryBuilder, tokio::write::ZipFileWriter};
+    use std::assert_matches;
 
     /// Create a zip file in memory containing the given files
     pub async fn zip_with_files(files: &[(&str, &[u8])]) -> Vec<u8> {
@@ -416,10 +418,10 @@ mod tests {
         async fn test_from_request_import_without_hash() {
             let request = multipart_request(&[("data", b"zip")]);
 
-            assert!(matches!(
+            assert_matches!(
                 CSBDataEntryImportRequest::from_request(request, &()).await,
                 Err(APIError::BadRequest(_, ErrorReference::InvalidData))
-            ));
+            );
         }
 
         #[test(tokio::test)]
@@ -427,30 +429,30 @@ mod tests {
             // Missing chunks in the hash
             let request = multipart_request(&[("hash", br#"["abcd"]"#), ("data", b"zip")]);
 
-            assert!(matches!(
+            assert_matches!(
                 CSBDataEntryImportValidateRequest::from_request(request, &()).await,
                 Err(APIError::BadRequest(_, ErrorReference::InvalidData))
-            ));
+            );
         }
 
         #[test(tokio::test)]
         async fn test_from_request_without_data() {
             let request = multipart_request(&[]);
 
-            assert!(matches!(
+            assert_matches!(
                 CSBDataEntryImportValidateRequest::from_request(request, &()).await,
                 Err(APIError::BadRequest(_, ErrorReference::InvalidData))
-            ));
+            );
         }
 
         #[test(tokio::test)]
         async fn test_from_request_unexpected_field() {
             let request = multipart_request(&[("data", b"zip"), ("other", b"value")]);
 
-            assert!(matches!(
+            assert_matches!(
                 CSBDataEntryImportValidateRequest::from_request(request, &()).await,
                 Err(APIError::BadRequest(_, ErrorReference::InvalidData))
-            ));
+            );
         }
     }
 
@@ -474,20 +476,20 @@ mod tests {
 
         #[test(tokio::test)]
         async fn test_invalid_zip() {
-            assert!(matches!(
+            assert_matches!(
                 read_eml_from_zip(b"not a zip file".to_vec()).await,
                 Err(APIError::Unprocessable(_, ErrorReference::ZipError))
-            ));
+            );
         }
 
         #[test(tokio::test)]
         async fn test_without_eml_file() {
             let zip = zip_with_files(&[("Telling_GR2026_Heemdamseburg.xml", b"<EML/>")]).await;
 
-            assert!(matches!(
+            assert_matches!(
                 read_eml_from_zip(zip).await,
                 Err(APIError::Unprocessable(_, ErrorReference::ZipError))
-            ));
+            );
         }
 
         #[test(tokio::test)]
@@ -498,10 +500,10 @@ mod tests {
             ])
             .await;
 
-            assert!(matches!(
+            assert_matches!(
                 read_eml_from_zip(zip).await,
                 Err(APIError::Unprocessable(_, ErrorReference::ZipError))
-            ));
+            );
         }
 
         #[test(tokio::test)]
@@ -515,13 +517,13 @@ mod tests {
                 .unwrap();
             let zip = writer.close().await.unwrap().into_inner();
 
-            assert!(matches!(
+            assert_matches!(
                 read_eml_from_zip(zip).await,
                 Err(APIError::ContentTooLarge(
                     _,
                     ErrorReference::RequestPayloadTooLarge
                 ))
-            ));
+            );
         }
     }
 
@@ -592,7 +594,7 @@ mod tests {
             let wrong_hash = std::array::from_fn(|_| "0000".to_string());
             let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
-            assert!(matches!(
+            assert_matches!(
                 validate_import(
                     &mut conn,
                     &user,
@@ -602,7 +604,7 @@ mod tests {
                 )
                 .await,
                 Err(APIError::InvalidHashError)
-            ));
+            );
         }
 
         #[test(sqlx::test(fixtures(
@@ -647,10 +649,10 @@ mod tests {
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
             let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
-            assert!(matches!(
+            assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(10), zip, None).await,
                 Err(APIError::EmlImportError(EMLImportError::MismatchElection))
-            ));
+            );
         }
 
         #[test(sqlx::test(fixtures(
@@ -671,10 +673,10 @@ mod tests {
             let eml = String::try_from(count).unwrap();
             let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
-            assert!(matches!(
+            assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::EmlImportError(EMLImportError::UnknownCommittee))
-            ));
+            );
         }
 
         #[test(sqlx::test(fixtures(
@@ -687,13 +689,13 @@ mod tests {
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
             let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
-            assert!(matches!(
+            assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
                     _,
                     ErrorReference::DataEntryNotAllowed
                 ))
-            ));
+            );
         }
 
         #[test(sqlx::test(fixtures(
@@ -713,13 +715,13 @@ mod tests {
             .unwrap();
             let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
-            assert!(matches!(
+            assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
                     _,
                     ErrorReference::InvalidCommitteeSessionStatus
                 ))
-            ));
+            );
         }
 
         #[test(sqlx::test(fixtures(
@@ -750,13 +752,13 @@ mod tests {
                 .await
                 .unwrap();
 
-            assert!(matches!(
+            assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
                     _,
                     ErrorReference::DataEntryValidationErrors
                 ))
-            ));
+            );
         }
     }
 }

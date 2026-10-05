@@ -1,0 +1,3024 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" Id="510b" SchemaVersion="5">
+  <TransactionId>1</TransactionId>
+  <ManagingAuthority>
+    <AuthorityIdentifier Id="0000">Test</AuthorityIdentifier>
+    <AuthorityAddress/>
+  </ManagingAuthority>
+  <kr:CreationDateTime>2022-03-17T14:39:06.776</kr:CreationDateTime>
+  <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+  <Count>
+    <EventIdentifier/>
+    <Election>
+      <ElectionIdentifier Id="GR2022_Test">
+        <ElectionName>Gemeenteraad Test 2022</ElectionName>
+        <ElectionCategory>GR</ElectionCategory>
+        <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
+        <kr:ElectionDomain Id="0000">Test</kr:ElectionDomain>
+        <kr:ElectionDate>2022-03-16</kr:ElectionDate>
+      </ElectionIdentifier>
+      <Contests>
+        <Contest>
+          <ContestIdentifier Id="geen"/>
+          <TotalVotes>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>6360</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>3044</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>1095</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>629</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>392</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>295</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>202</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>179</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>141</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>117</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>104</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>89</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>73</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>3901</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>2280</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>836</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>473</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>312</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>2122</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>1574</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>548</ValidVotes>
+            </Selection>
+            <Cast>20599</Cast>
+            <TotalCounted>12383</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">58</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">55</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">11282</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">1214</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">12496</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">1</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">1</UncountedVotes>
+          </TotalVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB1">Stadhuis (postcode: 1011 PN)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>449</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>238</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>74</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>38</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>19</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>20</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>16</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>13</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>7</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>222</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>138</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>35</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>29</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>20</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>150</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>108</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>42</ValidVotes>
+            </Selection>
+            <Cast>1273</Cast>
+            <TotalCounted>821</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">4</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">3</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">747</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">81</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">828</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB2">Melkweg (postcode: 1017 PH)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>0</ValidVotes>
+            </Selection>
+            <Cast>0</Cast>
+            <TotalCounted>0</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">0</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">0</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">0</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">0</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">0</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB3">Clubhuis Parkschouwburg PST/Swift (postcode: 1018 ST)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>236</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>97</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>46</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>23</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>16</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>14</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>151</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>102</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>29</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>12</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>87</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>61</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>26</ValidVotes>
+            </Selection>
+            <Cast>870</Cast>
+            <TotalCounted>474</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">3</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">3</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">446</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">34</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">480</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB4">Universiteitsbibliotheek Amsterdam (postcode: 1012 WP)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>233</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>99</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>44</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>26</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>17</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>13</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>137</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>73</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>40</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>15</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>95</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>72</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>23</ValidVotes>
+            </Selection>
+            <Cast>867</Cast>
+            <TotalCounted>465</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">2</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">2</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">421</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">47</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">468</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">1</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB5">MBO College Centrum (postcode: 1016 SB)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>363</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>185</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>75</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>25</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>19</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>12</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>264</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>140</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>76</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>27</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>21</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>123</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>88</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>35</ValidVotes>
+            </Selection>
+            <Cast>1151</Cast>
+            <TotalCounted>750</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">4</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">5</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">668</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">91</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">759</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB6">OBS De Witte Olifant (postcode: 1011 LX)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>314</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>178</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>54</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>20</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>17</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>155</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>88</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>34</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>19</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>14</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>106</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>86</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>20</ValidVotes>
+            </Selection>
+            <Cast>1022</Cast>
+            <TotalCounted>575</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">3</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">1</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">531</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">48</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">579</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB7">Voormalige Stadstimmertuin (postcode: 1018 ET)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>454</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>194</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>79</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>56</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>33</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>26</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>14</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>13</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>217</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>141</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>42</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>21</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>13</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>115</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>85</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>30</ValidVotes>
+            </Selection>
+            <Cast>1278</Cast>
+            <TotalCounted>786</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">3</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">5</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">713</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">81</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">794</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB8">OBS De Witte Olifant (postcode: 1011 CN)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>437</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>198</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>64</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>47</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>39</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>19</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>13</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>12</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>13</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>11</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>296</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>175</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>51</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>40</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>30</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>139</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>102</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>37</ValidVotes>
+            </Selection>
+            <Cast>1385</Cast>
+            <TotalCounted>872</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">4</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">2</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">790</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">88</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">878</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB9">Openbare Basisschool (OBS) De Burght (postcode: 1015 CD)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>238</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>101</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>41</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>29</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>20</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>14</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>141</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>80</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>25</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>22</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>14</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>78</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>59</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>19</ValidVotes>
+            </Selection>
+            <Cast>871</Cast>
+            <TotalCounted>457</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">2</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">2</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">414</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">47</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">461</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB10">The Hoxton Hotel (postcode: 1016 BJ)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>143</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>71</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>22</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>15</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>1</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>97</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>61</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>22</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>43</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>29</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>14</ValidVotes>
+            </Selection>
+            <Cast>491</Cast>
+            <TotalCounted>283</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">1</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">1</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">261</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">24</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">285</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB11">Kerk De Duif (postcode: 1017 LD)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>237</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>125</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>38</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>24</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>165</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>97</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>43</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>15</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>71</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>54</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>17</ValidVotes>
+            </Selection>
+            <Cast>859</Cast>
+            <TotalCounted>473</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">3</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">1</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">427</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">50</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">477</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB15">De Witte Boei (postcode: 1018 LT)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>709</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>325</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>115</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>78</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>51</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>38</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>22</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>20</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>18</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>11</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>12</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>11</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>508</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>299</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>112</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>62</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>35</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>285</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>199</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>86</ValidVotes>
+            </Selection>
+            <Cast>2324</Cast>
+            <TotalCounted>1502</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">5</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">7</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">1369</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">146</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">1515</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">1</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB16">De Balie (postcode: 1017 RR)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>140</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>57</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>24</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>18</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>83</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>46</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>16</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>12</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>51</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>32</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>19</ValidVotes>
+            </Selection>
+            <Cast>472</Cast>
+            <TotalCounted>274</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">2</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">2</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">249</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">29</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">278</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB17">Grachtenmuseum (postcode: 1016 CJ)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>414</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>188</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>71</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>45</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>21</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>21</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>16</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>16</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>11</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>255</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>149</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>59</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>25</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>22</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>137</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>111</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>26</ValidVotes>
+            </Selection>
+            <Cast>1498</Cast>
+            <TotalCounted>806</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">3</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">5</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">754</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">60</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">814</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB19">OBA Oosterdok (postcode: 1011 DL)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>99</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>44</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>17</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>1</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>1</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>59</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>33</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>11</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>35</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>27</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Cast>343</Cast>
+            <TotalCounted>193</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">1</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">1</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">173</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">22</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">195</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB20">Clayton Hotel Amsterdam American (postcode: 1017 PN)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>244</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>133</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>38</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>15</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>16</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>12</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>7</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>146</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>85</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>32</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>18</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>11</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>65</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>44</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>21</ValidVotes>
+            </Selection>
+            <Cast>797</Cast>
+            <TotalCounted>455</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">2</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">1</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">410</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">48</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">458</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB23">Motivaction International BV (postcode: 1015 ZL)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>665</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>331</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>125</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>71</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>26</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>19</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>23</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>19</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>15</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>7</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>341</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>197</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>78</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>38</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>28</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>199</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>158</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>41</ValidVotes>
+            </Selection>
+            <Cast>1754</Cast>
+            <TotalCounted>1205</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">5</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">6</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">1096</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">120</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">1216</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB24">Huis van de Buurt Het Claverhuis (postcode: 1016 TX)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>313</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>125</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>68</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>31</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>22</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>19</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>11</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>4</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>226</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>133</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>40</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>32</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>21</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>98</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>70</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>28</ValidVotes>
+            </Selection>
+            <Cast>937</Cast>
+            <TotalCounted>637</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">4</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">2</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">571</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">72</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">643</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB25">Huis van de Buurt De Boomsspijker (postcode: 1011 EC)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>474</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>280</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>56</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>37</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>23</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>16</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>9</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>11</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>8</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>7</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>7</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>332</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>179</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>69</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>59</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>25</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>193</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>150</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>43</ValidVotes>
+            </Selection>
+            <Cast>1807</Cast>
+            <TotalCounted>999</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">5</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">4</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">914</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">94</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">1008</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+          <ReportingUnitVotes>
+            <ReportingUnitIdentifier Id="0000::SB26">Kerk De Duif (postcode: 1017 LD)</ReportingUnitIdentifier>
+            <Selection>
+              <AffiliationIdentifier Id="1">
+                <RegisteredName>Partijdige Partij</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>198</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>75</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>44</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>23</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>16</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="5"/>
+              </Candidate>
+              <ValidVotes>12</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="6"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="7"/>
+              </Candidate>
+              <ValidVotes>6</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="8"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="9"/>
+              </Candidate>
+              <ValidVotes>5</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="10"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="11"/>
+              </Candidate>
+              <ValidVotes>3</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="12"/>
+              </Candidate>
+              <ValidVotes>2</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="2">
+                <RegisteredName>Lijst van de Kandidaten</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>106</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>64</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>22</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="3"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="4"/>
+              </Candidate>
+              <ValidVotes>10</ValidVotes>
+            </Selection>
+            <Selection>
+              <AffiliationIdentifier Id="3">
+                <RegisteredName>Partij voor de Stemmer</RegisteredName>
+              </AffiliationIdentifier>
+              <ValidVotes>52</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="1"/>
+              </Candidate>
+              <ValidVotes>39</ValidVotes>
+            </Selection>
+            <Selection>
+              <Candidate>
+                <CandidateIdentifier Id="2"/>
+              </Candidate>
+              <ValidVotes>13</ValidVotes>
+            </Selection>
+            <Cast>600</Cast>
+            <TotalCounted>356</TotalCounted>
+            <RejectedVotes ReasonCode="ongeldig">2</RejectedVotes>
+            <RejectedVotes ReasonCode="blanco">2</RejectedVotes>
+            <UncountedVotes ReasonCode="geldige stempassen">328</UncountedVotes>
+            <UncountedVotes ReasonCode="geldige volmachtbewijzen">32</UncountedVotes>
+            <UncountedVotes ReasonCode="toegelaten kiezers">360</UncountedVotes>
+            <UncountedVotes ReasonCode="meer getelde stembiljetten">0</UncountedVotes>
+            <UncountedVotes ReasonCode="minder getelde stembiljetten">0</UncountedVotes>
+            <kr:ReportingUnitInvestigations>
+              <kr:Investigation ReasonCode="toegelaten kiezers opnieuw vastgesteld">false</kr:Investigation>
+              <kr:Investigation ReasonCode="onderzocht vanwege andere reden">false</kr:Investigation>
+              <kr:Investigation ReasonCode="stembiljetten deels herteld">false</kr:Investigation>
+            </kr:ReportingUnitInvestigations>
+          </ReportingUnitVotes>
+        </Contest>
+      </Contests>
+    </Election>
+  </Count>
+</EML>

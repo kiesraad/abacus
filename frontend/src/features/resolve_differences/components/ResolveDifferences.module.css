@@ -6,7 +6,6 @@
 
   article {
     section:not([role="alert"] section) {
-      margin-top: 2.5rem;
       display: flex;
       flex-direction: column;
       gap: 1rem;
@@ -42,6 +41,7 @@
 
   .differencesTable {
     table-layout: fixed;
+    margin-bottom: 2.5rem;
 
     td {
       height: 4.5rem;

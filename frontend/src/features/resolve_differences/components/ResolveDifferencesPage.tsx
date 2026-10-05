@@ -45,14 +45,19 @@ function resolvedMessageAndPath(
         },
         path: `${statusPath}/${dataEntryId}/detail`,
       };
-    case "first_entry_finalised":
+    case "first_entry_finalised": {
+      let text = t("election_status.success.data_entry_kept");
+      if (outcome.keptUserId) {
+        text += ` ${t("election_status.success.choose_another_typist", { typist: getName(outcome.keptUserId) })}`;
+      }
       return {
         message: {
           title: t("election_status.success.differences_resolved", { number }),
-          text: t("election_status.success.data_entry_kept", { typist: getName(outcome.keptUserId) }),
+          text: text,
         },
         path: statusPath,
       };
+    }
     case "first_entry_correction":
     case "second_entry_correction":
       return {

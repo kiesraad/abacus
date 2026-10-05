@@ -97,7 +97,7 @@ export function useDataEntryDifferences(
   }
 
   const correctionBlocked = isCorrectionBlocked(correctEntry, differences);
-  const effectiveAction = effectiveWrongEntryAction(correctEntry, wrongEntryAction, correctionBlocked);
+  const effectiveAction = effectiveWrongEntryAction(correctEntry, wrongEntryAction, correctionBlocked !== undefined);
 
   const questionErrors = getQuestionErrors(correctEntry, effectiveAction, submitted);
 

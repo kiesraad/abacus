@@ -52,8 +52,8 @@ impl GSBResults {
         Ok(GSBResults {
             number_of_voters: u32::try_from(total_votes.eligible_voter_count.copied_value()?)
                 .map_err(EMLError::value_conversion)?,
-            voters_counts: Self::voters_counts(total_votes, election_category)?,
-            votes_counts: Self::votes_counts(total_votes, &political_group_votes)?,
+            voters_counts: voters_counts(total_votes, election_category)?,
+            votes_counts: votes_counts(total_votes, &political_group_votes)?,
             differences_counts: GSBDifferencesCounts {
                 more_ballots_count: uncounted_votes(
                     total_votes,
@@ -67,66 +67,66 @@ impl GSBResults {
             political_group_votes,
         })
     }
+}
 
-    fn voters_counts(
-        total_votes: &TotalVotes,
-        election_category: ElectionCategory,
-    ) -> Result<VotersCounts, EMLError> {
-        Ok(VotersCounts {
-            poll_card_count: uncounted_votes(total_votes, UncountedVotesReason::ValidPollCards)?,
-            proxy_certificate_count: uncounted_votes(
-                total_votes,
-                UncountedVotesReason::ValidProxyCertificates,
-            )?,
-            // Voter card count only exists for non-local
-            // However, EMLs may still contain voter card counts with value 0
-            voter_card_count: total_votes
-                .uncounted_votes
-                .get(&UncountedVotesReason::ValidVoterCards)
-                .map(|v| u32::try_from(v.copied_value()?).map_err(EMLError::value_conversion))
-                .transpose()?
-                // Only keep value if non-local election or > 0
-                .filter(|&count| count > 0 || !election_category.is_local_election()),
-            total_admitted_voters_count: uncounted_votes(
-                total_votes,
-                UncountedVotesReason::AdmittedVoters,
-            )?,
-        })
-    }
+fn voters_counts(
+    total_votes: &TotalVotes,
+    election_category: ElectionCategory,
+) -> Result<VotersCounts, EMLError> {
+    Ok(VotersCounts {
+        poll_card_count: uncounted_votes(total_votes, UncountedVotesReason::ValidPollCards)?,
+        proxy_certificate_count: uncounted_votes(
+            total_votes,
+            UncountedVotesReason::ValidProxyCertificates,
+        )?,
+        // Voter card count only exists for non-local
+        // However, EMLs may still contain voter card counts with value 0
+        voter_card_count: total_votes
+            .uncounted_votes
+            .get(&UncountedVotesReason::ValidVoterCards)
+            .map(|v| u32::try_from(v.copied_value()?).map_err(EMLError::value_conversion))
+            .transpose()?
+            // Only keep value if non-local election or > 0
+            .filter(|&count| count > 0 || !election_category.is_local_election()),
+        total_admitted_voters_count: uncounted_votes(
+            total_votes,
+            UncountedVotesReason::AdmittedVoters,
+        )?,
+    })
+}
 
-    fn votes_counts(
-        total_votes: &TotalVotes,
-        political_group_votes: &[PoliticalGroupCandidateVotes],
-    ) -> Result<VotesCounts, EMLError> {
-        let total_votes_candidates_count =
-            u32::try_from(total_votes.candidate_votes_count.copied_value()?)
-                .map_err(EMLError::value_conversion)?;
-        let blank_votes_count = u32::try_from(total_votes.blank_votes()?.copied_value()?)
+fn votes_counts(
+    total_votes: &TotalVotes,
+    political_group_votes: &[PoliticalGroupCandidateVotes],
+) -> Result<VotesCounts, EMLError> {
+    let total_votes_candidates_count =
+        u32::try_from(total_votes.candidate_votes_count.copied_value()?)
             .map_err(EMLError::value_conversion)?;
-        let invalid_votes_count = u32::try_from(total_votes.invalid_votes()?.copied_value()?)
-            .map_err(EMLError::value_conversion)?;
+    let blank_votes_count = u32::try_from(total_votes.blank_votes()?.copied_value()?)
+        .map_err(EMLError::value_conversion)?;
+    let invalid_votes_count = u32::try_from(total_votes.invalid_votes()?.copied_value()?)
+        .map_err(EMLError::value_conversion)?;
 
-        Ok(VotesCounts {
-            political_group_total_votes: political_group_votes
-                .iter()
-                .map(|pg| PoliticalGroupTotalVotes {
-                    number: pg.number,
-                    total: pg.total,
-                })
-                .collect(),
-            total_votes_candidates_count,
-            blank_votes_count,
-            invalid_votes_count,
-            // EML has no element for total votes cast count, so we add the counts
-            // of the votes on candidates, the blank votes, and the invalid votes
-            total_votes_cast_count: u32::try_from(
-                u64::from(total_votes_candidates_count)
-                    + u64::from(blank_votes_count)
-                    + u64::from(invalid_votes_count),
-            )
-            .map_err(EMLError::value_conversion)?,
-        })
-    }
+    Ok(VotesCounts {
+        political_group_total_votes: political_group_votes
+            .iter()
+            .map(|pg| PoliticalGroupTotalVotes {
+                number: pg.number,
+                total: pg.total,
+            })
+            .collect(),
+        total_votes_candidates_count,
+        blank_votes_count,
+        invalid_votes_count,
+        // EML has no element for total votes cast count, so we add the counts
+        // of the votes on candidates, the blank votes, and the invalid votes
+        total_votes_cast_count: u32::try_from(
+            u64::from(total_votes_candidates_count)
+                + u64::from(blank_votes_count)
+                + u64::from(invalid_votes_count),
+        )
+        .map_err(EMLError::value_conversion)?,
+    })
 }
 
 /// Convert the votes for an affiliation and its candidates into `PoliticalGroupCandidateVotes`.

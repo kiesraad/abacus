@@ -845,6 +845,7 @@ impl ElectionWithPoliticalGroups {
         Ok(selections)
     }
 
+    #[expect(clippy::too_many_lines)]
     fn as_eml_reporting_unit_votes(
         &self,
         committee_session: &CommitteeSession,
@@ -859,6 +860,13 @@ impl ElectionWithPoliticalGroups {
                 )?,
                 data_source.eml_reporting_unit_identifier_name(),
             ))
+            .reporting_unit_type_option(match data_source {
+                crate::domain::data_entry::DataEntrySource::PollingStation(ps) => ps
+                    .polling_station()
+                    .polling_station_type
+                    .map(|t| t.as_eml_reporting_unit_type()),
+                _ => None,
+            })
             .selections(self.as_eml_count_selections(results.political_group_votes())?)
             .eligible_voter_count(match results {
                 crate::domain::results::Results::DSOFirstSession(_)
@@ -1162,6 +1170,23 @@ pub fn polling_stations_eml_matches_election(
         && election_date == election.election_date)
 }
 
+impl crate::domain::polling_station::PollingStationType {
+    /// Converts this polling station type to the corresponding EML reporting unit type.
+    pub fn as_eml_reporting_unit_type(&self) -> eml_nl::utils::ReportingUnitType {
+        match self {
+            crate::domain::polling_station::PollingStationType::FixedLocation => {
+                eml_nl::utils::ReportingUnitType::FixedLocation
+            }
+            crate::domain::polling_station::PollingStationType::Special => {
+                eml_nl::utils::ReportingUnitType::Special
+            }
+            crate::domain::polling_station::PollingStationType::Mobile => {
+                eml_nl::utils::ReportingUnitType::Mobile
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::assert_matches;
@@ -1282,6 +1307,25 @@ mod tests {
                 ElectionCategory::Provincial
             ),
             "Provinciale Staten Juinen 2023"
+        );
+    }
+
+    #[test]
+    fn test_eml_repoting_unit_type_conversion() {
+        use crate::domain::polling_station::PollingStationType;
+        use eml_nl::utils::ReportingUnitType;
+
+        assert_eq!(
+            PollingStationType::FixedLocation.as_eml_reporting_unit_type(),
+            ReportingUnitType::FixedLocation
+        );
+        assert_eq!(
+            PollingStationType::Special.as_eml_reporting_unit_type(),
+            ReportingUnitType::Special
+        );
+        assert_eq!(
+            PollingStationType::Mobile.as_eml_reporting_unit_type(),
+            ReportingUnitType::Mobile
         );
     }
 

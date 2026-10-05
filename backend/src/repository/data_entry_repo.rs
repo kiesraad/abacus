@@ -493,7 +493,7 @@ mod tests {
         use super::*;
         use crate::{
             domain::{
-                data_entry::{self, DataEntrySourceId},
+                data_entry::{self, DataEntryOrigin, DataEntrySourceId},
                 sub_committee::SubCommitteeId,
             },
             repository::{
@@ -832,7 +832,7 @@ mod tests {
             .unwrap();
 
             let state = DataEntryStatus::Definitive(data_entry::Definitive {
-                first_entry_user_id: UserId::from(5),
+                first_entry_origin: DataEntryOrigin::Typist(UserId::from(5)),
                 second_entry_user_id: UserId::from(6),
                 finished_at: chrono::Utc::now(),
                 finalised_with_warnings: false,

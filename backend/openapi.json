@@ -3220,6 +3220,238 @@
         ]
       }
     },
+    "/api/elections/{election_id}/data_entry/import": {
+      "post": {
+        "summary": "Imports uploaded data entry results (coordinator_csb)",
+        "operationId": "election_data_entry_import",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CSBDataEntryImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Election count imported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CSBDataEntryImportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Import not possible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/data_entry/import/validate": {
+      "post": {
+        "summary": "Validates uploaded data entry results (coordinator_csb)",
+        "operationId": "election_data_entry_import_validate",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CSBDataEntryImportValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Election count validated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CSBDataEntryImportValidateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Import not possible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/dismiss_public_key_upload_reminder": {
       "put": {
         "summary": "administrator",
@@ -6678,6 +6910,89 @@
         },
         "additionalProperties": false
       },
+      "CSBDataEntryImportRequest": {
+        "type": "object",
+        "required": [
+          "hash",
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string",
+            "format": "binary"
+          },
+          "hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CSBDataEntryImportResponse": {
+        "type": "object",
+        "required": [
+          "election_name",
+          "election_date",
+          "sub_committee"
+        ],
+        "properties": {
+          "election_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "election_name": {
+            "type": "string"
+          },
+          "sub_committee": {
+            "$ref": "#/components/schemas/SubCommitteeFirstSession"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBDataEntryImportValidateRequest": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string",
+            "format": "binary"
+          },
+          "hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CSBDataEntryImportValidateResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "election_name",
+          "election_date",
+          "sub_committee"
+        ],
+        "properties": {
+          "election_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "election_name": {
+            "type": "string"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/RedactedEmlHash"
+          },
+          "sub_committee": {
+            "$ref": "#/components/schemas/SubCommitteeFirstSession"
+          }
+        },
+        "additionalProperties": false
+      },
       "CSBElectionCreationRequest": {
         "type": "object",
         "required": [
@@ -7615,7 +7930,7 @@
       "DataEntryGetDifferencesResponse": {
         "type": "object",
         "required": [
-          "first_entry_user_id",
+          "first_entry_origin",
           "first_entry",
           "first_entry_has_errors",
           "second_entry_user_id",
@@ -7630,8 +7945,8 @@
           "first_entry_has_errors": {
             "type": "boolean"
           },
-          "first_entry_user_id": {
-            "$ref": "#/components/schemas/UserId"
+          "first_entry_origin": {
+            "$ref": "#/components/schemas/DataEntryOrigin"
           },
           "second_entry": {
             "$ref": "#/components/schemas/Results"
@@ -7679,6 +7994,42 @@
         "type": "integer",
         "format": "int32",
         "minimum": 0
+      },
+      "DataEntryOrigin": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Import"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "user_id",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Typist"
+                ]
+              },
+              "user_id": {
+                "$ref": "#/components/schemas/UserId"
+              }
+            }
+          }
+        ]
       },
       "DataEntrySource": {
         "oneOf": [
@@ -8373,11 +8724,9 @@
             "type": "string",
             "description": "Time when the data entry was finalised"
           },
-          "first_entry_user_id": {
-            "type": "integer",
-            "format": "int32",
-            "description": "First entry user id",
-            "minimum": 0
+          "first_entry_origin": {
+            "$ref": "#/components/schemas/DataEntryOrigin",
+            "description": "First entry origin (import or typist user id)"
           },
           "second_entry_user_id": {
             "type": "integer",
@@ -8387,7 +8736,7 @@
           },
           "source": {
             "$ref": "#/components/schemas/DataEntrySource",
-            "description": "Data entry source (polling station or sub committee)"
+            "description": "Data entry source (polling station or subcommittee)"
           },
           "status": {
             "$ref": "#/components/schemas/DataEntryStatusName",
@@ -8576,6 +8925,7 @@
           "DataEntryCannotBeReset",
           "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
+          "DataEntryValidationErrors",
           "EmlImportError",
           "EmlError",
           "EntryNotFound",
@@ -8585,6 +8935,7 @@
           "InvalidApportionmentState",
           "InvalidCertificate",
           "InvalidCommitteeSessionStatus",
+          "InvalidCountType",
           "InvalidData",
           "InvalidDistrict",
           "InvalidHash",
@@ -8606,11 +8957,12 @@
           "PasswordRejectionTooShort",
           "PdfGenerationError",
           "PollingStationRepeated",
-          "PollingStationValidationErrors",
           "RequestPayloadTooLarge",
           "Unauthorized",
+          "UnknownCommittee",
           "UsernameNotUnique",
-          "UserNotFound"
+          "UserNotFound",
+          "ZipError"
         ]
       },
       "ErrorResponse": {

@@ -2,7 +2,10 @@ use std::{any::Any, error::Error, fmt::Debug};
 
 use axum::{
     Json,
-    extract::rejection::JsonRejection,
+    extract::{
+        multipart::{MultipartError, MultipartRejection},
+        rejection::JsonRejection,
+    },
     http::StatusCode,
     response::{IntoResponse, Response},
 };
@@ -15,7 +18,10 @@ use utoipa::ToSchema;
 
 use crate::{
     MAX_BODY_SIZE_MB,
-    api::middleware::authentication::error::AuthenticationError,
+    api::{
+        election::handlers::data_entry_import::DataEntryImportError,
+        middleware::authentication::error::AuthenticationError,
+    },
     domain::{
         committee_session::CommitteeSessionError, election::InvalidElectionError,
         models::error::ModelsError, results::IncorrectResultsModel, role::RoleNotAuthorizedError,
@@ -59,6 +65,7 @@ pub enum ErrorReference {
     DataEntryCannotBeReset,
     DataEntryGetNotAllowed,
     DataEntryNotAllowed,
+    DataEntryValidationErrors,
     EmlImportError,
     EmlError,
     EntryNotFound,
@@ -68,6 +75,7 @@ pub enum ErrorReference {
     InvalidApportionmentState,
     InvalidCertificate,
     InvalidCommitteeSessionStatus,
+    InvalidCountType,
     InvalidData,
     InvalidDistrict,
     InvalidHash,
@@ -89,11 +97,12 @@ pub enum ErrorReference {
     PasswordRejectionTooShort,
     PdfGenerationError,
     PollingStationRepeated,
-    PollingStationValidationErrors,
     RequestPayloadTooLarge,
     Unauthorized,
+    UnknownCommittee,
     UsernameNotUnique,
     UserNotFound,
+    ZipError,
 }
 
 /// Response structure for errors
@@ -144,6 +153,7 @@ pub enum APIError {
     SigningError(String),
     SqlxError(sqlx::Error),
     StdError(Box<dyn Error>),
+    Unprocessable(String, ErrorReference),
     ZipError(ZipResponseError),
 }
 
@@ -174,6 +184,10 @@ impl APIError {
             ),
             APIError::Conflict(message, reference) => (
                 StatusCode::CONFLICT,
+                ErrorResponse::new(message, reference, false),
+            ),
+            APIError::Unprocessable(message, reference) => (
+                StatusCode::UNPROCESSABLE_ENTITY,
                 ErrorResponse::new(message, reference, false),
             ),
             APIError::DataIntegrityError(message) => {
@@ -282,6 +296,17 @@ impl APIError {
                     ),
                 )
             }
+            APIError::EmlImportError(EMLImportError::InvalidCountType) => {
+                error!("Error importing EML file: Invalid count type");
+                (
+                    StatusCode::BAD_REQUEST,
+                    ErrorResponse::new(
+                        "EML import error".to_string(),
+                        ErrorReference::InvalidCountType,
+                        false,
+                    ),
+                )
+            }
             APIError::EmlImportError(EMLImportError::InvalidDistrict) => {
                 error!("Error importing EML file: Invalid district");
                 (
@@ -289,6 +314,17 @@ impl APIError {
                     ErrorResponse::new(
                         "EML import error".to_string(),
                         ErrorReference::InvalidDistrict,
+                        false,
+                    ),
+                )
+            }
+            APIError::EmlImportError(EMLImportError::UnknownCommittee) => {
+                error!("Error importing EML file: Unknown sub committee");
+                (
+                    StatusCode::BAD_REQUEST,
+                    ErrorResponse::new(
+                        "EML import error".to_string(),
+                        ErrorReference::UnknownCommittee,
                         false,
                     ),
                 )
@@ -327,6 +363,28 @@ impl IntoResponse for APIError {
 impl From<JsonRejection> for APIError {
     fn from(rejection: JsonRejection) -> Self {
         APIError::JsonRejection(rejection)
+    }
+}
+
+impl From<MultipartRejection> for APIError {
+    fn from(rejection: MultipartRejection) -> Self {
+        APIError::BadRequest(rejection.body_text(), ErrorReference::InvalidData)
+    }
+}
+
+impl From<MultipartError> for APIError {
+    fn from(err: MultipartError) -> Self {
+        if err.status() == StatusCode::PAYLOAD_TOO_LARGE {
+            APIError::ContentTooLarge(
+                MAX_BODY_SIZE_MB.to_string(),
+                ErrorReference::RequestPayloadTooLarge,
+            )
+        } else {
+            APIError::BadRequest(
+                format!("Invalid form data: {}", err.body_text()),
+                ErrorReference::InvalidData,
+            )
+        }
     }
 }
 
@@ -412,6 +470,24 @@ impl From<CommitteeSessionError> for APIError {
 impl From<SubCommitteeCertificateError> for APIError {
     fn from(err: SubCommitteeCertificateError) -> Self {
         APIError::Delegated(Box::new(err))
+    }
+}
+
+impl From<DataEntryImportError> for APIError {
+    fn from(err: DataEntryImportError) -> Self {
+        match err {
+            DataEntryImportError::EmlZipError(message) => {
+                APIError::Unprocessable(message, ErrorReference::ZipError)
+            }
+            DataEntryImportError::CommitteeSessionAlreadyCompleted => APIError::Unprocessable(
+                "Committee session already completed".into(),
+                ErrorReference::InvalidCommitteeSessionStatus,
+            ),
+            DataEntryImportError::SubCommitteeDataEntryNotEmpty => APIError::Unprocessable(
+                "Sub committee data entry not empty".into(),
+                ErrorReference::DataEntryNotAllowed,
+            ),
+        }
     }
 }
 

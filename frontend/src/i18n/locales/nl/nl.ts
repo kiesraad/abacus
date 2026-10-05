@@ -36,6 +36,7 @@ import privacy_statement from "./privacy_statement.json";
 import resolve_differences from "./resolve_differences.json";
 import results from "./results.json";
 import status from "./status.json";
+import sub_committee_keys from "./sub_committee_keys.json";
 import users from "./users.json";
 import voters_votes_counts from "./voters_votes_counts.json";
 
@@ -77,6 +78,7 @@ const nl = {
   privacy_statement,
   resolve_differences,
   status,
+  sub_committee_keys,
   users,
   backups,
   voters_votes_counts,

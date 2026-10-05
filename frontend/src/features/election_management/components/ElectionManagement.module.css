@@ -55,3 +55,13 @@ main.backgroundBlue {
     font-weight: bold;
   }
 }
+
+.subCommitteeKeys {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+
+  .keysTable {
+    width: 58.5rem;
+  }
+}

@@ -36,8 +36,8 @@ pub enum DataEntryTransitionError {
     CannotTransitionUsingDifferentUser,
     /// The second data entry needs to be claimed by a user other than the one who claimed the first entry
     SecondEntryNeedsDifferentUser,
-    /// Correction is not allowed because the entry to be kept has errors
-    CorrectionNotAllowed,
+    /// Correction is not allowed for a given reason
+    CorrectionNotAllowed(String),
     ValidatorError(DataError),
     ValidationError(ValidationResults),
 }
@@ -196,6 +196,13 @@ impl From<SubCommitteeFirstSession> for DataEntrySource {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+#[serde(tag = "type", content = "user_id", deny_unknown_fields)]
+pub enum DataEntryOrigin {
+    Import,
+    Typist(UserId),
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields, tag = "status", content = "state")]
 #[derive(Default)]
 pub enum DataEntryStatus {
@@ -323,8 +330,8 @@ pub struct FirstEntryHasErrors {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 #[serde(deny_unknown_fields)]
 pub struct FirstEntryFinalised {
-    /// User who did the first data entry
-    pub first_entry_user_id: UserId,
+    /// First data entry origin (import or typist user id)
+    pub first_entry_origin: DataEntryOrigin,
     /// First data entry
     pub finalised_first_entry: Results,
     /// When the first data entry was finalised
@@ -337,8 +344,8 @@ pub struct FirstEntryFinalised {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 #[serde(deny_unknown_fields)]
 pub struct SecondEntryInProgress {
-    /// User who did the first data entry
-    pub first_entry_user_id: UserId,
+    /// First data entry origin (import or typist user id)
+    pub first_entry_origin: DataEntryOrigin,
     /// First data entry
     pub finalised_first_entry: Results,
     /// When the first data entry was finalised
@@ -359,8 +366,8 @@ pub struct SecondEntryInProgress {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 #[serde(deny_unknown_fields)]
 pub struct EntriesDifferent {
-    /// User who did the first data entry
-    pub first_entry_user_id: UserId,
+    /// First data entry origin (import or typist user id)
+    pub first_entry_origin: DataEntryOrigin,
     /// User who did the second data entry
     pub second_entry_user_id: UserId,
     /// First data entry
@@ -378,9 +385,13 @@ pub struct EntriesDifferent {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 #[serde(deny_unknown_fields)]
 pub struct FirstEntryCorrection {
+    /// User who did the first data entry
     pub first_entry_user_id: UserId,
+    /// User who did the second data entry
     pub second_entry_user_id: UserId,
+    /// First data entry
     pub first_entry: Results,
+    /// Second data entry
     pub finalised_second_entry: Results,
     #[schema(value_type = String)]
     pub second_entry_finished_at: DateTime<Utc>,
@@ -394,9 +405,13 @@ pub struct FirstEntryCorrection {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 #[serde(deny_unknown_fields)]
 pub struct SecondEntryCorrection {
-    pub first_entry_user_id: UserId,
+    /// First data entry origin (import or typist user id)
+    pub first_entry_origin: DataEntryOrigin,
+    /// User who did the second data entry
     pub second_entry_user_id: UserId,
+    /// First data entry
     pub finalised_first_entry: Results,
+    /// Second data entry
     pub second_entry: Results,
     #[schema(value_type = String)]
     pub first_entry_finished_at: DateTime<Utc>,
@@ -411,8 +426,8 @@ pub struct SecondEntryCorrection {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 #[serde(deny_unknown_fields)]
 pub struct Definitive {
-    /// User who did the first data entry
-    pub first_entry_user_id: UserId,
+    /// First data entry origin (import or typist user id)
+    pub first_entry_origin: DataEntryOrigin,
     /// User who did the second data entry
     pub second_entry_user_id: UserId,
     /// The definitive results data
@@ -448,8 +463,15 @@ impl DataEntryStatus {
                 client_state: ClientState::default(),
                 is_correction: false,
             })),
-            DataEntryStatus::FirstEntryInProgress(_) | DataEntryStatus::FirstEntryCorrection(_) => {
-                if user_id == self.get_first_entry_user_id().expect("user id is present") {
+            DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+                first_entry_user_id,
+                ..
+            })
+            | DataEntryStatus::FirstEntryCorrection(FirstEntryCorrection {
+                first_entry_user_id,
+                ..
+            }) => {
+                if user_id == first_entry_user_id {
                     Ok(self)
                 } else {
                     Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
@@ -473,13 +495,13 @@ impl DataEntryStatus {
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryFinalised(state) => {
-                if user_id == state.first_entry_user_id {
+                if state.first_entry_origin == DataEntryOrigin::Typist(user_id) {
                     Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
                 } else if !state.finalised_first_entry.is_same_model(&initial_results) {
                     Err(DataEntryTransitionError::Invalid)
                 } else {
                     Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
-                        first_entry_user_id: state.first_entry_user_id,
+                        first_entry_origin: state.first_entry_origin,
                         finalised_first_entry: state.finalised_first_entry,
                         first_entry_finished_at: state.first_entry_finished_at,
                         progress: 0,
@@ -619,7 +641,7 @@ impl DataEntryStatus {
                     }))
                 } else {
                     Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
-                        first_entry_user_id: state.first_entry_user_id,
+                        first_entry_origin: DataEntryOrigin::Typist(state.first_entry_user_id),
                         finalised_first_entry: state.first_entry.clone(),
                         first_entry_finished_at: Utc::now(),
                         finalised_with_warnings: validation_results.has_warnings(),
@@ -639,7 +661,7 @@ impl DataEntryStatus {
                     }
 
                     Ok(Self::Definitive(Definitive {
-                        first_entry_user_id: state.first_entry_user_id,
+                        first_entry_origin: DataEntryOrigin::Typist(state.first_entry_user_id),
                         second_entry_user_id: state.second_entry_user_id,
                         finished_at: Utc::now(),
                         finalised_with_warnings: validation_results.has_warnings(),
@@ -647,7 +669,7 @@ impl DataEntryStatus {
                     }))
                 } else {
                     Ok(Self::EntriesDifferent(EntriesDifferent {
-                        first_entry_user_id: state.first_entry_user_id,
+                        first_entry_origin: DataEntryOrigin::Typist(state.first_entry_user_id),
                         second_entry_user_id: state.second_entry_user_id,
                         first_entry: state.first_entry.clone(),
                         second_entry: state.finalised_second_entry.clone(),
@@ -687,7 +709,7 @@ impl DataEntryStatus {
                     }
 
                     Ok(Self::Definitive(Definitive {
-                        first_entry_user_id: state.first_entry_user_id,
+                        first_entry_origin: state.first_entry_origin.clone(),
                         second_entry_user_id: state.second_entry_user_id,
                         finished_at: Utc::now(),
                         finalised_with_warnings: validation_results.has_warnings(),
@@ -695,7 +717,7 @@ impl DataEntryStatus {
                     }))
                 } else {
                     Ok(Self::EntriesDifferent(EntriesDifferent {
-                        first_entry_user_id: state.first_entry_user_id,
+                        first_entry_origin: state.first_entry_origin.clone(),
                         second_entry_user_id: state.second_entry_user_id,
                         first_entry: state.finalised_first_entry.clone(),
                         second_entry: state.second_entry.clone(),
@@ -717,7 +739,7 @@ impl DataEntryStatus {
                     }
 
                     Ok(Self::Definitive(Definitive {
-                        first_entry_user_id: state.first_entry_user_id,
+                        first_entry_origin: state.first_entry_origin.clone(),
                         second_entry_user_id: state.second_entry_user_id,
                         finished_at: Utc::now(),
                         finalised_with_warnings: validation_results.has_warnings(),
@@ -725,7 +747,7 @@ impl DataEntryStatus {
                     }))
                 } else {
                     Ok(Self::EntriesDifferent(EntriesDifferent {
-                        first_entry_user_id: state.first_entry_user_id,
+                        first_entry_origin: state.first_entry_origin.clone(),
                         second_entry_user_id: state.second_entry_user_id,
                         first_entry: state.finalised_first_entry.clone(),
                         second_entry: state.second_entry.clone(),
@@ -771,7 +793,7 @@ impl DataEntryStatus {
                 }
 
                 Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
-                    first_entry_user_id: state.second_entry_user_id,
+                    first_entry_origin: DataEntryOrigin::Typist(state.second_entry_user_id),
                     finalised_first_entry: state.finalised_second_entry,
                     first_entry_finished_at: state.second_entry_finished_at,
                     finalised_with_warnings: validation_results.has_warnings(),
@@ -798,7 +820,7 @@ impl DataEntryStatus {
             DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
                 first_entry_finished_at,
-                first_entry_user_id,
+                first_entry_origin,
                 second_entry_user_id,
                 ..
             }) => {
@@ -816,7 +838,7 @@ impl DataEntryStatus {
                 }
 
                 Ok(DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
-                    first_entry_user_id,
+                    first_entry_origin,
                     finalised_first_entry,
                     first_entry_finished_at,
                     finalised_with_warnings: validation_results.has_warnings(),
@@ -837,7 +859,7 @@ impl DataEntryStatus {
                 }
 
                 Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
-                    first_entry_user_id: state.first_entry_user_id,
+                    first_entry_origin: state.first_entry_origin.clone(),
                     finalised_first_entry: state.finalised_first_entry,
                     first_entry_finished_at: state.first_entry_finished_at,
                     finalised_with_warnings: validation_results.has_warnings(),
@@ -892,14 +914,19 @@ impl DataEntryStatus {
                 let validation_results = state.first_entry.start_validate(election)?;
 
                 if validation_results.has_errors() {
-                    Ok(Self::FirstEntryHasErrors(FirstEntryHasErrors {
-                        first_entry_user_id: state.first_entry_user_id,
-                        finalised_first_entry: state.first_entry.clone(),
-                        first_entry_finished_at: state.first_entry_finished_at,
-                    }))
+                    if let DataEntryOrigin::Typist(user_id) = state.first_entry_origin {
+                        Ok(Self::FirstEntryHasErrors(FirstEntryHasErrors {
+                            first_entry_user_id: user_id,
+                            finalised_first_entry: state.first_entry.clone(),
+                            first_entry_finished_at: state.first_entry_finished_at,
+                        }))
+                    } else {
+                        // Imported first entry cannot have errors
+                        Err(DataEntryTransitionError::Invalid)
+                    }
                 } else {
                     Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
-                        first_entry_user_id: state.first_entry_user_id,
+                        first_entry_origin: state.first_entry_origin.clone(),
                         finalised_first_entry: state.first_entry.clone(),
                         first_entry_finished_at: state.first_entry_finished_at,
                         finalised_with_warnings: validation_results.has_warnings(),
@@ -929,7 +956,7 @@ impl DataEntryStatus {
                     }))
                 } else {
                     Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
-                        first_entry_user_id: state.second_entry_user_id,
+                        first_entry_origin: DataEntryOrigin::Typist(state.second_entry_user_id),
                         finalised_first_entry: state.second_entry.clone(),
                         first_entry_finished_at: state.second_entry_finished_at,
                         finalised_with_warnings: validation_results.has_warnings(),
@@ -949,18 +976,27 @@ impl DataEntryStatus {
         match &self {
             DataEntryStatus::EntriesDifferent(state) => {
                 if state.second_entry.start_validate(election)?.has_errors() {
-                    return Err(DataEntryTransitionError::CorrectionNotAllowed);
+                    return Err(DataEntryTransitionError::CorrectionNotAllowed(
+                        "the entry to be kept has errors".to_string(),
+                    ));
                 }
 
-                Ok(Self::FirstEntryCorrection(FirstEntryCorrection {
-                    first_entry_user_id: state.first_entry_user_id,
-                    second_entry_user_id: state.second_entry_user_id,
-                    first_entry: state.first_entry.clone(),
-                    finalised_second_entry: state.second_entry.clone(),
-                    second_entry_finished_at: state.second_entry_finished_at,
-                    progress: 0,
-                    client_state: ClientState::default(),
-                }))
+                if let DataEntryOrigin::Typist(user_id) = state.first_entry_origin {
+                    Ok(Self::FirstEntryCorrection(FirstEntryCorrection {
+                        first_entry_user_id: user_id,
+                        second_entry_user_id: state.second_entry_user_id,
+                        first_entry: state.first_entry.clone(),
+                        finalised_second_entry: state.second_entry.clone(),
+                        second_entry_finished_at: state.second_entry_finished_at,
+                        progress: 0,
+                        client_state: ClientState::default(),
+                    }))
+                } else {
+                    // If first entry was imported, correction is not allowed
+                    Err(DataEntryTransitionError::CorrectionNotAllowed(
+                        "the entry to be corrected is imported".to_string(),
+                    ))
+                }
             }
             _ => Err(DataEntryTransitionError::Invalid),
         }
@@ -975,11 +1011,13 @@ impl DataEntryStatus {
         match &self {
             DataEntryStatus::EntriesDifferent(state) => {
                 if state.first_entry.start_validate(election)?.has_errors() {
-                    return Err(DataEntryTransitionError::CorrectionNotAllowed);
+                    return Err(DataEntryTransitionError::CorrectionNotAllowed(
+                        "the entry to be kept has errors".to_string(),
+                    ));
                 }
 
                 Ok(Self::SecondEntryCorrection(SecondEntryCorrection {
-                    first_entry_user_id: state.first_entry_user_id,
+                    first_entry_origin: state.first_entry_origin.clone(),
                     finalised_first_entry: state.first_entry.clone(),
                     second_entry_user_id: state.second_entry_user_id,
                     second_entry: state.second_entry.clone(),
@@ -1007,18 +1045,24 @@ impl DataEntryStatus {
         }
     }
 
-    /// Get the user ID of the first entry typist
-    pub fn get_first_entry_user_id(&self) -> Option<UserId> {
+    /// Get the origin of the first entry (import or typist user id)
+    pub fn get_first_entry_origin(&self) -> Option<DataEntryOrigin> {
         match self {
             DataEntryStatus::Empty => None,
-            DataEntryStatus::FirstEntryInProgress(state) => Some(state.first_entry_user_id),
-            DataEntryStatus::FirstEntryHasErrors(state) => Some(state.first_entry_user_id),
-            DataEntryStatus::FirstEntryFinalised(state) => Some(state.first_entry_user_id),
-            DataEntryStatus::SecondEntryInProgress(state) => Some(state.first_entry_user_id),
-            DataEntryStatus::EntriesDifferent(state) => Some(state.first_entry_user_id),
-            DataEntryStatus::FirstEntryCorrection(state) => Some(state.first_entry_user_id),
-            DataEntryStatus::SecondEntryCorrection(state) => Some(state.first_entry_user_id),
-            DataEntryStatus::Definitive(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::FirstEntryInProgress(state) => {
+                Some(DataEntryOrigin::Typist(state.first_entry_user_id))
+            }
+            DataEntryStatus::FirstEntryHasErrors(state) => {
+                Some(DataEntryOrigin::Typist(state.first_entry_user_id))
+            }
+            DataEntryStatus::FirstEntryFinalised(state) => Some(state.first_entry_origin.clone()),
+            DataEntryStatus::SecondEntryInProgress(state) => Some(state.first_entry_origin.clone()),
+            DataEntryStatus::EntriesDifferent(state) => Some(state.first_entry_origin.clone()),
+            DataEntryStatus::FirstEntryCorrection(state) => {
+                Some(DataEntryOrigin::Typist(state.first_entry_user_id))
+            }
+            DataEntryStatus::SecondEntryCorrection(state) => Some(state.first_entry_origin.clone()),
+            DataEntryStatus::Definitive(state) => Some(state.first_entry_origin.clone()),
         }
     }
 
@@ -1224,8 +1268,8 @@ impl Display for DataEntryTransitionError {
                 )
             }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
-            DataEntryTransitionError::CorrectionNotAllowed => {
-                write!(f, "Correction not allowed: the entry to be kept has errors")
+            DataEntryTransitionError::CorrectionNotAllowed(reason) => {
+                write!(f, "Correction not allowed: {reason}")
             }
             DataEntryTransitionError::ValidatorError(data_error) => {
                 write!(f, "Validator error: {data_error}")
@@ -1349,7 +1393,7 @@ mod tests {
 
     fn first_entry_finalised() -> DataEntryStatus {
         DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             finalised_first_entry: example_results(),
             first_entry_finished_at: Utc::now(),
             finalised_with_warnings: true,
@@ -1358,7 +1402,7 @@ mod tests {
 
     fn second_entry_in_progress() -> DataEntryStatus {
         DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             finalised_first_entry: example_results(),
             first_entry_finished_at: Utc::now(),
             progress: 0,
@@ -1370,7 +1414,7 @@ mod tests {
 
     fn definitive() -> DataEntryStatus {
         DataEntryStatus::Definitive(Definitive {
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             second_entry_user_id: UserId::from(0),
             finished_at: Utc::now(),
             finalised_with_warnings: false,
@@ -1381,7 +1425,7 @@ mod tests {
     fn entries_different() -> DataEntryStatus {
         DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: example_results(),
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             second_entry: example_results().with_difference(),
             second_entry_user_id: UserId::from(0),
             first_entry_finished_at: Utc::now(),
@@ -1403,7 +1447,7 @@ mod tests {
 
     fn second_entry_correction() -> DataEntryStatus {
         DataEntryStatus::SecondEntryCorrection(SecondEntryCorrection {
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             finalised_first_entry: example_results(),
             second_entry_user_id: UserId::from(1),
             second_entry: example_results().with_difference(),
@@ -1723,7 +1767,7 @@ mod tests {
             second_entry_user_id: UserId::from(0),
             second_entry: different_second_entry,
             client_state: Default::default(),
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             finalised_first_entry: first_entry,
             first_entry_finished_at: Utc::now(),
         });
@@ -1757,7 +1801,7 @@ mod tests {
     #[test]
     fn second_entry_in_progress_finalise_not_equal() {
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             finalised_first_entry: Results::CSOFirstSession(CSOFirstSessionResults {
                 voters_counts: VotersCounts {
                     poll_card_count: 1,
@@ -1962,7 +2006,7 @@ mod tests {
 
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: first_entry.clone(),
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             second_entry,
             second_entry_user_id: UserId::from(0),
             first_entry_finished_at: Utc::now(),
@@ -1984,7 +2028,7 @@ mod tests {
 
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry,
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             second_entry,
             second_entry_user_id: UserId::from(0),
             first_entry_finished_at: Utc::now(),
@@ -1993,7 +2037,9 @@ mod tests {
 
         assert_eq!(
             initial.correct_second_entry(&election()),
-            Err(DataEntryTransitionError::CorrectionNotAllowed)
+            Err(DataEntryTransitionError::CorrectionNotAllowed(
+                "the entry to be kept has errors".to_string()
+            ))
         );
     }
 
@@ -2013,7 +2059,7 @@ mod tests {
 
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: first_entry.clone(),
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             second_entry: second_entry.clone(),
             second_entry_user_id: UserId::from(0),
             first_entry_finished_at: Utc::now(),
@@ -2037,7 +2083,7 @@ mod tests {
 
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: first_entry.clone(),
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             second_entry: second_entry.clone(),
             second_entry_user_id: UserId::from(0),
             first_entry_finished_at: Utc::now(),
@@ -2059,7 +2105,7 @@ mod tests {
 
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry,
-            first_entry_user_id: UserId::from(0),
+            first_entry_origin: DataEntryOrigin::Typist(UserId::from(0)),
             second_entry,
             second_entry_user_id: UserId::from(0),
             first_entry_finished_at: Utc::now(),
@@ -2068,7 +2114,31 @@ mod tests {
 
         assert_eq!(
             initial.correct_first_entry(&election()),
-            Err(DataEntryTransitionError::CorrectionNotAllowed)
+            Err(DataEntryTransitionError::CorrectionNotAllowed(
+                "the entry to be kept has errors".to_string()
+            ))
+        );
+    }
+
+    #[test]
+    fn entries_different_keep_second_and_correct_first_imported_entry_is_rejected() {
+        let first_entry = example_results();
+        let second_entry = example_results();
+
+        let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry,
+            first_entry_origin: DataEntryOrigin::Import,
+            second_entry,
+            second_entry_user_id: UserId::from(0),
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
+        });
+
+        assert_eq!(
+            initial.correct_first_entry(&election()),
+            Err(DataEntryTransitionError::CorrectionNotAllowed(
+                "the entry to be corrected is imported".to_string()
+            ))
         );
     }
 
@@ -2110,8 +2180,8 @@ mod tests {
 
         if let DataEntryStatus::FirstEntryFinalised(kept_entry) = next {
             assert_eq!(
-                kept_entry.first_entry_user_id,
-                correction.second_entry_user_id
+                kept_entry.first_entry_origin,
+                DataEntryOrigin::Typist(correction.second_entry_user_id)
             );
             assert_eq!(
                 kept_entry.finalised_first_entry,
@@ -2171,10 +2241,7 @@ mod tests {
             .unwrap();
 
         if let DataEntryStatus::FirstEntryFinalised(kept_entry) = next {
-            assert_eq!(
-                kept_entry.first_entry_user_id,
-                correction.first_entry_user_id
-            );
+            assert_eq!(kept_entry.first_entry_origin, correction.first_entry_origin);
             assert_eq!(
                 kept_entry.finalised_first_entry,
                 correction.finalised_first_entry
@@ -2313,21 +2380,17 @@ mod tests {
     }
 
     #[test]
-    fn check_first_entry_user_id() {
-        assert!(DataEntryStatus::Empty.get_first_entry_user_id().is_none());
-        assert!(
-            first_entry_in_progress()
-                .get_first_entry_user_id()
-                .is_some()
-        );
-        assert!(first_entry_finalised().get_first_entry_user_id().is_some());
+    fn check_first_entry_origin() {
+        assert!(DataEntryStatus::Empty.get_first_entry_origin().is_none());
+        assert!(first_entry_in_progress().get_first_entry_origin().is_some());
+        assert!(first_entry_finalised().get_first_entry_origin().is_some());
         assert!(
             second_entry_in_progress()
-                .get_first_entry_user_id()
+                .get_first_entry_origin()
                 .is_some()
         );
-        assert!(entries_different().get_first_entry_user_id().is_some());
-        assert!(definitive().get_first_entry_user_id().is_some());
+        assert!(entries_different().get_first_entry_origin().is_some());
+        assert!(definitive().get_first_entry_origin().is_some());
     }
 
     #[test]

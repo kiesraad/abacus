@@ -46,12 +46,15 @@ use crate::{
     service::{create_sub_committee, list_polling_stations_for_session},
 };
 
+pub mod handlers;
+
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
     const ALL_ROLES: &[Role] = Role::VARIANTS;
     const ADMIN: &[Role] = &[Administrator];
     const ADMIN_GSB_COORDINATOR: &[Role] = &[Administrator, CoordinatorGSB];
+    const CSB_COORDINATOR: &[Role] = &[CoordinatorCSB];
 
     OpenApiRouter::default()
         .routes(routes!(election_import_validate).authorize(ADMIN))
@@ -59,6 +62,14 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_list).authorize(ALL_ROLES))
         .routes(routes!(election_details).authorize(ALL_ROLES))
         .routes(routes!(election_number_of_voters_change).authorize(ADMIN_GSB_COORDINATOR))
+        .routes(
+            routes!(handlers::data_entry_import::election_data_entry_import_validate)
+                .authorize(CSB_COORDINATOR),
+        )
+        .routes(
+            routes!(handlers::data_entry_import::election_data_entry_import)
+                .authorize(CSB_COORDINATOR),
+        )
 }
 
 /// Election list response
@@ -691,7 +702,7 @@ async fn import_csb_election(
 }
 
 /// Check if the user's entered hash matches the hash of given data
-fn check_hash(
+pub fn check_hash(
     data: &[u8],
     user_hash: Option<&[String; crate::eml::hash::CHUNK_COUNT]>,
 ) -> Result<[String; crate::eml::hash::CHUNK_COUNT], APIError> {
@@ -831,8 +842,15 @@ mod tests {
 
     use super::*;
     use crate::{
-        api::tests::{
-            assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
+        api::{
+            election::handlers::data_entry_import::{
+                CSBDataEntryImportRequest, CSBDataEntryImportValidateRequest,
+                election_data_entry_import, election_data_entry_import_validate,
+            },
+            tests::{
+                assert_committee_category_authorization_err,
+                assert_committee_category_authorization_ok,
+            },
         },
         repository::user_repo::UserId,
     };
@@ -900,11 +918,14 @@ mod tests {
         let user = User::test_user(coordinator_role, UserId::from(1));
         let audit = AuditService::new(Some(user.clone()), None);
         let election_id = ElectionId::from(2);
+        let import_hash = std::array::from_fn(|_| String::new());
 
         #[rustfmt::skip]
         let results = vec![
             ("details", election_details(user.clone(), State(pool.clone()), Path(election_id)).await.into_response()),
             ("voters", election_number_of_voters_change(user.clone(), State(pool.clone()), audit.clone(), Path(election_id), Json(ElectionNumberOfVotersChangeRequest { number_of_voters: 1000 })).await.into_response()),
+            ("import_validate", election_data_entry_import_validate(user.clone(), State(pool.clone()), Path(election_id), CSBDataEntryImportValidateRequest { hash: None, data: vec![] }).await.into_response()),
+            ("import", election_data_entry_import(user.clone(), State(pool.clone()), Path(election_id), CSBDataEntryImportRequest { hash: import_hash, data: vec![] }).await.into_response()),
         ];
         results
     }

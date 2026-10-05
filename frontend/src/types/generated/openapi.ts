@@ -240,6 +240,19 @@ export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/status`;
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
 
+// /api/elections/{election_id}/data_entry/import
+export interface ELECTION_DATA_ENTRY_IMPORT_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DATA_ENTRY_IMPORT_REQUEST_PATH = `/api/elections/${ElectionId}/data_entry/import`;
+
+// /api/elections/{election_id}/data_entry/import/validate
+export interface ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_PATH =
+  `/api/elections/${ElectionId}/data_entry/import/validate`;
+
 // /api/elections/{election_id}/dismiss_public_key_upload_reminder
 export interface DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -638,6 +651,29 @@ export interface BasePollingStation {
   postal_code: string;
 }
 
+export interface CSBDataEntryImportRequest {
+  data: string;
+  hash: string[];
+}
+
+export interface CSBDataEntryImportResponse {
+  election_date: string;
+  election_name: string;
+  sub_committee: SubCommitteeFirstSession;
+}
+
+export interface CSBDataEntryImportValidateRequest {
+  data: string;
+  hash?: string[];
+}
+
+export interface CSBDataEntryImportValidateResponse {
+  election_date: string;
+  election_name: string;
+  hash: RedactedEmlHash;
+  sub_committee: SubCommitteeFirstSession;
+}
+
 export interface CSBElectionCreationRequest {
   candidate_data: string;
   candidate_hash: string[];
@@ -987,7 +1023,7 @@ export interface DataEntry {
 export interface DataEntryGetDifferencesResponse {
   first_entry: Results;
   first_entry_has_errors: boolean;
-  first_entry_user_id: UserId;
+  first_entry_origin: DataEntryOrigin;
   second_entry: Results;
   second_entry_has_errors: boolean;
   second_entry_user_id: UserId;
@@ -1003,6 +1039,8 @@ export interface DataEntryGetResponse {
 }
 
 export type DataEntryId = number;
+
+export type DataEntryOrigin = { type: "Import" } | { type: "Typist"; user_id: UserId };
 
 export type DataEntrySource =
   | (PollingStationForSession & { type: "PollingStation" })
@@ -1222,11 +1260,11 @@ export interface ElectionStatusResponseEntry {
   finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
   finished_at?: string;
-  /** First entry user id */
-  first_entry_user_id?: number;
+  /** First entry origin (import or typist user id) */
+  first_entry_origin?: DataEntryOrigin;
   /** Second entry user id */
   second_entry_user_id?: number;
-  /** Data entry source (polling station or sub committee) */
+  /** Data entry source (polling station or subcommittee) */
   source: DataEntrySource;
   /** Data entry status */
   status: DataEntryStatusName;
@@ -1348,6 +1386,7 @@ export const errorReferenceValues = [
   "DataEntryCannotBeReset",
   "DataEntryGetNotAllowed",
   "DataEntryNotAllowed",
+  "DataEntryValidationErrors",
   "EmlImportError",
   "EmlError",
   "EntryNotFound",
@@ -1357,6 +1396,7 @@ export const errorReferenceValues = [
   "InvalidApportionmentState",
   "InvalidCertificate",
   "InvalidCommitteeSessionStatus",
+  "InvalidCountType",
   "InvalidData",
   "InvalidDistrict",
   "InvalidHash",
@@ -1378,11 +1418,12 @@ export const errorReferenceValues = [
   "PasswordRejectionTooShort",
   "PdfGenerationError",
   "PollingStationRepeated",
-  "PollingStationValidationErrors",
   "RequestPayloadTooLarge",
   "Unauthorized",
+  "UnknownCommittee",
   "UsernameNotUnique",
   "UserNotFound",
+  "ZipError",
 ] as const;
 export type ErrorReference = (typeof errorReferenceValues)[number];
 

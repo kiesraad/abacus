@@ -4,7 +4,9 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::{DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource},
-        sub_committee::{NewSubCommittee, SubCommittee, SubCommitteeFirstSession},
+        sub_committee::{
+            Certificate, NewSubCommittee, SubCommittee, SubCommitteeFirstSession, SubCommitteeId,
+        },
     },
     repository::common::{SubCommitteeRow, SubCommitteeRowLike},
 };
@@ -100,6 +102,27 @@ pub async fn create(
     .fetch_one(conn)
     .await
     .map(SubCommitteeRow::into_sub_committee_first_session)
+}
+
+/// Replace the certificates of a sub electoral committee
+pub async fn update_certificates(
+    conn: &mut SqliteConnection,
+    sub_committee_id: SubCommitteeId,
+    certificates: &[Certificate],
+) -> Result<(), sqlx::Error> {
+    let certificates = Json(certificates);
+    query!(
+        r#"
+        UPDATE sub_committees
+        SET certificates = ?
+        WHERE id = ?
+        "#,
+        certificates,
+        sub_committee_id
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
 }
 
 /// List all subcommittees for a first committee session with their data entry status.

@@ -25,7 +25,7 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionError, election::InvalidElectionError,
         models::error::ModelsError, results::IncorrectResultsModel, role::RoleNotAuthorizedError,
-        validate::DataError,
+        sub_committee::SubCommitteeCertificateError, validate::DataError,
     },
     eml::EMLImportError,
     infra::backup::BackupError,
@@ -55,6 +55,9 @@ pub enum ErrorReference {
     ApportionmentNotCompleted,
     ApportionmentCommitteeSessionNotCompleted,
     ApportionmentInvalidLotDrawing,
+    CertificateAlreadyAdded,
+    CertificateUnknownSubCommittee,
+    CertificateWrongElection,
     CommitteeSessionPaused,
     DatabaseError,
     DataEntryAlreadyClaimed,
@@ -70,6 +73,7 @@ pub enum ErrorReference {
     Forbidden,
     InternalServerError,
     InvalidApportionmentState,
+    InvalidCertificate,
     InvalidCommitteeSessionStatus,
     InvalidCountType,
     InvalidData,
@@ -459,6 +463,12 @@ impl From<Box<dyn Error>> for APIError {
 
 impl From<CommitteeSessionError> for APIError {
     fn from(err: CommitteeSessionError) -> Self {
+        APIError::Delegated(Box::new(err))
+    }
+}
+
+impl From<SubCommitteeCertificateError> for APIError {
+    fn from(err: SubCommitteeCertificateError) -> Self {
         APIError::Delegated(Box::new(err))
     }
 }

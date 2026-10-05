@@ -450,7 +450,7 @@ async fn read_exactly_one_file(
 
 #[cfg(test)]
 mod tests {
-    use std::assert_matches;
+    use std::{assert_matches, collections::HashMap};
 
     use async_zip::{Compression, ZipEntryBuilder, tokio::write::ZipFileWriter};
     use chrono::Local;
@@ -459,6 +459,7 @@ mod tests {
     use super::*;
     use crate::{
         domain::{sub_committee::Certificate, tabulation::ElectionTotals},
+        eml::CountResultsData,
         repository::sub_committee_repo::update_certificates,
     };
 
@@ -717,7 +718,12 @@ mod tests {
                 .unwrap();
         let totals = ElectionTotals::tabulate(&election, &results).unwrap();
         let count = election
-            .as_count_eml(None, &committee_session, &results, &totals, Local::now())
+            .as_count_eml(
+                None,
+                &committee_session,
+                &CountResultsData::new(&results, &HashMap::new(), &totals, None),
+                Local::now(),
+            )
             .unwrap();
 
         String::try_from(count).unwrap()

@@ -86,7 +86,7 @@ impl From<DataEntryRow> for DataEntryStatusResponse {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[derive(Serialize, Deserialize, Clone, ToSchema, Debug)]
 #[serde(tag = "type")]
 pub enum DataEntrySource {
     PollingStation(PollingStationForSession),
@@ -151,7 +151,7 @@ impl DataEntrySource {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(tag = "type", content = "number", deny_unknown_fields)]
 pub enum DataEntrySourceNumber {
     PollingStation(PollingStationNumber),

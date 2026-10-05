@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use apportionment::ApportionmentDetails;
 use chrono::{DateTime, Local, Utc};
 use eml_nl::{EMLError, documents::election_count::ElectionCount, io::EMLWrite};
@@ -11,7 +13,7 @@ use crate::{
     api::apportionment::{map_candidate_nomination, map_seat_assignment},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
-        data_entry::DataEntrySource,
+        data_entry::{DataEntrySource, DataEntrySourceNumber},
         election::{
             CommitteeCategory, ElectionWithPoliticalGroups, InvalidElectionError,
             VoteCountingMethod,
@@ -34,7 +36,7 @@ use crate::{
         },
         tabulation::ElectionTotals,
     },
-    eml::EmlHash,
+    eml::{CountResultsData, EmlHash},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
     repository::{
         committee_session_repo::{self, get_previous_session},
@@ -152,6 +154,7 @@ pub struct ResultsInputData {
     pub polling_stations: Vec<PollingStation>,
     pub investigations: Vec<PollingStationInvestigation>,
     pub results: Vec<(DataEntrySource, Results)>,
+    pub previous_results: HashMap<DataEntrySourceNumber, (DataEntrySource, Results)>,
     pub totals: ElectionTotals,
     pub previous_totals: Option<ElectionTotals>,
     pub previous_committee_session: Option<CommitteeSession>,
@@ -180,16 +183,21 @@ impl ResultsInputData {
         };
 
         // get the previous results totals from the previous committee session if it exists
-        let previous_totals = if let Some(previous_committee_session) = &previous_committee_session
-        {
-            let previous_results =
-                list_results_for_committee_session(conn, previous_committee_session.id).await?;
-            previous_results.verify_models(&election, previous_committee_session)?;
-            let previous_totals = ElectionTotals::tabulate(&election, &previous_results)?;
-            Some(previous_totals)
-        } else {
-            None
-        };
+        let (previous_totals, previous_results) =
+            if let Some(previous_committee_session) = &previous_committee_session {
+                let previous_results =
+                    list_results_for_committee_session(conn, previous_committee_session.id).await?;
+                previous_results.verify_models(&election, previous_committee_session)?;
+                let previous_totals = ElectionTotals::tabulate(&election, &previous_results)?;
+                (Some(previous_totals), previous_results)
+            } else {
+                (None, vec![])
+            };
+
+        let previous_results = previous_results
+            .into_iter()
+            .map(|(source, results)| (source.number(), (source, results)))
+            .collect();
 
         let totals = ElectionTotals::tabulate(&election, &results)?;
 
@@ -202,6 +210,7 @@ impl ResultsInputData {
             polling_stations,
             investigations,
             results,
+            previous_results,
             previous_committee_session,
         })
     }
@@ -210,8 +219,7 @@ impl ResultsInputData {
         self.election.as_count_eml(
             None,
             &self.committee_session,
-            &self.results,
-            &self.totals,
+            &CountResultsData::from_results_input_data(self),
             self.created_at,
         )
     }

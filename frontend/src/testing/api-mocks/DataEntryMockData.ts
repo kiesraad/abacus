@@ -109,7 +109,7 @@ export const saveDataEntryResponse: SaveDataEntryResponse = {
 };
 
 export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
-  first_entry_user_id: 3,
+  first_entry_origin: { type: "Typist", user_id: 3 },
   second_entry_user_id: 4,
   first_entry: {
     model: "CSOFirstSession",

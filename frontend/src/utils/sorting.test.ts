@@ -23,8 +23,10 @@ describe("Sort list", () => {
   it("Sorts ElectionStatusResponseEntry subcommittee data entry source list correctly by name", () => {
     const expectedSortedList: ElectionStatusResponseEntry[] = [
       electionStatusesCSBMock[4]!,
+      electionStatusesCSBMock[5]!,
       electionStatusesCSBMock[2]!,
       electionStatusesCSBMock[1]!,
+      electionStatusesCSBMock[6]!,
       electionStatusesCSBMock[3]!,
       electionStatusesCSBMock[0]!,
     ];

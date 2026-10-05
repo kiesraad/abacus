@@ -18,8 +18,8 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            ClientState, DataEntryId, DataEntryRow, DataEntrySource, DataEntrySourceContext,
-            DataEntryStatus, DataEntryStatusName, DataEntryStatusResponse,
+            ClientState, DataEntryId, DataEntryOrigin, DataEntryRow, DataEntrySource,
+            DataEntrySourceContext, DataEntryStatus, DataEntryStatusName, DataEntryStatusResponse,
             DataEntryTransitionError, DataEntryUpdate, EntriesDifferent,
         },
         election::ElectionId,
@@ -73,7 +73,7 @@ pub struct DataEntryAuditData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data_entry_progress: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub first_entry_user_id: Option<UserId>,
+    pub first_entry_origin: Option<DataEntryOrigin>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub second_entry_user_id: Option<UserId>,
 }
@@ -86,7 +86,7 @@ impl From<DataEntryRow> for DataEntryAuditData {
             data_entry_id: value.id,
             data_entry_status: state.status_name().to_string(),
             data_entry_progress: state.get_data_entry_progress().map(|p| format!("{p}%")),
-            first_entry_user_id: state.get_first_entry_user_id(),
+            first_entry_origin: state.get_first_entry_origin(),
             second_entry_user_id: state.get_second_entry_user_id(),
         }
     }
@@ -696,6 +696,7 @@ pub struct DataEntryGetResponse {
         ("data_entry_id" = DataEntryId, description = "Data entry database id"),
     ),
 )]
+#[expect(clippy::too_many_lines, reason = "Written out cases take many lines")]
 async fn data_entry_get(
     user: User,
     State(pool): State<SqlitePool>,
@@ -729,21 +730,24 @@ async fn data_entry_get(
             source: context.source,
         },
         FirstEntryFinalised(first_entry_finalised_state) => DataEntryGetResponse {
-            user_id: Some(first_entry_finalised_state.first_entry_user_id),
+            user_id: match first_entry_finalised_state.first_entry_origin {
+                DataEntryOrigin::Import => None,
+                DataEntryOrigin::Typist(user_id) => Some(user_id),
+            },
             data: first_entry_finalised_state.finalised_first_entry,
             status: state.status_name(),
             validation_results: state.start_validate(&context.election)?,
             source: context.source,
         },
         SecondEntryInProgress(second_entry_in_progress_state) => DataEntryGetResponse {
-            user_id: Some(second_entry_in_progress_state.second_entry_user_id),
+            user_id: state.get_second_entry_user_id(),
             data: second_entry_in_progress_state.second_entry,
             status: state.status_name(),
             validation_results: ValidationResults::default(),
             source: context.source,
         },
         SecondEntryCorrection(second_entry_correction_state) => DataEntryGetResponse {
-            user_id: Some(second_entry_correction_state.second_entry_user_id),
+            user_id: state.get_second_entry_user_id(),
             data: second_entry_correction_state.second_entry,
             status: state.status_name(),
             validation_results: ValidationResults::default(),
@@ -756,7 +760,7 @@ async fn data_entry_get(
             validation_results: state.start_validate(&context.election)?,
             source: context.source,
         },
-        _ => Err(APIError::Conflict(
+        Empty | EntriesDifferent(_) => Err(APIError::Conflict(
             "Data entry is in the wrong state".to_string(),
             ErrorReference::DataEntryGetNotAllowed,
         ))?,
@@ -820,7 +824,7 @@ async fn data_entry_resolve_errors(
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct DataEntryGetDifferencesResponse {
-    pub first_entry_user_id: UserId,
+    pub first_entry_origin: DataEntryOrigin,
     pub first_entry: Results,
     pub first_entry_has_errors: bool,
     pub second_entry_user_id: UserId,
@@ -856,7 +860,7 @@ async fn data_entry_get_differences(
 
     match state {
         DataEntryStatus::EntriesDifferent(EntriesDifferent {
-            first_entry_user_id,
+            first_entry_origin,
             first_entry,
             second_entry_user_id,
             second_entry,
@@ -868,7 +872,7 @@ async fn data_entry_get_differences(
                 second_entry.start_validate(&context.election)?.has_errors();
 
             Ok(Json(DataEntryGetDifferencesResponse {
-                first_entry_user_id,
+                first_entry_origin,
                 first_entry,
                 first_entry_has_errors,
                 second_entry_user_id,
@@ -962,14 +966,14 @@ pub struct ElectionStatusResponse {
 pub struct ElectionStatusResponseEntry {
     /// Data entry id
     pub data_entry_id: DataEntryId,
-    /// Data entry source (polling station or sub committee)
+    /// Data entry source (polling station or subcommittee)
     pub source: DataEntrySource,
     /// Data entry status
     pub status: DataEntryStatusName,
-    /// First entry user id
+    /// First entry origin (import or typist user id)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = u8)]
-    pub first_entry_user_id: Option<UserId>,
+    #[schema(value_type = DataEntryOrigin)]
+    pub first_entry_origin: Option<DataEntryOrigin>,
     /// Second entry user id
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = u8)]
@@ -1036,6 +1040,7 @@ mod tests {
         domain::{
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
+            data_entry::DataEntryOrigin,
             results::tests::example_results,
             role::Role,
             validate::{ValidationResult, ValidationResultCode},
@@ -1835,7 +1840,7 @@ mod tests {
             serde_json::json!({
                 "data_entry_id": 201,
                 "data_entry_status": "first_entry_has_errors",
-                "first_entry_user_id": 1,
+                "first_entry_origin": {"type": "Typist", "user_id": 1},
             })
         );
     }
@@ -2224,7 +2229,10 @@ mod tests {
         let DataEntryStatus::FirstEntryFinalised(state) = data_entry.state.0 else {
             panic!("Expected entry to be in FirstEntryFinalised state");
         };
-        assert_eq!(state.first_entry_user_id, UserId::from(2));
+        assert_eq!(
+            state.first_entry_origin,
+            DataEntryOrigin::Typist(UserId::from(2))
+        );
         let Results::CSOFirstSession(first_entry) = state.finalised_first_entry else {
             panic!("Expected entry to be CSOFirstSession model");
         };
@@ -2264,7 +2272,10 @@ mod tests {
         let DataEntryStatus::FirstEntryFinalised(state) = data_entry.state.0 else {
             panic!("Expected entry to be in FirstEntryFinalised state");
         };
-        assert_eq!(state.first_entry_user_id, UserId::from(1));
+        assert_eq!(
+            state.first_entry_origin,
+            DataEntryOrigin::Typist(UserId::from(1))
+        );
         let Results::CSOFirstSession(first_entry) = state.finalised_first_entry else {
             panic!("Expected entry to be CSOFirstSession model");
         };

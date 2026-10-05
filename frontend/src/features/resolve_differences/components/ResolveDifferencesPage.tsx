@@ -45,14 +45,19 @@ function resolvedMessageAndPath(
         },
         path: `${statusPath}/${dataEntryId}/detail`,
       };
-    case "first_entry_finalised":
+    case "first_entry_finalised": {
+      let text = t("election_status.success.data_entry_kept");
+      if (outcome.keptUserId) {
+        text += ` ${t("election_status.success.choose_another_typist", { typist: getName(outcome.keptUserId) })}`;
+      }
       return {
         message: {
           title: t("election_status.success.differences_resolved", { number }),
-          text: t("election_status.success.data_entry_kept", { typist: getName(outcome.keptUserId) }),
+          text: text,
         },
         path: statusPath,
       };
+    }
     case "first_entry_correction":
     case "second_entry_correction":
       return {
@@ -109,7 +114,7 @@ export function ResolveDifferencesPage() {
     return <Loader />;
   }
 
-  const { first_entry, first_entry_user_id, second_entry, second_entry_user_id, source } = differences;
+  const { first_entry, first_entry_origin, second_entry, second_entry_user_id, source } = differences;
 
   return (
     <>
@@ -134,7 +139,11 @@ export function ResolveDifferencesPage() {
             correctEntry={formState.correctEntry}
           />
           <ResolveDifferencesForm
-            firstEntryName={getName(first_entry_user_id)}
+            firstEntryName={
+              first_entry_origin.type === "Typist"
+                ? getName(first_entry_origin.user_id)
+                : t("resolve_differences.imported_from_file")
+            }
             secondEntryName={getName(second_entry_user_id)}
             formState={formState}
             onSubmit={onSubmit}

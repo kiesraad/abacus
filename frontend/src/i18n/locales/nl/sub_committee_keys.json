@@ -1,0 +1,10 @@
+{
+  "add_all": {
+    "title": "Voeg de publieke sleutels van alle GSB's in de kieskring toe",
+    "description": "Voeg de publieke sleutels van onderstaande GSB's toe. Deze staan op het overdrachtsplatform van de Kiesraad. Met de publieke sleutel kan Abacus controleren dat telbestanden echt van de betreffende GSB's komen en niet zijn gewijzigd."
+  },
+  "imported": "Geïmporteerde publieke sleutels",
+  "keys": "Sleutels",
+  "manage": "Sleutels van GSB's beheren",
+  "pending": "Nog toe te voegen publieke sleutels"
+}

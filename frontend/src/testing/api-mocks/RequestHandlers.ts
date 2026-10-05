@@ -130,6 +130,9 @@ import type {
   SaveDataEntryResponse,
   SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS,
   SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
+  SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS,
+  SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH,
+  SubCommittee,
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PARAMS,
   USER_CREATE_REQUEST_PATH,
@@ -164,6 +167,7 @@ import {
 import { statusResponseMock } from "./ElectionStatusMockData";
 import { logMockResponse } from "./LogMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
+import { subCommitteesMockData } from "./SubCommitteeMockData";
 import { loginResponseMockData, userMockData } from "./UserMockData";
 
 type ParamsToString<T> = {
@@ -362,6 +366,14 @@ export const CSBElectionRequestHandler = http.get<
   ElectionDetailsResponse | ErrorResponse
 >("/api/elections/2" satisfies ELECTION_DETAILS_REQUEST_PATH, () =>
   HttpResponse.json(csbElectionDetailsMockResponse, { status: 200 }),
+);
+
+export const CSBSubCommitteeCertificatesRequestHandler = http.get<
+  ParamsToString<SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS>,
+  null,
+  SubCommittee[]
+>("/api/elections/2/sub_committee_certificates" satisfies SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH, () =>
+  HttpResponse.json(subCommitteesMockData, { status: 200 }),
 );
 
 // get election status handler
@@ -702,6 +714,7 @@ export const handlers: HttpHandler[] = [
   ElectionStatusRequestHandler,
   ElectionCertificateDetailsRequestHandler,
   DismissPublicKeyUploadReminderRequestHandler,
+  CSBSubCommitteeCertificatesRequestHandler,
   CSBElectionStatusRequestHandler,
   GSBABElectionImportRequestHandler,
   GSBGRElectionImportRequestHandler,

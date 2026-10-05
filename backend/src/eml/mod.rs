@@ -1,6 +1,7 @@
 use std::{num::NonZeroU64, str::FromStr as _};
 
 pub mod committees;
+mod count;
 mod error;
 pub mod hash;
 

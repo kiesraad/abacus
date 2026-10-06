@@ -1,20 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, within } from "storybook/test";
-
-import { t } from "@/i18n/translate";
-
 import { type FileErrorCase, fileError } from "../hooks/useDataEntryImport";
-
 import { ImportFileForm } from "./ImportFileForm";
 
-const fileErrorCases: FileErrorCase[] = [
-  "invalid_510b",
-  "invalid_zip",
-  "data_entry_already_started",
-  "election_mismatch",
-  "contains_errors",
-  "unknown",
-];
+const fileErrorCases: Record<FileErrorCase, string> = {
+  invalid_510b: "Geen tellingsbestand EML 510b",
+  invalid_zip: "Geen geldig ZIP-bestand",
+  data_entry_already_started: "GSB al ingevoerd",
+  election_mismatch: "Tellingsbestand hoort niet bij dit CSB",
+  contains_errors: "Tellingsbestand bevat fouten",
+  unknown: "Importeren niet gelukt",
+};
 
 const meta = {
   component: ImportFileForm,
@@ -29,15 +25,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   play: async ({ canvas }) => {
-    await expect(canvas.getByText(t("no_file_chosen"))).toBeVisible();
-    await expect(canvas.getByText(t("select_file"))).toBeVisible();
+    await expect(canvas.getByText("Geen bestand gekozen")).toBeVisible();
+    await expect(canvas.getByText("Bestand kiezen")).toBeVisible();
   },
 };
 
 export const WithErrors: Story = {
   render: (args) => (
     <>
-      {fileErrorCases.map((name) => (
+      {(Object.keys(fileErrorCases) as FileErrorCase[]).map((name) => (
         <div key={name} id={name} className="mb-lg">
           <h2>{name}</h2>
           <ImportFileForm {...args} error={fileError(name, { electionName: "Gemeenteraad Juinen 2026" })} />
@@ -47,9 +43,9 @@ export const WithErrors: Story = {
     </>
   ),
   play: async ({ canvas }) => {
-    for (const name of fileErrorCases) {
+    for (const [name, title] of Object.entries(fileErrorCases)) {
       const alert = within(canvas.getByTestId(name)).getByRole("alert");
-      await expect(alert).toHaveTextContent(fileError(name).title);
+      await expect(alert).toHaveTextContent(title);
     }
   },
 };

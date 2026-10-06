@@ -27,7 +27,7 @@ export function CheckAndSave({ electionName, subCommittee, onSubmit }: CheckAndS
       </ul>
 
       <div className="mt-xl">
-        <Button type="submit" onClick={onSubmit}>
+        <Button type="button" onClick={onSubmit}>
           {t("save")}
         </Button>
       </div>

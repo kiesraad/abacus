@@ -1,9 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn } from "storybook/test";
-
-import { t } from "@/i18n/translate";
 import type { RedactedEmlHash } from "@/types/generated/openapi";
-
 import { HashCheck } from "./HashCheck";
 
 const redactedHash: RedactedEmlHash = {
@@ -46,13 +43,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText(t("data_entry_import.hash_check.title"))).toBeVisible();
+    await expect(await canvas.findByText("Controleer tellingbestand")).toBeVisible();
     await expect(canvas.getByText("telling.eml.xml.zip")).toBeVisible();
     await expect(canvas.getByText("Gemeenteraad Juinen 2026")).toBeVisible();
     await expect(
-      canvas.getByText(t("data_entry_import.hash_check.instructions", { fileAuthorityName: "Juinen" })),
+      canvas.getByText(
+        "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code staat op het proces-verbaal Na 31-2 van het GSB van de gemeente Juinen.",
+      ),
     ).toBeVisible();
-    await expect(canvas.getByRole("button", { name: t("next") })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Volgende" })).toBeVisible();
   },
 };
 
@@ -62,7 +61,7 @@ export const WithError: Story = {
   },
   play: async ({ canvas }) => {
     await expect(await canvas.findByRole("alert")).toHaveTextContent(
-      t("data_entry_import.hash_check.error.description"),
+      "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
     );
   },
 };

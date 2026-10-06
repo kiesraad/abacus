@@ -103,12 +103,22 @@ async fn read_form_data<S: Send + Sync>(
     while let Some(field) = multipart.next_field().await? {
         match field.name() {
             Some("hash") => {
+                if hash.is_some() {
+                    return Err(invalid_form_data("Duplicate hash field"));
+                }
+
                 let json = field.text().await?;
                 let chunks = serde_json::from_str(&json)
                     .map_err(|err| invalid_form_data(format!("Invalid hash: {err}")))?;
                 hash = Some(chunks);
             }
-            Some("data") => data = Some(field.bytes().await?.into()),
+            Some("data") => {
+                if data.is_some() {
+                    return Err(invalid_form_data("Duplicate data field"));
+                }
+
+                data = Some(field.bytes().await?.into())
+            }
             name => {
                 let name = name.unwrap_or_default();
                 return Err(invalid_form_data(format!("Unexpected field \"{name}\"")));
@@ -471,7 +481,20 @@ mod tests {
 
             assert_matches!(
                 CSBDataEntryImportRequest::from_request(request, &()).await,
-                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message == "Missing hash"
+            );
+        }
+
+        #[test(tokio::test)]
+        async fn test_from_request_import_duplicate_hash() {
+            let hash = serde_json::to_vec(&vec!["abcd"; crate::eml::hash::CHUNK_COUNT]).unwrap();
+            let request = multipart_request(&[("hash", &hash), ("hash", &hash), ("data", b"zip")]);
+
+            assert_matches!(
+                CSBDataEntryImportRequest::from_request(request, &()).await,
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message == "Duplicate hash field"
             );
         }
 
@@ -482,7 +505,8 @@ mod tests {
 
             assert_matches!(
                 CSBDataEntryImportValidateRequest::from_request(request, &()).await,
-                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message.starts_with("Invalid hash")
             );
         }
 
@@ -492,7 +516,19 @@ mod tests {
 
             assert_matches!(
                 CSBDataEntryImportValidateRequest::from_request(request, &()).await,
-                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message.starts_with("Invalid form data:")
+            );
+        }
+
+        #[test(tokio::test)]
+        async fn test_from_request_duplicate_data() {
+            let request = multipart_request(&[("data", b"zip"), ("data", b"zip")]);
+
+            assert_matches!(
+                CSBDataEntryImportValidateRequest::from_request(request, &()).await,
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message == "Duplicate data field"
             );
         }
 
@@ -502,7 +538,8 @@ mod tests {
 
             assert_matches!(
                 CSBDataEntryImportValidateRequest::from_request(request, &()).await,
-                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message == "Unexpected field \"other\""
             );
         }
     }
@@ -529,7 +566,8 @@ mod tests {
         async fn test_invalid_zip() {
             assert_matches!(
                 read_eml_from_zip(b"not a zip file".to_vec()).await,
-                Err(APIError::Unprocessable(_, ErrorReference::ZipError))
+                Err(APIError::Unprocessable(message, ErrorReference::ZipError))
+                    if message == "Failed to read ZIP file"
             );
         }
 
@@ -539,7 +577,8 @@ mod tests {
 
             assert_matches!(
                 read_eml_from_zip(zip).await,
-                Err(APIError::Unprocessable(_, ErrorReference::ZipError))
+                Err(APIError::Unprocessable(message, ErrorReference::ZipError))
+                    if message == "Missing EML file in ZIP"
             );
         }
 
@@ -553,7 +592,8 @@ mod tests {
 
             assert_matches!(
                 read_eml_from_zip(zip).await,
-                Err(APIError::Unprocessable(_, ErrorReference::ZipError))
+                Err(APIError::Unprocessable(message, ErrorReference::ZipError))
+                    if message == "Multiple EML files in ZIP"
             );
         }
 
@@ -571,9 +611,10 @@ mod tests {
             assert_matches!(
                 read_eml_from_zip(zip).await,
                 Err(APIError::ContentTooLarge(
-                    _,
+                    message,
                     ErrorReference::RequestPayloadTooLarge
                 ))
+                    if message == "EML file too large"
             );
         }
     }
@@ -754,9 +795,9 @@ mod tests {
             assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
-                    _,
+                    message,
                     ErrorReference::DataEntryNotAllowed
-                ))
+                )) if message == "Sub committee data entry not empty"
             );
         }
 
@@ -780,9 +821,9 @@ mod tests {
             assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
-                    _,
+                    message,
                     ErrorReference::InvalidCommitteeSessionStatus
-                ))
+                )) if message == "Committee session already completed"
             );
         }
 
@@ -817,9 +858,9 @@ mod tests {
             assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
-                    _,
+                    message,
                     ErrorReference::DataEntryValidationErrors
-                ))
+                )) if message == "Results have validation errors"
             );
         }
     }

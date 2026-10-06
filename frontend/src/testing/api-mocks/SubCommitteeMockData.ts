@@ -1,4 +1,4 @@
-import type { Certificate, SubCommittee } from "@/types/generated/openapi";
+import type { AddSubCommitteeCertificateResponse, Certificate, SubCommittee } from "@/types/generated/openapi";
 
 export const getCertificateMockData = (certificate: Partial<Certificate> = {}): Certificate => {
   return {
@@ -25,6 +25,20 @@ export const getSubCommitteeMockData = (subCommittee: Partial<SubCommittee> = {}
     ...subCommittee,
   };
 };
+
+export const getAddCertificateResponse = (
+  response: Partial<AddSubCommitteeCertificateResponse> = {},
+): AddSubCommitteeCertificateResponse => {
+  return {
+    authority_name: "Aalsmeer",
+    certificate: getCertificateMockData({ common_name: "Gemeente Aalsmeer" }),
+    expired: false,
+    sub_committee_id: 1,
+    ...response,
+  };
+};
+
+export const addCertificateResponse = getAddCertificateResponse();
 
 export const pendingSubCommitteesMockData: SubCommittee[] = [
   getSubCommitteeMockData({ id: 1, number: 1, name: "Aalsmeer", authority_id: "0358", authority_name: "Aalsmeer" }),

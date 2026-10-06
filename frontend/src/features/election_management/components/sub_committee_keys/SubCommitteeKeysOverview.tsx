@@ -158,6 +158,7 @@ export function SubCommitteeKeysOverview({ subCommittees, electionId, onSuccess 
 
       if (isSuccess(response)) {
         processSuccess(response.data);
+        setFile(undefined);
       } else if (isError(response)) {
         setAlert(processError(response, currentFile));
       }

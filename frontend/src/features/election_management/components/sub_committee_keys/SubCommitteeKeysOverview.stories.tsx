@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import {
   importedSubCommitteesMockData,
@@ -11,9 +11,11 @@ import { SubCommitteeKeysOverview } from "./SubCommitteeKeysOverview";
 
 const meta = {
   component: SubCommitteeKeysOverview,
+  parameters: { needsMessages: true },
   args: {
     subCommittees: subCommitteesMockData,
     electionId: 1,
+    onSuccess: fn(),
   },
 } satisfies Meta<typeof SubCommitteeKeysOverview>;
 

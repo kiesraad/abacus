@@ -112,9 +112,10 @@ function processError(response: AnyError, currentFile: File): AlertDetails | und
 interface SubCommitteeKeysOverviewProps {
   subCommittees: SubCommittee[];
   electionId: ElectionId;
+  onSuccess: () => void;
 }
 
-export function SubCommitteeKeysOverview({ subCommittees, electionId }: SubCommitteeKeysOverviewProps) {
+export function SubCommitteeKeysOverview({ subCommittees, electionId, onSuccess }: SubCommitteeKeysOverviewProps) {
   const { pushMessage } = useMessages();
   const [alert, setAlert] = useState<AlertDetails | undefined>();
   const [file, setFile] = useState<File | undefined>();
@@ -136,7 +137,7 @@ export function SubCommitteeKeysOverview({ subCommittees, electionId }: SubCommi
           })
         : undefined,
     });
-    // TODO do something to make message show up
+    onSuccess();
   }
 
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {

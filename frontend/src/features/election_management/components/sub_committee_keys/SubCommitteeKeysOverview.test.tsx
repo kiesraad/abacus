@@ -26,6 +26,7 @@ describe("SubCommitteeKeysOverview", () => {
             ],
           }),
         ]}
+        electionId={1}
       />,
     );
 

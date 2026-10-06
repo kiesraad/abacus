@@ -13,6 +13,7 @@ const meta = {
   component: SubCommitteeKeysOverview,
   args: {
     subCommittees: subCommitteesMockData,
+    electionId: 1,
   },
 } satisfies Meta<typeof SubCommitteeKeysOverview>;
 

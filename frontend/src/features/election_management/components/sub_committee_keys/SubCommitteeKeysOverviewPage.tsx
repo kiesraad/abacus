@@ -22,7 +22,7 @@ export function SubCommitteeKeysOverviewPage() {
 
   return (
     <>
-      <PageTitle title={`${t("sub_committee_keys.manage")} - Abacus`} />
+      <PageTitle title={`${t("sub_committee_keys.title")} - Abacus`} />
       <header>
         <section>
           <h1>{t("sub_committee_keys.manage")}</h1>
@@ -32,7 +32,7 @@ export function SubCommitteeKeysOverviewPage() {
       <Messages />
 
       <main>
-        <SubCommitteeKeysOverview subCommittees={requestState.data} />
+        <SubCommitteeKeysOverview subCommittees={requestState.data} electionId={election.id} />
       </main>
       <Footer />
     </>

@@ -9,7 +9,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         compare::Compare,
-        election::ElectionWithPoliticalGroups,
+        election::{CommitteeCategory, ElectionWithPoliticalGroups},
         field_path::FieldPath,
         identifier::id,
         polling_station::{PollingStationForSession, PollingStationId, PollingStationNumber},
@@ -614,6 +614,35 @@ impl DataEntryStatus {
             }
             DataEntryStatus::Definitive(_) => {
                 Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Import the first entry and allow a second entry to be started
+    pub fn import_first_entry(
+        self,
+        election: &ElectionWithPoliticalGroups,
+        results: Results,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match &self {
+            DataEntryStatus::Empty => {
+                // Only CSB is allowed to import the first entry
+                if election.committee_category != CommitteeCategory::CSB {
+                    return Err(DataEntryTransitionError::Invalid);
+                }
+
+                let validation_results = results.start_validate(election)?;
+                if validation_results.has_errors() {
+                    Err(validation_results.into())
+                } else {
+                    Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
+                        first_entry_origin: DataEntryOrigin::Import,
+                        finalised_first_entry: results,
+                        first_entry_finished_at: Utc::now(),
+                        finalised_with_warnings: validation_results.has_warnings(),
+                    }))
+                }
             }
             _ => Err(DataEntryTransitionError::Invalid),
         }
@@ -2636,6 +2665,125 @@ mod tests {
                     .finalised_with_warnings(),
                 Some(&true)
             )
+        }
+    }
+
+    mod import_first_entry {
+        use std::assert_matches;
+
+        use super::*;
+        use crate::domain::{
+            election::tests::election_fixture,
+            results::{gsb_differences_counts::GSBDifferencesCounts, gsb_results::GSBResults},
+        };
+
+        fn csb_election() -> ElectionWithPoliticalGroups {
+            election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2, 2])
+        }
+
+        fn example_gsb_results() -> Results {
+            let Results::CSOFirstSession(results) = example_results() else {
+                panic!("not CSOFirstSession results");
+            };
+
+            Results::GSB(GSBResults {
+                number_of_voters: 1000,
+                voters_counts: results.voters_counts,
+                votes_counts: results.votes_counts,
+                differences_counts: GSBDifferencesCounts::default(),
+                political_group_votes: results.political_group_votes,
+            })
+        }
+
+        /// Empty --> FirstEntryFinalised: import
+        #[test]
+        fn empty_to_first_entry_finalised() {
+            let results = example_gsb_results();
+            let next = DataEntryStatus::Empty
+                .import_first_entry(&csb_election(), results.clone())
+                .expect("should be Ok");
+
+            let DataEntryStatus::FirstEntryFinalised(state) = &next else {
+                panic!("expected FirstEntryFinalised, got {next:?}");
+            };
+            assert_eq!(state.first_entry_origin, DataEntryOrigin::Import);
+            assert_eq!(state.finalised_first_entry, results);
+            assert!(!state.finalised_with_warnings);
+        }
+
+        #[test]
+        fn import_with_warnings() {
+            let Results::GSB(mut results) = example_gsb_results() else {
+                panic!("not GSB results");
+            };
+
+            // Trigger W.206
+            results.number_of_voters = 50;
+
+            let next = DataEntryStatus::Empty
+                .import_first_entry(&csb_election(), Results::GSB(results))
+                .expect("should be Ok");
+
+            assert_eq!(next.status_name(), DataEntryStatusName::FirstEntryFinalised);
+            assert_eq!(next.finalised_with_warnings(), Some(&true));
+        }
+
+        /// An imported first entry cannot have errors, so the import is rejected
+        #[test]
+        fn import_with_errors_is_rejected() {
+            assert_matches!(
+                DataEntryStatus::Empty
+                    .import_first_entry(&csb_election(), example_gsb_results().with_error()),
+                Err(DataEntryTransitionError::ValidationError(_))
+            );
+        }
+
+        /// Only a CSB can import the first entry
+        #[test]
+        fn import_for_gsb_election_is_invalid() {
+            assert_eq!(
+                DataEntryStatus::Empty.import_first_entry(&election(), example_gsb_results()),
+                Err(DataEntryTransitionError::Invalid)
+            );
+        }
+
+        /// An imported first entry has no typist, so using user 0 for the second entry is allowed
+        #[test]
+        fn imported_first_entry_claim_second_entry_not_restricted_by_user() {
+            let imported = DataEntryStatus::Empty
+                .import_first_entry(&csb_election(), example_gsb_results())
+                .expect("should be Ok");
+
+            assert_matches!(
+                imported.claim_second_entry(UserId::from(0), example_gsb_results()),
+                Ok(DataEntryStatus::SecondEntryInProgress(
+                    SecondEntryInProgress {
+                        first_entry_origin: DataEntryOrigin::Import,
+                        ..
+                    }
+                ))
+            );
+        }
+
+        #[test]
+        fn import_from_other_states_is_invalid() {
+            for status in [
+                first_entry_in_progress(),
+                first_entry_has_errors(),
+                first_entry_finalised(),
+                second_entry_in_progress(),
+                entries_different(),
+                first_entry_correction(),
+                second_entry_correction(),
+                definitive(),
+            ] {
+                let name = status.status_name();
+                assert_eq!(
+                    status.import_first_entry(&csb_election(), example_gsb_results()),
+                    Err(DataEntryTransitionError::Invalid),
+                    "should be invalid for state {name}"
+                );
+            }
         }
     }
 

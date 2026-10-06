@@ -20,7 +20,7 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{DataEntrySource, DataEntryStatus, DataEntryTransitionError},
+        data_entry::{DataEntryOrigin, DataEntrySource, DataEntryStatus, DataEntryTransitionError},
         election::{ElectionId, ElectionWithPoliticalGroups},
         results::{Results, gsb_results::GSBResults},
         sub_committee::{SubCommitteeFirstSession, SubCommitteeId},
@@ -37,6 +37,7 @@ use crate::{
 pub enum DataEntryImportError {
     EmlZipError(String),
     CommitteeSessionAlreadyCompleted,
+    SubCommitteeDataEntryAlreadyImported,
     SubCommitteeDataEntryNotEmpty,
     ResultsHaveValidationErrors,
 }
@@ -294,8 +295,11 @@ async fn validate_import(
     let authority_identifier = &definition.managing_authority.authority_identifier;
     let (sub_committee, data_entry_status) =
         find_sub_committee(conn, committee_session.id, authority_identifier).await?;
+
+    if data_entry_status.get_first_entry_origin() == Some(DataEntryOrigin::Import) {
+        return Err(DataEntryImportError::SubCommitteeDataEntryAlreadyImported.into());
+    }
     if data_entry_status != DataEntryStatus::Empty {
-        // TODO #3905 Throw different error when results have already been *imported*, otherwise the following one
         return Err(DataEntryImportError::SubCommitteeDataEntryNotEmpty.into());
     }
 
@@ -919,7 +923,7 @@ mod tests {
                 import_count(pool, &eml).await,
                 Err(APIError::Unprocessable(
                     _,
-                    ErrorReference::DataEntryNotAllowed
+                    ErrorReference::DataEntryAlreadyImported
                 ))
             );
         }

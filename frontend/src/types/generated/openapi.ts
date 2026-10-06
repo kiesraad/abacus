@@ -1383,6 +1383,7 @@ export const errorReferenceValues = [
   "CommitteeSessionPaused",
   "DatabaseError",
   "DataEntryAlreadyClaimed",
+  "DataEntryAlreadyImported",
   "DataEntryAlreadyFinalised",
   "DataEntryCannotBeReset",
   "DataEntryGetNotAllowed",

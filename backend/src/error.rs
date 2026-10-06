@@ -61,6 +61,7 @@ pub enum ErrorReference {
     CommitteeSessionPaused,
     DatabaseError,
     DataEntryAlreadyClaimed,
+    DataEntryAlreadyImported,
     DataEntryAlreadyFinalised,
     DataEntryCannotBeReset,
     DataEntryGetNotAllowed,
@@ -482,6 +483,10 @@ impl From<DataEntryImportError> for APIError {
             DataEntryImportError::CommitteeSessionAlreadyCompleted => APIError::Unprocessable(
                 "Committee session already completed".into(),
                 ErrorReference::InvalidCommitteeSessionStatus,
+            ),
+            DataEntryImportError::SubCommitteeDataEntryAlreadyImported => APIError::Unprocessable(
+                "Sub committee data entry already imported".into(),
+                ErrorReference::DataEntryAlreadyImported,
             ),
             DataEntryImportError::SubCommitteeDataEntryNotEmpty => APIError::Unprocessable(
                 "Sub committee data entry not empty".into(),

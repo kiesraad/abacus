@@ -8922,6 +8922,7 @@
           "CommitteeSessionPaused",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
+          "DataEntryAlreadyImported",
           "DataEntryAlreadyFinalised",
           "DataEntryCannotBeReset",
           "DataEntryGetNotAllowed",

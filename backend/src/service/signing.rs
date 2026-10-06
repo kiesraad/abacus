@@ -1,17 +1,135 @@
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use eml_signature::{
-    Certificate, CertificateSubject, Committee, EmlSignatureError, SigningKeyPair,
+    Certificate, CertificateSubject, Committee, EmlSignatureError, RSA_KEY_BITS, SigningKeyPair,
 };
 use serde::Serialize;
 use sqlx::SqliteConnection;
 
 use crate::{
     APIError,
-    domain::election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
+    domain::{
+        committee_session::CommitteeSessionError,
+        committee_session_status::CommitteeSessionStatus,
+        election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
+        sub_committee::{
+            AddCertificateError, Certificate as DomainCertificate, SubCommittee, SubCommitteeId,
+        },
+    },
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::signing_keypair_repo,
+    repository::{committee_session_repo, signing_keypair_repo, sub_committee_repo},
 };
+
+/// Signature algorithm of all certificates, which use an RSA key of [`RSA_KEY_BITS`] bits
+pub fn signature_algorithm() -> String {
+    format!("RSA {RSA_KEY_BITS}-bit")
+}
+
+impl From<&Certificate> for DomainCertificate {
+    fn from(certificate: &Certificate) -> Self {
+        let subject = certificate.subject();
+        Self {
+            election_identifier: subject.election_identifier.clone(),
+            organizational_unit: subject.organizational_unit.clone(),
+            common_name: subject.common_name.clone(),
+            not_before: certificate.not_before(),
+            not_after: certificate.not_after(),
+            signature_algorithm: signature_algorithm(),
+            public_key: certificate.public_key().to_pem(),
+        }
+    }
+}
+
+/// Reasons a certificate cannot be added to a sub committee.
+#[derive(Debug)]
+pub enum SubCommitteeCertificateError {
+    /// The file is not a valid certificate.
+    InvalidCertificate(EmlSignatureError),
+    /// The certificate is for another election.
+    WrongElection,
+    /// The certificate is for a sub committee that is not part of this election.
+    UnknownSubCommittee,
+    /// The public key in the certificate was already added to the sub committee.
+    AlreadyAdded,
+}
+
+impl From<AddCertificateError> for SubCommitteeCertificateError {
+    fn from(err: AddCertificateError) -> Self {
+        match err {
+            AddCertificateError::AlreadyAdded => Self::AlreadyAdded,
+        }
+    }
+}
+
+#[derive(Serialize)]
+struct SubCommitteeCertificateAddedAuditData {
+    election_id: ElectionId,
+    sub_committee_id: SubCommitteeId,
+    authority_id: String,
+    organizational_unit: String,
+    common_name: String,
+    not_before: DateTime<Utc>,
+    not_after: DateTime<Utc>,
+}
+
+impl AsAuditEvent for SubCommitteeCertificateAddedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::SubCommitteeCertificateAdded;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+/// Add a certificate to the GSB sub committee it belongs to.
+///
+/// The sub committee is found by the `UID` in the certificate subject. A certificate whose public key was already
+/// added to that sub committee is rejected, even if the other certificate fields differ. An expired certificate is
+/// accepted.
+pub async fn add_sub_committee_certificate(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    election: &ElectionWithPoliticalGroups,
+    certificate: &eml_signature::Certificate,
+) -> Result<(SubCommittee, DomainCertificate), APIError> {
+    let committee_session =
+        committee_session_repo::get_election_committee_session(conn, election.id).await?;
+    if committee_session.status == CommitteeSessionStatus::Completed {
+        return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
+    }
+
+    let subject = certificate.subject();
+    if subject.election_identifier != election.election_id {
+        return Err(SubCommitteeCertificateError::WrongElection.into());
+    }
+
+    let Committee::Gsb { authority_id, .. } = &subject.committee;
+    let mut sub_committee = sub_committee_repo::list(conn, committee_session.id)
+        .await?
+        .into_iter()
+        .find(|sub_committee| sub_committee.authority_id == *authority_id)
+        .ok_or(SubCommitteeCertificateError::UnknownSubCommittee)?;
+
+    let new_certificate = sub_committee
+        .add_certificate(DomainCertificate::from(certificate))
+        .map_err(SubCommitteeCertificateError::from)?;
+    sub_committee_repo::update_certificates(conn, sub_committee.id, &sub_committee.certificates)
+        .await?;
+
+    audit_service
+        .log(
+            conn,
+            &SubCommitteeCertificateAddedAuditData {
+                election_id: election.id,
+                sub_committee_id: sub_committee.id,
+                authority_id: sub_committee.authority_id.clone(),
+                organizational_unit: new_certificate.organizational_unit.clone(),
+                common_name: new_certificate.common_name.clone(),
+                not_before: new_certificate.not_before,
+                not_after: new_certificate.not_after,
+            },
+            None,
+        )
+        .await?;
+
+    Ok((sub_committee, new_certificate))
+}
 
 #[derive(Debug)]
 pub enum SigningServiceError {

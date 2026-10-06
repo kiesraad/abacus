@@ -22,15 +22,15 @@ use crate::{
         election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
         filename::hyphenate,
         role::Role,
-        sub_committee::{
-            Certificate, SubCommittee, SubCommitteeCertificateError, SubCommitteeId,
-            signature_algorithm,
-        },
+        sub_committee::{Certificate, SubCommittee, SubCommitteeId},
     },
     error::{ApiErrorResponse, ErrorReference},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{committee_session_repo, election_repo, signing_keypair_repo, sub_committee_repo},
-    service::{add_sub_committee_certificate, get_election_certificate},
+    service::{
+        SubCommitteeCertificateError, add_sub_committee_certificate, get_election_certificate,
+        signature_algorithm,
+    },
 };
 
 impl ApiErrorResponse for SubCommitteeCertificateError {
@@ -289,6 +289,7 @@ pub struct AddSubCommitteeCertificateResponse {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not Found", body = ErrorResponse),
         (status = 409, description = "Public key already added or committee session completed", body = ErrorResponse),
+        (status = 413, description = "Payload too large", body = ErrorResponse),
         (status = 422, description = "Certificate is for another election or an unknown sub committee", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -348,11 +349,11 @@ mod tests {
     // ```
 
     /// Abacus certificate for `GR2026_TestLocation`, GSB 9101.
-    const PSB9101: &str = include_str!("../../fixtures/certificates/psb9101.crt");
+    const PSB9101: &str = include_str!("../tests/certificates/psb9101.crt");
     /// Certificate for another key of GSB 9101, expired on 2026-06-18.
-    const PSB9101_EXPIRED: &str = include_str!("../../fixtures/certificates/psb9101_expired.crt");
+    const PSB9101_EXPIRED: &str = include_str!("../tests/certificates/psb9101_expired.crt");
     /// Certificate for GSB 9999, which election 9 doesn't have.
-    const PSB9999: &str = include_str!("../../fixtures/certificates/psb9999.crt");
+    const PSB9999: &str = include_str!("../tests/certificates/psb9999.crt");
     const OSV2020_NIEUWSTRAND: &str =
         include_str!("../../eml_signature/tests/fixtures/osv2020_nieuwstrand.crt");
 

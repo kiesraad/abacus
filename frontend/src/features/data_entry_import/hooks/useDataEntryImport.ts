@@ -93,11 +93,11 @@ function importError(error: AnyError, electionName: string): FileImportError {
     return fileError("contains_errors");
   }
 
-  // Not handled separately: InvalidCommitteeSessionStatus, InvalidData.
+  // Not handled separately: InvalidCommitteeSessionStatus.
   return fileError("unknown");
 }
 
-function importRequestBody(file: File, hash?: string[]): FormData {
+export function importRequestBody(file: File, hash?: string[]): FormData {
   const body = new FormData();
   body.append("data", file);
   if (hash) {

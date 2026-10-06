@@ -12,6 +12,7 @@ import counting_differences_polling_station from "./counting_differences_polling
 import data_entry from "./data_entry.json";
 import data_entry_detail from "./data_entry_detail.json";
 import data_entry_home from "./data_entry_home.json";
+import data_entry_import from "./data_entry_import.json";
 import differences_counts from "./differences_counts.json";
 import election from "./election.json";
 import election_category from "./election_category.json";
@@ -54,6 +55,7 @@ const nl = {
   counting_differences_polling_station,
   data_entry,
   data_entry_detail,
+  data_entry_import,
   differences_counts,
   election,
   election_category,

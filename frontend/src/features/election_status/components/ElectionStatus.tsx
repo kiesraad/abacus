@@ -54,6 +54,18 @@ export function ElectionStatus({ statuses, election, committeeSession, addLinks,
                 {t("investigations.title")}
               </Button>
             ))}
+
+          {election.committee_category === "CSB" && committeeSession.status !== "completed" && (
+            <Button
+              size="md"
+              variant="secondary"
+              onClick={() => {
+                navigate(`/elections/${election.id}/data-entry/import`);
+              }}
+            >
+              {t("data_entry_import.button_title")}
+            </Button>
+          )}
         </div>
       </div>
       <div className={cls.statusSection}>

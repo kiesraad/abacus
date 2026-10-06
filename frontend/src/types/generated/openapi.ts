@@ -369,6 +369,15 @@ export interface SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS {
 export type SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH = `/api/elections/${ElectionId}/sub_committee_certificates`;
 export type SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY = AddSubCommitteeCertificateRequest;
 
+// /api/elections/{election_id}/sub_committees/{sub_committee_id}/certificates/{public_key_fingerprint}
+export interface SUB_COMMITTEE_CERTIFICATE_DELETE_REQUEST_PARAMS {
+  election_id: ElectionId;
+  sub_committee_id: SubCommitteeId;
+  public_key_fingerprint: string;
+}
+export type SUB_COMMITTEE_CERTIFICATE_DELETE_REQUEST_PATH =
+  `/api/elections/${ElectionId}/sub_committees/${SubCommitteeId}/certificates/${string}`;
+
 // /api/elections/{election_id}/voters
 export interface ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -595,6 +604,7 @@ export const auditEventTypeValues = [
   "DatabaseBackupCreated",
   "SigningKeypairCreated",
   "SubCommitteeCertificateAdded",
+  "SubCommitteeCertificateDeleted",
   "ApiError",
   "ApiWarning",
   "UnknownEvent",
@@ -795,6 +805,7 @@ export interface Certificate {
   not_before: string;
   organizational_unit: string;
   public_key: string;
+  public_key_fingerprint: string;
   signature_algorithm: string;
 }
 

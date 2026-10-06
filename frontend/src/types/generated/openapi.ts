@@ -577,6 +577,7 @@ export const auditEventTypeValues = [
   "PollingStationsExported",
   "DataEntryStarted",
   "DataEntrySaved",
+  "DataEntryImported",
   "DataEntryResumed",
   "DataEntryDeleted",
   "DataEntryDiscarded",

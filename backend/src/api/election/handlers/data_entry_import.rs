@@ -16,19 +16,21 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    api::election::check_hash,
+    api::{data_entry::DataEntryAuditData, election::check_hash},
     domain::{
         committee_session::CommitteeSessionId,
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{DataEntrySource, DataEntryStatus},
+        data_entry::{DataEntrySource, DataEntryStatus, DataEntryTransitionError},
         election::{ElectionId, ElectionWithPoliticalGroups},
         results::{Results, gsb_results::GSBResults},
-        sub_committee::SubCommitteeFirstSession,
-        validate::ValidateRoot,
+        sub_committee::{SubCommitteeFirstSession, SubCommitteeId},
     },
     eml::{EMLImportError, RedactedEmlHash},
     error::ErrorReference,
-    repository::{committee_session_repo, election_repo, sub_committee_repo, user_repo::User},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
+    repository::{
+        committee_session_repo, data_entry_repo, election_repo, sub_committee_repo, user_repo::User,
+    },
 };
 
 #[derive(Debug)]
@@ -37,6 +39,20 @@ pub enum DataEntryImportError {
     CommitteeSessionAlreadyCompleted,
     SubCommitteeDataEntryNotEmpty,
     ResultsHaveValidationErrors,
+}
+
+#[derive(Serialize)]
+struct DataEntryImportedAuditData {
+    election_id: ElectionId,
+    sub_committee_id: SubCommitteeId,
+    authority_id: String,
+    #[serde(flatten)]
+    data_entry: DataEntryAuditData,
+}
+
+impl AsAuditEvent for DataEntryImportedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryImported;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
 #[derive(Debug, ToSchema)]
@@ -188,14 +204,35 @@ pub async fn election_data_entry_import(
     user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
+    audit_service: AuditService,
     request: CSBDataEntryImportRequest,
 ) -> Result<Json<CSBDataEntryImportResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
     let hash = Some(&request.hash);
     let import = validate_import(&mut tx, &user, election_id, request.data, hash).await?;
 
-    // TODO #3905 Store origin of data entry
-    // TODO #3906 Save data entry results
+    let data_entry = data_entry_repo::update(
+        &mut tx,
+        import.sub_committee.data_entry_id,
+        &import.new_state,
+    )
+    .await?;
+
+    audit_service
+        .log(
+            &mut tx,
+            &DataEntryImportedAuditData {
+                election_id: import.election.id,
+                sub_committee_id: import.sub_committee.id,
+                authority_id: import.sub_committee.authority_id.clone(),
+                data_entry: data_entry.into(),
+            },
+            Some(format!(
+                "Election count file hash: {}",
+                request.hash.join(" ")
+            )),
+        )
+        .await?;
 
     tx.commit().await?;
 
@@ -212,9 +249,10 @@ struct ValidatedImport {
     election: ElectionWithPoliticalGroups,
     sub_committee: SubCommitteeFirstSession,
     hash: RedactedEmlHash,
+    new_state: DataEntryStatus,
 }
 
-/// Validate uploaded data: hash, ZIP and EML
+/// Validate uploaded data and get the resulting data entry state
 async fn validate_import(
     conn: &mut SqliteConnection,
     user: &User,
@@ -254,23 +292,30 @@ async fn validate_import(
     }
 
     let authority_identifier = &definition.managing_authority.authority_identifier;
-    let (sub_committee, status) =
+    let (sub_committee, data_entry_status) =
         find_sub_committee(conn, committee_session.id, authority_identifier).await?;
-    if status != DataEntryStatus::Empty {
+    if data_entry_status != DataEntryStatus::Empty {
         // TODO #3905 Throw different error when results have already been *imported*, otherwise the following one
         return Err(DataEntryImportError::SubCommitteeDataEntryNotEmpty.into());
     }
 
+    // The state machine validates results, report validation errors as import errors
     let results = Results::GSB(GSBResults::from_eml_count(&definition, election.category)?);
-    let validation_results = results.start_validate(&election)?;
-    if validation_results.has_errors() {
-        return Err(DataEntryImportError::ResultsHaveValidationErrors.into());
-    }
+    let new_state = data_entry_status
+        .import_first_entry(&election, results)
+        .map_err(|err| match err {
+            DataEntryTransitionError::ValidationError(_) => {
+                APIError::from(DataEntryImportError::ResultsHaveValidationErrors)
+            }
+            DataEntryTransitionError::ValidatorError(err) => APIError::from(err),
+            err => APIError::from(err),
+        })?;
 
     Ok(ValidatedImport {
         election,
         sub_committee,
         hash: RedactedEmlHash::from(eml.as_bytes()),
+        new_state,
     })
 }
 

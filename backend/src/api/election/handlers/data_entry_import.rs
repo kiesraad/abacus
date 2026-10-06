@@ -395,7 +395,9 @@ async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::domain::tabulation::ElectionTotals;
     use async_zip::{Compression, ZipEntryBuilder, tokio::write::ZipFileWriter};
+    use chrono::Local;
     use std::assert_matches;
 
     /// Create a zip file in memory containing the given files
@@ -572,8 +574,26 @@ mod tests {
         }
     }
 
+    /// Generate the count EML (510b) for the given election
+    async fn count_eml(conn: &mut SqliteConnection, election_id: ElectionId) -> String {
+        let election = election_repo::get(conn, election_id).await.unwrap();
+        let committee_session =
+            committee_session_repo::get_election_committee_session(conn, election_id)
+                .await
+                .unwrap();
+        let results =
+            data_entry_repo::list_results_for_committee_session(conn, committee_session.id)
+                .await
+                .unwrap();
+        let totals = ElectionTotals::tabulate(&election, &results).unwrap();
+        let count = election
+            .as_count_eml(None, &committee_session, &results, &totals, Local::now())
+            .unwrap();
+
+        String::try_from(count).unwrap()
+    }
+
     mod validate_import {
-        use chrono::Local;
         use eml_nl::{
             documents::election_count::UncountedVotesReason,
             utils::{AuthorityId, StringValue},
@@ -582,25 +602,13 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::{data_entry::DataEntryId, role::Role, tabulation::ElectionTotals},
+            domain::{
+                data_entry::{DataEntryId, DataEntryOrigin, FirstEntryFinalised},
+                role::Role,
+            },
             eml::EmlHash,
             repository::{data_entry_repo, user_repo::UserId},
         };
-
-        /// Generate the count EML (510b) for the given election
-        async fn count_eml(conn: &mut SqliteConnection, election_id: ElectionId) -> String {
-            let election = election_repo::get(conn, election_id).await.unwrap();
-            let committee_session =
-                committee_session_repo::get_election_committee_session(conn, election_id)
-                    .await
-                    .unwrap();
-            let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
-            let count = election
-                .as_count_eml(None, &committee_session, &[], &totals, Local::now())
-                .unwrap();
-
-            String::try_from(count).unwrap()
-        }
 
         #[test(sqlx::test(fixtures(
             path = "../../../../fixtures",
@@ -625,7 +633,14 @@ mod tests {
 
             assert_eq!(import.election.id, csb_election_id);
             assert_eq!(import.sub_committee.authority_id, "0035");
-            // TODO #3906 Compare results with empty GSB results
+            assert_matches!(
+                import.new_state,
+                DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                    first_entry_origin: DataEntryOrigin::Import,
+                    finalised_first_entry: Results::GSB(_),
+                    ..
+                })
+            );
         }
 
         #[test(sqlx::test(fixtures(
@@ -674,11 +689,9 @@ mod tests {
                 let eml = String::try_from(count.clone()).unwrap();
                 let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
-                assert!(
-                    matches!(
-                        validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
-                        Err(APIError::EmlImportError(EMLImportError::InvalidCountType))
-                    ),
+                assert_matches!(
+                    validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
+                    Err(APIError::EmlImportError(EMLImportError::InvalidCountType)),
                     "{count_type:?}"
                 );
             }
@@ -802,6 +815,111 @@ mod tests {
                 Err(APIError::Unprocessable(
                     _,
                     ErrorReference::DataEntryValidationErrors
+                ))
+            );
+        }
+    }
+
+    mod import {
+        use test_log::test;
+
+        use super::*;
+        use crate::{
+            domain::{
+                data_entry::{DataEntryId, DataEntryOrigin},
+                election::ElectionCategory,
+                role::Role,
+            },
+            eml::EmlHash,
+            infra::audit_log,
+            repository::{data_entry_repo, user_repo::UserId},
+        };
+
+        async fn import_count(
+            pool: SqlitePool,
+            eml: &str,
+        ) -> Result<Json<CSBDataEntryImportResponse>, APIError> {
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+            let audit_service = AuditService::new(Some(user.clone()), None);
+            let hash = EmlHash::from(eml.as_bytes()).chunks;
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            election_data_entry_import(
+                user,
+                State(pool),
+                Path(ElectionId::from(8)),
+                audit_service,
+                CSBDataEntryImportRequest { hash, data: zip },
+            )
+            .await
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_import_saves_results_and_logs_audit_event(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let data_entry_id = DataEntryId::from(801);
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, data_entry_id, &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            let response = import_count(pool, &eml).await.expect("should be Ok");
+            assert_eq!(response.sub_committee.data_entry_id, data_entry_id);
+
+            let data_entry = data_entry_repo::get(&mut conn, data_entry_id)
+                .await
+                .unwrap();
+            let DataEntryStatus::FirstEntryFinalised(state) = &data_entry.state.0 else {
+                panic!("expected FirstEntryFinalised, got {:?}", data_entry.state.0);
+            };
+            assert_eq!(state.first_entry_origin, DataEntryOrigin::Import);
+
+            let count = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict)
+                .ok()
+                .unwrap();
+            let expected = GSBResults::from_eml_count(&count, ElectionCategory::Municipal).unwrap();
+            assert_eq!(state.finalised_first_entry, Results::GSB(expected));
+
+            audit_log::assert_last_event(
+                &mut conn,
+                AuditEventType::DataEntryImported,
+                AuditEventLevel::Success,
+                serde_json::json!({
+                    "election_id": 8,
+                    "sub_committee_id": 811,
+                    "authority_id": "0035",
+                    "data_entry_id": 801,
+                    "data_entry_status": "first_entry_finalised",
+                    "first_entry_origin": { "type": "Import" }
+                }),
+            )
+            .await;
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_import_twice_not_allowed(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            assert_matches!(import_count(pool.clone(), &eml).await, Ok(_));
+            assert_matches!(
+                import_count(pool, &eml).await,
+                Err(APIError::Unprocessable(
+                    _,
+                    ErrorReference::DataEntryNotAllowed
                 ))
             );
         }

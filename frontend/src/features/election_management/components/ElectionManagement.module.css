@@ -65,6 +65,10 @@ main.backgroundBlue {
     display: flex;
     flex-direction: column;
     gap: var(--space-md-lg);
+
+    div[role="alert"] {
+      width: 58.5rem;
+    }
   }
 
   .keysTable {

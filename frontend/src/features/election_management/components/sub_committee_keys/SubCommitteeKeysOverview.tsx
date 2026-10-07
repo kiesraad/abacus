@@ -74,39 +74,41 @@ interface AlertDetails {
 }
 
 function processError(response: AnyError, currentFile: File): AlertDetails | undefined {
+  if (!(response instanceof ApiError)) throw response;
+
   // Response code 413 indicates that the file is too large
-  if (response instanceof ApiError && response.code === 413) {
+  if (response.code === 413) {
     return {
       title: t("sub_committee_keys.invalid_public_key"),
       message: fileTooLargeError(currentFile),
       type: "error",
     };
-  } else if (response instanceof ApiError && response.reference === "InvalidCertificate") {
+  } else if (response.reference === "InvalidCertificate") {
     return {
       title: t("sub_committee_keys.no_public_key"),
       message: t("error.api_error.InvalidCertificate"),
       type: "error",
     };
-  } else if (response instanceof ApiError && response.reference === "CertificateWrongElection") {
+  } else if (response.reference === "CertificateWrongElection") {
     return {
       title: t("sub_committee_keys.key_wrong_election"),
       message: t("error.api_error.CertificateWrongElection"),
       type: "error",
     };
-  } else if (response instanceof ApiError && response.reference === "CertificateUnknownSubCommittee") {
+  } else if (response.reference === "CertificateUnknownSubCommittee") {
     return {
       title: t("sub_committee_keys.key_unknown_subcommittee"),
       message: t("error.api_error.CertificateUnknownSubCommittee"),
       type: "error",
     };
-  } else if (response instanceof ApiError && response.reference === "CertificateAlreadyAdded") {
+  } else if (response.reference === "CertificateAlreadyAdded") {
     return {
       title: t("sub_committee_keys.key_already_added"),
       message: t("error.api_error.CertificateAlreadyAdded"),
       type: "success",
     };
   }
-  return undefined;
+  throw response;
 }
 
 interface SubCommitteeKeysOverviewProps {
@@ -143,6 +145,7 @@ export function SubCommitteeKeysOverview({ subCommittees, electionId, onSuccess 
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      setFile(currentFile);
       if (await isFileTooLarge(currentFile)) {
         setAlert({
           title: t("sub_committee_keys.invalid_public_key"),
@@ -152,7 +155,6 @@ export function SubCommitteeKeysOverview({ subCommittees, electionId, onSuccess 
         return;
       }
 
-      setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({ data });
 

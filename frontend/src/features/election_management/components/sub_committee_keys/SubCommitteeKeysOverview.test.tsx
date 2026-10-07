@@ -1,6 +1,7 @@
 import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import alertCls from "@/components/ui/Alert/Alert.module.css";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { tx } from "@/i18n/translate";
@@ -123,21 +124,21 @@ describe("SubCommitteeKeysOverview", () => {
     });
   });
 
-  test("Shows an error when frontend determines uploaded file is too large", async () => {
+  test("Shows an error alert when frontend determines uploaded file is too large", async () => {
     vi.spyOn(uploadFileSize, "isFileTooLarge").mockResolvedValueOnce(true);
 
     renderSubCommitteeKeysOverview(subCommittees, false);
     await uploadFile(file);
 
-    expect(screen.getByLabelText("Geen bestand gekozen")).toBeInTheDocument();
-    expect(screen.getAllByText(filename).length).toBe(1);
-    expect(screen.getByRole("alert")).toHaveTextContent("Ongeldige publieke sleutel");
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      `Het bestand ${filename} is te groot. Kies een bestand van maximaal 5 Megabyte`,
-    );
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Ongeldige publieke sleutel");
+    expect(alert).toHaveTextContent(`Het bestand ${filename} is te groot. Kies een bestand van maximaal 5 Megabyte`);
+    expect(alert).toHaveClass(alertCls.error!);
   });
 
-  test("Shows an error when backend determines uploaded file is too large", async () => {
+  test("Shows an error alert when backend determines uploaded file is too large", async () => {
     overrideOnce("post", "/api/elections/2/sub_committee_certificates", 413, {
       error: "15",
       fatal: false,
@@ -149,13 +150,13 @@ describe("SubCommitteeKeysOverview", () => {
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);
-    expect(screen.getByRole("alert")).toHaveTextContent("Ongeldige publieke sleutel");
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      `Het bestand ${filename} is te groot. Kies een bestand van maximaal 5 Megabyte`,
-    );
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Ongeldige publieke sleutel");
+    expect(alert).toHaveTextContent(`Het bestand ${filename} is te groot. Kies een bestand van maximaal 5 Megabyte`);
+    expect(alert).toHaveClass(alertCls.error!);
   });
 
-  test("Shows an error when backend determines uploaded file is invalid", async () => {
+  test("Shows an error alert when backend determines uploaded file is invalid", async () => {
     overrideOnce("post", "/api/elections/2/sub_committee_certificates", 400, {
       error: "Invalid certificate",
       fatal: false,
@@ -167,13 +168,15 @@ describe("SubCommitteeKeysOverview", () => {
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(1);
-    expect(screen.getByRole("alert")).toHaveTextContent("Geen publieke sleutel");
-    expect(screen.getByRole("alert")).toHaveTextContent(
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Geen publieke sleutel");
+    expect(alert).toHaveTextContent(
       "Het bestand dat je probeert te importeren is geen publieke sleutel. Probeer een ander bestand.",
     );
+    expect(alert).toHaveClass(alertCls.error!);
   });
 
-  test("Shows an error when backend determines uploaded certificate is for wrong election", async () => {
+  test("Shows an error alert when backend determines uploaded certificate is for wrong election", async () => {
     overrideOnce("post", "/api/elections/2/sub_committee_certificates", 422, {
       error: "Certificate is for another election",
       fatal: false,
@@ -185,11 +188,13 @@ describe("SubCommitteeKeysOverview", () => {
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(1);
-    expect(screen.getByRole("alert")).toHaveTextContent("Publieke sleutel voor andere verkiezing");
-    expect(screen.getByRole("alert")).toHaveTextContent("De publieke sleutel hoort bij een andere verkiezing");
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Publieke sleutel voor andere verkiezing");
+    expect(alert).toHaveTextContent("De publieke sleutel hoort bij een andere verkiezing");
+    expect(alert).toHaveClass(alertCls.error!);
   });
 
-  test("Shows an error when backend determines uploaded certificate is for unknown subcommittee", async () => {
+  test("Shows an error alert when backend determines uploaded certificate is for unknown subcommittee", async () => {
     overrideOnce("post", "/api/elections/2/sub_committee_certificates", 422, {
       error: "Certificate is for an unknown sub committee",
       fatal: false,
@@ -201,13 +206,13 @@ describe("SubCommitteeKeysOverview", () => {
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(1);
-    expect(screen.getByRole("alert")).toHaveTextContent("Publieke sleutel van onbekend stembureau");
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "De publieke sleutel hoort bij een GSB dat niet bij deze verkiezing hoort",
-    );
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Publieke sleutel van onbekend stembureau");
+    expect(alert).toHaveTextContent("De publieke sleutel hoort bij een GSB dat niet bij deze verkiezing hoort");
+    expect(alert).toHaveClass(alertCls.error!);
   });
 
-  test("Shows an error when backend determines uploaded certificate is already added", async () => {
+  test("Shows a success alert when backend determines uploaded certificate is already added", async () => {
     overrideOnce("post", "/api/elections/2/sub_committee_certificates", 409, {
       error: "Public key was already added",
       fatal: false,
@@ -219,7 +224,9 @@ describe("SubCommitteeKeysOverview", () => {
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(1);
-    expect(screen.getByRole("alert")).toHaveTextContent("Publieke sleutel al geïmporteerd");
-    expect(screen.getByRole("alert")).toHaveTextContent("Deze publieke sleutel is al toegevoegd");
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Publieke sleutel al geïmporteerd");
+    expect(alert).toHaveTextContent("Deze publieke sleutel is al toegevoegd");
+    expect(alert).toHaveClass(alertCls.success!);
   });
 });

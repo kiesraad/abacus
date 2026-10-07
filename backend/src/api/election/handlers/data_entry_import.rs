@@ -639,6 +639,7 @@ mod tests {
     }
 
     mod validate_import {
+        use chrono::Utc;
         use eml_nl::{
             documents::election_count::UncountedVotesReason,
             utils::{AuthorityId, StringValue},
@@ -779,6 +780,38 @@ mod tests {
             assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::EmlImportError(EMLImportError::UnknownCommittee))
+            );
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_data_entry_already_imported(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            data_entry_repo::update(
+                &mut conn,
+                DataEntryId::from(801),
+                &DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                    first_entry_origin: DataEntryOrigin::Import,
+                    finalised_first_entry: Results::GSB(GSBResults::default()),
+                    first_entry_finished_at: Utc::now(),
+                    finalised_with_warnings: false,
+                }),
+            )
+            .await
+            .unwrap();
+
+            assert_matches!(
+                validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
+                Err(APIError::Unprocessable(
+                    message,
+                    ErrorReference::DataEntryAlreadyImported
+                )) if message == "Sub committee data entry already imported"
             );
         }
 

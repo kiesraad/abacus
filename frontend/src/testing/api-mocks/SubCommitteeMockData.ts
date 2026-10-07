@@ -9,6 +9,7 @@ export const getCertificateMockData = (certificate: Partial<Certificate> = {}): 
     not_after: "2027-04-01T00:00:00Z",
     signature_algorithm: "RSA 4096-bit",
     public_key: "-----BEGIN PUBLIC KEY-----\n-----END PUBLIC KEY-----\n",
+    public_key_fingerprint: "a4ac04ce062498ce950a4b02d6fc5bb1dea3f74b209ae6f6e7251e626252b8e1",
     ...certificate,
   };
 };

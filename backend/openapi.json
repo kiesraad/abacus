@@ -5037,8 +5037,118 @@
               }
             }
           },
+          "413": {
+            "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Certificate is for another election or an unknown sub committee",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/sub_committees/{sub_committee_id}/certificates/{public_key_fingerprint}": {
+      "delete": {
+        "summary": "Delete a sub committee certificate by its public key fingerprint (administrator)",
+        "operationId": "sub_committee_certificate_delete",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          },
+          {
+            "name": "sub_committee_id",
+            "in": "path",
+            "description": "Sub committee database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SubCommitteeId"
+            }
+          },
+          {
+            "name": "public_key_fingerprint",
+            "in": "path",
+            "description": "Lowercase hex SHA-256 of the certificate's SubjectPublicKeyInfo DER, as in the list response",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Certificate deleted"
+          },
+          "400": {
+            "description": "Invalid path parameter"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election, sub committee or certificate not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Committee session completed",
             "content": {
               "application/json": {
                 "schema": {
@@ -6739,6 +6849,7 @@
           "DatabaseBackupCreated",
           "SigningKeypairCreated",
           "SubCommitteeCertificateAdded",
+          "SubCommitteeCertificateDeleted",
           "ApiError",
           "ApiWarning",
           "UnknownEvent"
@@ -7316,7 +7427,8 @@
           "not_before",
           "not_after",
           "signature_algorithm",
-          "public_key"
+          "public_key",
+          "public_key_fingerprint"
         ],
         "properties": {
           "common_name": {
@@ -7337,6 +7449,9 @@
             "type": "string"
           },
           "public_key": {
+            "type": "string"
+          },
+          "public_key_fingerprint": {
             "type": "string"
           },
           "signature_algorithm": {

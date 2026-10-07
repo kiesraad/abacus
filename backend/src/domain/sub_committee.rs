@@ -1,5 +1,4 @@
 use chrono::{DateTime, Utc};
-use eml_signature::{EmlSignatureError, RSA_KEY_BITS};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -36,26 +35,7 @@ pub struct Certificate {
     pub not_after: DateTime<Utc>,
     pub signature_algorithm: String,
     pub public_key: String,
-}
-
-/// Signature algorithm of all certificates, which use an RSA key of [`RSA_KEY_BITS`] bits
-pub fn signature_algorithm() -> String {
-    format!("RSA {RSA_KEY_BITS}-bit")
-}
-
-impl From<&eml_signature::Certificate> for Certificate {
-    fn from(certificate: &eml_signature::Certificate) -> Self {
-        let subject = certificate.subject();
-        Self {
-            election_identifier: subject.election_identifier.clone(),
-            organizational_unit: subject.organizational_unit.clone(),
-            common_name: subject.common_name.clone(),
-            not_before: certificate.not_before(),
-            not_after: certificate.not_after(),
-            signature_algorithm: signature_algorithm(),
-            public_key: certificate.public_key().to_pem(),
-        }
-    }
+    pub public_key_fingerprint: String,
 }
 
 impl Certificate {
@@ -69,32 +49,46 @@ impl SubCommittee {
     /// Add a certificate, unless its public key was already added. The other certificate fields may differ.
     pub fn add_certificate(
         &mut self,
-        certificate: &eml_signature::Certificate,
-    ) -> Result<Certificate, SubCommitteeCertificateError> {
-        let new_certificate = Certificate::from(certificate);
+        certificate: Certificate,
+    ) -> Result<Certificate, AddCertificateError> {
         if self
             .certificates
             .iter()
-            .any(|stored| stored.public_key == new_certificate.public_key)
+            .any(|stored| stored.public_key_fingerprint == certificate.public_key_fingerprint)
         {
-            return Err(SubCommitteeCertificateError::AlreadyAdded);
+            return Err(AddCertificateError::AlreadyAdded);
         }
-        self.certificates.push(new_certificate.clone());
-        Ok(new_certificate)
+        self.certificates.push(certificate.clone());
+        Ok(certificate)
+    }
+
+    /// Delete a certificate by its public key fingerprint and return the removed certificate.
+    pub fn delete_certificate(
+        &mut self,
+        public_key_fingerprint: &str,
+    ) -> Result<Certificate, DeleteCertificateError> {
+        let index = self
+            .certificates
+            .iter()
+            .position(|certificate| certificate.public_key_fingerprint == public_key_fingerprint)
+            .ok_or(DeleteCertificateError::NotFound)?;
+
+        Ok(self.certificates.remove(index))
     }
 }
 
 /// Reasons a certificate cannot be added to a sub committee.
 #[derive(Debug)]
-pub enum SubCommitteeCertificateError {
-    /// The file is not a valid certificate.
-    InvalidCertificate(EmlSignatureError),
-    /// The certificate is for another election.
-    WrongElection,
-    /// The certificate is for a sub committee that is not part of this election.
-    UnknownSubCommittee,
+pub enum AddCertificateError {
     /// The public key in the certificate was already added to the sub committee.
     AlreadyAdded,
+}
+
+/// Reasons a certificate cannot be deleted from a sub committee.
+#[derive(Debug)]
+pub enum DeleteCertificateError {
+    /// No certificate has the requested public key fingerprint.
+    NotFound,
 }
 
 /// Struct for creating a new subcommittee in Abacus.
@@ -126,37 +120,62 @@ pub struct SubCommitteeFirstSession {
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use chrono::TimeZone;
 
     use super::*;
 
-    #[test]
-    fn test_certificate_is_expired() {
-        let certificate = Certificate {
+    fn certificate(fingerprint: &str) -> Certificate {
+        Certificate {
             election_identifier: "GR2026_TestLocation".to_string(),
             organizational_unit: "Abacus 1.1.0".to_string(),
             common_name: "Gemeente Test Location".to_string(),
             not_before: Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap(),
             not_after: Utc.with_ymd_and_hms(2026, 6, 18, 0, 0, 0).unwrap(),
             signature_algorithm: "RSA 4096-bit".to_string(),
-            public_key: String::new(),
-        };
+            public_key: format!("public key {fingerprint}"),
+            public_key_fingerprint: fingerprint.to_string(),
+        }
+    }
 
+    fn sub_committee(certificates: Vec<Certificate>) -> SubCommittee {
+        SubCommittee {
+            id: SubCommitteeId::from(911),
+            number: 1,
+            name: "GSB Test Location".to_string(),
+            category: CommitteeCategory::GSB,
+            authority_id: "9101".to_string(),
+            authority_name: "Test Location".to_string(),
+            certificates,
+        }
+    }
+
+    #[test]
+    fn test_certificate_is_expired() {
+        let certificate = certificate("key-a");
         assert!(!certificate.is_expired(Utc.with_ymd_and_hms(2026, 3, 18, 0, 0, 0).unwrap()));
         assert!(!certificate.is_expired(certificate.not_after));
         assert!(certificate.is_expired(Utc.with_ymd_and_hms(2026, 6, 18, 0, 0, 1).unwrap()));
     }
 
-    fn certificate(pem: &str) -> eml_signature::Certificate {
-        eml_signature::Certificate::from_pem(pem.as_bytes()).unwrap()
-    }
-
     #[test]
     fn test_sub_committee_add_certificate() {
-        let psb9101 = certificate(include_str!("../../fixtures/certificates/psb9101.crt"));
-        let psb9101_other_key = certificate(include_str!(
-            "../../fixtures/certificates/psb9101_expired.crt"
-        ));
+        let psb9101 = Certificate {
+            election_identifier: "GR2026_TestLocation".to_string(),
+            organizational_unit: "Abacus 1.1.0".to_string(),
+            common_name: "Gemeente Test Location".to_string(),
+            not_before: Utc.with_ymd_and_hms(2026, 10, 1, 0, 0, 0).unwrap(),
+            not_after: Utc.with_ymd_and_hms(2026, 12, 31, 0, 0, 0).unwrap(),
+            signature_algorithm: "RSA 4096-bit".to_string(),
+            public_key: "first public key".to_string(),
+            public_key_fingerprint: "first fingerprint".to_string(),
+        };
+        let psb9101_other_key = Certificate {
+            public_key: "second public key".to_string(),
+            public_key_fingerprint: "second fingerprint".to_string(),
+            ..psb9101.clone()
+        };
         let mut sub_committee = SubCommittee {
             id: SubCommitteeId::from(911),
             number: 1,
@@ -167,13 +186,13 @@ mod tests {
             certificates: vec![],
         };
 
-        let added = sub_committee.add_certificate(&psb9101).unwrap();
-        assert_eq!(added, Certificate::from(&psb9101));
+        let added = sub_committee.add_certificate(psb9101.clone()).unwrap();
+        assert_eq!(added, psb9101.clone());
         assert_eq!(sub_committee.certificates, vec![added]);
 
         assert!(matches!(
-            sub_committee.add_certificate(&psb9101),
-            Err(SubCommitteeCertificateError::AlreadyAdded)
+            sub_committee.add_certificate(psb9101.clone()),
+            Err(AddCertificateError::AlreadyAdded)
         ));
         assert_eq!(sub_committee.certificates.len(), 1);
 
@@ -181,16 +200,40 @@ mod tests {
         let same_key = Certificate {
             organizational_unit: "OSV2020-U".to_string(),
             not_before: Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap(),
-            ..Certificate::from(&psb9101)
+            ..psb9101.clone()
         };
         sub_committee.certificates = vec![same_key.clone()];
         assert!(matches!(
-            sub_committee.add_certificate(&psb9101),
-            Err(SubCommitteeCertificateError::AlreadyAdded)
+            sub_committee.add_certificate(psb9101.clone()),
+            Err(AddCertificateError::AlreadyAdded)
         ));
         assert_eq!(sub_committee.certificates, vec![same_key]);
 
-        assert!(sub_committee.add_certificate(&psb9101_other_key).is_ok());
+        assert!(sub_committee.add_certificate(psb9101_other_key).is_ok());
         assert_eq!(sub_committee.certificates.len(), 2);
+    }
+
+    #[test]
+    fn test_sub_committee_delete_certificate() {
+        let removed = certificate("key-a");
+        let remaining = certificate("key-b");
+        let mut committee = sub_committee(vec![remaining.clone(), removed.clone()]);
+
+        assert_eq!(committee.delete_certificate("key-a").unwrap(), removed);
+        assert_eq!(committee.certificates, vec![remaining]);
+    }
+
+    #[test]
+    fn test_sub_committee_delete_certificate_not_found() {
+        for certificates in [vec![certificate("key-a")], vec![]] {
+            let mut committee = sub_committee(certificates);
+            let before = committee.clone();
+
+            assert_matches!(
+                committee.delete_certificate("missing"),
+                Err(DeleteCertificateError::NotFound)
+            );
+            assert_eq!(committee, before);
+        }
     }
 }

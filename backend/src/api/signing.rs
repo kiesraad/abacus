@@ -22,15 +22,15 @@ use crate::{
         election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
         filename::hyphenate,
         role::Role,
-        sub_committee::{
-            Certificate, SubCommittee, SubCommitteeCertificateError, SubCommitteeId,
-            signature_algorithm,
-        },
+        sub_committee::{Certificate, SubCommittee, SubCommitteeId},
     },
     error::{ApiErrorResponse, ErrorReference},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{committee_session_repo, election_repo, signing_keypair_repo, sub_committee_repo},
-    service::{add_sub_committee_certificate, get_election_certificate},
+    service::{
+        SubCommitteeCertificateError, add_sub_committee_certificate,
+        delete_sub_committee_certificate, get_election_certificate, signature_algorithm,
+    },
 };
 
 impl ApiErrorResponse for SubCommitteeCertificateError {
@@ -82,7 +82,9 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(certificate).authorize(ADMIN))
         .routes(routes!(certificate_details).authorize(ADMIN))
-        .routes(routes!(sub_committee_certificates, sub_committee_certificate_add).authorize(ADMIN))
+        .routes(routes!(sub_committee_certificates).authorize(ADMIN))
+        .routes(routes!(sub_committee_certificate_add).authorize(ADMIN))
+        .routes(routes!(sub_committee_certificate_delete).authorize(ADMIN))
         .routes(routes!(dismiss_public_key_upload_reminder).authorize(ADMIN))
 }
 
@@ -289,6 +291,7 @@ pub struct AddSubCommitteeCertificateResponse {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not Found", body = ErrorResponse),
         (status = 409, description = "Public key already added or committee session completed", body = ErrorResponse),
+        (status = 413, description = "Payload too large", body = ErrorResponse),
         (status = 422, description = "Certificate is for another election or an unknown sub committee", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -324,6 +327,48 @@ pub async fn sub_committee_certificate_add(
     ))
 }
 
+/// Delete a sub committee certificate by its public key fingerprint
+#[utoipa::path(
+    delete,
+    path = "/api/elections/{election_id}/sub_committees/{sub_committee_id}/certificates/{public_key_fingerprint}",
+    responses(
+        (status = 204, description = "Certificate deleted"),
+        (status = 400, description = "Invalid path parameter"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Election, sub committee or certificate not found", body = ErrorResponse),
+        (status = 409, description = "Committee session completed", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+        ("sub_committee_id" = SubCommitteeId, description = "Sub committee database id"),
+        ("public_key_fingerprint" = String, description = "Lowercase hex SHA-256 of the certificate's SubjectPublicKeyInfo DER, as in the list response"),
+    ),
+)]
+pub async fn sub_committee_certificate_delete(
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Path((election_id, sub_committee_id, public_key_fingerprint)): Path<(
+        ElectionId,
+        SubCommitteeId,
+        String,
+    )>,
+) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+    election_repo::get(&mut tx, election_id).await?;
+    delete_sub_committee_certificate(
+        &mut tx,
+        &audit_service,
+        election_id,
+        sub_committee_id,
+        &public_key_fingerprint,
+    )
+    .await?;
+    tx.commit().await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
 #[cfg(test)]
 mod tests {
     use std::assert_matches;
@@ -348,11 +393,11 @@ mod tests {
     // ```
 
     /// Abacus certificate for `GR2026_TestLocation`, GSB 9101.
-    const PSB9101: &str = include_str!("../../fixtures/certificates/psb9101.crt");
+    const PSB9101: &str = include_str!("../tests/certificates/psb9101.crt");
     /// Certificate for another key of GSB 9101, expired on 2026-06-18.
-    const PSB9101_EXPIRED: &str = include_str!("../../fixtures/certificates/psb9101_expired.crt");
+    const PSB9101_EXPIRED: &str = include_str!("../tests/certificates/psb9101_expired.crt");
     /// Certificate for GSB 9999, which election 9 doesn't have.
-    const PSB9999: &str = include_str!("../../fixtures/certificates/psb9999.crt");
+    const PSB9999: &str = include_str!("../tests/certificates/psb9999.crt");
     const OSV2020_NIEUWSTRAND: &str =
         include_str!("../../eml_signature/tests/fixtures/osv2020_nieuwstrand.crt");
 
@@ -390,6 +435,45 @@ mod tests {
                 .expect("should be ok");
         assert_eq!(sub_committees.len(), 1);
         sub_committees.remove(0).certificates
+    }
+
+    /// Fingerprint of the certificate in the `sub_committee_certificate` fixture
+    const FIXTURE_FINGERPRINT: &str =
+        "bd0bfa8699f1317b08593ea5da84f28b53cae1f2730611bf69e143e0ba132c34";
+
+    async fn delete_certificate(
+        pool: SqlitePool,
+        election_id: u32,
+        sub_committee_id: u32,
+        fingerprint: &str,
+    ) -> Result<StatusCode, APIError> {
+        let user = User::test_user(Role::Administrator, UserId::from(1));
+        sub_committee_certificate_delete(
+            State(pool),
+            AuditService::new(Some(user), None),
+            Path((
+                election_id.into(),
+                sub_committee_id.into(),
+                fingerprint.into(),
+            )),
+        )
+        .await
+    }
+
+    async fn delete_certificate_error(
+        pool: SqlitePool,
+        election_id: u32,
+        sub_committee_id: u32,
+        fingerprint: &str,
+    ) -> (StatusCode, ErrorReference) {
+        let response = delete_certificate(pool, election_id, sub_committee_id, fingerprint)
+            .await
+            .expect_err("should fail")
+            .into_response();
+        let status = response.status();
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let error: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        (status, error.reference)
     }
 
     #[test]
@@ -530,6 +614,7 @@ mod tests {
                 "common_name": "Gemeente Test Location",
                 "not_before": certificate.not_before,
                 "not_after": certificate.not_after,
+                "public_key_fingerprint": certificate.public_key_fingerprint,
             }),
         )
         .await;
@@ -633,5 +718,110 @@ mod tests {
                 .unwrap()
                 .contains(&"SubCommitteeCertificateAdded".to_string())
         );
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_9_csb", "sub_committee_certificate")
+    )))]
+    async fn test_sub_committee_certificate_delete(pool: SqlitePool) {
+        let remaining = stored_certificates(pool.clone()).await;
+        let (_, Json(added)) = add_certificate(pool.clone(), PSB9101).await.unwrap();
+        let removed = added.certificate;
+
+        assert_eq!(
+            delete_certificate(pool.clone(), 9, 911, &removed.public_key_fingerprint)
+                .await
+                .unwrap(),
+            StatusCode::NO_CONTENT
+        );
+        assert_eq!(stored_certificates(pool.clone()).await, remaining);
+        assert_last_event(
+            &mut pool.acquire().await.unwrap(),
+            AuditEventType::SubCommitteeCertificateDeleted,
+            AuditEventLevel::Success,
+            json!({
+                "election_id": 9,
+                "sub_committee_id": 911,
+                "authority_id": "9101",
+                "organizational_unit": removed.organizational_unit,
+                "common_name": removed.common_name,
+                "not_before": removed.not_before,
+                "not_after": removed.not_after,
+                "public_key_fingerprint": removed.public_key_fingerprint,
+            }),
+        )
+        .await;
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts(
+            "election_9_csb",
+            "sub_committee_certificate",
+            "election_8_csb_with_results"
+        )
+    )))]
+    async fn test_sub_committee_certificate_delete_not_found(pool: SqlitePool) {
+        let before = stored_certificates(pool.clone()).await;
+        for (election_id, sub_committee_id, fingerprint) in [
+            (999, 911, FIXTURE_FINGERPRINT), // missing election
+            (9, 999, FIXTURE_FINGERPRINT),   // missing sub committee
+            (8, 911, FIXTURE_FINGERPRINT),   // sub committee belongs to another election
+            (9, 911, "unknown"),             // missing certificate
+        ] {
+            assert_eq!(
+                delete_certificate_error(pool.clone(), election_id, sub_committee_id, fingerprint)
+                    .await,
+                (StatusCode::NOT_FOUND, ErrorReference::EntryNotFound)
+            );
+        }
+        assert_eq!(stored_certificates(pool).await, before);
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_9_csb", "sub_committee_certificate")
+    )))]
+    async fn test_sub_committee_certificate_delete_previous_session(pool: SqlitePool) {
+        sqlx::query("INSERT INTO committee_sessions (id, number, election_id, status, location) VALUES (902, 2, 9, 'data_entry', '')")
+            .execute(&pool).await.unwrap();
+        let before = sub_committee_repo::list(&mut pool.acquire().await.unwrap(), 901.into())
+            .await
+            .unwrap();
+        assert_eq!(
+            delete_certificate_error(pool.clone(), 9, 911, FIXTURE_FINGERPRINT).await,
+            (StatusCode::NOT_FOUND, ErrorReference::EntryNotFound)
+        );
+        let mut conn = pool.acquire().await.unwrap();
+        assert_eq!(
+            sub_committee_repo::list(&mut conn, 901.into())
+                .await
+                .unwrap(),
+            before
+        );
+        assert!(list_event_names(&mut conn).await.unwrap().is_empty());
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_9_csb", "sub_committee_certificate")
+    )))]
+    async fn test_sub_committee_certificate_delete_completed_session(pool: SqlitePool) {
+        sqlx::query("UPDATE committee_sessions SET status = 'completed' WHERE id = 901")
+            .execute(&pool)
+            .await
+            .unwrap();
+        assert_eq!(
+            delete_certificate_error(pool.clone(), 9, 911, FIXTURE_FINGERPRINT).await,
+            (
+                StatusCode::CONFLICT,
+                ErrorReference::InvalidCommitteeSessionStatus
+            )
+        );
+        assert_eq!(stored_certificates(pool.clone()).await.len(), 1);
+
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(list_event_names(&mut conn).await.unwrap().is_empty());
     }
 }

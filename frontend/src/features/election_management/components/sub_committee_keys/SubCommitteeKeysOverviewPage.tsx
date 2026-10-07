@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Footer } from "@/components/footer/Footer";
 import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -10,7 +12,13 @@ import { SubCommitteeKeysOverview } from "./SubCommitteeKeysOverview";
 
 export function SubCommitteeKeysOverviewPage() {
   const { election } = useElection();
-  const { requestState } = useSubCommitteeListRequest(election.id);
+  const { requestState, refetch } = useSubCommitteeListRequest(election.id);
+  const [messagesVersion, setMessagesVersion] = useState(0);
+
+  function onSuccess() {
+    setMessagesVersion((version) => version + 1);
+    void refetch();
+  }
 
   if (requestState.status === "loading") {
     return <Loader />;
@@ -22,17 +30,17 @@ export function SubCommitteeKeysOverviewPage() {
 
   return (
     <>
-      <PageTitle title={`${t("sub_committee_keys.manage")} - Abacus`} />
+      <PageTitle title={`${t("sub_committee_keys.title")} - Abacus`} />
       <header>
         <section>
           <h1>{t("sub_committee_keys.manage")}</h1>
         </section>
       </header>
 
-      <Messages />
+      <Messages key={messagesVersion} />
 
       <main>
-        <SubCommitteeKeysOverview subCommittees={requestState.data} />
+        <SubCommitteeKeysOverview subCommittees={requestState.data} electionId={election.id} onSuccess={onSuccess} />
       </main>
       <Footer />
     </>

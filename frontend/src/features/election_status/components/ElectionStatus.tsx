@@ -14,6 +14,7 @@ import {
 } from "../hooks/useElectionStatus";
 import { CategoryHeader } from "./CategoryHeader";
 import { CategoryRow } from "./CategoryRow";
+import { DataEntryImportButton } from "./DataEntryImportButton";
 import cls from "./ElectionStatus.module.css";
 
 export interface ElectionStatusProps {
@@ -55,17 +56,7 @@ export function ElectionStatus({ statuses, election, committeeSession, addLinks,
               </Button>
             ))}
 
-          {election.committee_category === "CSB" && committeeSession.status !== "completed" && (
-            <Button
-              size="md"
-              variant="secondary"
-              onClick={() => {
-                navigate(`/elections/${election.id}/data-entry/import`);
-              }}
-            >
-              {t("data_entry_import.button_title")}
-            </Button>
-          )}
+          <DataEntryImportButton election={election} committeeSession={committeeSession} navigate={navigate} />
         </div>
       </div>
       <div className={cls.statusSection}>

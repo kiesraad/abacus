@@ -12,7 +12,8 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
         sub_committee::{
-            AddCertificateError, Certificate as DomainCertificate, SubCommittee, SubCommitteeId,
+            AddCertificateError, Certificate as DomainCertificate, DeleteCertificateError,
+            SubCommittee, SubCommitteeId,
         },
     },
     error::ErrorReference,
@@ -36,6 +37,7 @@ impl From<&Certificate> for DomainCertificate {
             not_after: certificate.not_after(),
             signature_algorithm: signature_algorithm(),
             public_key: certificate.public_key().to_pem(),
+            public_key_fingerprint: certificate.public_key().sha256_fingerprint(),
         }
     }
 }
@@ -70,6 +72,7 @@ struct SubCommitteeCertificateAddedAuditData {
     common_name: String,
     not_before: DateTime<Utc>,
     not_after: DateTime<Utc>,
+    public_key_fingerprint: String,
 }
 
 impl AsAuditEvent for SubCommitteeCertificateAddedAuditData {
@@ -123,12 +126,85 @@ pub async fn add_sub_committee_certificate(
                 common_name: new_certificate.common_name.clone(),
                 not_before: new_certificate.not_before,
                 not_after: new_certificate.not_after,
+                public_key_fingerprint: new_certificate.public_key_fingerprint.clone(),
             },
             None,
         )
         .await?;
 
     Ok((sub_committee, new_certificate))
+}
+
+#[derive(Serialize)]
+struct SubCommitteeCertificateDeletedAuditData {
+    election_id: ElectionId,
+    sub_committee_id: SubCommitteeId,
+    authority_id: String,
+    organizational_unit: String,
+    common_name: String,
+    not_before: DateTime<Utc>,
+    not_after: DateTime<Utc>,
+    public_key_fingerprint: String,
+}
+
+impl AsAuditEvent for SubCommitteeCertificateDeletedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::SubCommitteeCertificateDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+/// Delete the certificate with the given public key fingerprint from a sub committee.
+pub async fn delete_sub_committee_certificate(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    election_id: ElectionId,
+    sub_committee_id: SubCommitteeId,
+    public_key_fingerprint: &str,
+) -> Result<(), APIError> {
+    let committee_session =
+        committee_session_repo::get_election_committee_session(conn, election_id).await?;
+    if committee_session.status == CommitteeSessionStatus::Completed {
+        return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
+    }
+
+    let mut sub_committee = sub_committee_repo::list(conn, committee_session.id)
+        .await?
+        .into_iter()
+        .find(|sub_committee| sub_committee.id == sub_committee_id)
+        .ok_or_else(|| {
+            APIError::NotFound(
+                "Sub committee not found".into(),
+                ErrorReference::EntryNotFound,
+            )
+        })?;
+
+    let certificate = sub_committee
+        .delete_certificate(public_key_fingerprint)
+        .map_err(|err| match err {
+            DeleteCertificateError::NotFound => APIError::NotFound(
+                "Certificate not found".into(),
+                ErrorReference::EntryNotFound,
+            ),
+        })?;
+
+    sub_committee_repo::update_certificates(conn, sub_committee.id, &sub_committee.certificates)
+        .await?;
+    audit_service
+        .log(
+            conn,
+            &SubCommitteeCertificateDeletedAuditData {
+                election_id,
+                sub_committee_id,
+                authority_id: sub_committee.authority_id,
+                organizational_unit: certificate.organizational_unit,
+                common_name: certificate.common_name,
+                not_before: certificate.not_before,
+                not_after: certificate.not_after,
+                public_key_fingerprint: certificate.public_key_fingerprint,
+            },
+            None,
+        )
+        .await?;
+    Ok(())
 }
 
 #[derive(Debug)]

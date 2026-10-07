@@ -14,5 +14,7 @@
   "manage": "Sleutels van GSB's beheren",
   "no_public_key": "Geen publieke sleutel",
   "pending": "Nog toe te voegen publieke sleutels",
+  "public_keys_explanation": "Met deze publieke sleutel(s) kan iedereen controleren dat bestanden die zijn ondertekend door het GSB {authority_name} echt van dit GSB komen en niet zijn gewijzigd.",
+  "public_keys_for": "Publieke sleutel(s) GSB {authority_name}",
   "title": "Sleutelbeheer"
 }

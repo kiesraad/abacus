@@ -69,12 +69,12 @@ export function PollingStationImportPage() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      setFile(currentFile);
       if (await isFileTooLarge(currentFile)) {
         setError(fileTooLargeError(currentFile));
         return;
       }
 
-      setFile(currentFile);
       const data = await currentFile.text();
       const response = await postValidate({ data });
 

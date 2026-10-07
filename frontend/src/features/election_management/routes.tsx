@@ -6,6 +6,7 @@ import { t } from "@/i18n/translate";
 import { ElectionHomePage } from "./components/ElectionHomePage";
 import { ElectionReportPage } from "./components/report/ElectionReportPage";
 import { FinishDataEntryPage } from "./components/report/FinishDataEntryPage";
+import { SubCommitteeKeysDetailPage } from "./components/sub_committee_keys/SubCommitteeKeysDetailPage";
 import { SubCommitteeKeysOverviewPage } from "./components/sub_committee_keys/SubCommitteeKeysOverviewPage";
 import { CommitteeSessionDetailsPage } from "./components/update/CommitteeSessionDetailsPage";
 import { NumberOfVotersPage } from "./components/update/NumberOfVotersPage";
@@ -29,8 +30,18 @@ export const electionManagementRoutes: RouteObject[] = [
   },
   {
     path: "sub-committees",
-    Component: SubCommitteeKeysOverviewPage,
-    handle: { roles: ["administrator"] },
+    children: [
+      {
+        index: true,
+        Component: SubCommitteeKeysOverviewPage,
+        handle: { roles: ["administrator"] },
+      },
+      {
+        path: ":subCommitteeId",
+        Component: SubCommitteeKeysDetailPage,
+        handle: { roles: ["administrator"] },
+      },
+    ],
   },
   {
     path: "report",

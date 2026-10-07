@@ -1,6 +1,7 @@
 //! The metadata certificate and the public key inside it, in the OSV2020-U
 //! format described in README.md.
 
+use aws_lc_rs::digest::{SHA256, digest};
 use chrono::{DateTime, Utc};
 use const_oid::db::{rfc4519, rfc5912};
 use der::{
@@ -155,6 +156,16 @@ impl PublicKey {
     /// stores when a `.crt` is imported.
     pub fn to_der(&self) -> Vec<u8> {
         self.spki_der.clone()
+    }
+
+    /// Lowercase hex SHA-256 of the `SubjectPublicKeyInfo` DER, can also be
+    /// computed by `openssl pkey -pubin -outform DER | sha256sum`.
+    pub fn sha256_fingerprint(&self) -> String {
+        digest(&SHA256, &self.spki_der)
+            .as_ref()
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect()
     }
 
     /// The key as `SubjectPublicKeyInfo` DER (borrowed).

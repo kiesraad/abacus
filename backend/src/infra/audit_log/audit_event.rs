@@ -159,6 +159,7 @@ pub enum AuditEventType {
     // signing events
     SigningKeypairCreated,
     SubCommitteeCertificateAdded,
+    SubCommitteeCertificateDeleted,
     // API events (one for each severity level)
     ApiError,
     ApiWarning,

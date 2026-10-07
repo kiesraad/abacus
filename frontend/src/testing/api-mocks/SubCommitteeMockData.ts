@@ -1,4 +1,4 @@
-import type { Certificate, SubCommittee } from "@/types/generated/openapi";
+import type { AddSubCommitteeCertificateResponse, Certificate, SubCommittee } from "@/types/generated/openapi";
 
 export const getCertificateMockData = (certificate: Partial<Certificate> = {}): Certificate => {
   return {
@@ -9,6 +9,7 @@ export const getCertificateMockData = (certificate: Partial<Certificate> = {}): 
     not_after: "2027-04-01T00:00:00Z",
     signature_algorithm: "RSA 4096-bit",
     public_key: "-----BEGIN PUBLIC KEY-----\n-----END PUBLIC KEY-----\n",
+    public_key_fingerprint: "a4ac04ce062498ce950a4b02d6fc5bb1dea3f74b209ae6f6e7251e626252b8e1",
     ...certificate,
   };
 };
@@ -25,6 +26,20 @@ export const getSubCommitteeMockData = (subCommittee: Partial<SubCommittee> = {}
     ...subCommittee,
   };
 };
+
+export const getAddCertificateResponse = (
+  response: Partial<AddSubCommitteeCertificateResponse> = {},
+): AddSubCommitteeCertificateResponse => {
+  return {
+    authority_name: "Aalsmeer",
+    certificate: getCertificateMockData({ common_name: "Gemeente Aalsmeer" }),
+    expired: false,
+    sub_committee_id: 1,
+    ...response,
+  };
+};
+
+export const addCertificateResponse = getAddCertificateResponse();
 
 export const pendingSubCommitteesMockData: SubCommittee[] = [
   getSubCommitteeMockData({ id: 1, number: 1, name: "Aalsmeer", authority_id: "0358", authority_name: "Aalsmeer" }),

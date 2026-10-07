@@ -178,6 +178,15 @@ fn public_key_pem_round_trips() {
     );
 }
 
+/// Compare to `openssl pkey -pubin -in osv2020_nieuwstrand.pub.pem -outform DER | sha256sum`.
+#[test]
+fn public_key_sha256_fingerprint() {
+    assert_eq!(
+        osv_public_key().sha256_fingerprint(),
+        "19178e2a9f23cf15d7c0a9f602b2055e2337b8d316b1a6d87ae74a3e07fc8598"
+    );
+}
+
 /// Assert that the shape of the signature file matches OSV2020-U.
 fn assert_osv_signature_file_shape(name: &str, signature: &[u8]) {
     let signed_data = parse_signed_data(signature);

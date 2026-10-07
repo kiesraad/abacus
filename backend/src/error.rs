@@ -99,6 +99,9 @@ pub enum ErrorReference {
     PdfGenerationError,
     PollingStationRepeated,
     RequestPayloadTooLarge,
+    SignatureMissing,
+    SignatureUnknown,
+    SubCommitteeHasNoCertificates,
     Unauthorized,
     UnknownCommittee,
     UsernameNotUnique,
@@ -495,6 +498,18 @@ impl From<DataEntryImportError> for APIError {
             DataEntryImportError::ResultsHaveValidationErrors => APIError::Unprocessable(
                 "Results have validation errors".into(),
                 ErrorReference::DataEntryValidationErrors,
+            ),
+            DataEntryImportError::SignatureMissing => APIError::Unprocessable(
+                "Signature matching EML missing".into(),
+                ErrorReference::SignatureMissing,
+            ),
+            DataEntryImportError::SignatureUnknown => APIError::Unprocessable(
+                "Signature does not match public key of subcommittee".into(),
+                ErrorReference::SignatureUnknown,
+            ),
+            DataEntryImportError::SubCommitteeHasNoCertificates => APIError::Unprocessable(
+                "Subcommittee does not have any certificates".into(),
+                ErrorReference::SubCommitteeHasNoCertificates,
             ),
         }
     }

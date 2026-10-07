@@ -23,10 +23,12 @@ pub use investigation::create_test_investigation;
 pub use polling_station::{
     PollingStationServiceError, list_for_session as list_polling_stations_for_session,
 };
+#[cfg(test)]
+pub use signing::get_existing_signing_keypair;
 pub use signing::{
-    SigningServiceError, SubCommitteeCertificateError, add_sub_committee_certificate,
-    delete_sub_committee_certificate, get_election_certificate, get_signing_keypair,
-    signature_algorithm,
+    SignatureError, SigningServiceError, SubCommitteeCertificateError,
+    add_sub_committee_certificate, delete_sub_committee_certificate, get_election_certificate,
+    get_signing_keypair, signature_algorithm, verify_signature,
 };
 pub use sub_committee::{
     SubCommitteeServiceError, create as create_sub_committee,

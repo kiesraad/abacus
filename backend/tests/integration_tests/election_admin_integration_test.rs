@@ -6,7 +6,10 @@ use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
-    shared::{FixtureUser::*, get_election_details, get_statuses, login, post_multipart},
+    shared::{
+        FixtureUser::*, get_election_details, get_statuses, import_certificate, login,
+        post_multipart,
+    },
     utils::serve_api,
 };
 
@@ -239,6 +242,12 @@ async fn test_csb_municipal_election_import_save(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_csb_election_import_and_gsb_count_import(pool: SqlitePool) {
+    // To create a certificate and signature
+    // - cd backend/eml_signature
+    // - cargo run --example create GR2022_Test 0000 Test 2022-03-16 2022-03-16
+    // - cargo run --example sign PSB0000.key PSB0000.crt ../src/eml/tests/eml510b_test.eml.xml
+    // - mv PSB0000.crt ../src/eml/tests/eml510b_test.crt
+
     let addr = serve_api(pool).await;
     let client = reqwest::Client::new();
 
@@ -270,14 +279,21 @@ async fn test_csb_election_import_and_gsb_count_import(pool: SqlitePool) {
     let body: serde_json::Value = response.json().await.unwrap();
     let election_id = body["id"].as_u64().unwrap();
 
+    let certificate = include_str!("../../src/eml/tests/eml510b_test.crt");
+    let response = import_certificate(&addr, &admin_cookie, election_id, certificate).await;
+    assert_eq!(response.status(), StatusCode::CREATED);
+
     let coordinator_cookie = login(&addr, CoordinatorCSB).await;
     let import_url = format!("http://{addr}/api/elections/{election_id}/data_entry/import");
 
-    // Make ZIP with EML file
+    // Make ZIP with EML file and signature
     let mut writer = ZipFileWriter::with_tokio(Vec::new());
     let entry = ZipEntryBuilder::new("count.eml.xml".into(), Compression::Deflate);
     let eml = include_bytes!("../../src/eml/tests/eml510b_test.eml.xml");
     writer.write_entry_whole(entry, eml).await.unwrap();
+    let entry = ZipEntryBuilder::new("count.eml.xml.signature".into(), Compression::Deflate);
+    let signature = include_bytes!("../../src/eml/tests/eml510b_test.eml.xml.signature");
+    writer.write_entry_whole(entry, signature).await.unwrap();
     let zip = writer.close().await.unwrap().into_inner();
 
     let hash = serde_json::json!([

@@ -84,6 +84,17 @@ impl SigningKeyPair {
     }
 }
 
+impl TryFrom<(String, Zeroizing<Vec<u8>>)> for SigningKeyPair {
+    type Error = EmlSignatureError;
+
+    fn try_from(
+        (certificate, private_key): (String, Zeroizing<Vec<u8>>),
+    ) -> Result<Self, Self::Error> {
+        let certificate = Certificate::from_pem(certificate.as_bytes())?;
+        SigningKeyPair::new(private_key, certificate)
+    }
+}
+
 /// Generate a fresh RSA-4096 keypair ([`crate::RSA_KEY_BITS`]).
 fn generate_key_pair() -> Result<Zeroizing<KeyPair>, EmlSignatureError> {
     // Key size needs to match [`crate::RSA_KEY_BITS`], validated by [`Certificate::from_der`].

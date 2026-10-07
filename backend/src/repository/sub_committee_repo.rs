@@ -1,4 +1,4 @@
-use sqlx::{SqliteConnection, query, query_as, types::Json};
+use sqlx::{SqliteConnection, query, query_as, query_scalar, types::Json};
 
 use crate::{
     domain::{
@@ -123,6 +123,24 @@ pub async fn update_certificates(
     .execute(conn)
     .await?;
     Ok(())
+}
+
+/// Get all certificates for a sub electoral committee
+pub async fn get_certificates(
+    conn: &mut SqliteConnection,
+    sub_committee_id: SubCommitteeId,
+) -> Result<Vec<Certificate>, sqlx::Error> {
+    let certificates = query_scalar!(
+        r#"
+        SELECT certificates
+        FROM sub_committees
+        WHERE id = ?
+        "#,
+        sub_committee_id
+    )
+    .fetch_one(conn)
+    .await?;
+    Ok(certificates.0)
 }
 
 /// List all subcommittees for a first committee session with their data entry status.

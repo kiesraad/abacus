@@ -31,15 +31,19 @@ use crate::{
     repository::{
         committee_session_repo, data_entry_repo, election_repo, sub_committee_repo, user_repo::User,
     },
+    service::{SignatureError, verify_signature},
 };
 
 #[derive(Debug)]
 pub enum DataEntryImportError {
-    EmlZipError(String),
     CommitteeSessionAlreadyCompleted,
+    EmlZipError(String),
+    ResultsHaveValidationErrors,
+    SignatureMissing,
+    SignatureUnknown,
     SubCommitteeDataEntryAlreadyImported,
     SubCommitteeDataEntryNotEmpty,
-    ResultsHaveValidationErrors,
+    SubCommitteeHasNoCertificates,
 }
 
 #[derive(Serialize)]
@@ -263,6 +267,18 @@ struct ValidatedImport {
     new_state: DataEntryStatus,
 }
 
+impl From<SignatureError> for APIError {
+    fn from(error: SignatureError) -> APIError {
+        match error {
+            SignatureError::NoCertificates => {
+                DataEntryImportError::SubCommitteeHasNoCertificates.into()
+            }
+            SignatureError::Invalid => DataEntryImportError::SignatureUnknown.into(),
+            SignatureError::DatabaseError(e) => APIError::SqlxError(e),
+        }
+    }
+}
+
 /// Validate uploaded data and get the resulting data entry state
 async fn validate_import(
     conn: &mut SqliteConnection,
@@ -274,8 +290,15 @@ async fn validate_import(
     let election = election_repo::get(conn, election_id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    let eml = read_eml_from_zip(zip_data).await?;
-    check_hash(eml.as_bytes(), hash)?;
+    let reader = ZipFileReader::new(zip_data)
+        .await
+        .map_err(|_| DataEntryImportError::EmlZipError("Failed to read ZIP file".to_string()))?;
+
+    let (filename, eml_bytes) = read_eml_from_zip(&reader).await?;
+    check_hash(&eml_bytes, hash)?;
+
+    let eml = String::from_utf8(eml_bytes.clone())
+        .map_err(|_| EMLError::custom("EML file is not valid UTF-8"))?;
     let definition = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict).ok()?;
 
     // We only support 510b counts for now
@@ -288,12 +311,10 @@ async fn validate_import(
     let eml_election_date = election_identifier.election_date.copied_value()?.date;
 
     if election.election_id != eml_election_id.value() {
-        return Err(APIError::EmlImportError(EMLImportError::MismatchElection));
+        return Err(EMLImportError::MismatchElection.into());
     }
     if election.election_date != eml_election_date {
-        return Err(APIError::EmlImportError(
-            EMLImportError::MismatchElectionDate,
-        ));
+        return Err(EMLImportError::MismatchElectionDate.into());
     }
 
     let committee_session =
@@ -312,6 +333,12 @@ async fn validate_import(
     if data_entry_status != DataEntryStatus::Empty {
         return Err(DataEntryImportError::SubCommitteeDataEntryNotEmpty.into());
     }
+
+    let (_, signature) = read_signature_from_zip(&reader, &filename)
+        .await
+        .map_err(|_| DataEntryImportError::SignatureMissing)?;
+
+    verify_signature(conn, sub_committee.id, &eml_bytes, &signature).await?;
 
     // The state machine validates results, report validation errors as import errors
     let results = Results::GSB(GSBResults::from_eml_count(&definition, election.category)?);
@@ -359,26 +386,45 @@ async fn find_sub_committee(
 
 /// Read the contents of the single `*.eml.xml` file that is expected in the ZIP-file.
 /// If the ZIP file does not contain exactly one `*.eml.xml` file, an error is returned.
-async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
-    // TODO #4024 Validate signature
-    let reader = ZipFileReader::new(zip_data)
-        .await
-        .map_err(|_| DataEntryImportError::EmlZipError("Failed to read ZIP file".to_string()))?;
+async fn read_eml_from_zip(reader: &ZipFileReader) -> Result<(String, Vec<u8>), APIError> {
+    read_exactly_one_file(reader, "EML file", |name| {
+        name.to_ascii_lowercase().ends_with(".eml.xml")
+    })
+    .await
+}
 
-    let files = reader.file().entries().iter().enumerate();
-    let mut eml_files = files.filter(|(_, entry)| {
-        entry
-            .filename()
-            .as_str()
-            .is_ok_and(|name| name.to_ascii_lowercase().ends_with(".eml.xml"))
+async fn read_signature_from_zip(
+    reader: &ZipFileReader,
+    eml_filename: &str,
+) -> Result<(String, Vec<u8>), APIError> {
+    read_exactly_one_file(reader, "signature file", |name| {
+        name.to_ascii_lowercase() == format!("{}.signature", eml_filename.to_ascii_lowercase())
+    })
+    .await
+}
+
+async fn read_exactly_one_file(
+    reader: &ZipFileReader,
+    file: &str,
+    filter: impl Fn(&str) -> bool,
+) -> Result<(String, Vec<u8>), APIError> {
+    let entries = reader.file().entries().iter().enumerate();
+
+    let mut files = entries.filter_map(|(index, entry)| {
+        let filename = entry.filename().as_str().ok()?;
+        filter(filename).then_some((index, entry, filename.to_string()))
     });
 
-    let (index, entry) = eml_files.next().ok_or(DataEntryImportError::EmlZipError(
-        "Missing EML file in ZIP".to_string(),
-    ))?;
-    if eml_files.next().is_some() {
+    let (index, entry, filename) =
+        files
+            .next()
+            .ok_or(DataEntryImportError::EmlZipError(format!(
+                "Missing {file} in ZIP"
+            )))?;
+
+    if files.next().is_some() {
         return Err(
-            DataEntryImportError::EmlZipError("Multiple EML files in ZIP".to_string()).into(),
+            DataEntryImportError::EmlZipError(format!("More than one {file} in ZIP")).into(),
         );
     }
 
@@ -386,33 +432,36 @@ async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
     let max_size = 128 * 1024 * 1024;
     if entry.uncompressed_size() > max_size {
         return Err(APIError::ContentTooLarge(
-            "EML file too large".to_string(),
+            format!("{file} too large"),
             ErrorReference::RequestPayloadTooLarge,
         ));
     }
 
-    let mut eml_data = Vec::new();
+    let mut data = Vec::new();
     reader
         .reader_with_entry(index)
         .await
         .map_err(|_| DataEntryImportError::EmlZipError("Invalid ZIP file".to_string()))?
-        .read_to_end_checked(&mut eml_data)
+        .read_to_end_checked(&mut data)
         .await
         .map_err(|_| DataEntryImportError::EmlZipError("Invalid ZIP file".to_string()))?;
 
-    let eml_string =
-        String::from_utf8(eml_data).map_err(|_| EMLError::custom("EML file is not valid UTF-8"))?;
-
-    Ok(eml_string)
+    Ok((filename, data))
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::domain::tabulation::ElectionTotals;
+    use std::assert_matches;
+
     use async_zip::{Compression, ZipEntryBuilder, tokio::write::ZipFileWriter};
     use chrono::Local;
-    use std::assert_matches;
+    use eml_signature::SigningKeyPair;
+
+    use super::*;
+    use crate::{
+        domain::{sub_committee::Certificate, tabulation::ElectionTotals},
+        repository::sub_committee_repo::update_certificates,
+    };
 
     /// Create a zip file in memory containing the given files
     pub async fn zip_with_files(files: &[(&str, &[u8])]) -> Vec<u8> {
@@ -425,10 +474,11 @@ mod tests {
     }
 
     mod multipart_request {
-        use super::*;
         use axum::body::Body;
         use reqwest::multipart::{Form, Part};
         use test_log::test;
+
+        use super::*;
 
         /// Create a multipart request with the given form fields
         fn multipart_request(fields: &[(&str, &[u8])]) -> Request {
@@ -545,8 +595,9 @@ mod tests {
     }
 
     mod read_eml_from_zip {
-        use super::*;
         use test_log::test;
+
+        use super::*;
 
         #[test(tokio::test)]
         async fn test_valid_zip() {
@@ -558,25 +609,20 @@ mod tests {
                 ),
             ])
             .await;
+            let reader = ZipFileReader::new(zip).await.unwrap();
 
-            assert_eq!(read_eml_from_zip(zip).await.unwrap(), "<EML/>");
-        }
-
-        #[test(tokio::test)]
-        async fn test_invalid_zip() {
-            assert_matches!(
-                read_eml_from_zip(b"not a zip file".to_vec()).await,
-                Err(APIError::Unprocessable(message, ErrorReference::ZipError))
-                    if message == "Failed to read ZIP file"
-            );
+            let (filename, eml) = read_eml_from_zip(&reader).await.unwrap();
+            assert_eq!(filename, "Telling_GR2026_Heemdamseburg.eml.xml");
+            assert_eq!(eml, b"<EML/>");
         }
 
         #[test(tokio::test)]
         async fn test_without_eml_file() {
             let zip = zip_with_files(&[("Telling_GR2026_Heemdamseburg.xml", b"<EML/>")]).await;
+            let reader = ZipFileReader::new(zip).await.unwrap();
 
             assert_matches!(
-                read_eml_from_zip(zip).await,
+                read_eml_from_zip(&reader).await,
                 Err(APIError::Unprocessable(message, ErrorReference::ZipError))
                     if message == "Missing EML file in ZIP"
             );
@@ -589,11 +635,12 @@ mod tests {
                 ("Telling_GR2026_Juinen.eml.xml", b"<EML/>"),
             ])
             .await;
+            let reader = ZipFileReader::new(zip).await.unwrap();
 
             assert_matches!(
-                read_eml_from_zip(zip).await,
+                read_eml_from_zip(&reader).await,
                 Err(APIError::Unprocessable(message, ErrorReference::ZipError))
-                    if message == "Multiple EML files in ZIP"
+                    if message == "More than one EML file in ZIP"
             );
         }
 
@@ -607,14 +654,53 @@ mod tests {
                 .await
                 .unwrap();
             let zip = writer.close().await.unwrap().into_inner();
+            let reader = ZipFileReader::new(zip).await.unwrap();
 
             assert_matches!(
-                read_eml_from_zip(zip).await,
+                read_eml_from_zip(&reader).await,
                 Err(APIError::ContentTooLarge(
                     message,
                     ErrorReference::RequestPayloadTooLarge
                 ))
                     if message == "EML file too large"
+            );
+        }
+    }
+
+    mod read_signature_from_zip {
+        use test_log::test;
+
+        use super::*;
+
+        #[test(tokio::test)]
+        async fn test_valid_zip() {
+            let zip = zip_with_files(&[
+                ("Telling_GR2026_Heemdamseburg.eml.xml", b"<EML/>"),
+                (
+                    "Telling_GR2026_Heemdamseburg.eml.xml.signature",
+                    b"signature",
+                ),
+            ])
+            .await;
+            let reader = ZipFileReader::new(zip).await.unwrap();
+
+            let (filename, eml) =
+                read_signature_from_zip(&reader, "Telling_GR2026_Heemdamseburg.eml.xml")
+                    .await
+                    .unwrap();
+            assert_eq!(filename, "Telling_GR2026_Heemdamseburg.eml.xml.signature");
+            assert_eq!(eml, b"signature");
+        }
+
+        #[test(tokio::test)]
+        async fn test_without_signature_file() {
+            let zip = zip_with_files(&[("Telling_GR2026_Heemdamseburg.eml.xml", b"<EML/>")]).await;
+            let reader = ZipFileReader::new(zip).await.unwrap();
+
+            assert_matches!(
+                read_signature_from_zip(&reader, "Telling_GR2026_Heemdamseburg.eml.xml").await,
+                Err(APIError::Unprocessable(message, ErrorReference::ZipError))
+                    if message == "Missing signature file in ZIP"
             );
         }
     }
@@ -638,6 +724,17 @@ mod tests {
         String::try_from(count).unwrap()
     }
 
+    async fn update_sub_committee_certificate(
+        conn: &mut SqliteConnection,
+        sub_committee_id: SubCommitteeId,
+        keypair: &SigningKeyPair,
+    ) {
+        let certificate = Certificate::from(keypair.certificate());
+        update_certificates(conn, sub_committee_id, &[certificate])
+            .await
+            .unwrap()
+    }
+
     mod validate_import {
         use chrono::Utc;
         use eml_nl::{
@@ -649,24 +746,39 @@ mod tests {
         use super::*;
         use crate::{
             domain::{
-                data_entry::{DataEntryId, DataEntryOrigin, FirstEntryFinalised},
+                data_entry::{DataEntryId, FirstEntryFinalised},
                 role::Role,
+                sub_committee::SubCommitteeId,
             },
             eml::EmlHash,
             repository::{data_entry_repo, user_repo::UserId},
+            service::get_existing_signing_keypair,
         };
 
         #[test(sqlx::test(fixtures(
             path = "../../../../fixtures",
-            scripts("election_5_with_results", "election_8_csb_with_results")
+            scripts(
+                "election_5_with_results",
+                "election_8_csb_with_results",
+                "signing_keypair"
+            )
         )))]
         async fn test_valid_import(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
             let csb_election_id = ElectionId::from(8);
-            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
-            let hash = EmlHash::from(eml.as_bytes()).chunks;
-            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await.into_bytes();
+            let hash = EmlHash::from(&eml[..]).chunks;
+
+            let keypair = get_existing_signing_keypair(&mut conn, ElectionId::from(5)).await;
+            update_sub_committee_certificate(&mut conn, SubCommitteeId::from(811), &keypair).await;
+
+            let signature = keypair.sign(&eml).unwrap().to_der();
+            let zip = zip_with_files(&[
+                ("count.eml.xml", &eml),
+                ("count.eml.xml.signature", &signature),
+            ])
+            .await;
 
             // Empty CSB fixture data entry
             data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
@@ -686,6 +798,27 @@ mod tests {
                     finalised_first_entry: Results::GSB(_),
                     ..
                 })
+            );
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_invalid_zip(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+
+            assert_matches!(
+                validate_import(
+                    &mut conn,
+                    &user,
+                    ElectionId::from(8),
+                    b"not a zip file".to_vec(),
+                    None,
+                )
+                .await,
+                Err(APIError::Unprocessable(_, ErrorReference::ZipError))
             );
         }
 
@@ -862,7 +995,108 @@ mod tests {
 
         #[test(sqlx::test(fixtures(
             path = "../../../../fixtures",
-            scripts("election_5_with_results", "election_8_csb_with_results")
+            scripts("election_5_with_results", "election_8_csb_with_results",)
+        )))]
+        async fn test_signature_missing(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await.into_bytes();
+            let hash = EmlHash::from(&eml[..]).chunks;
+
+            let zip = zip_with_files(&[("count.eml.xml", &eml)]).await;
+
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            assert_matches!(
+                validate_import(&mut conn, &user, ElectionId::from(8), zip, Some(&hash)).await,
+                Err(APIError::Unprocessable(message, ErrorReference::SignatureMissing))
+                    if message == "Signature matching EML missing"
+            );
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts(
+                "election_5_with_results",
+                "election_8_csb_with_results",
+                "signing_keypair",
+            )
+        )))]
+        async fn test_signature_unknown(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await.into_bytes();
+            let hash = EmlHash::from(&eml[..]).chunks;
+
+            let keypair = get_existing_signing_keypair(&mut conn, ElectionId::from(5)).await;
+            update_sub_committee_certificate(&mut conn, SubCommitteeId::from(811), &keypair).await;
+
+            let wrong_signature: &[u8] =
+                include_bytes!("../../../eml/tests/eml510b_test.eml.xml.signature");
+            let zip = zip_with_files(&[
+                ("count.eml.xml", &eml),
+                ("count.eml.xml.signature", wrong_signature),
+            ])
+            .await;
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            assert_matches!(
+                validate_import(&mut conn, &user, ElectionId::from(8), zip, Some(&hash)).await,
+                Err(APIError::Unprocessable(message, ErrorReference::SignatureUnknown))
+                    if message == "Signature does not match public key of subcommittee"
+            );
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts(
+                "election_5_with_results",
+                "election_8_csb_with_results",
+                "signing_keypair",
+            )
+        )))]
+        async fn test_signature_no_certificates(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await.into_bytes();
+            let hash = EmlHash::from(&eml[..]).chunks;
+
+            let keypair = get_existing_signing_keypair(&mut conn, ElectionId::from(5)).await;
+            // No importing of certificate in CSB election
+
+            let signature = keypair.sign(&eml).unwrap().to_der();
+            let zip = zip_with_files(&[
+                ("count.eml.xml", &eml),
+                ("count.eml.xml.signature", &signature),
+            ])
+            .await;
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            assert_matches!(
+                validate_import(&mut conn, &user, ElectionId::from(8), zip, Some(&hash)).await,
+                Err(APIError::Unprocessable(
+                    message,
+                    ErrorReference::SubCommitteeHasNoCertificates
+                )) if message == "Subcommittee does not have any certificates"
+            );
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts(
+                "election_5_with_results",
+                "election_8_csb_with_results",
+                "signing_keypair",
+            )
         )))]
         async fn test_results_with_validation_errors(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
@@ -880,8 +1114,18 @@ mod tests {
                 UncountedVotesReason::ValidPollCards,
                 StringValue::from_value(1),
             );
-            let eml = String::try_from(count).unwrap();
-            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+            let eml = String::try_from(count).unwrap().into_bytes();
+
+            let keypair = get_existing_signing_keypair(&mut conn, ElectionId::from(5)).await;
+            update_sub_committee_certificate(&mut conn, SubCommitteeId::from(811), &keypair).await;
+
+            let signature = keypair.sign(&eml).unwrap().to_der();
+
+            let zip = zip_with_files(&[
+                ("count.eml.xml", &eml),
+                ("count.eml.xml.signature", &signature),
+            ])
+            .await;
 
             // Empty CSB fixture data entry
             data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
@@ -911,6 +1155,7 @@ mod tests {
             eml::EmlHash,
             infra::audit_log,
             repository::{data_entry_repo, user_repo::UserId},
+            service::get_existing_signing_keypair,
         };
 
         async fn import_count(
@@ -920,7 +1165,17 @@ mod tests {
             let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
             let audit_service = AuditService::new(Some(user.clone()), None);
             let hash = EmlHash::from(eml.as_bytes()).chunks;
-            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            let mut conn = pool.acquire().await?;
+            let keypair = get_existing_signing_keypair(&mut conn, ElectionId::from(5)).await;
+            update_sub_committee_certificate(&mut conn, SubCommitteeId::from(811), &keypair).await;
+
+            let signature = keypair.sign(eml.as_bytes()).unwrap().to_der();
+            let zip = zip_with_files(&[
+                ("count.eml.xml", eml.as_bytes()),
+                ("count.eml.xml.signature", &signature),
+            ])
+            .await;
 
             election_data_entry_import(
                 user,
@@ -934,7 +1189,11 @@ mod tests {
 
         #[test(sqlx::test(fixtures(
             path = "../../../../fixtures",
-            scripts("election_5_with_results", "election_8_csb_with_results")
+            scripts(
+                "election_5_with_results",
+                "election_8_csb_with_results",
+                "signing_keypair",
+            )
         )))]
         async fn test_import_saves_results_and_logs_audit_event(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
@@ -981,7 +1240,11 @@ mod tests {
 
         #[test(sqlx::test(fixtures(
             path = "../../../../fixtures",
-            scripts("election_5_with_results", "election_8_csb_with_results")
+            scripts(
+                "election_5_with_results",
+                "election_8_csb_with_results",
+                "signing_keypair",
+            )
         )))]
         async fn test_import_twice_not_allowed(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();

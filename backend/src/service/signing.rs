@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use eml_signature::{
-    Certificate, CertificateSubject, Committee, EmlSignatureError, RSA_KEY_BITS, SigningKeyPair,
+    Certificate, CertificateSubject, Committee, EmlSignatureError, PublicKey, RSA_KEY_BITS,
+    Signature, SigningKeyPair,
 };
 use serde::Serialize;
 use sqlx::SqliteConnection;
@@ -280,11 +281,24 @@ pub async fn get_signing_keypair(
     ensure_supports_signing(election)?;
 
     match signing_keypair_repo::get_keypair(conn, election.id).await? {
-        Some((certificate, private_key)) => Certificate::from_pem(certificate.as_bytes())
-            .and_then(|certificate| SigningKeyPair::new(private_key, certificate))
-            .map_err(|e| APIError::DataIntegrityError(e.to_string())),
+        Some(keypair) => keypair
+            .try_into()
+            .map_err(|e: EmlSignatureError| APIError::DataIntegrityError(e.to_string())),
         None => create_keypair(conn, audit_service, election).await,
     }
+}
+
+#[cfg(test)]
+pub async fn get_existing_signing_keypair(
+    conn: &mut SqliteConnection,
+    election_id: ElectionId,
+) -> SigningKeyPair {
+    signing_keypair_repo::get_keypair(conn, election_id)
+        .await
+        .unwrap()
+        .expect("keypair should exist")
+        .try_into()
+        .expect("keypair should be valid")
 }
 
 fn ensure_supports_signing(election: &ElectionWithPoliticalGroups) -> Result<(), APIError> {
@@ -343,6 +357,37 @@ async fn generate_keypair(
         SigningKeyPair::generate(&subject, valid_from, election_date).map_err(Into::into)
     })
     .await?
+}
+
+#[derive(Debug)]
+pub enum SignatureError {
+    Invalid,
+    NoCertificates,
+    DatabaseError(sqlx::Error),
+}
+
+pub async fn verify_signature(
+    conn: &mut SqliteConnection,
+    sub_committee_id: SubCommitteeId,
+    eml: &[u8],
+    signature: &[u8],
+) -> Result<(), SignatureError> {
+    let certificates = sub_committee_repo::get_certificates(conn, sub_committee_id)
+        .await
+        .map_err(SignatureError::DatabaseError)?;
+    if certificates.is_empty() {
+        return Err(SignatureError::NoCertificates);
+    }
+
+    let signature = Signature::from_der(signature).map_err(|_| SignatureError::Invalid)?;
+    for cert in certificates {
+        if let Ok(public_key) = PublicKey::from_pem(cert.public_key.as_bytes())
+            && public_key.verify(eml, &signature).is_ok()
+        {
+            return Ok(());
+        };
+    }
+    Err(SignatureError::Invalid)
 }
 
 #[cfg(test)]
@@ -504,5 +549,79 @@ mod tests {
             .expect("should return error");
 
         assert_matches!(err, APIError::DataIntegrityError(_));
+    }
+
+    mod verify_signature {
+        use test_log::test;
+
+        use super::*;
+        use crate::repository::sub_committee_repo::update_certificates;
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts(
+                "election_5_with_results",
+                "election_8_csb_with_results",
+                "signing_keypair"
+            )
+        )))]
+        async fn test_verify_signature_valid(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml: &[u8] = b"<EML/>";
+
+            let sub_committee_id = SubCommitteeId::from(811);
+            let keypair = get_existing_signing_keypair(&mut conn, ElectionId::from(5)).await;
+            let certificate = DomainCertificate::from(keypair.certificate());
+            update_certificates(&mut conn, sub_committee_id, &[certificate])
+                .await
+                .unwrap();
+
+            let signature = keypair.sign(eml).unwrap().to_der();
+            assert_matches!(
+                verify_signature(&mut conn, sub_committee_id, eml, &signature).await,
+                Ok(())
+            );
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts(
+                "election_5_with_results",
+                "election_8_csb_with_results",
+                "signing_keypair"
+            )
+        )))]
+        async fn test_verify_signature_invalid(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml: &[u8] = b"<EML/>";
+
+            let sub_committee_id = SubCommitteeId::from(811);
+            let keypair = get_existing_signing_keypair(&mut conn, ElectionId::from(5)).await;
+            let certificate = DomainCertificate::from(keypair.certificate());
+            update_certificates(&mut conn, sub_committee_id, &[certificate])
+                .await
+                .unwrap();
+
+            let signature: &[u8] = include_bytes!("../eml/tests/eml510b_test.eml.xml.signature");
+            assert_matches!(
+                verify_signature(&mut conn, sub_committee_id, eml, signature).await,
+                Err(SignatureError::Invalid)
+            );
+        }
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_8_csb_with_results",)
+        )))]
+        async fn test_verify_signature_no_certificates(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml: &[u8] = b"<EML/>";
+
+            let sub_committee_id = SubCommitteeId::from(811);
+            let signature: &[u8] = include_bytes!("../eml/tests/eml510b_test.eml.xml.signature");
+            assert_matches!(
+                verify_signature(&mut conn, sub_committee_id, eml, signature).await,
+                Err(SignatureError::NoCertificates)
+            );
+        }
     }
 }

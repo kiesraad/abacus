@@ -82,7 +82,8 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(certificate).authorize(ADMIN))
         .routes(routes!(certificate_details).authorize(ADMIN))
-        .routes(routes!(sub_committee_certificates, sub_committee_certificate_add).authorize(ADMIN))
+        .routes(routes!(sub_committee_certificates).authorize(ADMIN))
+        .routes(routes!(sub_committee_certificate_add).authorize(ADMIN))
         .routes(routes!(sub_committee_certificate_delete).authorize(ADMIN))
         .routes(routes!(dismiss_public_key_upload_reminder).authorize(ADMIN))
 }
@@ -747,7 +748,6 @@ mod tests {
                 "common_name": removed.common_name,
                 "not_before": removed.not_before,
                 "not_after": removed.not_after,
-                "public_key": removed.public_key,
                 "public_key_fingerprint": removed.public_key_fingerprint,
             }),
         )

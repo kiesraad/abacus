@@ -144,7 +144,6 @@ struct SubCommitteeCertificateDeletedAuditData {
     common_name: String,
     not_before: DateTime<Utc>,
     not_after: DateTime<Utc>,
-    public_key: String,
     public_key_fingerprint: String,
 }
 
@@ -200,7 +199,6 @@ pub async fn delete_sub_committee_certificate(
                 common_name: certificate.common_name,
                 not_before: certificate.not_before,
                 not_after: certificate.not_after,
-                public_key: certificate.public_key,
                 public_key_fingerprint: certificate.public_key_fingerprint,
             },
             None,

@@ -120,6 +120,8 @@ pub struct SubCommitteeFirstSession {
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use chrono::TimeZone;
 
     use super::*;
@@ -227,10 +229,10 @@ mod tests {
             let mut committee = sub_committee(certificates);
             let before = committee.clone();
 
-            assert!(matches!(
+            assert_matches!(
                 committee.delete_certificate("missing"),
                 Err(DeleteCertificateError::NotFound)
-            ));
+            );
             assert_eq!(committee, before);
         }
     }

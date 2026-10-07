@@ -25,14 +25,14 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionError, election::InvalidElectionError,
         models::error::ModelsError, results::IncorrectResultsModel, role::RoleNotAuthorizedError,
-        sub_committee::SubCommitteeCertificateError, validate::DataError,
+        validate::DataError,
     },
     eml::EMLImportError,
     infra::backup::BackupError,
     repository::polling_station_repo,
     service::{
         DataEntryServiceError, PollingStationServiceError, SigningServiceError,
-        SubCommitteeServiceError,
+        SubCommitteeCertificateError, SubCommitteeServiceError,
     },
 };
 

@@ -1,21 +1,11 @@
-use chrono::{DateTime, Utc};
-use eml_signature::Committee;
-use serde::Serialize;
 use sqlx::{Connection, SqliteConnection};
 
 use crate::{
-    APIError,
     domain::{
-        committee_session::{CommitteeSessionError, CommitteeSessionId},
-        committee_session_status::CommitteeSessionStatus,
-        election::{ElectionId, ElectionWithPoliticalGroups},
-        sub_committee::{
-            Certificate, NewSubCommittee, SubCommittee, SubCommitteeCertificateError,
-            SubCommitteeFirstSession, SubCommitteeId,
-        },
+        committee_session::CommitteeSessionId,
+        sub_committee::{NewSubCommittee, SubCommitteeFirstSession},
     },
-    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, data_entry_repo, sub_committee_repo},
+    repository::{data_entry_repo, sub_committee_repo},
 };
 
 #[derive(Debug)]
@@ -48,74 +38,6 @@ pub async fn list_for_first_session(
     committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<SubCommitteeFirstSession>, SubCommitteeServiceError> {
     Ok(sub_committee_repo::list_first_session(conn, committee_session_id).await?)
-}
-
-#[derive(Serialize)]
-struct SubCommitteeCertificateAddedAuditData {
-    election_id: ElectionId,
-    sub_committee_id: SubCommitteeId,
-    authority_id: String,
-    organizational_unit: String,
-    common_name: String,
-    not_before: DateTime<Utc>,
-    not_after: DateTime<Utc>,
-}
-
-impl AsAuditEvent for SubCommitteeCertificateAddedAuditData {
-    const EVENT_TYPE: AuditEventType = AuditEventType::SubCommitteeCertificateAdded;
-    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
-}
-
-/// Add a certificate to the GSB sub committee it belongs to.
-///
-/// The sub committee is found by the `UID` in the certificate subject. A certificate whose public key was already
-/// added to that sub committee is rejected, even if the other certificate fields differ. An expired certificate is
-/// accepted.
-pub async fn add_certificate(
-    conn: &mut SqliteConnection,
-    audit_service: &AuditService,
-    election: &ElectionWithPoliticalGroups,
-    certificate: &eml_signature::Certificate,
-) -> Result<(SubCommittee, Certificate), APIError> {
-    let committee_session =
-        committee_session_repo::get_election_committee_session(conn, election.id).await?;
-    if committee_session.status == CommitteeSessionStatus::Completed {
-        return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
-    }
-
-    let subject = certificate.subject();
-    if subject.election_identifier != election.election_id {
-        return Err(SubCommitteeCertificateError::WrongElection.into());
-    }
-
-    let Committee::Gsb { authority_id, .. } = &subject.committee;
-    let mut sub_committee = sub_committee_repo::list(conn, committee_session.id)
-        .await?
-        .into_iter()
-        .find(|sub_committee| sub_committee.authority_id == *authority_id)
-        .ok_or(SubCommitteeCertificateError::UnknownSubCommittee)?;
-
-    let new_certificate = sub_committee.add_certificate(certificate)?;
-    sub_committee_repo::update_certificates(conn, sub_committee.id, &sub_committee.certificates)
-        .await?;
-
-    audit_service
-        .log(
-            conn,
-            &SubCommitteeCertificateAddedAuditData {
-                election_id: election.id,
-                sub_committee_id: sub_committee.id,
-                authority_id: sub_committee.authority_id.clone(),
-                organizational_unit: new_certificate.organizational_unit.clone(),
-                common_name: new_certificate.common_name.clone(),
-                not_before: new_certificate.not_before,
-                not_after: new_certificate.not_after,
-            },
-            None,
-        )
-        .await?;
-
-    Ok((sub_committee, new_certificate))
 }
 
 #[cfg(test)]

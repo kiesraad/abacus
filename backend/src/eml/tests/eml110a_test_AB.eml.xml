@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <EML xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:kr="http://www.kiesraad.nl/extensions" Id="110a" SchemaVersion="5">
+    <kr:Schema Version="1.3.1"/>
     <TransactionId>1</TransactionId>
     <IssueDate>2023-02-09</IssueDate>
     <kr:CreationDateTime>2023-02-09T15:12:25.983</kr:CreationDateTime>

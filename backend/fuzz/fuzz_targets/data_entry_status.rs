@@ -2,7 +2,10 @@
 
 use abacus::{
     domain::{
-        data_entry::{ClientState, DataEntryStatus, DataEntryTransitionError, DataEntryUpdate},
+        data_entry::{
+            ClientState, DataEntryOrigin, DataEntryStatus, DataEntryTransitionError,
+            DataEntryUpdate,
+        },
         election::{
             CommitteeCategory, CommitteeDistrict, ElectionCategory, ElectionDomain, ElectionId,
             ElectionSubCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
@@ -215,6 +218,7 @@ fn election(committee_category: CommitteeCategory) -> ElectionWithPoliticalGroup
 
 #[derive(Arbitrary, Debug)]
 enum Transition {
+    ImportFirstEntry(EntryValue),
     ClaimFirstEntry(bool),
     ClaimSecondEntry(bool),
     UpdateFirstEntry(bool, EntryValue),
@@ -244,10 +248,22 @@ fn is_as_expected(
     state: &DataEntryStatus,
     transition: &Transition,
     resulting_state: &Result<DataEntryStatus, DataEntryTransitionError>,
-    first_entry: EntryValue,
-    second_entry: EntryValue,
+    model: &Model,
 ) -> bool {
     match (state, transition) {
+        // ImportFirstEntry: only CSB and without errors
+        (DataEntryStatus::Empty, Transition::ImportFirstEntry(entry)) => {
+            if model.committee_category != CommitteeCategory::CSB {
+                matches!(resulting_state, Err(DataEntryTransitionError::Invalid))
+            } else if entry.has_errors() {
+                matches!(
+                    resulting_state,
+                    Err(DataEntryTransitionError::ValidationError(_))
+                )
+            } else {
+                matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
+            }
+        }
         // ClaimFirstEntry: an unclaimed first entry can be claimed by any user
         (DataEntryStatus::Empty, Transition::ClaimFirstEntry(_)) => matches!(
             resulting_state,
@@ -274,7 +290,7 @@ fn is_as_expected(
         }
         // FinaliseFirstEntry
         (DataEntryStatus::FirstEntryInProgress(_), Transition::FinaliseFirstEntry(true)) => {
-            is_kept_as_expected(resulting_state, first_entry)
+            is_kept_as_expected(resulting_state, model.first_entry)
         }
         // DiscardFirstEntry
         (DataEntryStatus::FirstEntryHasErrors(_), Transition::DiscardFirstEntryWithErrors) => {
@@ -285,6 +301,16 @@ fn is_as_expected(
             matches!(
                 resulting_state,
                 Ok(DataEntryStatus::FirstEntryInProgress(_))
+            )
+        }
+        // ClaimSecondEntry on an imported first entry has no typist for first entry,
+        // so any user can claim the second entry
+        (DataEntryStatus::FirstEntryFinalised(_), Transition::ClaimSecondEntry(_))
+            if model.first_entry_imported =>
+        {
+            matches!(
+                resulting_state,
+                Ok(DataEntryStatus::SecondEntryInProgress(_))
             )
         }
         // ClaimSecondEntry
@@ -317,23 +343,24 @@ fn is_as_expected(
         }
         // FinaliseSecondEntry
         (DataEntryStatus::SecondEntryInProgress(_), Transition::FinaliseSecondEntry(true)) => {
-            is_finalised_as_expected(resulting_state, first_entry, second_entry)
+            is_finalised_as_expected(resulting_state, model.first_entry, model.second_entry)
         }
         // KeepFirstEntry
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepFirstEntry) => {
-            is_kept_as_expected(resulting_state, first_entry)
+            is_kept_as_expected(resulting_state, model.first_entry)
         }
         // KeepSecondEntry
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepSecondEntry) => {
-            is_kept_as_expected(resulting_state, second_entry)
+            is_kept_as_expected(resulting_state, model.second_entry)
         }
         // DiscardBothEntries
         (DataEntryStatus::EntriesDifferent(_), Transition::DiscardEntries) => {
             matches!(resulting_state, Ok(DataEntryStatus::Empty))
         }
         // CorrectFirstEntry, only allowed when the second entry has no errors
+        // and the first entry was not imported
         (DataEntryStatus::EntriesDifferent(_), Transition::CorrectFirstEntry) => {
-            if second_entry.has_errors() {
+            if model.second_entry.has_errors() || model.first_entry_imported {
                 matches!(
                     resulting_state,
                     Err(DataEntryTransitionError::CorrectionNotAllowed(_))
@@ -347,7 +374,7 @@ fn is_as_expected(
         }
         // CorrectSecondEntry, only allowed when the first entry has no errors
         (DataEntryStatus::EntriesDifferent(_), Transition::CorrectSecondEntry) => {
-            if first_entry.has_errors() {
+            if model.first_entry.has_errors() {
                 matches!(
                     resulting_state,
                     Err(DataEntryTransitionError::CorrectionNotAllowed(_))
@@ -373,7 +400,7 @@ fn is_as_expected(
         }
         // FinaliseFirstEntry after correcting it
         (DataEntryStatus::FirstEntryCorrection(_), Transition::FinaliseFirstEntry(true)) => {
-            is_finalised_as_expected(resulting_state, first_entry, second_entry)
+            is_finalised_as_expected(resulting_state, model.first_entry, model.second_entry)
         }
         // DiscardFirstEntry while correcting it: the kept second entry becomes the first entry
         (
@@ -398,7 +425,7 @@ fn is_as_expected(
         }
         // FinaliseSecondEntry after correcting it
         (DataEntryStatus::SecondEntryCorrection(_), Transition::FinaliseSecondEntry(true)) => {
-            is_finalised_as_expected(resulting_state, first_entry, second_entry)
+            is_finalised_as_expected(resulting_state, model.first_entry, model.second_entry)
         }
         // DiscardSecondEntry while correcting it: the finalised first entry is kept unchanged
         (
@@ -536,19 +563,23 @@ fn is_finalised_as_expected(
 
 /// Fuzz state shadowing the real state machine
 struct Model {
+    committee_category: CommitteeCategory,
     first_user: UserId,  // used for first entry
     second_user: UserId, // used for second entry
     first_entry: EntryValue,
     second_entry: EntryValue,
+    first_entry_imported: bool,
 }
 
 impl Model {
-    fn new() -> Self {
+    fn new(committee_category: CommitteeCategory) -> Self {
         Model {
+            committee_category,
             first_user: UserId::from(0),
             second_user: UserId::from(1),
             first_entry: EntryValue::ValidEmpty,
             second_entry: EntryValue::ValidEmpty,
+            first_entry_imported: false,
         }
     }
 
@@ -574,12 +605,39 @@ impl Model {
             std::mem::swap(&mut self.first_user, &mut self.second_user);
         }
         self.first_entry = EntryValue::ValidEmpty;
+        self.first_entry_imported = false;
+    }
+
+    /// An imported first entry is finalised immediately and has no typist.
+    fn import_first_entry(&mut self, entry: EntryValue) {
+        self.first_entry = entry;
+        self.first_entry_imported = true;
+    }
+
+    /// An unclaimed second entry can only be claimed by a different
+    /// user than the first entry. An imported first entry however
+    /// has no typist and can be claimed by any user.
+    fn claim_second_entry(&mut self, correct_user: bool) {
+        if self.first_entry_imported && !correct_user {
+            std::mem::swap(&mut self.first_user, &mut self.second_user);
+        }
+        self.second_entry = EntryValue::ValidEmpty;
     }
 
     /// The second entry becomes the first entry, taking its typist along.
     fn promote_second_entry(&mut self) {
         std::mem::swap(&mut self.first_user, &mut self.second_user);
         self.first_entry = self.second_entry;
+        self.first_entry_imported = false;
+    }
+
+    /// Expect the origin of the first entry to be in the given state
+    fn expected_first_entry_origin(&self, state: &DataEntryStatus) -> Option<DataEntryOrigin> {
+        match state {
+            DataEntryStatus::Empty => None,
+            _ if self.first_entry_imported => Some(DataEntryOrigin::Import),
+            _ => Some(DataEntryOrigin::Typist(self.first_user)),
+        }
     }
 }
 
@@ -608,7 +666,7 @@ impl From<ArbitraryCommitteeCategory> for CommitteeCategory {
 // every step matches the expected state machine defined above
 fuzz_target!(|input: Input| {
     let mut state = DataEntryStatus::default();
-    let mut model = Model::new();
+    let mut model = Model::new(input.committee_category.into());
     let election = election(input.committee_category.into());
 
     for transition in input.transitions {
@@ -616,6 +674,14 @@ fuzz_target!(|input: Input| {
 
         // Apply transition
         let next_state = match transition {
+            Transition::ImportFirstEntry(entry) => {
+                let res = state
+                    .import_first_entry(&election, entry.results(input.committee_category.into()));
+                if res.is_ok() {
+                    model.import_first_entry(entry);
+                }
+                res
+            }
             Transition::ClaimFirstEntry(correct_user) => {
                 let res = state.claim_first_entry(
                     model.first_user(correct_user),
@@ -657,8 +723,7 @@ fuzz_target!(|input: Input| {
                     valid_empty_result(input.committee_category.into()),
                 );
                 if res.is_ok() && matches!(prev_state, DataEntryStatus::FirstEntryFinalised(_)) {
-                    // a newly claimed second entry starts out empty
-                    model.second_entry = EntryValue::ValidEmpty;
+                    model.claim_second_entry(correct_user);
                 }
                 res
             }
@@ -694,15 +759,9 @@ fuzz_target!(|input: Input| {
         };
 
         // Check that the applied transition matches what we expect from the state machine
-        if !is_as_expected(
-            &prev_state,
-            &transition,
-            &next_state,
-            model.first_entry,
-            model.second_entry,
-        ) {
+        if !is_as_expected(&prev_state, &transition, &next_state, &model) {
             panic!(
-                "Prev: {:?}\n\nNext: {:?}\n\nInvalid transition: {} --{:?}--> {}\nfirst_entry: {:?}, second_entry: {:?}\n",
+                "Prev: {:?}\n\nNext: {:?}\n\nInvalid transition: {} --{:?}--> {}\nfirst_entry: {:?}, second_entry: {:?}, first_entry_imported: {}\n",
                 prev_state,
                 next_state,
                 prev_state.status_name(),
@@ -712,8 +771,27 @@ fuzz_target!(|input: Input| {
                     .map(|s| s.status_name().to_string())
                     .unwrap_or_else(|e| e.to_string()),
                 model.first_entry,
-                model.second_entry
+                model.second_entry,
+                model.first_entry_imported
             )
+        }
+
+        // Validate the first entry origin
+        if let Ok(next_state) = &next_state {
+            let expected_origin = model.expected_first_entry_origin(next_state);
+            let actual_origin = next_state.get_first_entry_origin();
+            if actual_origin != expected_origin {
+                panic!(
+                    "Prev: {:?}\n\nNext: {:?}\n\nUnexpected first entry origin after {} --{:?}--> {}\nexpected: {:?}, actual: {:?}\n",
+                    prev_state,
+                    next_state,
+                    prev_state.status_name(),
+                    transition,
+                    next_state.status_name(),
+                    expected_origin,
+                    actual_origin,
+                )
+            }
         }
 
         // State only updates if there was no error during the transition

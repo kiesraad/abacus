@@ -53,6 +53,7 @@ export interface FileImportError {
 export type FileErrorCase =
   | "invalid_510b"
   | "invalid_zip"
+  | "data_entry_already_imported"
   | "data_entry_already_started"
   | "election_mismatch"
   | "contains_errors"
@@ -84,7 +85,10 @@ function importError(error: AnyError, electionName: string): FileImportError {
     return fileError("election_mismatch", { electionName });
   }
 
-  // TODO #3905 will add distinction between entry and imported.
+  if (error.reference === "DataEntryAlreadyImported") {
+    return fileError("data_entry_already_imported");
+  }
+
   if (error.reference === "DataEntryNotAllowed") {
     return fileError("data_entry_already_started");
   }

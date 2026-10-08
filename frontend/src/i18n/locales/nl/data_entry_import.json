@@ -13,6 +13,10 @@
       "title": "Geen geldig ZIP-bestand",
       "description": "Het ZIP-bestand kan niet gelezen worden of de inhoud is niet correct. Probeer een ander bestand."
     },
+    "data_entry_already_imported": {
+      "title": "Telresultaten GSB al geïmporteerd",
+      "description": "Je hebt de telresultaten van dit GSB al geïmporteerd. Wil je de eerder geïmporteerde telresultaten vervangen? Verwijder dan eerst de geïmporteerde resultaten."
+    },
     "data_entry_already_started": {
       "title": "GSB al ingevoerd",
       "description": "Er zijn al telresultaten van dit GSB ingevoerd. Wil je de ingevoerde telresultaten vervangen? Verwijder dan eerst de ingevoerde resultaten."

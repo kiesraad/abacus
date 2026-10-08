@@ -135,6 +135,7 @@ describe("DataEntryImportPage", () => {
       { status: 422, reference: "InvalidCountType", title: "Geen tellingsbestand EML 510b" },
       { status: 422, reference: "EmlImportError", title: "Tellingsbestand hoort niet bij dit CSB" },
       { status: 422, reference: "UnknownCommittee", title: "Tellingsbestand hoort niet bij dit CSB" },
+      { status: 422, reference: "DataEntryAlreadyImported", title: "Telresultaten GSB al geïmporteerd" },
       { status: 422, reference: "DataEntryNotAllowed", title: "GSB al ingevoerd" },
       { status: 422, reference: "DataEntryValidationErrors", title: "Tellingsbestand bevat fouten" },
       { status: 422, reference: "EmlError", title: "Tellingsbestand bevat fouten" },

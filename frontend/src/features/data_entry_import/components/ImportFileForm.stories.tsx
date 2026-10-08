@@ -6,6 +6,7 @@ import { ImportFileForm } from "./ImportFileForm";
 const fileErrorCases: Record<FileErrorCase, string> = {
   invalid_510b: "Geen tellingsbestand EML 510b",
   invalid_zip: "Geen geldig ZIP-bestand",
+  data_entry_already_imported: "Telresultaten GSB al geïmporteerd",
   data_entry_already_started: "GSB al ingevoerd",
   election_mismatch: "Tellingsbestand hoort niet bij dit CSB",
   contains_errors: "Tellingsbestand bevat fouten",

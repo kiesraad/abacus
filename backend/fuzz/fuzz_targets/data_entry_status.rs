@@ -648,6 +648,7 @@ struct Input {
 }
 
 #[derive(Arbitrary, Copy, Clone, Debug)]
+#[expect(clippy::upper_case_acronyms)]
 enum ArbitraryCommitteeCategory {
     GSB,
     CSB,

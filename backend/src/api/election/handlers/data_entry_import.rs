@@ -16,27 +16,44 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    api::election::check_hash,
+    api::{data_entry::DataEntryAuditData, election::check_hash},
     domain::{
         committee_session::CommitteeSessionId,
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{DataEntrySource, DataEntryStatus},
+        data_entry::{DataEntryOrigin, DataEntrySource, DataEntryStatus, DataEntryTransitionError},
         election::{ElectionId, ElectionWithPoliticalGroups},
         results::{Results, gsb_results::GSBResults},
-        sub_committee::SubCommitteeFirstSession,
-        validate::ValidateRoot,
+        sub_committee::{SubCommitteeFirstSession, SubCommitteeId},
     },
     eml::{EMLImportError, RedactedEmlHash},
     error::ErrorReference,
-    repository::{committee_session_repo, election_repo, sub_committee_repo, user_repo::User},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
+    repository::{
+        committee_session_repo, data_entry_repo, election_repo, sub_committee_repo, user_repo::User,
+    },
 };
 
 #[derive(Debug)]
 pub enum DataEntryImportError {
     EmlZipError(String),
     CommitteeSessionAlreadyCompleted,
+    SubCommitteeDataEntryAlreadyImported,
     SubCommitteeDataEntryNotEmpty,
     ResultsHaveValidationErrors,
+}
+
+#[derive(Serialize)]
+struct DataEntryImportedAuditData {
+    election_id: ElectionId,
+    sub_committee_id: SubCommitteeId,
+    authority_id: String,
+    #[serde(flatten)]
+    data_entry: DataEntryAuditData,
+}
+
+impl AsAuditEvent for DataEntryImportedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryImported;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
 #[derive(Debug, ToSchema)]
@@ -86,12 +103,22 @@ async fn read_form_data<S: Send + Sync>(
     while let Some(field) = multipart.next_field().await? {
         match field.name() {
             Some("hash") => {
+                if hash.is_some() {
+                    return Err(invalid_form_data("Duplicate hash field"));
+                }
+
                 let json = field.text().await?;
                 let chunks = serde_json::from_str(&json)
                     .map_err(|err| invalid_form_data(format!("Invalid hash: {err}")))?;
                 hash = Some(chunks);
             }
-            Some("data") => data = Some(field.bytes().await?.into()),
+            Some("data") => {
+                if data.is_some() {
+                    return Err(invalid_form_data("Duplicate data field"));
+                }
+
+                data = Some(field.bytes().await?.into())
+            }
             name => {
                 let name = name.unwrap_or_default();
                 return Err(invalid_form_data(format!("Unexpected field \"{name}\"")));
@@ -188,14 +215,35 @@ pub async fn election_data_entry_import(
     user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
+    audit_service: AuditService,
     request: CSBDataEntryImportRequest,
 ) -> Result<Json<CSBDataEntryImportResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
     let hash = Some(&request.hash);
     let import = validate_import(&mut tx, &user, election_id, request.data, hash).await?;
 
-    // TODO #3905 Store origin of data entry
-    // TODO #3906 Save data entry results
+    let data_entry = data_entry_repo::update(
+        &mut tx,
+        import.sub_committee.data_entry_id,
+        &import.new_state,
+    )
+    .await?;
+
+    audit_service
+        .log(
+            &mut tx,
+            &DataEntryImportedAuditData {
+                election_id: import.election.id,
+                sub_committee_id: import.sub_committee.id,
+                authority_id: import.sub_committee.authority_id.clone(),
+                data_entry: data_entry.into(),
+            },
+            Some(format!(
+                "Election count file hash: {}",
+                request.hash.join(" ")
+            )),
+        )
+        .await?;
 
     tx.commit().await?;
 
@@ -212,9 +260,10 @@ struct ValidatedImport {
     election: ElectionWithPoliticalGroups,
     sub_committee: SubCommitteeFirstSession,
     hash: RedactedEmlHash,
+    new_state: DataEntryStatus,
 }
 
-/// Validate uploaded data: hash, ZIP and EML
+/// Validate uploaded data and get the resulting data entry state
 async fn validate_import(
     conn: &mut SqliteConnection,
     user: &User,
@@ -254,23 +303,33 @@ async fn validate_import(
     }
 
     let authority_identifier = &definition.managing_authority.authority_identifier;
-    let (sub_committee, status) =
+    let (sub_committee, data_entry_status) =
         find_sub_committee(conn, committee_session.id, authority_identifier).await?;
-    if status != DataEntryStatus::Empty {
-        // TODO #3905 Throw different error when results have already been *imported*, otherwise the following one
+
+    if data_entry_status.get_first_entry_origin() == Some(DataEntryOrigin::Import) {
+        return Err(DataEntryImportError::SubCommitteeDataEntryAlreadyImported.into());
+    }
+    if data_entry_status != DataEntryStatus::Empty {
         return Err(DataEntryImportError::SubCommitteeDataEntryNotEmpty.into());
     }
 
+    // The state machine validates results, report validation errors as import errors
     let results = Results::GSB(GSBResults::from_eml_count(&definition, election.category)?);
-    let validation_results = results.start_validate(&election)?;
-    if validation_results.has_errors() {
-        return Err(DataEntryImportError::ResultsHaveValidationErrors.into());
-    }
+    let new_state = data_entry_status
+        .import_first_entry(&election, results)
+        .map_err(|err| match err {
+            DataEntryTransitionError::ValidationError(_) => {
+                APIError::from(DataEntryImportError::ResultsHaveValidationErrors)
+            }
+            DataEntryTransitionError::ValidatorError(err) => APIError::from(err),
+            err => APIError::from(err),
+        })?;
 
     Ok(ValidatedImport {
         election,
         sub_committee,
         hash: RedactedEmlHash::from(eml.as_bytes()),
+        new_state,
     })
 }
 
@@ -350,7 +409,9 @@ async fn read_eml_from_zip(zip_data: Vec<u8>) -> Result<String, APIError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::domain::tabulation::ElectionTotals;
     use async_zip::{Compression, ZipEntryBuilder, tokio::write::ZipFileWriter};
+    use chrono::Local;
     use std::assert_matches;
 
     /// Create a zip file in memory containing the given files
@@ -420,7 +481,20 @@ mod tests {
 
             assert_matches!(
                 CSBDataEntryImportRequest::from_request(request, &()).await,
-                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message == "Missing hash"
+            );
+        }
+
+        #[test(tokio::test)]
+        async fn test_from_request_import_duplicate_hash() {
+            let hash = serde_json::to_vec(&vec!["abcd"; crate::eml::hash::CHUNK_COUNT]).unwrap();
+            let request = multipart_request(&[("hash", &hash), ("hash", &hash), ("data", b"zip")]);
+
+            assert_matches!(
+                CSBDataEntryImportRequest::from_request(request, &()).await,
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message == "Duplicate hash field"
             );
         }
 
@@ -431,7 +505,8 @@ mod tests {
 
             assert_matches!(
                 CSBDataEntryImportValidateRequest::from_request(request, &()).await,
-                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message.starts_with("Invalid hash")
             );
         }
 
@@ -441,7 +516,19 @@ mod tests {
 
             assert_matches!(
                 CSBDataEntryImportValidateRequest::from_request(request, &()).await,
-                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message.starts_with("Invalid form data:")
+            );
+        }
+
+        #[test(tokio::test)]
+        async fn test_from_request_duplicate_data() {
+            let request = multipart_request(&[("data", b"zip"), ("data", b"zip")]);
+
+            assert_matches!(
+                CSBDataEntryImportValidateRequest::from_request(request, &()).await,
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message == "Duplicate data field"
             );
         }
 
@@ -451,7 +538,8 @@ mod tests {
 
             assert_matches!(
                 CSBDataEntryImportValidateRequest::from_request(request, &()).await,
-                Err(APIError::BadRequest(_, ErrorReference::InvalidData))
+                Err(APIError::BadRequest(message, ErrorReference::InvalidData))
+                    if message == "Unexpected field \"other\""
             );
         }
     }
@@ -478,7 +566,8 @@ mod tests {
         async fn test_invalid_zip() {
             assert_matches!(
                 read_eml_from_zip(b"not a zip file".to_vec()).await,
-                Err(APIError::Unprocessable(_, ErrorReference::ZipError))
+                Err(APIError::Unprocessable(message, ErrorReference::ZipError))
+                    if message == "Failed to read ZIP file"
             );
         }
 
@@ -488,7 +577,8 @@ mod tests {
 
             assert_matches!(
                 read_eml_from_zip(zip).await,
-                Err(APIError::Unprocessable(_, ErrorReference::ZipError))
+                Err(APIError::Unprocessable(message, ErrorReference::ZipError))
+                    if message == "Missing EML file in ZIP"
             );
         }
 
@@ -502,7 +592,8 @@ mod tests {
 
             assert_matches!(
                 read_eml_from_zip(zip).await,
-                Err(APIError::Unprocessable(_, ErrorReference::ZipError))
+                Err(APIError::Unprocessable(message, ErrorReference::ZipError))
+                    if message == "Multiple EML files in ZIP"
             );
         }
 
@@ -520,15 +611,35 @@ mod tests {
             assert_matches!(
                 read_eml_from_zip(zip).await,
                 Err(APIError::ContentTooLarge(
-                    _,
+                    message,
                     ErrorReference::RequestPayloadTooLarge
                 ))
+                    if message == "EML file too large"
             );
         }
     }
 
+    /// Generate the count EML (510b) for the given election
+    async fn count_eml(conn: &mut SqliteConnection, election_id: ElectionId) -> String {
+        let election = election_repo::get(conn, election_id).await.unwrap();
+        let committee_session =
+            committee_session_repo::get_election_committee_session(conn, election_id)
+                .await
+                .unwrap();
+        let results =
+            data_entry_repo::list_results_for_committee_session(conn, committee_session.id)
+                .await
+                .unwrap();
+        let totals = ElectionTotals::tabulate(&election, &results).unwrap();
+        let count = election
+            .as_count_eml(None, &committee_session, &results, &totals, Local::now())
+            .unwrap();
+
+        String::try_from(count).unwrap()
+    }
+
     mod validate_import {
-        use chrono::Local;
+        use chrono::Utc;
         use eml_nl::{
             documents::election_count::UncountedVotesReason,
             utils::{AuthorityId, StringValue},
@@ -537,25 +648,13 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::{data_entry::DataEntryId, role::Role, tabulation::ElectionTotals},
+            domain::{
+                data_entry::{DataEntryId, DataEntryOrigin, FirstEntryFinalised},
+                role::Role,
+            },
             eml::EmlHash,
             repository::{data_entry_repo, user_repo::UserId},
         };
-
-        /// Generate the count EML (510b) for the given election
-        async fn count_eml(conn: &mut SqliteConnection, election_id: ElectionId) -> String {
-            let election = election_repo::get(conn, election_id).await.unwrap();
-            let committee_session =
-                committee_session_repo::get_election_committee_session(conn, election_id)
-                    .await
-                    .unwrap();
-            let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
-            let count = election
-                .as_count_eml(None, &committee_session, &[], &totals, Local::now())
-                .unwrap();
-
-            String::try_from(count).unwrap()
-        }
 
         #[test(sqlx::test(fixtures(
             path = "../../../../fixtures",
@@ -580,7 +679,14 @@ mod tests {
 
             assert_eq!(import.election.id, csb_election_id);
             assert_eq!(import.sub_committee.authority_id, "0035");
-            // TODO #3906 Compare results with empty GSB results
+            assert_matches!(
+                import.new_state,
+                DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                    first_entry_origin: DataEntryOrigin::Import,
+                    finalised_first_entry: Results::GSB(_),
+                    ..
+                })
+            );
         }
 
         #[test(sqlx::test(fixtures(
@@ -629,11 +735,9 @@ mod tests {
                 let eml = String::try_from(count.clone()).unwrap();
                 let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
-                assert!(
-                    matches!(
-                        validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
-                        Err(APIError::EmlImportError(EMLImportError::InvalidCountType))
-                    ),
+                assert_matches!(
+                    validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
+                    Err(APIError::EmlImportError(EMLImportError::InvalidCountType)),
                     "{count_type:?}"
                 );
             }
@@ -683,6 +787,38 @@ mod tests {
             path = "../../../../fixtures",
             scripts("election_5_with_results", "election_8_csb_with_results")
         )))]
+        async fn test_data_entry_already_imported(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            data_entry_repo::update(
+                &mut conn,
+                DataEntryId::from(801),
+                &DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                    first_entry_origin: DataEntryOrigin::Import,
+                    finalised_first_entry: Results::GSB(GSBResults::default()),
+                    first_entry_finished_at: Utc::now(),
+                    finalised_with_warnings: false,
+                }),
+            )
+            .await
+            .unwrap();
+
+            assert_matches!(
+                validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
+                Err(APIError::Unprocessable(
+                    message,
+                    ErrorReference::DataEntryAlreadyImported
+                )) if message == "Sub committee data entry already imported"
+            );
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
         async fn test_data_entry_not_empty(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
@@ -692,9 +828,9 @@ mod tests {
             assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
-                    _,
+                    message,
                     ErrorReference::DataEntryNotAllowed
-                ))
+                )) if message == "Sub committee data entry not empty"
             );
         }
 
@@ -718,9 +854,9 @@ mod tests {
             assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
-                    _,
+                    message,
                     ErrorReference::InvalidCommitteeSessionStatus
-                ))
+                )) if message == "Committee session already completed"
             );
         }
 
@@ -755,8 +891,113 @@ mod tests {
             assert_matches!(
                 validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
                 Err(APIError::Unprocessable(
-                    _,
+                    message,
                     ErrorReference::DataEntryValidationErrors
+                )) if message == "Results have validation errors"
+            );
+        }
+    }
+
+    mod import {
+        use test_log::test;
+
+        use super::*;
+        use crate::{
+            domain::{
+                data_entry::{DataEntryId, DataEntryOrigin},
+                election::ElectionCategory,
+                role::Role,
+            },
+            eml::EmlHash,
+            infra::audit_log,
+            repository::{data_entry_repo, user_repo::UserId},
+        };
+
+        async fn import_count(
+            pool: SqlitePool,
+            eml: &str,
+        ) -> Result<Json<CSBDataEntryImportResponse>, APIError> {
+            let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+            let audit_service = AuditService::new(Some(user.clone()), None);
+            let hash = EmlHash::from(eml.as_bytes()).chunks;
+            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+            election_data_entry_import(
+                user,
+                State(pool),
+                Path(ElectionId::from(8)),
+                audit_service,
+                CSBDataEntryImportRequest { hash, data: zip },
+            )
+            .await
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_import_saves_results_and_logs_audit_event(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let data_entry_id = DataEntryId::from(801);
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, data_entry_id, &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            let response = import_count(pool, &eml).await.expect("should be Ok");
+            assert_eq!(response.sub_committee.data_entry_id, data_entry_id);
+
+            let data_entry = data_entry_repo::get(&mut conn, data_entry_id)
+                .await
+                .unwrap();
+            let DataEntryStatus::FirstEntryFinalised(state) = &data_entry.state.0 else {
+                panic!("expected FirstEntryFinalised, got {:?}", data_entry.state.0);
+            };
+            assert_eq!(state.first_entry_origin, DataEntryOrigin::Import);
+
+            let count = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict)
+                .ok()
+                .unwrap();
+            let expected = GSBResults::from_eml_count(&count, ElectionCategory::Municipal).unwrap();
+            assert_eq!(state.finalised_first_entry, Results::GSB(expected));
+
+            audit_log::assert_last_event(
+                &mut conn,
+                AuditEventType::DataEntryImported,
+                AuditEventLevel::Success,
+                serde_json::json!({
+                    "election_id": 8,
+                    "sub_committee_id": 811,
+                    "authority_id": "0035",
+                    "data_entry_id": 801,
+                    "data_entry_status": "first_entry_finalised",
+                    "first_entry_origin": { "type": "Import" }
+                }),
+            )
+            .await;
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../../../fixtures",
+            scripts("election_5_with_results", "election_8_csb_with_results")
+        )))]
+        async fn test_import_twice_not_allowed(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            assert_matches!(import_count(pool.clone(), &eml).await, Ok(_));
+            assert_matches!(
+                import_count(pool, &eml).await,
+                Err(APIError::Unprocessable(
+                    _,
+                    ErrorReference::DataEntryAlreadyImported
                 ))
             );
         }

@@ -66,6 +66,12 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
       <Link to={`/elections/${election.id}`}>
         <ElectionBreadcrumb election={election} />
       </Link>
+      {location.pathname.match(/^\/elections\/\d+\/sub-committees\/\d+\/?$/) && (
+        <>
+          <IconChevronRight />
+          <Link to={`/elections/${election.id}/sub-committees`}>{t("sub_committee_keys.title")}</Link>
+        </>
+      )}
       {location.pathname.match(/^\/elections\/\d+\/polling-stations\/(create|\d+\/update)$/) && (
         <>
           <IconChevronRight />

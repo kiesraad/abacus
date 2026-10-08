@@ -310,6 +310,24 @@ async fn test_csb_election_import_and_gsb_count_import(pool: SqlitePool) {
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["election_name"], "Gemeenteraad Test 2022");
     assert_eq!(body["sub_committee"]["authority_id"], "0000");
+    let sub_committee_id = u32::try_from(body["sub_committee"]["id"].as_u64().unwrap()).unwrap();
+
+    // The imported results are saved as the finalised first entry
+    let statuses = get_statuses(
+        &addr,
+        &coordinator_cookie,
+        u32::try_from(election_id).unwrap(),
+    )
+    .await;
+    let status = &statuses[&sub_committee_id];
+    assert_eq!(status["status"], "first_entry_finalised");
+    assert_eq!(status["first_entry_origin"]["type"], "Import");
+
+    // Importing the same file again is not allowed
+    let response = post_multipart(&import_url, &coordinator_cookie, &fields).await;
+    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["reference"], "DataEntryAlreadyImported");
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]

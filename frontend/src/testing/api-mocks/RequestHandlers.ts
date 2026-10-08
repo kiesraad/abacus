@@ -11,6 +11,7 @@ import type {
   ADD_DECEASED_CANDIDATE_REQUEST_PATH,
   ADMIN_EXISTS_REQUEST_PARAMS,
   ADMIN_EXISTS_REQUEST_PATH,
+  AddSubCommitteeCertificateResponse,
   ApportionmentState,
   AUDIT_LOG_LIST_REQUEST_PARAMS,
   AUDIT_LOG_LIST_REQUEST_PATH,
@@ -130,6 +131,8 @@ import type {
   SaveDataEntryResponse,
   SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS,
   SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH,
   SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS,
   SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH,
   SubCommittee,
@@ -167,7 +170,7 @@ import {
 import { statusResponseMock } from "./ElectionStatusMockData";
 import { logMockResponse } from "./LogMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
-import { subCommitteesMockData } from "./SubCommitteeMockData";
+import { addCertificateResponse, subCommitteesMockData } from "./SubCommitteeMockData";
 import { loginResponseMockData, userMockData } from "./UserMockData";
 
 type ParamsToString<T> = {
@@ -374,6 +377,14 @@ export const CSBSubCommitteeCertificatesRequestHandler = http.get<
   SubCommittee[]
 >("/api/elections/2/sub_committee_certificates" satisfies SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH, () =>
   HttpResponse.json(subCommitteesMockData, { status: 200 }),
+);
+
+export const CSBSubCommitteeCertificateAddRequestHandler = http.post<
+  ParamsToString<SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS>,
+  null,
+  AddSubCommitteeCertificateResponse
+>("/api/elections/2/sub_committee_certificates" satisfies SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH, () =>
+  HttpResponse.json(addCertificateResponse, { status: 201 }),
 );
 
 // get election status handler
@@ -714,7 +725,9 @@ export const handlers: HttpHandler[] = [
   ElectionStatusRequestHandler,
   ElectionCertificateDetailsRequestHandler,
   DismissPublicKeyUploadReminderRequestHandler,
+  CSBElectionRequestHandler,
   CSBSubCommitteeCertificatesRequestHandler,
+  CSBSubCommitteeCertificateAddRequestHandler,
   CSBElectionStatusRequestHandler,
   GSBABElectionImportRequestHandler,
   GSBGRElectionImportRequestHandler,

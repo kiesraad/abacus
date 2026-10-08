@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect } from "storybook/test";
+import { expect, fn } from "storybook/test";
 import { t } from "@/i18n/translate";
 import { getCertificateMockData, getSubCommitteeMockData } from "@/testing/api-mocks/SubCommitteeMockData";
 import { CertificateInformation } from "./CertificateInformation";
@@ -21,7 +21,7 @@ const meta = {
   args: {
     certificate: certificate,
     title: `${t("election_certificate.certificate")} ${committee} ${certificate.election_identifier}`,
-    deleteHref: undefined,
+    onDelete: fn(),
   },
 } satisfies Meta<typeof CertificateInformation>;
 

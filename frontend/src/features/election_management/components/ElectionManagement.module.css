@@ -113,7 +113,7 @@ main.backgroundBlue {
         font-weight: bold;
       }
 
-      .deleteHref {
+      button {
         color: var(--red-700);
       }
     }

@@ -31,7 +31,7 @@
     }
   },
   "hash_check": {
-    "description": "Het bestand <file>filename</file> is geïmporteerd en bevat de volgende telresultaten:",
+    "description": "Het bestand <file>filename</file> bevat de volgende telresultaten:",
     "instructions": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code staat op het proces-verbaal Na 31-2 van het GSB van de gemeente {fileAuthorityName}.",
     "title": "Controleer tellingsbestand",
     "error": {

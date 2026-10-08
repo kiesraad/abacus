@@ -134,8 +134,6 @@ import type {
   SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY,
   SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS,
   SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH,
-  SUB_COMMITTEE_CERTIFICATE_DELETE_REQUEST_PARAMS,
-  SUB_COMMITTEE_CERTIFICATE_DELETE_REQUEST_PATH,
   SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS,
   SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH,
   SubCommittee,
@@ -388,13 +386,6 @@ export const CSBSubCommitteeCertificateAddRequestHandler = http.post<
   AddSubCommitteeCertificateResponse
 >("/api/elections/2/sub_committee_certificates" satisfies SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH, () =>
   HttpResponse.json(addCertificateResponse, { status: 201 }),
-);
-
-export const CSBSubCommitteeCertificateDeleteRequestHandler = http.delete<
-  ParamsToString<SUB_COMMITTEE_CERTIFICATE_DELETE_REQUEST_PARAMS>
->(
-  "/api/elections/2/sub_committees/1/certificates/abc" satisfies SUB_COMMITTEE_CERTIFICATE_DELETE_REQUEST_PATH,
-  () => new HttpResponse(null, { status: 204 }),
 );
 
 // get election status handler
@@ -738,7 +729,6 @@ export const handlers: HttpHandler[] = [
   CSBElectionRequestHandler,
   CSBSubCommitteeCertificatesRequestHandler,
   CSBSubCommitteeCertificateAddRequestHandler,
-  CSBSubCommitteeCertificateDeleteRequestHandler,
   CSBElectionStatusRequestHandler,
   GSBABElectionImportRequestHandler,
   GSBGRElectionImportRequestHandler,

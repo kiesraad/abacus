@@ -1,5 +1,17 @@
 import type { AddSubCommitteeCertificateResponse, Certificate, SubCommittee } from "@/types/generated/openapi";
 
+function generateRandomString(length: number): string {
+  const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+
+  return result;
+}
+
 export const getCertificateMockData = (certificate: Partial<Certificate> = {}): Certificate => {
   return {
     election_identifier: "PS2027_Noord-Holland",
@@ -9,7 +21,7 @@ export const getCertificateMockData = (certificate: Partial<Certificate> = {}): 
     not_after: "2027-04-01T00:00:00Z",
     signature_algorithm: "RSA 4096-bit",
     public_key: "-----BEGIN PUBLIC KEY-----\n-----END PUBLIC KEY-----\n",
-    public_key_fingerprint: "a4ac04ce062498ce950a4b02d6fc5bb1dea3f74b209ae6f6e7251e626252b8e1",
+    public_key_fingerprint: generateRandomString(65),
     ...certificate,
   };
 };

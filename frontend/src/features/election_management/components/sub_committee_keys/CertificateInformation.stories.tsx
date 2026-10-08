@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 import { t } from "@/i18n/translate";
 import { getCertificateMockData, getSubCommitteeMockData } from "@/testing/api-mocks/SubCommitteeMockData";
 import { CertificateInformation } from "./CertificateInformation";
@@ -30,7 +30,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   play: async ({ canvas }) => {
-    await expect(await canvas.findByTestId(`certificate-info-${certificate.public_key_fingerprint}`)).toHaveTextContent(
+    const certificateInfo = await canvas.findByTestId(`certificate-${certificate.public_key_fingerprint}`);
+    await expect(certificateInfo).toHaveTextContent(
       [
         "Organisatie: PS2027_Noord-Holland",
         "Organisatorische eenheid: Abacus 1.2.0",
@@ -40,8 +41,7 @@ export const Default: Story = {
         "Handtekeningalgoritme: RSA 4096-bit",
       ].join(""),
     );
-    await expect(
-      await canvas.findByTestId(`certificate-title-${certificate.public_key_fingerprint}`),
-    ).toHaveTextContent("Publieke sleutel GSB Juinen PS2027_Noord-Holland");
+    await expect(certificateInfo).toHaveTextContent("Publieke sleutel GSB Juinen PS2027_Noord-Holland");
+    await expect(within(certificateInfo).getByRole("button", { name: "Verwijderen" })).toBeVisible();
   },
 };

@@ -12,15 +12,11 @@ export interface CertificateInformationProps {
 
 export function CertificateInformation({ certificate, title, onDelete }: CertificateInformationProps) {
   return (
-    <div className={cls.certificateInformation}>
-      <div id={`certificate-info-${certificate.public_key_fingerprint}`} className={cls.certificateSection}>
-        {getCertificateInfo(certificate)}
-      </div>
+    <div id={`certificate-${certificate.public_key_fingerprint}`} className={cls.certificateInformation}>
+      <div className={cls.certificateSection}>{getCertificateInfo(certificate)}</div>
       <div className={cls.titleSection}>
         <span>
-          <span id={`certificate-title-${certificate.public_key_fingerprint}`} className={cls.title}>
-            {title}
-          </span>
+          <span className={cls.title}>{title}</span>
           {onDelete && (
             <Button
               variant="underlined"

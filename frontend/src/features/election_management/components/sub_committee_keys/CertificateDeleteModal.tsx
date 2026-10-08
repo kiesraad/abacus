@@ -37,7 +37,7 @@ export function CertificateDeleteModal({
   }
 
   return (
-    <Modal title={`${t("sub_committee_keys.delete_public_key")}?`} onClose={onCancel}>
+    <Modal title={t("sub_committee_keys.delete_public_key")} onClose={onCancel}>
       <p>{t("sub_committee_keys.delete_are_you_sure")}</p>
       <nav>
         <Button

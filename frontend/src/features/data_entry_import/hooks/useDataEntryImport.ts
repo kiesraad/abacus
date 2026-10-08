@@ -42,6 +42,7 @@ export interface UseDataEntryImport {
   onFileChange: (file: File | undefined) => Promise<void>;
   onHashSubmit: (chunks: string[]) => Promise<void>;
   onFinalSubmit: () => Promise<void>;
+  onAbort: () => void;
 }
 
 export interface FileImportError {
@@ -178,5 +179,9 @@ export function useDataEntryImport(): UseDataEntryImport {
     }
   }
 
-  return { state, onFileChange, onHashSubmit, onFinalSubmit };
+  function onAbort() {
+    void navigate(`/elections/${election.id}/status`);
+  }
+
+  return { state, onFileChange, onHashSubmit, onFinalSubmit, onAbort };
 }

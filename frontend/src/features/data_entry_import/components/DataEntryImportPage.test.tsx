@@ -193,4 +193,12 @@ describe("DataEntryImportPage", () => {
     });
     expect(router.state.location.pathname).toEqual(`/elections/${electionId}/status`);
   });
+
+  test("abort navigates back to the election status page", async () => {
+    const user = userEvent.setup();
+    const router = renderPage();
+
+    await user.click(await screen.findByRole("button", { name: "Importeren afbreken" }));
+    expect(router.state.location.pathname).toEqual(`/elections/${electionId}/status`);
+  });
 });

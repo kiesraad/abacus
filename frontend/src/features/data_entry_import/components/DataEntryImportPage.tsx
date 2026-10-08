@@ -1,16 +1,15 @@
 import type { ReactElement } from "react";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { AbortDataImportControl } from "@/features/data_entry_import/components/AbortDataImportControl";
+import { Button } from "@/components/ui/Button/Button";
 import { useDataEntryImport } from "@/features/data_entry_import/hooks/useDataEntryImport";
 import { t } from "@/i18n/translate";
-
 import { CheckAndSave } from "./CheckAndSave";
 import { HashCheck } from "./HashCheck";
 import { ImportFileForm } from "./ImportFileForm";
 
 export function DataEntryImportPage() {
-  const { state, onFileChange, onHashSubmit, onFinalSubmit } = useDataEntryImport();
+  const { state, onFileChange, onHashSubmit, onFinalSubmit, onAbort } = useDataEntryImport();
 
   function getContent(): ReactElement {
     switch (state.status) {
@@ -47,7 +46,9 @@ export function DataEntryImportPage() {
           <h1>{t("data_entry_import.title")}</h1>
         </section>
         <section>
-          <AbortDataImportControl />
+          <Button variant="secondary" size="sm" onClick={onAbort}>
+            {t("data_entry_import.abort")}
+          </Button>
         </section>
       </header>
 

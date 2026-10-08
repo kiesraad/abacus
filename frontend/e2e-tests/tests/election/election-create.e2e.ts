@@ -468,7 +468,7 @@ test.describe("Election creation", () => {
       // Correct hash, incorrect case
       const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
       await expect(checkDefinitionPage.hashInput1).toBeFocused();
-      await checkDefinitionPage.inputHash("476B", "C0DE");
+      await checkDefinitionPage.inputHash(eml110a.hashInput1, eml110a.hashInput2);
 
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();

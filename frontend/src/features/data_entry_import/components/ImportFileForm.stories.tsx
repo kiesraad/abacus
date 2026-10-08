@@ -4,6 +4,7 @@ import { type FileErrorCase, fileError } from "../hooks/useDataEntryImport";
 import { ImportFileForm } from "./ImportFileForm";
 
 const fileErrorCases: Record<FileErrorCase, string> = {
+  file_too_large: "Het bestand is te groot",
   invalid_510b: "Geen tellingsbestand EML 510b",
   invalid_zip: "Geen geldig ZIP-bestand",
   data_entry_already_imported: "Telresultaten GSB al geïmporteerd",
@@ -37,7 +38,14 @@ export const WithErrors: Story = {
       {(Object.keys(fileErrorCases) as FileErrorCase[]).map((name) => (
         <div key={name} id={name} className="mb-lg">
           <h2>{name}</h2>
-          <ImportFileForm {...args} error={fileError(name, { electionName: "Gemeenteraad Juinen 2026" })} />
+          <ImportFileForm
+            {...args}
+            error={fileError(name, {
+              electionName: "Gemeenteraad Juinen 2026",
+              filename: "tellingsbestand_510b.zip",
+              max_size: 12,
+            })}
+          />
           <hr />
         </div>
       ))}

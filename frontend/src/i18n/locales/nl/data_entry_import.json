@@ -9,6 +9,9 @@
       "title": "Geen tellingsbestand EML 510b",
       "description": "Het bestand dat je probeert te importeren is geen geldige EML 510b met telresultaten. Probeer een ander bestand."
     },
+    "file_too_large": {
+      "title": "Het bestand is te groot"
+    },
     "invalid_zip": {
       "title": "Geen geldig ZIP-bestand",
       "description": "Het ZIP-bestand kan niet gelezen worden of de inhoud is niet correct. Probeer een ander bestand."

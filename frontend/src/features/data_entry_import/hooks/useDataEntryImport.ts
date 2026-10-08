@@ -5,6 +5,7 @@ import { type AnyError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
+import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import type {
   CSBDataEntryImportResponse,
@@ -51,8 +52,9 @@ export interface FileImportError {
 }
 
 export type FileErrorCase =
-  | "invalid_510b"
+  | "file_too_large"
   | "invalid_zip"
+  | "invalid_510b"
   | "data_entry_already_imported"
   | "data_entry_already_started"
   | "election_mismatch"
@@ -60,19 +62,28 @@ export type FileErrorCase =
   | "unknown";
 
 export function fileError(fileErrorCase: FileErrorCase, vars?: Record<string, string | number>): FileImportError {
+  // file_too_large is shared with other components via generic.json, title is local.
+  const description: TranslationPath =
+    fileErrorCase === "file_too_large" ? "file_too_large" : `data_entry_import.file_error.${fileErrorCase}.description`;
+
   return {
     title: t(`data_entry_import.file_error.${fileErrorCase}.title`),
-    message: tx(`data_entry_import.file_error.${fileErrorCase}.description`, {}, vars),
+    message: tx(description, {}, vars),
   };
 }
 
-function importError(error: AnyError, electionName: string): FileImportError {
+function importError(error: AnyError, electionName: string, file: File): FileImportError {
   if (!(error instanceof ApiError)) {
     return fileError("unknown");
   }
 
-  // ZIP too large; EML too large; unreadable ZIP; ZIP with more than 1 EML.
-  if (error.code === 413 || error.reference === "ZipError") {
+  // ZIP too large; EML too large.
+  if (error.code === 413) {
+    return fileError("file_too_large", { filename: file.name, max_size: error.message });
+  }
+
+  // Unreadable ZIP; ZIP with more than 1 EML.
+  if (error.reference === "ZipError") {
     return fileError("invalid_zip");
   }
 
@@ -139,7 +150,7 @@ export function useDataEntryImport(): UseDataEntryImport {
         electionDate: response.data.election_date,
       });
     } else {
-      setState({ status: "idle", error: importError(response, election.name) });
+      setState({ status: "idle", error: importError(response, election.name, selectedFile) });
     }
   }
 
@@ -161,7 +172,7 @@ export function useDataEntryImport(): UseDataEntryImport {
     } else if (response instanceof ApiError && response.reference === "InvalidHash") {
       setState({ ...state, error: response.message });
     } else {
-      setState({ status: "idle", error: importError(response, election.name) });
+      setState({ status: "idle", error: importError(response, election.name, state.file) });
     }
   }
 
@@ -177,7 +188,7 @@ export function useDataEntryImport(): UseDataEntryImport {
       });
       void navigate(`/elections/${election.id}/status`);
     } else {
-      const { title, message } = importError(response, election.name);
+      const { title, message } = importError(response, election.name, state.file);
       pushMessage({ type: "error", title, text: message });
       void navigate(`/elections/${election.id}/status`);
     }

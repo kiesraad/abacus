@@ -139,6 +139,7 @@ const locationsWithElectionsLinksCoordinator: Locations = [
   { pathname: "/elections/1/apportionment", userRole: "coordinator_csb" },
   { pathname: "/elections/1/apportionment/details-full-seats", userRole: "coordinator_csb" },
   { pathname: "/elections/1/apportionment/details-residual-seats", userRole: "coordinator_csb" },
+  { pathname: "/elections/1/data-entry/import", userRole: "coordinator_csb" },
 ];
 
 export const ElectionsNavBarForCoordinator: Story = {

@@ -43,7 +43,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("Controleer tellingbestand")).toBeVisible();
+    await expect(await canvas.findByText("Controleer tellingsbestand")).toBeVisible();
     await expect(canvas.getByText("telling.eml.xml.zip")).toBeVisible();
     await expect(canvas.getByText("Gemeenteraad Juinen 2026")).toBeVisible();
     await expect(

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { importRequestBody } from "./useDataEntryImport";
 
-const file = new File(["content"], "tellingbestand_510b.zip", { type: "application/zip" });
+const file = new File(["content"], "tellingsbestand_510b.zip", { type: "application/zip" });
 
 describe("importRequestBody", () => {
   test("sets the data field with File data", () => {

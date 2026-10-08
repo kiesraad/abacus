@@ -8,7 +8,7 @@ import type { Election, Role } from "@/types/generated/openapi";
 
 import { DataEntryImportButton } from "./DataEntryImportButton";
 
-const buttonName = "Tellingbestand GSB importeren";
+const buttonName = "Tellingsbestand GSB importeren";
 
 function renderButton(userRole: Role, election: Election, completed: boolean) {
   render(

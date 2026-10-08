@@ -234,7 +234,7 @@ export const CSBElectionStatusNoLinks: StoryObj<StoryProps> = {
     });
 
     await step("Import button", async () => {
-      await expect(canvas.getByRole("button", { name: "Tellingbestand GSB importeren" })).toBeVisible();
+      await expect(canvas.getByRole("button", { name: "Tellingsbestand GSB importeren" })).toBeVisible();
     });
   },
 };

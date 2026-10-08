@@ -22,7 +22,7 @@ export const VisibleForCoordinatorCSB: StoryObj<StoryProps> = {
     </TestUserProvider>
   ),
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("button", { name: "Tellingbestand GSB importeren" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Tellingsbestand GSB importeren" })).toBeVisible();
   },
 };
 

@@ -77,7 +77,7 @@ function renderPage() {
 
 async function selectFile(user: ReturnType<typeof userEvent.setup>) {
   const input = await screen.findByLabelText("Bestand kiezen");
-  await user.upload(input, new File(["content"], "tellingbestand_510b.zip", { type: "application/zip" }));
+  await user.upload(input, new File(["content"], "tellingsbestand_510b.zip", { type: "application/zip" }));
 }
 
 async function enterHashStubs(user: ReturnType<typeof userEvent.setup>) {
@@ -100,13 +100,13 @@ describe("DataEntryImportPage", () => {
     const user = userEvent.setup();
     const router = renderPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Importeer tellingbestand" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 1, name: "Importeer tellingsbestand" })).toBeVisible();
 
     // 1. Select file - POST to validatePath is made without a hash.
     overrideOnce("post", validatePath, 200, validateResponse);
     await selectFile(user);
-    expect(await screen.findByRole("heading", { name: "Controleer tellingbestand" })).toBeVisible();
-    expect(screen.getByText("tellingbestand_510b.zip")).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Controleer tellingsbestand" })).toBeVisible();
+    expect(screen.getByText("tellingsbestand_510b.zip")).toBeVisible();
     expect(screen.getByText(electionName)).toBeVisible();
 
     // 2. Complete check hash form - POST to validatePath contains completed hash.
@@ -124,7 +124,7 @@ describe("DataEntryImportPage", () => {
       sub_committee: subCommittee,
     });
     await user.click(screen.getByRole("button", { name: "Opslaan" }));
-    expect(pushMessage).toHaveBeenCalledWith({ title: "Tellingbestand GSB Heemdamseburg geïmporteerd" });
+    expect(pushMessage).toHaveBeenCalledWith({ title: "Tellingsbestand GSB Heemdamseburg geïmporteerd" });
     expect(router.state.location.pathname).toEqual(`/elections/${electionId}/status`);
   });
 
@@ -163,14 +163,14 @@ describe("DataEntryImportPage", () => {
 
     overrideOnce("post", validatePath, 200, validateResponse);
     await selectFile(user);
-    expect(await screen.findByRole("heading", { name: "Controleer tellingbestand" })).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Controleer tellingsbestand" })).toBeVisible();
 
     overrideOnce("post", validatePath, 400, errorResponse("InvalidHash"));
     await enterHashStubs(user);
 
     // See frontend/src/components/check_hash/CheckHash.test.tsx for more tests.
     expect(await screen.findByRole("alert")).toBeVisible();
-    expect(screen.getByRole("heading", { name: "Controleer tellingbestand" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Controleer tellingsbestand" })).toBeVisible();
   });
 
   test("shows failed import of final submit as message on status page", async () => {

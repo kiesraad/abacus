@@ -15,6 +15,7 @@ use abacus::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
             },
             extra_investigation::ExtraInvestigation,
+            gsb_results::GSBResults,
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
             yes_no::YesNo,
@@ -29,8 +30,11 @@ use libfuzzer_sys::{
 };
 
 /// A valid result without any votes
-fn valid_empty_result() -> Results {
-    Results::CSOFirstSession(valid_empty_cso_result())
+fn valid_empty_result(committee_category: CommitteeCategory) -> Results {
+    match committee_category {
+        CommitteeCategory::GSB => Results::CSOFirstSession(valid_empty_cso_result()),
+        CommitteeCategory::CSB => Results::GSB(valid_empty_gsb_result()),
+    }
 }
 
 fn valid_empty_cso_result() -> CSOFirstSessionResults {
@@ -61,52 +65,84 @@ fn valid_empty_cso_result() -> CSOFirstSessionResults {
     }
 }
 
-/// A valid result that is different from [`valid_empty_result`], so that two
-/// entries can have differences but no errors.
-fn valid_counted_result() -> Results {
-    Results::CSOFirstSession(CSOFirstSessionResults {
-        voters_counts: VotersCounts {
-            poll_card_count: 100,
-            proxy_certificate_count: 0,
-            voter_card_count: None,
-            total_admitted_voters_count: 100,
-        },
-        votes_counts: VotesCounts {
-            political_group_total_votes: vec![],
-            total_votes_candidates_count: 0,
-            blank_votes_count: 100,
-            invalid_votes_count: 0,
-            total_votes_cast_count: 100,
-        },
-        ..valid_empty_cso_result()
-    })
+fn valid_empty_gsb_result() -> GSBResults {
+    GSBResults {
+        number_of_voters: 1000,
+        voters_counts: Default::default(),
+        votes_counts: Default::default(),
+        differences_counts: Default::default(),
+        political_group_votes: vec![],
+    }
 }
 
-fn invalid_result() -> Results {
-    Results::CSOFirstSession(CSOFirstSessionResults {
-        extra_investigation: Default::default(),
-        counting_differences_polling_station: Default::default(),
-        voters_counts: VotersCounts {
-            poll_card_count: 10,
-            proxy_certificate_count: 5,
-            voter_card_count: None,
-            total_admitted_voters_count: 20,
-        },
-        votes_counts: VotesCounts {
-            political_group_total_votes: vec![],
-            total_votes_candidates_count: 10,
-            blank_votes_count: 0,
-            invalid_votes_count: 0,
-            total_votes_cast_count: 20,
-        },
-        differences_counts: DifferencesCounts {
-            compare_votes_cast_admitted_voters: Default::default(),
-            more_ballots_count: 0,
-            fewer_ballots_count: 0,
-            difference_completely_accounted_for: Default::default(),
-        },
-        political_group_votes: vec![],
-    })
+/// A valid result that is different from [`valid_empty_result`], so that two
+/// entries can have differences but no errors.
+fn valid_counted_result(committee_category: CommitteeCategory) -> Results {
+    let voters_counts = VotersCounts {
+        poll_card_count: 100,
+        proxy_certificate_count: 0,
+        voter_card_count: None,
+        total_admitted_voters_count: 100,
+    };
+
+    let votes_counts = VotesCounts {
+        political_group_total_votes: vec![],
+        total_votes_candidates_count: 0,
+        blank_votes_count: 100,
+        invalid_votes_count: 0,
+        total_votes_cast_count: 100,
+    };
+
+    match committee_category {
+        CommitteeCategory::GSB => Results::CSOFirstSession(CSOFirstSessionResults {
+            voters_counts,
+            votes_counts,
+            ..valid_empty_cso_result()
+        }),
+        CommitteeCategory::CSB => Results::GSB(GSBResults {
+            voters_counts,
+            votes_counts,
+            ..valid_empty_gsb_result()
+        }),
+    }
+}
+
+fn invalid_result(committee_category: CommitteeCategory) -> Results {
+    let voters_counts = VotersCounts {
+        poll_card_count: 10,
+        proxy_certificate_count: 5,
+        voter_card_count: None,
+        total_admitted_voters_count: 20,
+    };
+
+    let votes_counts = VotesCounts {
+        political_group_total_votes: vec![],
+        total_votes_candidates_count: 10,
+        blank_votes_count: 0,
+        invalid_votes_count: 0,
+        total_votes_cast_count: 20,
+    };
+
+    match committee_category {
+        CommitteeCategory::GSB => Results::CSOFirstSession(CSOFirstSessionResults {
+            extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
+            voters_counts,
+            votes_counts,
+            differences_counts: DifferencesCounts {
+                compare_votes_cast_admitted_voters: Default::default(),
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                difference_completely_accounted_for: Default::default(),
+            },
+            political_group_votes: vec![],
+        }),
+        CommitteeCategory::CSB => Results::GSB(GSBResults {
+            voters_counts,
+            votes_counts,
+            ..valid_empty_gsb_result()
+        }),
+    }
 }
 
 /// The possible values an entry can hold.
@@ -118,11 +154,11 @@ enum EntryValue {
 }
 
 impl EntryValue {
-    fn results(self) -> Results {
+    fn results(self, committee_category: CommitteeCategory) -> Results {
         match self {
-            EntryValue::ValidEmpty => valid_empty_result(),
-            EntryValue::ValidCounted => valid_counted_result(),
-            EntryValue::Invalid => invalid_result(),
+            EntryValue::ValidEmpty => valid_empty_result(committee_category),
+            EntryValue::ValidCounted => valid_counted_result(committee_category),
+            EntryValue::Invalid => invalid_result(committee_category),
         }
     }
 
@@ -131,25 +167,35 @@ impl EntryValue {
     }
 }
 
-fn update(user_id: UserId, entry: EntryValue) -> DataEntryUpdate {
+fn update(
+    user_id: UserId,
+    entry: EntryValue,
+    committee_category: CommitteeCategory,
+) -> DataEntryUpdate {
     DataEntryUpdate {
         progress: 0,
         user_id,
-        entry: entry.results(),
+        entry: entry.results(committee_category),
         client_state: ClientState::default(),
     }
 }
 
-fn election() -> ElectionWithPoliticalGroups {
+fn election(committee_category: CommitteeCategory) -> ElectionWithPoliticalGroups {
     ElectionWithPoliticalGroups {
         id: ElectionId::from(1),
         name: "Gemeenteraad Test Location 2025".to_string(),
         official_name: "Gemeenteraad Test Location 2025".to_string(),
-        committee_category: CommitteeCategory::GSB,
-        counting_method: Some(VoteCountingMethod::CSO),
+        committee_category,
+        counting_method: match committee_category {
+            CommitteeCategory::GSB => Some(VoteCountingMethod::CSO),
+            CommitteeCategory::CSB => None,
+        },
         election_id: "GR2025_TestLocation".to_string(),
         location: "Test Location".to_string(),
-        authority_id: "0000".to_string(),
+        authority_id: match committee_category {
+            CommitteeCategory::GSB => "0000".to_string(),
+            CommitteeCategory::CSB => "CSB".to_string(),
+        },
         authority_name: "Test".to_string(),
         authority_region: "Test".to_string(),
         district: CommitteeDistrict::None,
@@ -476,7 +522,7 @@ fn is_finalised_as_expected(
     first_entry: EntryValue,
     second_entry: EntryValue,
 ) -> bool {
-    if first_entry.results() != second_entry.results() {
+    if first_entry != second_entry {
         matches!(resulting_state, Ok(DataEntryStatus::EntriesDifferent(_)))
     } else if first_entry.has_errors() {
         matches!(
@@ -537,28 +583,55 @@ impl Model {
     }
 }
 
+#[derive(Arbitrary, Debug)]
+struct Input {
+    committee_category: ArbitraryCommitteeCategory,
+    transitions: Vec<Transition>,
+}
+
+#[derive(Arbitrary, Copy, Clone, Debug)]
+enum ArbitraryCommitteeCategory {
+    GSB,
+    CSB,
+}
+
+impl From<ArbitraryCommitteeCategory> for CommitteeCategory {
+    fn from(category: ArbitraryCommitteeCategory) -> Self {
+        match category {
+            ArbitraryCommitteeCategory::GSB => CommitteeCategory::GSB,
+            ArbitraryCommitteeCategory::CSB => CommitteeCategory::CSB,
+        }
+    }
+}
+
 // This fuzz target randomly chooses a sequence of transitions to mutate the state, and checks that
 // every step matches the expected state machine defined above
-fuzz_target!(|transitions: Vec<Transition>| {
+fuzz_target!(|input: Input| {
     let mut state = DataEntryStatus::default();
     let mut model = Model::new();
-    let election = election();
+    let election = election(input.committee_category.into());
 
-    for transition in transitions {
+    for transition in input.transitions {
         let prev_state = state.clone();
 
         // Apply transition
         let next_state = match transition {
             Transition::ClaimFirstEntry(correct_user) => {
-                let res =
-                    state.claim_first_entry(model.first_user(correct_user), valid_empty_result());
+                let res = state.claim_first_entry(
+                    model.first_user(correct_user),
+                    valid_empty_result(input.committee_category.into()),
+                );
                 if res.is_ok() && prev_state == DataEntryStatus::Empty {
                     model.claim_empty_first_entry(correct_user);
                 }
                 res
             }
             Transition::UpdateFirstEntry(correct_user, entry) => {
-                let res = state.update_first_entry(update(model.first_user(correct_user), entry));
+                let res = state.update_first_entry(update(
+                    model.first_user(correct_user),
+                    entry,
+                    input.committee_category.into(),
+                ));
                 if res.is_ok() {
                     model.first_entry = entry
                 };
@@ -579,8 +652,10 @@ fuzz_target!(|transitions: Vec<Transition>| {
             }
             Transition::DiscardFirstEntryWithErrors => state.discard_first_entry_with_errors(),
             Transition::ClaimSecondEntry(correct_user) => {
-                let res =
-                    state.claim_second_entry(model.second_user(correct_user), valid_empty_result());
+                let res = state.claim_second_entry(
+                    model.second_user(correct_user),
+                    valid_empty_result(input.committee_category.into()),
+                );
                 if res.is_ok() && matches!(prev_state, DataEntryStatus::FirstEntryFinalised(_)) {
                     // a newly claimed second entry starts out empty
                     model.second_entry = EntryValue::ValidEmpty;
@@ -588,7 +663,11 @@ fuzz_target!(|transitions: Vec<Transition>| {
                 res
             }
             Transition::UpdateSecondEntry(correct_user, entry) => {
-                let res = state.update_second_entry(update(model.second_user(correct_user), entry));
+                let res = state.update_second_entry(update(
+                    model.second_user(correct_user),
+                    entry,
+                    input.committee_category.into(),
+                ));
                 if res.is_ok() {
                     model.second_entry = entry
                 };

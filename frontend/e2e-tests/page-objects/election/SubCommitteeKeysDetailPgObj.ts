@@ -30,6 +30,6 @@ export class SubCommitteeKeysDetail {
   }
 
   async clickDeleteCertificate(fingerprint: string) {
-    await this.page.getByTestId(`certificate-${fingerprint}`).getByRole("button", { name: "Verwijderen" }).click();
+    await this.getCertificateInfo(fingerprint).getByRole("button", { name: "Verwijderen" }).click();
   }
 }

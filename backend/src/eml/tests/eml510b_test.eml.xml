@@ -5,6 +5,7 @@
     <AuthorityIdentifier Id="0000">Test</AuthorityIdentifier>
     <AuthorityAddress/>
   </ManagingAuthority>
+  <kr:Schema Version="1.3.1"/>
   <kr:CreationDateTime>2022-03-17T14:39:06.776</kr:CreationDateTime>
   <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
   <Count>
@@ -161,6 +162,7 @@
           </TotalVotes>
           <ReportingUnitVotes>
             <ReportingUnitIdentifier Id="0000::SB1">Stadhuis (postcode: 1011 PN)</ReportingUnitIdentifier>
+            <kr:ReportingUnitType>FixedLocation</kr:ReportingUnitType>
             <Selection>
               <AffiliationIdentifier Id="1">
                 <RegisteredName>Partijdige Partij</RegisteredName>

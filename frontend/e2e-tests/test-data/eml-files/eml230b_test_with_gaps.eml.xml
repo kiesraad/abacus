@@ -38,7 +38,7 @@
                 <xnl:LastName>Blikkert</xnl:LastName>
               </xnl:PersonName>
             </CandidateFullName>
-            <Gender>female</Gender>
+            <kr:GenderAnnex>female</kr:GenderAnnex>
             <QualifyingAddress>
               <xal:Locality>
                 <xal:LocalityName>Heemdamseburgsebuurt</xal:LocalityName>
@@ -55,7 +55,7 @@
                 <xnl:LastName>Jaspers-Gezen</xnl:LastName>
               </xnl:PersonName>
             </CandidateFullName>
-            <Gender>male</Gender>
+            <kr:GenderAnnex>male</kr:GenderAnnex>
             <QualifyingAddress>
               <xal:Locality>
                 <xal:LocalityName>Heemdamseburg</xal:LocalityName>
@@ -71,7 +71,7 @@
                 <xnl:LastName>Blankenvoorde</xnl:LastName>
               </xnl:PersonName>
             </CandidateFullName>
-            <Gender>female</Gender>
+            <kr:GenderAnnex>female</kr:GenderAnnex>
             <QualifyingAddress>
               <xal:Locality>
                 <xal:LocalityName>Heemdamseburg</xal:LocalityName>
@@ -87,7 +87,7 @@
                 <xnl:LastName>Oudenalder</xnl:LastName>
               </xnl:PersonName>
             </CandidateFullName>
-            <Gender>male</Gender>
+            <kr:GenderAnnex>male</kr:GenderAnnex>
             <QualifyingAddress>
               <xal:Locality>
                 <xal:LocalityName>Heemdamseburg</xal:LocalityName>
@@ -104,7 +104,7 @@
                 <xnl:LastName>Wolbert</xnl:LastName>
               </xnl:PersonName>
             </CandidateFullName>
-            <Gender>female</Gender>
+            <kr:GenderAnnex>female</kr:GenderAnnex>
             <QualifyingAddress>
               <xal:Locality>
                 <xal:LocalityName>Heemdamseburg</xal:LocalityName>
@@ -120,7 +120,7 @@
                 <xnl:LastName>Vredeveld</xnl:LastName>
               </xnl:PersonName>
             </CandidateFullName>
-            <Gender>male</Gender>
+            <kr:GenderAnnex>male</kr:GenderAnnex>
             <QualifyingAddress>
               <xal:Locality>
                 <xal:LocalityName>Heemdamseburg</xal:LocalityName>
@@ -136,7 +136,7 @@
                 <xnl:LastName>Cornelis</xnl:LastName>
               </xnl:PersonName>
             </CandidateFullName>
-            <Gender>female</Gender>
+            <kr:GenderAnnex>female</kr:GenderAnnex>
             <QualifyingAddress>
               <xal:Locality>
                 <xal:LocalityName>Heemdamseburg</xal:LocalityName>
@@ -160,7 +160,7 @@
                 <xnl:LastName>Gopal</xnl:LastName>
               </xnl:PersonName>
             </CandidateFullName>
-            <Gender>female</Gender>
+            <kr:GenderAnnex>female</kr:GenderAnnex>
             <QualifyingAddress>
               <xal:Locality>
                 <xal:LocalityName>Heemdamseburg</xal:LocalityName>
@@ -176,7 +176,7 @@
                 <xnl:LastName>Wolfswinkel</xnl:LastName>
               </xnl:PersonName>
             </CandidateFullName>
-            <Gender>male</Gender>
+            <kr:GenderAnnex>male</kr:GenderAnnex>
             <QualifyingAddress>
               <xal:Locality>
                 <xal:LocalityName>Heemdamseburg</xal:LocalityName>

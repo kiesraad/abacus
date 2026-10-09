@@ -143,7 +143,7 @@ test.describe("GSB certificates", () => {
         "Organisatorische eenheid: Abacus 1.1.0",
         "Algemene naam: Gemeente Heemdamseburg",
         "Geldig vanaf: 1 oktober 2026",
-        "Geldig tot en met: 18 juni 2027",
+        "Geldig tot en met: 18 juni 2033",
         "Handtekeningalgoritme: RSA 4096-bit",
       ].join(""),
     );

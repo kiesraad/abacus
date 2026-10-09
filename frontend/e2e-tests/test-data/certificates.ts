@@ -11,7 +11,7 @@ export const certificate_0123_Heemdamseburg: Certificate = {
   path: "e2e-tests/test-data/certificates/0123_Heemdamseburg.crt",
   electionName: "Waterschap Rivier en Polder 2023",
   electionDate: "woensdag 15 maart 2023",
-  fingerprint: "91c2c35664b41d91681237d8bbe886b070720d87f532c67729173bf79be20ea3",
+  fingerprint: "2dd6c754d4fc655c0ba58ea7b0e1a7ab942e03f0b7ca20951b1af72d5516b6dc",
 };
 
 export const certificate_0123_Heemdamseburg_expired: Certificate = {

@@ -21,7 +21,7 @@ export const getCertificateMockData = (certificate: Partial<Certificate> = {}): 
     not_after: "2027-04-01T00:00:00Z",
     signature_algorithm: "RSA 4096-bit",
     public_key: "-----BEGIN PUBLIC KEY-----\n-----END PUBLIC KEY-----\n",
-    public_key_fingerprint: generateRandomString(65),
+    public_key_fingerprint: generateRandomString(64),
     ...certificate,
   };
 };

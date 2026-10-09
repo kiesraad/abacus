@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:sb="http://www.kiesraad.nl/sb-extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="110b" SchemaVersion="5">
+<EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="110b" SchemaVersion="5">
   <TransactionId>1</TransactionId>
   <ManagingAuthority>
     <AuthorityIdentifier Id="0000">Test</AuthorityIdentifier>
     <AuthorityAddress/>
   </ManagingAuthority>
-  <kr:Schema Version="1.3.1"/>
   <kr:CreationDateTime>2024-05-27T17:05:57</kr:CreationDateTime>
   <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
   <ElectionEvent>
@@ -48,47 +47,6 @@
                   <xal:PostalCodeNumber>1017 PH</xal:PostalCodeNumber>
                 </xal:PostalCode>
               </Locality>
-              <sb:Location>
-                <sb:BAGId>0363010000724220</sb:BAGId>
-                <sb:StreetName>Lijnbaansgracht</sb:StreetName>
-                <sb:Number>234</sb:Number>
-                <sb:Letter>A</sb:Letter>
-                <sb:NumberAddition>bis</sb:NumberAddition>
-                <sb:PostalCode>1017 PH</sb:PostalCode>
-                <sb:City>Amsterdam</sb:City>
-                <sb:AdditionalAddressInformation>Ingang achterom</sb:AdditionalAddressInformation>
-                <sb:BuildingUsage>Bijeenkomst</sb:BuildingUsage>
-                <sb:DistrictName>Centrum</sb:DistrictName>
-                <sb:DistrictCode>WK363432</sb:DistrictCode>
-                <sb:NeighbourhoodName>Leidsebuurt</sb:NeighbourhoodName>
-                <sb:NeighbourhoodCode>BU36343219</sb:NeighbourhoodCode>
-                <sb:RDx>120540.35</sb:RDx>
-                <sb:RDy>486448.69</sb:RDy>
-                <sb:Latitude>52.364792</sb:Latitude>
-                <sb:Longitude>4.88115</sb:Longitude>
-                <sb:Website>https://www.melkweg.nl</sb:Website>
-                <sb:OpenTime>2022-02-04T11:16:26.827</sb:OpenTime>
-                <sb:ClosingTime>2022-02-04T11:16:26.828</sb:ClosingTime>
-                <sb:CountingLocation>true</sb:CountingLocation>
-                <sb:Accessibility>
-                  <sb:Accessible>true</sb:Accessible>
-                  <sb:AccessibilityProperties>
-                    <sb:AccessiblePublicTransport>true</sb:AccessiblePublicTransport>
-                    <sb:AccessibleToilet>true</sb:AccessibleToilet>
-                    <sb:HostPresent>true</sb:HostPresent>
-                    <sb:Guidelines>inside and outside</sb:Guidelines>
-                    <sb:VotingTemplate>false</sb:VotingTemplate>
-                    <sb:BrailleCandidateList>true</sb:BrailleCandidateList>
-                    <sb:LargeLetteredCandidateList>false</sb:LargeLetteredCandidateList>
-                    <sb:SignLanguageInterpreter>at location</sb:SignLanguageInterpreter>
-                    <sb:SignLanguagePollingStationMember>true</sb:SignLanguagePollingStationMember>
-                    <sb:AcousticsForHearingImpaired>true</sb:AcousticsForHearingImpaired>
-                    <sb:LowStimulusEnvironment>false</sb:LowStimulusEnvironment>
-                    <sb:Other>Chairlift</sb:Other>
-                  </sb:AccessibilityProperties>
-                </sb:Accessibility>
-                <sb:OtherInfo>Gratis koffie</sb:OtherInfo>
-              </sb:Location>
             </Address>
             <PollingStation Id="2">0</PollingStation>
           </PhysicalLocation>

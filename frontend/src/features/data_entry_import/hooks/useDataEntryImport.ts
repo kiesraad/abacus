@@ -5,7 +5,6 @@ import { type AnyError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
-import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import type {
   CSBDataEntryImportResponse,
@@ -62,24 +61,22 @@ export type FileErrorCase =
   | "unknown";
 
 export function fileError(fileErrorCase: FileErrorCase, vars?: Record<string, string | number>): FileImportError {
-  // file_too_large is shared with other components via generic.json, title is local.
-  const description: TranslationPath =
-    fileErrorCase === "file_too_large" ? "file_too_large" : `data_entry_import.file_error.${fileErrorCase}.description`;
-
   return {
     title: t(`data_entry_import.file_error.${fileErrorCase}.title`),
-    message: tx(description, {}, vars),
+    message: tx(`data_entry_import.file_error.${fileErrorCase}.description`, {}, vars),
   };
 }
 
-function importError(error: AnyError, electionName: string, file: File): FileImportError {
+function importError(error: AnyError, electionName: string): FileImportError {
   if (!(error instanceof ApiError)) {
     return fileError("unknown");
   }
 
   // ZIP too large; EML too large.
+  // Note: both use different limits and the backend response does not indicate which one was hit.
+  // Displaying the `max_size`, as `file_too_large` in `generic.json` does, is hence not very useful.
   if (error.code === 413) {
-    return fileError("file_too_large", { filename: file.name, max_size: error.message });
+    return fileError("file_too_large");
   }
 
   // Unreadable ZIP; ZIP with more than 1 EML.
@@ -150,7 +147,7 @@ export function useDataEntryImport(): UseDataEntryImport {
         electionDate: response.data.election_date,
       });
     } else {
-      setState({ status: "idle", error: importError(response, election.name, selectedFile) });
+      setState({ status: "idle", error: importError(response, election.name) });
     }
   }
 
@@ -172,7 +169,7 @@ export function useDataEntryImport(): UseDataEntryImport {
     } else if (response instanceof ApiError && response.reference === "InvalidHash") {
       setState({ ...state, error: response.message });
     } else {
-      setState({ status: "idle", error: importError(response, election.name, state.file) });
+      setState({ status: "idle", error: importError(response, election.name) });
     }
   }
 
@@ -188,7 +185,7 @@ export function useDataEntryImport(): UseDataEntryImport {
       });
       void navigate(`/elections/${election.id}/status`);
     } else {
-      const { title, message } = importError(response, election.name, state.file);
+      const { title, message } = importError(response, election.name);
       pushMessage({ type: "error", title, text: message });
       void navigate(`/elections/${election.id}/status`);
     }

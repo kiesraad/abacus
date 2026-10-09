@@ -10,7 +10,8 @@
       "description": "Het bestand dat je probeert te importeren is geen geldige EML 510b met telresultaten. Probeer een ander bestand."
     },
     "file_too_large": {
-      "title": "Het bestand is te groot"
+      "title": "Het bestand is te groot",
+      "description": "Het ZIP-bestand of het EML-bestand is te groot om verwerkt te worden. Probeer een ander bestand."
     },
     "invalid_zip": {
       "title": "Geen geldig ZIP-bestand",

@@ -42,8 +42,6 @@ export const WithErrors: Story = {
             {...args}
             error={fileError(name, {
               electionName: "Gemeenteraad Juinen 2026",
-              filename: "tellingsbestand_510b.zip",
-              max_size: 12,
             })}
           />
           <hr />

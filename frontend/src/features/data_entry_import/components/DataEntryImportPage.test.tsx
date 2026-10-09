@@ -61,8 +61,8 @@ const validateResponse: CSBDataEntryImportValidateResponse = {
   hash: redactedHash,
 };
 
-function errorResponse(reference: ErrorReference, errorMessage: string = reference): ErrorResponse {
-  return { error: errorMessage, fatal: false, reference };
+function errorResponse(reference: ErrorReference): ErrorResponse {
+  return { error: reference, fatal: false, reference };
 }
 
 const pushMessage = vi.fn();
@@ -130,6 +130,7 @@ describe("DataEntryImportPage", () => {
 
   describe("import validation errors", () => {
     test.each([
+      { status: 413, reference: "RequestPayloadTooLarge", title: "Het bestand is te groot" },
       { status: 422, reference: "ZipError", title: "Geen geldig ZIP-bestand" },
       { status: 422, reference: "InvalidCountType", title: "Geen tellingsbestand EML 510b" },
       { status: 422, reference: "EmlImportError", title: "Tellingsbestand hoort niet bij dit CSB" },
@@ -153,20 +154,6 @@ describe("DataEntryImportPage", () => {
 
       const alert = await screen.findByRole("alert");
       expect(within(alert).getByText(title)).toBeVisible();
-      expect(screen.getByLabelText("Bestand kiezen")).toBeVisible();
-    });
-
-    test("shows the upload limit reported by the backend when the file is too large", async () => {
-      const user = userEvent.setup();
-      renderPage();
-
-      overrideOnce("post", validatePath, 413, errorResponse("RequestPayloadTooLarge", "12"));
-      await selectFile(user);
-
-      const alert = await screen.findByRole("alert");
-      expect(within(alert).getByText("Het bestand is te groot")).toBeVisible();
-      expect(alert).toHaveTextContent("tellingsbestand_510b.zip");
-      expect(alert).toHaveTextContent("maximaal 12 Megabyte");
       expect(screen.getByLabelText("Bestand kiezen")).toBeVisible();
     });
   });

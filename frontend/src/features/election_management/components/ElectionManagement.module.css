@@ -91,7 +91,6 @@ main.backgroundBlue {
   .certificateSection {
     background-color: var(--blue-200);
     padding: var(--space-md);
-    /*color: var(--base-white);*/
     font-family: var(--font-number);
     font-size: var(--font-size-xs);
     line-height: 1rem;

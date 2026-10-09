@@ -334,9 +334,7 @@ async fn validate_import(
         return Err(DataEntryImportError::SubCommitteeDataEntryNotEmpty.into());
     }
 
-    let (_, signature) = read_signature_from_zip(&reader, &filename)
-        .await
-        .map_err(|_| DataEntryImportError::SignatureMissing)?;
+    let (_, signature) = read_signature_from_zip(&reader, &filename).await?;
 
     verify_signature(conn, sub_committee.id, &eml_bytes, &signature).await?;
 
@@ -390,7 +388,8 @@ async fn read_eml_from_zip(reader: &ZipFileReader) -> Result<(String, Vec<u8>), 
     read_exactly_one_file(reader, "EML file", |name| {
         name.to_ascii_lowercase().ends_with(".eml.xml")
     })
-    .await
+    .await?
+    .ok_or(DataEntryImportError::EmlZipError("Missing EML file in ZIP".to_string()).into())
 }
 
 async fn read_signature_from_zip(
@@ -400,14 +399,15 @@ async fn read_signature_from_zip(
     read_exactly_one_file(reader, "signature file", |name| {
         name.to_ascii_lowercase() == format!("{}.signature", eml_filename.to_ascii_lowercase())
     })
-    .await
+    .await?
+    .ok_or(DataEntryImportError::SignatureMissing.into())
 }
 
 async fn read_exactly_one_file(
     reader: &ZipFileReader,
     file: &str,
     filter: impl Fn(&str) -> bool,
-) -> Result<(String, Vec<u8>), APIError> {
+) -> Result<Option<(String, Vec<u8>)>, APIError> {
     let entries = reader.file().entries().iter().enumerate();
 
     let mut files = entries.filter_map(|(index, entry)| {
@@ -415,12 +415,9 @@ async fn read_exactly_one_file(
         filter(filename).then_some((index, entry, filename.to_string()))
     });
 
-    let (index, entry, filename) =
-        files
-            .next()
-            .ok_or(DataEntryImportError::EmlZipError(format!(
-                "Missing {file} in ZIP"
-            )))?;
+    let Some((index, entry, filename)) = files.next() else {
+        return Ok(None);
+    };
 
     if files.next().is_some() {
         return Err(
@@ -446,7 +443,7 @@ async fn read_exactly_one_file(
         .await
         .map_err(|_| DataEntryImportError::EmlZipError("Invalid ZIP file".to_string()))?;
 
-    Ok((filename, data))
+    Ok(Some((filename, data)))
 }
 
 #[cfg(test)]
@@ -699,8 +696,8 @@ mod tests {
 
             assert_matches!(
                 read_signature_from_zip(&reader, "Telling_GR2026_Heemdamseburg.eml.xml").await,
-                Err(APIError::Unprocessable(message, ErrorReference::ZipError))
-                    if message == "Missing signature file in ZIP"
+                Err(APIError::Unprocessable(message, ErrorReference::SignatureMissing))
+                    if message == "Signature matching EML missing"
             );
         }
     }

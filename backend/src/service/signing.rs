@@ -565,7 +565,7 @@ mod tests {
                 "signing_keypair"
             )
         )))]
-        async fn test_verify_signature_valid(pool: SqlitePool) {
+        async fn test_signature_valid(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let eml: &[u8] = b"<EML/>";
 
@@ -591,7 +591,7 @@ mod tests {
                 "signing_keypair"
             )
         )))]
-        async fn test_verify_signature_invalid(pool: SqlitePool) {
+        async fn test_signature_invalid(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let eml: &[u8] = b"<EML/>";
 
@@ -612,7 +612,7 @@ mod tests {
             path = "../../fixtures",
             scripts("election_8_csb_with_results",)
         )))]
-        async fn test_verify_signature_no_certificates(pool: SqlitePool) {
+        async fn test_no_certificates(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let eml: &[u8] = b"<EML/>";
 

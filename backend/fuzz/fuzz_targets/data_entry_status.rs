@@ -2,7 +2,10 @@
 
 use abacus::{
     domain::{
-        data_entry::{ClientState, DataEntryStatus, DataEntryTransitionError, DataEntryUpdate},
+        data_entry::{
+            ClientState, DataEntryOrigin, DataEntryStatus, DataEntryTransitionError,
+            DataEntryUpdate,
+        },
         election::{
             CommitteeCategory, CommitteeDistrict, ElectionCategory, ElectionDomain, ElectionId,
             ElectionSubCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
@@ -15,6 +18,7 @@ use abacus::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
             },
             extra_investigation::ExtraInvestigation,
+            gsb_results::GSBResults,
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
             yes_no::YesNo,
@@ -29,8 +33,11 @@ use libfuzzer_sys::{
 };
 
 /// A valid result without any votes
-fn valid_empty_result() -> Results {
-    Results::CSOFirstSession(valid_empty_cso_result())
+fn valid_empty_result(committee_category: CommitteeCategory) -> Results {
+    match committee_category {
+        CommitteeCategory::GSB => Results::CSOFirstSession(valid_empty_cso_result()),
+        CommitteeCategory::CSB => Results::GSB(valid_empty_gsb_result()),
+    }
 }
 
 fn valid_empty_cso_result() -> CSOFirstSessionResults {
@@ -61,52 +68,84 @@ fn valid_empty_cso_result() -> CSOFirstSessionResults {
     }
 }
 
-/// A valid result that is different from [`valid_empty_result`], so that two
-/// entries can have differences but no errors.
-fn valid_counted_result() -> Results {
-    Results::CSOFirstSession(CSOFirstSessionResults {
-        voters_counts: VotersCounts {
-            poll_card_count: 100,
-            proxy_certificate_count: 0,
-            voter_card_count: None,
-            total_admitted_voters_count: 100,
-        },
-        votes_counts: VotesCounts {
-            political_group_total_votes: vec![],
-            total_votes_candidates_count: 0,
-            blank_votes_count: 100,
-            invalid_votes_count: 0,
-            total_votes_cast_count: 100,
-        },
-        ..valid_empty_cso_result()
-    })
+fn valid_empty_gsb_result() -> GSBResults {
+    GSBResults {
+        number_of_voters: 1000,
+        voters_counts: Default::default(),
+        votes_counts: Default::default(),
+        differences_counts: Default::default(),
+        political_group_votes: vec![],
+    }
 }
 
-fn invalid_result() -> Results {
-    Results::CSOFirstSession(CSOFirstSessionResults {
-        extra_investigation: Default::default(),
-        counting_differences_polling_station: Default::default(),
-        voters_counts: VotersCounts {
-            poll_card_count: 10,
-            proxy_certificate_count: 5,
-            voter_card_count: None,
-            total_admitted_voters_count: 20,
-        },
-        votes_counts: VotesCounts {
-            political_group_total_votes: vec![],
-            total_votes_candidates_count: 10,
-            blank_votes_count: 0,
-            invalid_votes_count: 0,
-            total_votes_cast_count: 20,
-        },
-        differences_counts: DifferencesCounts {
-            compare_votes_cast_admitted_voters: Default::default(),
-            more_ballots_count: 0,
-            fewer_ballots_count: 0,
-            difference_completely_accounted_for: Default::default(),
-        },
-        political_group_votes: vec![],
-    })
+/// A valid result that is different from [`valid_empty_result`], so that two
+/// entries can have differences but no errors.
+fn valid_counted_result(committee_category: CommitteeCategory) -> Results {
+    let voters_counts = VotersCounts {
+        poll_card_count: 100,
+        proxy_certificate_count: 0,
+        voter_card_count: None,
+        total_admitted_voters_count: 100,
+    };
+
+    let votes_counts = VotesCounts {
+        political_group_total_votes: vec![],
+        total_votes_candidates_count: 0,
+        blank_votes_count: 100,
+        invalid_votes_count: 0,
+        total_votes_cast_count: 100,
+    };
+
+    match committee_category {
+        CommitteeCategory::GSB => Results::CSOFirstSession(CSOFirstSessionResults {
+            voters_counts,
+            votes_counts,
+            ..valid_empty_cso_result()
+        }),
+        CommitteeCategory::CSB => Results::GSB(GSBResults {
+            voters_counts,
+            votes_counts,
+            ..valid_empty_gsb_result()
+        }),
+    }
+}
+
+fn invalid_result(committee_category: CommitteeCategory) -> Results {
+    let voters_counts = VotersCounts {
+        poll_card_count: 10,
+        proxy_certificate_count: 5,
+        voter_card_count: None,
+        total_admitted_voters_count: 20,
+    };
+
+    let votes_counts = VotesCounts {
+        political_group_total_votes: vec![],
+        total_votes_candidates_count: 10,
+        blank_votes_count: 0,
+        invalid_votes_count: 0,
+        total_votes_cast_count: 20,
+    };
+
+    match committee_category {
+        CommitteeCategory::GSB => Results::CSOFirstSession(CSOFirstSessionResults {
+            extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
+            voters_counts,
+            votes_counts,
+            differences_counts: DifferencesCounts {
+                compare_votes_cast_admitted_voters: Default::default(),
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                difference_completely_accounted_for: Default::default(),
+            },
+            political_group_votes: vec![],
+        }),
+        CommitteeCategory::CSB => Results::GSB(GSBResults {
+            voters_counts,
+            votes_counts,
+            ..valid_empty_gsb_result()
+        }),
+    }
 }
 
 /// The possible values an entry can hold.
@@ -118,11 +157,11 @@ enum EntryValue {
 }
 
 impl EntryValue {
-    fn results(self) -> Results {
+    fn results(self, committee_category: CommitteeCategory) -> Results {
         match self {
-            EntryValue::ValidEmpty => valid_empty_result(),
-            EntryValue::ValidCounted => valid_counted_result(),
-            EntryValue::Invalid => invalid_result(),
+            EntryValue::ValidEmpty => valid_empty_result(committee_category),
+            EntryValue::ValidCounted => valid_counted_result(committee_category),
+            EntryValue::Invalid => invalid_result(committee_category),
         }
     }
 
@@ -131,25 +170,35 @@ impl EntryValue {
     }
 }
 
-fn update(user_id: UserId, entry: EntryValue) -> DataEntryUpdate {
+fn update(
+    user_id: UserId,
+    entry: EntryValue,
+    committee_category: CommitteeCategory,
+) -> DataEntryUpdate {
     DataEntryUpdate {
         progress: 0,
         user_id,
-        entry: entry.results(),
+        entry: entry.results(committee_category),
         client_state: ClientState::default(),
     }
 }
 
-fn election() -> ElectionWithPoliticalGroups {
+fn election(committee_category: CommitteeCategory) -> ElectionWithPoliticalGroups {
     ElectionWithPoliticalGroups {
         id: ElectionId::from(1),
         name: "Gemeenteraad Test Location 2025".to_string(),
         official_name: "Gemeenteraad Test Location 2025".to_string(),
-        committee_category: CommitteeCategory::GSB,
-        counting_method: Some(VoteCountingMethod::CSO),
+        committee_category,
+        counting_method: match committee_category {
+            CommitteeCategory::GSB => Some(VoteCountingMethod::CSO),
+            CommitteeCategory::CSB => None,
+        },
         election_id: "GR2025_TestLocation".to_string(),
         location: "Test Location".to_string(),
-        authority_id: "0000".to_string(),
+        authority_id: match committee_category {
+            CommitteeCategory::GSB => "0000".to_string(),
+            CommitteeCategory::CSB => "CSB".to_string(),
+        },
         authority_name: "Test".to_string(),
         authority_region: "Test".to_string(),
         district: CommitteeDistrict::None,
@@ -169,6 +218,7 @@ fn election() -> ElectionWithPoliticalGroups {
 
 #[derive(Arbitrary, Debug)]
 enum Transition {
+    ImportFirstEntry(EntryValue),
     ClaimFirstEntry(bool),
     ClaimSecondEntry(bool),
     UpdateFirstEntry(bool, EntryValue),
@@ -198,10 +248,22 @@ fn is_as_expected(
     state: &DataEntryStatus,
     transition: &Transition,
     resulting_state: &Result<DataEntryStatus, DataEntryTransitionError>,
-    first_entry: EntryValue,
-    second_entry: EntryValue,
+    model: &Model,
 ) -> bool {
     match (state, transition) {
+        // ImportFirstEntry: only CSB and without errors
+        (DataEntryStatus::Empty, Transition::ImportFirstEntry(entry)) => {
+            if model.committee_category != CommitteeCategory::CSB {
+                matches!(resulting_state, Err(DataEntryTransitionError::Invalid))
+            } else if entry.has_errors() {
+                matches!(
+                    resulting_state,
+                    Err(DataEntryTransitionError::ValidationError(_))
+                )
+            } else {
+                matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
+            }
+        }
         // ClaimFirstEntry: an unclaimed first entry can be claimed by any user
         (DataEntryStatus::Empty, Transition::ClaimFirstEntry(_)) => matches!(
             resulting_state,
@@ -228,7 +290,7 @@ fn is_as_expected(
         }
         // FinaliseFirstEntry
         (DataEntryStatus::FirstEntryInProgress(_), Transition::FinaliseFirstEntry(true)) => {
-            is_kept_as_expected(resulting_state, first_entry)
+            is_kept_as_expected(resulting_state, model.first_entry)
         }
         // DiscardFirstEntry
         (DataEntryStatus::FirstEntryHasErrors(_), Transition::DiscardFirstEntryWithErrors) => {
@@ -239,6 +301,16 @@ fn is_as_expected(
             matches!(
                 resulting_state,
                 Ok(DataEntryStatus::FirstEntryInProgress(_))
+            )
+        }
+        // ClaimSecondEntry on an imported first entry has no typist for first entry,
+        // so any user can claim the second entry
+        (DataEntryStatus::FirstEntryFinalised(_), Transition::ClaimSecondEntry(_))
+            if model.first_entry_imported =>
+        {
+            matches!(
+                resulting_state,
+                Ok(DataEntryStatus::SecondEntryInProgress(_))
             )
         }
         // ClaimSecondEntry
@@ -271,23 +343,24 @@ fn is_as_expected(
         }
         // FinaliseSecondEntry
         (DataEntryStatus::SecondEntryInProgress(_), Transition::FinaliseSecondEntry(true)) => {
-            is_finalised_as_expected(resulting_state, first_entry, second_entry)
+            is_finalised_as_expected(resulting_state, model.first_entry, model.second_entry)
         }
         // KeepFirstEntry
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepFirstEntry) => {
-            is_kept_as_expected(resulting_state, first_entry)
+            is_kept_as_expected(resulting_state, model.first_entry)
         }
         // KeepSecondEntry
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepSecondEntry) => {
-            is_kept_as_expected(resulting_state, second_entry)
+            is_kept_as_expected(resulting_state, model.second_entry)
         }
         // DiscardBothEntries
         (DataEntryStatus::EntriesDifferent(_), Transition::DiscardEntries) => {
             matches!(resulting_state, Ok(DataEntryStatus::Empty))
         }
         // CorrectFirstEntry, only allowed when the second entry has no errors
+        // and the first entry was not imported
         (DataEntryStatus::EntriesDifferent(_), Transition::CorrectFirstEntry) => {
-            if second_entry.has_errors() {
+            if model.second_entry.has_errors() || model.first_entry_imported {
                 matches!(
                     resulting_state,
                     Err(DataEntryTransitionError::CorrectionNotAllowed(_))
@@ -301,7 +374,7 @@ fn is_as_expected(
         }
         // CorrectSecondEntry, only allowed when the first entry has no errors
         (DataEntryStatus::EntriesDifferent(_), Transition::CorrectSecondEntry) => {
-            if first_entry.has_errors() {
+            if model.first_entry.has_errors() {
                 matches!(
                     resulting_state,
                     Err(DataEntryTransitionError::CorrectionNotAllowed(_))
@@ -327,7 +400,7 @@ fn is_as_expected(
         }
         // FinaliseFirstEntry after correcting it
         (DataEntryStatus::FirstEntryCorrection(_), Transition::FinaliseFirstEntry(true)) => {
-            is_finalised_as_expected(resulting_state, first_entry, second_entry)
+            is_finalised_as_expected(resulting_state, model.first_entry, model.second_entry)
         }
         // DiscardFirstEntry while correcting it: the kept second entry becomes the first entry
         (
@@ -352,7 +425,7 @@ fn is_as_expected(
         }
         // FinaliseSecondEntry after correcting it
         (DataEntryStatus::SecondEntryCorrection(_), Transition::FinaliseSecondEntry(true)) => {
-            is_finalised_as_expected(resulting_state, first_entry, second_entry)
+            is_finalised_as_expected(resulting_state, model.first_entry, model.second_entry)
         }
         // DiscardSecondEntry while correcting it: the finalised first entry is kept unchanged
         (
@@ -476,7 +549,7 @@ fn is_finalised_as_expected(
     first_entry: EntryValue,
     second_entry: EntryValue,
 ) -> bool {
-    if first_entry.results() != second_entry.results() {
+    if first_entry != second_entry {
         matches!(resulting_state, Ok(DataEntryStatus::EntriesDifferent(_)))
     } else if first_entry.has_errors() {
         matches!(
@@ -490,19 +563,23 @@ fn is_finalised_as_expected(
 
 /// Fuzz state shadowing the real state machine
 struct Model {
+    committee_category: CommitteeCategory,
     first_user: UserId,  // used for first entry
     second_user: UserId, // used for second entry
     first_entry: EntryValue,
     second_entry: EntryValue,
+    first_entry_imported: bool,
 }
 
 impl Model {
-    fn new() -> Self {
+    fn new(committee_category: CommitteeCategory) -> Self {
         Model {
+            committee_category,
             first_user: UserId::from(0),
             second_user: UserId::from(1),
             first_entry: EntryValue::ValidEmpty,
             second_entry: EntryValue::ValidEmpty,
+            first_entry_imported: false,
         }
     }
 
@@ -528,37 +605,100 @@ impl Model {
             std::mem::swap(&mut self.first_user, &mut self.second_user);
         }
         self.first_entry = EntryValue::ValidEmpty;
+        self.first_entry_imported = false;
+    }
+
+    /// An imported first entry is finalised immediately and has no typist.
+    fn import_first_entry(&mut self, entry: EntryValue) {
+        self.first_entry = entry;
+        self.first_entry_imported = true;
+    }
+
+    /// An unclaimed second entry can only be claimed by a different
+    /// user than the first entry. An imported first entry however
+    /// has no typist and can be claimed by any user.
+    fn claim_second_entry(&mut self, correct_user: bool) {
+        if self.first_entry_imported && !correct_user {
+            std::mem::swap(&mut self.first_user, &mut self.second_user);
+        }
+        self.second_entry = EntryValue::ValidEmpty;
     }
 
     /// The second entry becomes the first entry, taking its typist along.
     fn promote_second_entry(&mut self) {
         std::mem::swap(&mut self.first_user, &mut self.second_user);
         self.first_entry = self.second_entry;
+        self.first_entry_imported = false;
+    }
+
+    /// Expect the origin of the first entry to be in the given state
+    fn expected_first_entry_origin(&self, state: &DataEntryStatus) -> Option<DataEntryOrigin> {
+        match state {
+            DataEntryStatus::Empty => None,
+            _ if self.first_entry_imported => Some(DataEntryOrigin::Import),
+            _ => Some(DataEntryOrigin::Typist(self.first_user)),
+        }
+    }
+}
+
+#[derive(Arbitrary, Debug)]
+struct Input {
+    committee_category: ArbitraryCommitteeCategory,
+    transitions: Vec<Transition>,
+}
+
+#[derive(Arbitrary, Copy, Clone, Debug)]
+#[expect(clippy::upper_case_acronyms)]
+enum ArbitraryCommitteeCategory {
+    GSB,
+    CSB,
+}
+
+impl From<ArbitraryCommitteeCategory> for CommitteeCategory {
+    fn from(category: ArbitraryCommitteeCategory) -> Self {
+        match category {
+            ArbitraryCommitteeCategory::GSB => CommitteeCategory::GSB,
+            ArbitraryCommitteeCategory::CSB => CommitteeCategory::CSB,
+        }
     }
 }
 
 // This fuzz target randomly chooses a sequence of transitions to mutate the state, and checks that
 // every step matches the expected state machine defined above
-fuzz_target!(|transitions: Vec<Transition>| {
+fuzz_target!(|input: Input| {
     let mut state = DataEntryStatus::default();
-    let mut model = Model::new();
-    let election = election();
+    let mut model = Model::new(input.committee_category.into());
+    let election = election(input.committee_category.into());
 
-    for transition in transitions {
+    for transition in input.transitions {
         let prev_state = state.clone();
 
         // Apply transition
         let next_state = match transition {
+            Transition::ImportFirstEntry(entry) => {
+                let res = state
+                    .import_first_entry(&election, entry.results(input.committee_category.into()));
+                if res.is_ok() {
+                    model.import_first_entry(entry);
+                }
+                res
+            }
             Transition::ClaimFirstEntry(correct_user) => {
-                let res =
-                    state.claim_first_entry(model.first_user(correct_user), valid_empty_result());
+                let res = state.claim_first_entry(
+                    model.first_user(correct_user),
+                    valid_empty_result(input.committee_category.into()),
+                );
                 if res.is_ok() && prev_state == DataEntryStatus::Empty {
                     model.claim_empty_first_entry(correct_user);
                 }
                 res
             }
             Transition::UpdateFirstEntry(correct_user, entry) => {
-                let res = state.update_first_entry(update(model.first_user(correct_user), entry));
+                let res = state.update_first_entry(update(
+                    model.first_user(correct_user),
+                    entry,
+                    input.committee_category.into(),
+                ));
                 if res.is_ok() {
                     model.first_entry = entry
                 };
@@ -579,16 +719,21 @@ fuzz_target!(|transitions: Vec<Transition>| {
             }
             Transition::DiscardFirstEntryWithErrors => state.discard_first_entry_with_errors(),
             Transition::ClaimSecondEntry(correct_user) => {
-                let res =
-                    state.claim_second_entry(model.second_user(correct_user), valid_empty_result());
+                let res = state.claim_second_entry(
+                    model.second_user(correct_user),
+                    valid_empty_result(input.committee_category.into()),
+                );
                 if res.is_ok() && matches!(prev_state, DataEntryStatus::FirstEntryFinalised(_)) {
-                    // a newly claimed second entry starts out empty
-                    model.second_entry = EntryValue::ValidEmpty;
+                    model.claim_second_entry(correct_user);
                 }
                 res
             }
             Transition::UpdateSecondEntry(correct_user, entry) => {
-                let res = state.update_second_entry(update(model.second_user(correct_user), entry));
+                let res = state.update_second_entry(update(
+                    model.second_user(correct_user),
+                    entry,
+                    input.committee_category.into(),
+                ));
                 if res.is_ok() {
                     model.second_entry = entry
                 };
@@ -615,15 +760,9 @@ fuzz_target!(|transitions: Vec<Transition>| {
         };
 
         // Check that the applied transition matches what we expect from the state machine
-        if !is_as_expected(
-            &prev_state,
-            &transition,
-            &next_state,
-            model.first_entry,
-            model.second_entry,
-        ) {
+        if !is_as_expected(&prev_state, &transition, &next_state, &model) {
             panic!(
-                "Prev: {:?}\n\nNext: {:?}\n\nInvalid transition: {} --{:?}--> {}\nfirst_entry: {:?}, second_entry: {:?}\n",
+                "Prev: {:?}\n\nNext: {:?}\n\nInvalid transition: {} --{:?}--> {}\nfirst_entry: {:?}, second_entry: {:?}, first_entry_imported: {}\n",
                 prev_state,
                 next_state,
                 prev_state.status_name(),
@@ -633,8 +772,27 @@ fuzz_target!(|transitions: Vec<Transition>| {
                     .map(|s| s.status_name().to_string())
                     .unwrap_or_else(|e| e.to_string()),
                 model.first_entry,
-                model.second_entry
+                model.second_entry,
+                model.first_entry_imported
             )
+        }
+
+        // Validate the first entry origin
+        if let Ok(next_state) = &next_state {
+            let expected_origin = model.expected_first_entry_origin(next_state);
+            let actual_origin = next_state.get_first_entry_origin();
+            if actual_origin != expected_origin {
+                panic!(
+                    "Prev: {:?}\n\nNext: {:?}\n\nUnexpected first entry origin after {} --{:?}--> {}\nexpected: {:?}, actual: {:?}\n",
+                    prev_state,
+                    next_state,
+                    prev_state.status_name(),
+                    transition,
+                    next_state.status_name(),
+                    expected_origin,
+                    actual_origin,
+                )
+            }
         }
 
         // State only updates if there was no error during the transition

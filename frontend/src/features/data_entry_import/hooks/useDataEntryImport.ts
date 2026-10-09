@@ -43,6 +43,8 @@ export interface UseDataEntryImport {
   onHashSubmit: (chunks: string[]) => Promise<void>;
   onFinalSubmit: () => Promise<void>;
   onAbort: () => void;
+  isValidating: boolean;
+  isSaving: boolean;
 }
 
 export interface FileImportError {
@@ -127,8 +129,10 @@ export function useDataEntryImport(): UseDataEntryImport {
 
   const validatePath: ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/${election.id}/data_entry/import/validate`;
   const importPath: ELECTION_DATA_ENTRY_IMPORT_REQUEST_PATH = `/api/elections/${election.id}/data_entry/import`;
-  const { create: postValidate } = useCrud<CSBDataEntryImportValidateResponse>({ createPath: validatePath });
-  const { create: postImport } = useCrud<CSBDataEntryImportResponse>({ createPath: importPath });
+  const { create: postValidate, isLoading: isValidating } = useCrud<CSBDataEntryImportValidateResponse>({
+    createPath: validatePath,
+  });
+  const { create: postImport, isLoading: isSaving } = useCrud<CSBDataEntryImportResponse>({ createPath: importPath });
 
   async function onFileChange(selectedFile: File | undefined) {
     if (selectedFile === undefined) {
@@ -195,5 +199,5 @@ export function useDataEntryImport(): UseDataEntryImport {
     void navigate(`/elections/${election.id}/status`);
   }
 
-  return { state, onFileChange, onHashSubmit, onFinalSubmit, onAbort };
+  return { state, onFileChange, onHashSubmit, onFinalSubmit, onAbort, isValidating, isSaving };
 }

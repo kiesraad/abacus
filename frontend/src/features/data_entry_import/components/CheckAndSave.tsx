@@ -6,9 +6,10 @@ export interface CheckAndSaveProps {
   electionName: string;
   subCommittee: SubCommitteeFirstSession;
   onSubmit: () => void;
+  isLoading: boolean;
 }
 
-export function CheckAndSave({ electionName, subCommittee, onSubmit }: CheckAndSaveProps) {
+export function CheckAndSave({ electionName, subCommittee, onSubmit, isLoading }: CheckAndSaveProps) {
   return (
     <section className="md">
       <h2>{t("data_entry_import.check_and_save.title")}</h2>
@@ -27,7 +28,7 @@ export function CheckAndSave({ electionName, subCommittee, onSubmit }: CheckAndS
       </ul>
 
       <div className="mt-xl">
-        <Button type="button" onClick={onSubmit}>
+        <Button type="button" onClick={onSubmit} isLoading={isLoading}>
           {t("save")}
         </Button>
       </div>

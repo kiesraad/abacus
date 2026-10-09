@@ -19,6 +19,7 @@ const meta = {
   args: {
     error: undefined,
     onFileChange: fn(),
+    isLoading: false,
   },
 } satisfies Meta<typeof ImportFileForm>;
 

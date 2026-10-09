@@ -19,6 +19,7 @@ const meta = {
     electionName: "Gemeenteraad Juinen 2026",
     subCommittee,
     onSubmit: fn(),
+    isLoading: false,
   },
 } satisfies Meta<typeof CheckAndSave>;
 

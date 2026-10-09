@@ -11,16 +11,17 @@ import type { FileImportError } from "../hooks/useDataEntryImport";
 export interface ImportFileFormProps {
   error: FileImportError | undefined;
   onFileChange: (file: File | undefined) => void;
+  isLoading: boolean;
 }
 
-export function ImportFileForm({ error, onFileChange }: ImportFileFormProps) {
+export function ImportFileForm({ error, onFileChange, isLoading }: ImportFileFormProps) {
   const inputId = useId();
   const [file, setFile] = useState<File | undefined>();
 
   return (
     <section className="md">
       <Form title={t("data_entry_import.import_for_entry", { entry: t("data_entry.first_entry") })}>
-        <FormLayout>
+        <FormLayout disabled={isLoading}>
           <FormLayout.Section>
             {error && (
               <Alert type="error" title={error.title} inline>

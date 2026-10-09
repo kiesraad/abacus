@@ -9,12 +9,18 @@ import { HashCheck } from "./HashCheck";
 import { ImportFileForm } from "./ImportFileForm";
 
 export function DataEntryImportPage() {
-  const { state, onFileChange, onHashSubmit, onFinalSubmit, onAbort } = useDataEntryImport();
+  const { state, onFileChange, onHashSubmit, onFinalSubmit, onAbort, isValidating, isSaving } = useDataEntryImport();
 
   function getContent(): ReactElement {
     switch (state.status) {
       case "idle":
-        return <ImportFileForm error={state.error} onFileChange={(file) => void onFileChange(file)} />;
+        return (
+          <ImportFileForm
+            error={state.error}
+            onFileChange={(file) => void onFileChange(file)}
+            isLoading={isValidating}
+          />
+        );
       case "hash_check":
         return (
           <HashCheck
@@ -33,6 +39,7 @@ export function DataEntryImportPage() {
             electionName={state.electionName}
             subCommittee={state.subCommittee}
             onSubmit={() => void onFinalSubmit()}
+            isLoading={isSaving}
           />
         );
     }

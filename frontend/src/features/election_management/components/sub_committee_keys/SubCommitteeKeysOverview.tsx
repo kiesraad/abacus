@@ -55,7 +55,7 @@ function ImportedKeysTable({ subCommittees }: SubCommitteeKeysTableProps) {
         </Table.Header>
         <Table.Body className="fs-md">
           {subCommittees.map((subCommittee) => (
-            <Table.Row key={subCommittee.id} to={`${subCommittee.id}`}>
+            <Table.Row key={subCommittee.id} id={`subCommittee-${subCommittee.authority_id}`} to={`${subCommittee.id}`}>
               <Table.NumberCell>{subCommittee.authority_id}</Table.NumberCell>
               <Table.Cell className="break-word">{subCommittee.authority_name}</Table.Cell>
               <Table.NumberCell>{subCommittee.certificates.length}</Table.NumberCell>

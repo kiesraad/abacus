@@ -75,3 +75,46 @@ main.backgroundBlue {
     width: 58.5rem;
   }
 }
+
+.certificateDetailSection {
+  gap: var(--space-md-lg);
+}
+
+.certificateInformation {
+  max-width: 32rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  .certificateSection {
+    background-color: var(--blue-200);
+    padding: var(--space-md);
+    font-family: var(--font-number);
+    font-size: var(--font-size-xs);
+    line-height: 1rem;
+  }
+
+  .titleSection {
+    background: var(--button-color-secondary);
+    text-decoration: none;
+
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+
+    & > span {
+      display: inline-flex;
+      flex-direction: column;
+
+      .title {
+        font-weight: bold;
+      }
+
+      button {
+        color: var(--red-700);
+      }
+    }
+  }
+}

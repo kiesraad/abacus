@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import alertCls from "@/components/ui/Alert/Alert.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import {
   CSBElectionRequestHandler,
   CSBSubCommitteeCertificatesRequestHandler,
@@ -146,6 +147,12 @@ describe("SubCommitteeKeysDetailPage", () => {
 
   test("Redirects to overview page when deleting a last certificate", async () => {
     const user = userEvent.setup();
+    const pushMessage = vi.fn();
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      pushMessage,
+      popMessages: vi.fn(() => []),
+      hasMessages: vi.fn(() => false),
+    });
     server.use(
       http.get("/api/elections/2/sub_committee_certificates", () =>
         HttpResponse.json(
@@ -218,5 +225,9 @@ describe("SubCommitteeKeysDetailPage", () => {
     await user.click(deleteButton);
 
     expect(navigate).toHaveBeenCalledWith("/elections/2/sub-committees");
+    expect(pushMessage).toHaveBeenCalledExactlyOnceWith({
+      title: "Publieke sleutel Diemen verwijderd",
+      text: undefined,
+    });
   });
 });

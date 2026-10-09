@@ -8,6 +8,7 @@
   <kr:CreationDateTime>2022-03-17T14:39:06.776</kr:CreationDateTime>
   <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
   <Count>
+    <kr:CountingMethod MethodCode="centrale stemopneming"/>
     <kr:Phase PhaseCode="eerste zitting"/>
     <EventIdentifier/>
     <Election>

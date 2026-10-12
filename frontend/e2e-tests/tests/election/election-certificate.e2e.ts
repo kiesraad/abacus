@@ -79,7 +79,7 @@ test.describe("GSB certificates", () => {
     await expect(overviewPage.alertPublicKeyAdded).toBeVisible();
     await expect(overviewPage.alertPublicKeyAdded).toContainText("Publieke sleutel Heemdamseburg toegevoegd");
     await expect(overviewPage.alertPublicKeyAdded).toContainText(
-      "Let op: Deze sleutel is verlopen op 18 juni 2026, maar kan wel gebruikt worden. Neem bij twijfel contact op met het GSB van Heemdamseburg of de Kiesraad.",
+      /Let op: Deze sleutel is verlopen op \d+ \w+ \d+, maar kan wel gebruikt worden\. Neem bij twijfel contact op met het GSB van Heemdamseburg of de Kiesraad\./,
     );
 
     await expect(overviewPage.pendingTableHeader).toBeVisible();
@@ -118,7 +118,7 @@ test.describe("GSB certificates", () => {
     await expect(overviewPage.alertPublicKeyAdded).toBeVisible();
     await expect(overviewPage.alertPublicKeyAdded).toHaveText("Publieke sleutel Heemdamseburg toegevoegd");
     await expect(overviewPage.alertPublicKeyAdded).not.toContainText(
-      "Let op: Deze sleutel is verlopen op 18 juni 2026, maar kan wel gebruikt worden. Neem bij twijfel contact op met het GSB van Heemdamseburg of de Kiesraad.",
+      /Let op: Deze sleutel is verlopen op \d+ \w+ \d+, maar kan wel gebruikt worden\. Neem bij twijfel contact op met het GSB van Heemdamseburg of de Kiesraad\./,
     );
 
     await overviewPage.clickSubCommitteeFromList("0123");

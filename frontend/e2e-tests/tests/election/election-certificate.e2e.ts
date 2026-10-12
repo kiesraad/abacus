@@ -94,6 +94,8 @@ test.describe("GSB certificates", () => {
 
     const detailPage = new SubCommitteeKeysDetail(page);
     await expect(detailPage.header).toBeVisible();
+    await expect(detailPage.subHeader).toBeVisible();
+    await expect(detailPage.subHeader).toHaveText("Publieke sleutel(s) GSB Heemdamseburg");
     const firstCert = detailPage.getCertificateInfo(certificate_0123_Heemdamseburg_expired.fingerprint);
     await expect(firstCert).toContainText(
       [
@@ -155,6 +157,7 @@ test.describe("GSB certificates", () => {
     await detailPage.deleteCertificateModal.deleteButton.click();
 
     await expect(detailPage.alertPublicKeyDeleted).toBeVisible();
+    await expect(detailPage.alertPublicKeyDeleted).toContainText("Publieke sleutel Heemdamseburg verwijderd");
     await expect(detailPage.alertPublicKeyDeleted).toContainText(
       "De sleutel is verwijderd. Onderstaande sleutels zijn nog aanwezig.",
     );

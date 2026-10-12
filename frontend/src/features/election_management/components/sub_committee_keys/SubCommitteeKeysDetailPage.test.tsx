@@ -42,6 +42,7 @@ describe("SubCommitteeKeysDetailPage", () => {
     renderSubCommitteeKeyDetailPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Sleutels van GSB's beheren" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Publieke sleutel(s) GSB Diemen" })).toBeVisible();
 
     const certificates = await screen.findAllByTestId(/certificate-\w/);
     expect(certificates.length).toBe(2);

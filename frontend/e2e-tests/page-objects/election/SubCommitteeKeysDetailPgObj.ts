@@ -16,11 +16,11 @@ export class SubCommitteeKeysDetail {
     });
     this.subHeader = page.getByRole("heading", {
       level: 2,
-      name: "Publieke sleutel(s) GSB Heemdamseburg",
+      name: /Publieke sleutel\(s\) GSB \w/,
     });
 
     this.publicKeyDeleted = page.getByRole("strong").filter({
-      hasText: /^Publieke sleutel Heemdamseburg verwijderd$/,
+      hasText: /^Publieke sleutel \w+ verwijderd$/,
     });
     this.alertPublicKeyDeleted = page.getByRole("alert").filter({ has: this.publicKeyDeleted });
   }

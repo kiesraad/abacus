@@ -10,4 +10,5 @@ pub mod init_tls_test;
 pub mod investigation_integration_test;
 pub mod polling_station_integration_test;
 pub mod report_integration_test;
+pub mod signing_integration_test;
 pub mod user_integration_test;

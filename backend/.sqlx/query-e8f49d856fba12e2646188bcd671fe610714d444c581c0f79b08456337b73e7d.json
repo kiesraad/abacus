@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT certificates\n        FROM sub_committees\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "certificates",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "certificates"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e8f49d856fba12e2646188bcd671fe610714d444c581c0f79b08456337b73e7d"
+}

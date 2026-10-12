@@ -27,7 +27,7 @@ use eml_nl::{
         election_result::{
             ElectionResult, ElectionResultContest, ElectionResultSelection, RankingType, YesNoType,
         },
-        polling_stations::{PollingPlace, PollingStations, PollingStationsContest},
+        polling_stations::{Location, PollingPlace, PollingStations, PollingStationsContest},
     },
     io::{EMLParsingMode, EMLRead as _},
     utils::{
@@ -663,7 +663,7 @@ impl ElectionWithPoliticalGroups {
                     polling_stations
                         .iter()
                         .map(|ps| {
-                            PollingPlace::builder()
+                            let mut polling_place = PollingPlace::builder()
                                 .channel(VotingChannelType::Polling)
                                 // Use polling station name (not ps.locality which contains the physical location).
                                 .locality_name(&ps.name[..])
@@ -676,7 +676,17 @@ impl ElectionWithPoliticalGroups {
                                         .map(|n| n.to_string())
                                         .unwrap_or_else(|| "0".to_string()),
                                 )
-                                .build()
+                                .reporting_unit_type_option(
+                                    ps.polling_station_type
+                                        .map(|t| t.as_eml_reporting_unit_type()),
+                                )
+                                .build()?;
+                            polling_place
+                                .physical_location
+                                .address
+                                .locations
+                                .push(polling_station_location(ps));
+                            Ok(polling_place)
                         })
                         .collect::<Result<Vec<_>, EMLError>>()?,
                 )
@@ -1122,6 +1132,8 @@ pub fn polling_stations_from_eml(
         let physical_location = &ps.physical_location;
         let pspl = &physical_location.polling_station;
         let locality = &physical_location.address.locality;
+        // Only the first EML 1.3 location is used
+        let location = physical_location.address.locations.first();
         result.push(crate::domain::polling_station::PollingStationRequest {
             name: locality.locality_name.name.to_string(),
             number: Some(
@@ -1132,19 +1144,66 @@ pub fn polling_stations_from_eml(
                     .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
             ),
             number_of_voters: pspl.data.parse::<u32>().ok(),
-            polling_station_type: None,
-            address: "".to_string(),
-            postal_code: locality
-                .postal_code
+            polling_station_type: physical_location
+                .reporting_unit_type
                 .as_ref()
-                .map(|pc| &pc.number.number[..])
+                .map(|t| t.copied_value())
+                .transpose()?
+                .map(crate::domain::polling_station::PollingStationType::from_eml_reporting_unit_type),
+            address: location.map(location_address).unwrap_or_default(),
+            // A postal code in the location takes precedence over the legacy postal code
+            postal_code: match location.and_then(|l| l.postal_code.as_ref()) {
+                Some(postal_code) => postal_code.raw().trim().to_string(),
+                None => locality
+                    .postal_code
+                    .as_ref()
+                    .map(|pc| &pc.number.number[..])
+                    .unwrap_or("")
+                    .to_string(),
+            },
+            locality: location
+                .and_then(|l| l.city.as_deref())
                 .unwrap_or("")
+                .trim()
                 .to_string(),
-            locality: "".to_string(),
         });
     }
 
     Ok(result)
+}
+
+/// Formats the address of an EML location as e.g. `Street 12A bis Ingang achterom`.
+fn location_address(location: &Location) -> String {
+    let number = location.number.as_ref().map(|n| n.raw());
+    let house_number = format!(
+        "{}{}",
+        number.as_deref().unwrap_or("").trim(),
+        location.letter.as_deref().unwrap_or("").trim()
+    );
+    [
+        location.street_name.as_deref(),
+        Some(&house_number[..]),
+        location.number_addition.as_deref(),
+        location.additional_address_information.as_deref(),
+    ]
+    .into_iter()
+    .flatten()
+    .map(str::trim)
+    .filter(|part| !part.is_empty())
+    .collect::<Vec<_>>()
+    .join(" ")
+}
+
+/// Builds the EML location of a polling station. Abacus stores the address as free text,
+/// so it is exported as additional address information instead of being split into parts.
+fn polling_station_location(ps: &crate::domain::polling_station::PollingStation) -> Location {
+    let non_empty = |s: &str| (!s.is_empty()).then(|| s.to_string());
+    let mut location = Location::new()
+        .with_additional_address_information_option(non_empty(&ps.address))
+        .with_city_option(non_empty(&ps.locality));
+    // The postal code is not validated in Abacus, so it is exported verbatim.
+    location.postal_code = non_empty(&ps.postal_code).map(StringValue::from_raw);
+    location
 }
 
 pub fn number_of_voters_from_polling_stations_eml(
@@ -1186,6 +1245,23 @@ impl crate::domain::polling_station::PollingStationType {
             }
         }
     }
+
+    /// Converts an EML reporting unit type to the corresponding polling station type.
+    pub fn from_eml_reporting_unit_type(
+        reporting_unit_type: eml_nl::utils::ReportingUnitType,
+    ) -> Self {
+        match reporting_unit_type {
+            eml_nl::utils::ReportingUnitType::FixedLocation => {
+                crate::domain::polling_station::PollingStationType::FixedLocation
+            }
+            eml_nl::utils::ReportingUnitType::Special => {
+                crate::domain::polling_station::PollingStationType::Special
+            }
+            eml_nl::utils::ReportingUnitType::Mobile => {
+                crate::domain::polling_station::PollingStationType::Mobile
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -1194,7 +1270,8 @@ mod tests {
 
     use apportionment::Fraction;
     use eml_nl::{
-        EMLErrorKind, documents::election_result::ElectionResultSelectionType, utils::StringValue,
+        EMLErrorKind, documents::election_result::ElectionResultSelectionType, io::EMLWrite as _,
+        utils::StringValue,
     };
 
     use super::*;
@@ -1203,7 +1280,7 @@ mod tests {
         data_entry::{DataEntryId, DataEntrySource},
         election::{ElectionCategory, tests::election_fixture},
         polling_station::{
-            PollingStationFirstSession, PollingStationForSession,
+            PollingStationFirstSession, PollingStationForSession, PollingStationType,
             test_helpers::polling_stations_fixture,
         },
         results::{
@@ -1313,7 +1390,6 @@ mod tests {
 
     #[test]
     fn test_eml_repoting_unit_type_conversion() {
-        use crate::domain::polling_station::PollingStationType;
         use eml_nl::utils::ReportingUnitType;
 
         assert_eq!(
@@ -1327,6 +1403,19 @@ mod tests {
         assert_eq!(
             PollingStationType::Mobile.as_eml_reporting_unit_type(),
             ReportingUnitType::Mobile
+        );
+
+        assert_eq!(
+            PollingStationType::from_eml_reporting_unit_type(ReportingUnitType::FixedLocation),
+            PollingStationType::FixedLocation
+        );
+        assert_eq!(
+            PollingStationType::from_eml_reporting_unit_type(ReportingUnitType::Special),
+            PollingStationType::Special
+        );
+        assert_eq!(
+            PollingStationType::from_eml_reporting_unit_type(ReportingUnitType::Mobile),
+            PollingStationType::Mobile
         );
     }
 
@@ -1639,6 +1728,254 @@ mod tests {
         );
         assert_eq!(second.polling_station.id.raw(), "32");
         assert_eq!(&second.polling_station.data[..], "2000");
+    }
+
+    /// Address, postal code, locality and type of the imported polling stations.
+    fn imported_locations(xml: &str) -> Vec<(String, String, String, Option<PollingStationType>)> {
+        locations(polling_stations_from_eml_str(xml).unwrap())
+    }
+
+    fn locations(
+        polling_stations: Vec<crate::domain::polling_station::PollingStationRequest>,
+    ) -> Vec<(String, String, String, Option<PollingStationType>)> {
+        polling_stations
+            .into_iter()
+            .map(|ps| {
+                (
+                    ps.address,
+                    ps.postal_code,
+                    ps.locality,
+                    ps.polling_station_type,
+                )
+            })
+            .collect()
+    }
+
+    fn location(
+        address: &str,
+        postal_code: &str,
+        locality: &str,
+        polling_station_type: Option<PollingStationType>,
+    ) -> (String, String, String, Option<PollingStationType>) {
+        (
+            address.to_string(),
+            postal_code.to_string(),
+            locality.to_string(),
+            polling_station_type,
+        )
+    }
+
+    #[test]
+    fn test_polling_stations_from_legacy_eml() {
+        let polling_stations =
+            polling_stations_from_eml_str(include_str!("./tests/eml110b_test.eml.xml")).unwrap();
+
+        assert_eq!(polling_stations.len(), 20);
+        let first = &polling_stations[0];
+        assert_eq!(first.name, "Stadhuis");
+        assert_eq!(first.number, Some(1));
+        assert_eq!(first.number_of_voters, Some(1273));
+        assert_eq!(first.polling_station_type, None);
+        assert_eq!(first.address, "");
+        assert_eq!(first.postal_code, "1011 PN");
+        assert_eq!(first.locality, "");
+    }
+
+    #[test]
+    fn test_polling_stations_from_eml_with_locations() {
+        let polling_stations =
+            polling_stations_from_eml_str(include_str!("./tests/eml110b_v1_3_1.eml.xml")).unwrap();
+
+        // The name still comes from the legacy locality name.
+        assert_eq!(
+            polling_stations
+                .iter()
+                .map(|ps| ps.name.as_str())
+                .collect::<Vec<_>>(),
+            [
+                "Stadhuis",
+                "Melkweg",
+                "Op Rolletjes",
+                "Ziekenhuis",
+                "Bibliotheek",
+                "Sporthal",
+                "Buurthuis"
+            ]
+        );
+
+        assert_eq!(
+            locations(polling_stations),
+            [
+                // Legacy address only
+                location("", "1011 PN", "", None),
+                // Structured address combined with additional information,
+                // the location postal code overrides the legacy postal code
+                location(
+                    "Lijnbaansgracht 234A bis Ingang achterom",
+                    "1017 PH",
+                    "Amsterdam",
+                    Some(PollingStationType::FixedLocation),
+                ),
+                // Additional address information only, legacy postal code fallback
+                location(
+                    "Parkeerplaats bij de Rijksweg A12, 1",
+                    "1234 YQ",
+                    "Heemdamseburg",
+                    Some(PollingStationType::Mobile),
+                ),
+                // Later locations do not fill in missing fields
+                location("Hoofdweg", "", "", Some(PollingStationType::Special)),
+                // An empty location postal code overrides the legacy postal code
+                location("Kerkstraat 3", "", "", None),
+                // Malformed values are imported verbatim
+                location("Sportlaan 12-14", "1234ab", "", None),
+                // Surrounding whitespace is trimmed, whitespace-only parts are skipped
+                location("5 Achteringang", "1234 AB", "Juinen", None),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_as_polling_stations_eml_location() {
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
+        let mut polling_stations = polling_stations_fixture(&[1000, 2000, 3000]);
+        polling_stations[1].polling_station_type = Some(PollingStationType::FixedLocation);
+        polling_stations[2].polling_station_type = Some(PollingStationType::Mobile);
+        polling_stations[2].address = "".to_string();
+        polling_stations[2].locality = "".to_string();
+        polling_stations[2].postal_code = "".to_string();
+
+        let eml = election
+            .as_polling_stations_eml(&polling_stations, None, None)
+            .unwrap();
+        let polling_places = &eml.election_event.election.contests[0].polling_places;
+
+        let first = &polling_places[0].physical_location;
+        // Legacy fields are preserved
+        assert_eq!(&first.address.locality.locality_name.name[..], "Testplek 1");
+        assert_eq!(
+            &first
+                .address
+                .locality
+                .postal_code
+                .as_ref()
+                .unwrap()
+                .number
+                .number[..],
+            "1234 QY"
+        );
+        assert_eq!(first.reporting_unit_type.as_ref().unwrap().raw(), "Special");
+        // Exactly one location, with only the address, postal code and locality set
+        assert_eq!(
+            first.address.locations,
+            [Location {
+                postal_code: Some(StringValue::from_raw("1234 QY")),
+                city: Some("Testdorp".into()),
+                additional_address_information: Some("Teststraat 2a".into()),
+                ..Location::new()
+            }]
+        );
+
+        assert_eq!(
+            polling_places[1]
+                .physical_location
+                .reporting_unit_type
+                .as_ref()
+                .unwrap()
+                .raw(),
+            "FixedLocation"
+        );
+
+        // Empty fields are omitted
+        let third = &polling_places[2].physical_location;
+        assert_eq!(third.reporting_unit_type.as_ref().unwrap().raw(), "Mobile");
+        assert_eq!(third.address.locations, [Location::new()]);
+    }
+
+    #[test]
+    fn test_as_polling_stations_eml_without_type() {
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
+        let mut polling_stations = polling_stations_fixture(&[1000]);
+        polling_stations[0].polling_station_type = None;
+
+        let eml = election
+            .as_polling_stations_eml(&polling_stations, None, None)
+            .unwrap();
+
+        let first = &eml.election_event.election.contests[0].polling_places[0].physical_location;
+        assert!(first.reporting_unit_type.is_none());
+    }
+
+    #[test]
+    fn test_as_polling_stations_eml_roundtrip() {
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
+        let mut polling_stations = polling_stations_fixture(&[1000, 2000, 3000, 4000]);
+        polling_stations[0].address =
+            "Lijnbaansgracht 234A bis, ingang <achterom> & \"zij\"".into();
+        polling_stations[0].locality = "'s-Hertogenbosch".into();
+        polling_stations[0].postal_code = "1017 PH".into();
+        polling_stations[1].polling_station_type = Some(PollingStationType::FixedLocation);
+        polling_stations[2].polling_station_type = Some(PollingStationType::Mobile);
+        polling_stations[3].polling_station_type = None;
+
+        let xml = election
+            .as_polling_stations_eml(&polling_stations, None, None)
+            .unwrap()
+            .write_eml_root_str(true, true)
+            .unwrap();
+
+        // Valid data can be parsed strictly
+        PollingStations::parse_eml(&xml, EMLParsingMode::Strict)
+            .ok()
+            .unwrap();
+
+        assert_eq!(
+            imported_locations(&xml),
+            [
+                location(
+                    "Lijnbaansgracht 234A bis, ingang <achterom> & \"zij\"",
+                    "1017 PH",
+                    "'s-Hertogenbosch",
+                    Some(PollingStationType::Special),
+                ),
+                location(
+                    "Teststraat 2a",
+                    "1234 QY",
+                    "Testdorp",
+                    Some(PollingStationType::FixedLocation),
+                ),
+                location(
+                    "Teststraat 2a",
+                    "1234 QY",
+                    "Testdorp",
+                    Some(PollingStationType::Mobile),
+                ),
+                location("Teststraat 2a", "1234 QY", "Testdorp", None),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_as_polling_stations_eml_roundtrip_malformed_postal_code() {
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
+        let mut polling_stations = polling_stations_fixture(&[1000]);
+        polling_stations[0].postal_code = "1234qy".into();
+
+        let xml = election
+            .as_polling_stations_eml(&polling_stations, None, None)
+            .unwrap()
+            .write_eml_root_str(true, true)
+            .unwrap();
+
+        // The malformed postal code is exported verbatim, so strict parsing fails
+        assert!(
+            PollingStations::parse_eml(&xml, EMLParsingMode::Strict)
+                .ok()
+                .is_err()
+        );
+
+        // The fallback parser used for imports preserves it
+        assert_eq!(imported_locations(&xml)[0].1, "1234qy");
     }
 
     #[test]

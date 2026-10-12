@@ -107,6 +107,14 @@ export function CheckHash({
                   <br />
                   <span className="capitalize-first">{formatDateFull(new Date(date))}</span>
                 </p>
+              </section>
+            </div>
+
+            <h3>{t("check_hash_title")}</h3>
+            <p>{instructions}</p>
+
+            <div className={cls.checkHash}>
+              <section>
                 <div>
                   <span>
                     <strong>{t("digital_signature")}</strong> ({t("hashcode")}):
@@ -115,7 +123,6 @@ export function CheckHash({
                 </div>
               </section>
             </div>
-            <p>{instructions}</p>
 
             {stubs.map((stub, stubIndex) => (
               <InputField

@@ -30,7 +30,7 @@ const meta = {
   args: {
     date: "2026-03-18",
     instructions:
-      "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
+      "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
     errorTitle: "Controle digitale vingerafdruk niet gelukt",
     errorDescription:
       "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
@@ -48,8 +48,8 @@ export const Election: Story = {
     header: "Controleer verkiezingsdefinitie",
     description: (
       <>
-        Het bestand <strong>verkiezingsdefinitie_PS27.eml.xml</strong> is geïmporteerd en bevat de instellingen voor de
-        volgende verkiezing:
+        Het bestand <strong>verkiezingsdefinitie_PS27.eml.xml</strong> bevat de instellingen voor de volgende
+        verkiezing:
       </>
     ),
     title: "Gemeenteraad Juinen 2026",
@@ -60,7 +60,7 @@ export const Election: Story = {
     await expect(canvas.getByText("Gemeenteraad Juinen 2026")).toBeVisible();
     await expect(
       canvas.getByText(
-        "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
+        "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
       ),
     ).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Volgende" })).toBeVisible();
@@ -72,8 +72,8 @@ export const ElectionWithError: Story = {
     header: "Controleer verkiezingsdefinitie",
     description: (
       <>
-        Het bestand <strong>verkiezingsdefinitie_PS27.eml.xml</strong> is geïmporteerd en bevat de instellingen voor de
-        volgende verkiezing:
+        Het bestand <strong>verkiezingsdefinitie_PS27.eml.xml</strong> bevat de instellingen voor de volgende
+        verkiezing:
       </>
     ),
     title: "Gemeenteraad Juinen 2026",
@@ -91,8 +91,7 @@ export const Candidates: Story = {
     header: "Controleer kandidatenlijsten",
     description: (
       <>
-        Het bestand <strong>kandidatenlijst_Fryslân_PS27.eml.xml</strong> is geïmporteerd en bevat de volgende
-        kandidaten:
+        Het bestand <strong>kandidatenlijst_Fryslân_PS27.eml.xml</strong> bevat de volgende kandidaten:
       </>
     ),
     title: "Fryslân, kandidatenlijsten PS2027",
@@ -104,8 +103,7 @@ export const CandidatesWithError: Story = {
     header: "Controleer kandidatenlijsten",
     description: (
       <>
-        Het bestand <strong>kandidatenlijst_Fryslân_PS27.eml.xml</strong> is geïmporteerd en bevat de volgende
-        kandidaten:
+        Het bestand <strong>kandidatenlijst_Fryslân_PS27.eml.xml</strong> bevat de volgende kandidaten:
       </>
     ),
     title: "Fryslân, kandidatenlijsten PS2027",

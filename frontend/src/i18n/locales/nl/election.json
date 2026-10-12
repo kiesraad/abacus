@@ -13,10 +13,10 @@
     "title": "Controleren en opslaan"
   },
   "check_eml": {
-    "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de volgende kandidaten:",
+    "candidates_description": "Het bestand <file>filename</file> bevat de volgende kandidaten:",
     "candidates_title": "Controleer kandidatenlijsten",
-    "check_hash_instructions": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
-    "election_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
+    "check_hash_instructions": "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
+    "election_description": "Het bestand <file>filename</file> bevat de instellingen voor de volgende verkiezing:",
     "election_title": "Controleer verkiezingsdefinitie",
     "error": {
       "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
@@ -71,7 +71,7 @@
   "polling_stations": {
     "added": "{num} stembureaus",
     "check": {
-      "description": "Het bestand <file>filename</file> is geïmporteerd en bevat onderstaande stembureaus. Zie je een verschil met de vooraf gepubliceerde lijst? Je kan na het toevoegen van deze verkiezing stembureaus toevoegen, verwijderen of aanpassen.",
+      "description": "Het bestand <file>filename</file> bevat onderstaande stembureaus. Zie je een verschil met de vooraf gepubliceerde lijst? Je kan na het toevoegen van deze verkiezing stembureaus toevoegen, verwijderen of aanpassen.",
       "title": "Controleer stembureaus"
     },
     "show_all": "Toon alle {num} stembureaus",

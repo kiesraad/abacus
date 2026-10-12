@@ -39,12 +39,12 @@ export class SubCommitteeKeysOverview {
     this.importedSubCommittees = this.importedTable.locator("tbody").getByRole("row");
 
     this.publicKeyAdded = page.getByRole("strong").filter({
-      hasText: /^Publieke sleutel Heemdamseburg toegevoegd$/,
+      hasText: /^Publieke sleutel \w+ toegevoegd$/,
     });
     this.alertPublicKeyAdded = page.getByRole("alert").filter({ has: this.publicKeyAdded });
 
     this.publicKeyDeleted = page.getByRole("strong").filter({
-      hasText: /^Publieke sleutel Heemdamseburg verwijderd$/,
+      hasText: /^Publieke sleutel \w+ verwijderd$/,
     });
     this.alertPublicKeyDeleted = page.getByRole("alert").filter({ has: this.publicKeyDeleted });
   }

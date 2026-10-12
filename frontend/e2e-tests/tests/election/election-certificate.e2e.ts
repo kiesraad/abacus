@@ -77,6 +77,7 @@ test.describe("GSB certificates", () => {
     await overviewPage.uploadFile(certificate_0123_Heemdamseburg_expired.path);
 
     await expect(overviewPage.alertPublicKeyAdded).toBeVisible();
+    await expect(overviewPage.alertPublicKeyAdded).toContainText("Publieke sleutel Heemdamseburg toegevoegd");
     await expect(overviewPage.alertPublicKeyAdded).toContainText(
       "Let op: Deze sleutel is verlopen op 18 juni 2026, maar kan wel gebruikt worden. Neem bij twijfel contact op met het GSB van Heemdamseburg of de Kiesraad.",
     );
@@ -115,6 +116,7 @@ test.describe("GSB certificates", () => {
     await overviewPage.uploadFile(certificate_0123_Heemdamseburg.path);
 
     await expect(overviewPage.alertPublicKeyAdded).toBeVisible();
+    await expect(overviewPage.alertPublicKeyAdded).toHaveText("Publieke sleutel Heemdamseburg toegevoegd");
     await expect(overviewPage.alertPublicKeyAdded).not.toContainText(
       "Let op: Deze sleutel is verlopen op 18 juni 2026, maar kan wel gebruikt worden. Neem bij twijfel contact op met het GSB van Heemdamseburg of de Kiesraad.",
     );
@@ -168,6 +170,7 @@ test.describe("GSB certificates", () => {
     await expect(overviewPage.header).toBeVisible();
     await expect(overviewPage.subHeader).toBeVisible();
     await expect(overviewPage.alertPublicKeyDeleted).toBeVisible();
+    await expect(overviewPage.alertPublicKeyDeleted).toHaveText("Publieke sleutel Heemdamseburg verwijderd");
     await expect(overviewPage.alertPublicKeyDeleted).not.toContainText(
       "De sleutel is verwijderd. Onderstaande sleutels zijn nog aanwezig.",
     );

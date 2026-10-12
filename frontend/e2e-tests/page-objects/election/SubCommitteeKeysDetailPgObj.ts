@@ -16,7 +16,7 @@ export class SubCommitteeKeysDetail {
     });
     this.subHeader = page.getByRole("heading", {
       level: 2,
-      name: /Publieke sleutel\(s\) GSB \w/,
+      name: /Publieke sleutel\(s\) GSB \w+/,
     });
 
     this.publicKeyDeleted = page.getByRole("strong").filter({

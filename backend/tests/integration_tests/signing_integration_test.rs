@@ -10,12 +10,13 @@ use test_log::test;
 use crate::{
     shared::{
         FixtureUser::{Admin, CoordinatorCSB},
-        get_statuses, import_certificate, login, post_multipart,
+        change_status_committee_session, get_election_committee_session, get_statuses,
+        import_certificate, login, post_multipart,
     },
     utils::serve_api,
 };
 
-async fn import_election(addr: &SocketAddr, admin_cookie: &HeaderValue) -> u64 {
+async fn import_election(addr: &SocketAddr, admin_cookie: &HeaderValue) -> u32 {
     let response = reqwest::Client::new()
         .post(format!("http://{addr}/api/elections/import"))
         .header("cookie", admin_cookie)
@@ -41,7 +42,7 @@ async fn import_election(addr: &SocketAddr, admin_cookie: &HeaderValue) -> u64 {
         .unwrap();
     assert_eq!(response.status(), StatusCode::CREATED);
     let body: serde_json::Value = response.json().await.unwrap();
-    body["id"].as_u64().unwrap()
+    u32::try_from(body["id"].as_u64().unwrap()).unwrap()
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
@@ -62,6 +63,18 @@ async fn test_certificate_import_and_gsb_count_import(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::CREATED);
 
     let coordinator_cookie = login(&addr, CoordinatorCSB).await;
+    let committee_session =
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    let committee_session_id = u32::try_from(committee_session["id"].as_u64().unwrap()).unwrap();
+    change_status_committee_session(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        committee_session_id,
+        "data_entry",
+    )
+    .await;
+
     let import_url = format!("http://{addr}/api/elections/{election_id}/data_entry/import");
 
     // Make ZIP with EML file and signature
@@ -107,12 +120,7 @@ async fn test_certificate_import_and_gsb_count_import(pool: SqlitePool) {
     let sub_committee_id = u32::try_from(body["sub_committee"]["id"].as_u64().unwrap()).unwrap();
 
     // The imported results are saved as the finalised first entry
-    let statuses = get_statuses(
-        &addr,
-        &coordinator_cookie,
-        u32::try_from(election_id).unwrap(),
-    )
-    .await;
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
     let status = &statuses[&sub_committee_id];
     assert_eq!(status["status"], "first_entry_finalised");
     assert_eq!(status["first_entry_origin"]["type"], "Import");
@@ -136,6 +144,18 @@ async fn test_wrong_signature(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::CREATED);
 
     let coordinator_cookie = login(&addr, CoordinatorCSB).await;
+    let committee_session =
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    let committee_session_id = u32::try_from(committee_session["id"].as_u64().unwrap()).unwrap();
+    change_status_committee_session(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        committee_session_id,
+        "data_entry",
+    )
+    .await;
+
     let import_url = format!("http://{addr}/api/elections/{election_id}/data_entry/import");
 
     // Make ZIP with EML file and signature

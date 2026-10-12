@@ -36,8 +36,8 @@ use crate::{
 
 #[derive(Debug)]
 pub enum DataEntryImportError {
-    CommitteeSessionAlreadyCompleted,
     EmlZipError(String),
+    InvalidCommitteeSessionStatus,
     ResultsHaveValidationErrors,
     SignatureMissing,
     SignatureUnknown,
@@ -319,8 +319,10 @@ async fn validate_import(
 
     let committee_session =
         committee_session_repo::get_election_committee_session(conn, election_id).await?;
-    if committee_session.status == CommitteeSessionStatus::Completed {
-        return Err(DataEntryImportError::CommitteeSessionAlreadyCompleted.into());
+    if committee_session.status != CommitteeSessionStatus::DataEntry
+        && committee_session.status != CommitteeSessionStatus::Paused
+    {
+        return Err(DataEntryImportError::InvalidCommitteeSessionStatus.into());
     }
 
     let authority_identifier = &definition.managing_authority.authority_identifier;
@@ -738,6 +740,7 @@ mod tests {
             documents::election_count::UncountedVotesReason,
             utils::{AuthorityId, StringValue},
         };
+        use strum::VariantArray;
         use test_log::test;
 
         use super::*;
@@ -966,28 +969,62 @@ mod tests {
 
         #[test(sqlx::test(fixtures(
             path = "../../../../fixtures",
-            scripts("election_5_with_results", "election_8_csb_with_results")
+            scripts(
+                "election_5_with_results",
+                "election_8_csb_with_results",
+                "signing_keypair"
+            )
         )))]
-        async fn test_completed_committee_session(pool: SqlitePool) {
+        async fn test_committee_session_status(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
-            let eml = count_eml(&mut conn, ElectionId::from(5)).await;
-            committee_session_repo::change_status(
-                &mut conn,
-                CommitteeSessionId::from(801),
-                CommitteeSessionStatus::Completed,
-            )
-            .await
-            .unwrap();
-            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
 
-            assert_matches!(
-                validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
-                Err(APIError::Unprocessable(
-                    message,
-                    ErrorReference::InvalidCommitteeSessionStatus
-                )) if message == "Committee session already completed"
-            );
+            let keypair = get_existing_signing_keypair(&mut conn, ElectionId::from(5)).await;
+            update_sub_committee_certificate(&mut conn, SubCommitteeId::from(811), &keypair).await;
+
+            let eml = count_eml(&mut conn, ElectionId::from(5)).await.into_bytes();
+            let signature = keypair.sign(&eml).unwrap().to_der();
+
+            // Empty CSB fixture data entry
+            data_entry_repo::update(&mut conn, DataEntryId::from(801), &DataEntryStatus::Empty)
+                .await
+                .unwrap();
+
+            let allowed = &[
+                CommitteeSessionStatus::DataEntry,
+                CommitteeSessionStatus::Paused,
+            ];
+
+            for &status in CommitteeSessionStatus::VARIANTS {
+                committee_session_repo::change_status(
+                    &mut conn,
+                    CommitteeSessionId::from(801),
+                    status,
+                )
+                .await
+                .unwrap();
+
+                let zip = zip_with_files(&[
+                    ("count.eml.xml", &eml),
+                    ("count.eml.xml.signature", &signature),
+                ])
+                .await;
+
+                if allowed.contains(&status) {
+                    assert_matches!(
+                        validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
+                        Ok(_)
+                    );
+                } else {
+                    assert_matches!(
+                        validate_import(&mut conn, &user, ElectionId::from(8), zip, None).await,
+                        Err(APIError::Unprocessable(
+                            message,
+                            ErrorReference::InvalidCommitteeSessionStatus
+                        )) if message == "Invalid committee session status"
+                    );
+                }
+            }
         }
 
         #[test(sqlx::test(fixtures(

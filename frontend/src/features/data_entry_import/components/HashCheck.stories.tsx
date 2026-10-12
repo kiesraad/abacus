@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn } from "storybook/test";
-import type { RedactedEmlHash } from "@/types/generated/openapi";
+import type { RedactedEmlHash, SubCommitteeFirstSession } from "@/types/generated/openapi";
 import { HashCheck } from "./HashCheck";
 
 const redactedHash: RedactedEmlHash = {
@@ -25,13 +25,23 @@ const redactedHash: RedactedEmlHash = {
   redacted_indexes: [2, 9],
 };
 
+const subCommittee: SubCommitteeFirstSession = {
+  committee_session_id: 801,
+  id: 811,
+  number: 35,
+  name: "Juinen",
+  authority_id: "0035",
+  authority_name: "Juinen",
+  data_entry_id: 801,
+};
+
 const meta = {
   component: HashCheck,
   args: {
     date: "2026-03-18",
-    title: "Gemeenteraad Juinen 2026",
+    title: "Telresultaten GSB Gemeenteraad Juinen 2026",
     fileName: "telling.eml.xml.zip",
-    fileAuthorityName: "Juinen",
+    subCommittee,
     hash: redactedHash,
     error: undefined,
     onSubmit: fn(),
@@ -45,7 +55,7 @@ export const Default: Story = {
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Controleer tellingsbestand")).toBeVisible();
     await expect(canvas.getByText("telling.eml.xml.zip")).toBeVisible();
-    await expect(canvas.getByText("Gemeenteraad Juinen 2026")).toBeVisible();
+    await expect(canvas.getByText("Telresultaten GSB Gemeenteraad Juinen 2026")).toBeVisible();
     await expect(
       canvas.getByText(
         "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code staat op het proces-verbaal Na 31-2 van het GSB van de gemeente Juinen.",

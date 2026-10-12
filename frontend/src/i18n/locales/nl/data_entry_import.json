@@ -40,7 +40,8 @@
   },
   "hash_check": {
     "description": "Het bestand <file>filename</file> bevat de volgende telresultaten:",
-    "instructions": "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code staat op het proces-verbaal Na 31-2 van het GSB van de gemeente {fileAuthorityName}.",
+    "instructions": "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code staat op het proces-verbaal Na 31-2 van het GSB van de gemeente {authorityName}.",
+    "signature": "Bestand is afkomstig van GSB {number} {name}",
     "title": "Controleer tellingsbestand",
     "error": {
       "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",

@@ -10,8 +10,8 @@
   <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
   <Count>
     <kr:CountingMethod MethodCode="centrale stemopneming"/>
-    <kr:Phase PhaseCode="eerste zitting"/>
     <EventIdentifier/>
+    <kr:Phase PhaseCode="eerste zitting"/>
     <Election>
       <ElectionIdentifier Id="GR2022_Test">
         <ElectionName>Gemeenteraad Test 2022</ElectionName>

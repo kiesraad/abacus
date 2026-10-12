@@ -60,7 +60,6 @@ test.describe("GSB certificates", () => {
 
     const overviewPage = new SubCommitteeKeysOverview(page);
     await expect(overviewPage.header).toBeVisible();
-    await expect(overviewPage.subHeader).toBeVisible();
     await expect(overviewPage.pendingTableHeader).toBeVisible();
     await expect(overviewPage.pendingTable).toBeVisible();
     await expect(overviewPage.pendingSubCommittees).toHaveCount(4);
@@ -95,7 +94,6 @@ test.describe("GSB certificates", () => {
 
     const detailPage = new SubCommitteeKeysDetail(page);
     await expect(detailPage.header).toBeVisible();
-    await expect(detailPage.subHeader).toBeVisible();
     const firstCert = detailPage.getCertificateInfo(certificate_0123_Heemdamseburg_expired.fingerprint);
     await expect(firstCert).toContainText(
       [
@@ -124,7 +122,6 @@ test.describe("GSB certificates", () => {
     await overviewPage.clickSubCommitteeFromList("0123");
 
     await expect(detailPage.header).toBeVisible();
-    await expect(detailPage.subHeader).toBeVisible();
     await expect(firstCert).toContainText(
       [
         "Organisatie: AB2023_RivierenPolder",
@@ -168,7 +165,6 @@ test.describe("GSB certificates", () => {
     await detailPage.deleteCertificateModal.deleteButton.click();
 
     await expect(overviewPage.header).toBeVisible();
-    await expect(overviewPage.subHeader).toBeVisible();
     await expect(overviewPage.alertPublicKeyDeleted).toBeVisible();
     await expect(overviewPage.alertPublicKeyDeleted).toHaveText("Publieke sleutel Heemdamseburg verwijderd");
     await expect(overviewPage.alertPublicKeyDeleted).not.toContainText(

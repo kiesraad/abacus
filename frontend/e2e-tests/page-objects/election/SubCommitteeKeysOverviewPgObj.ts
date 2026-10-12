@@ -2,7 +2,6 @@ import type { Locator, Page } from "@playwright/test";
 
 export class SubCommitteeKeysOverview {
   readonly header: Locator;
-  readonly subHeader: Locator;
   readonly upload: Locator;
   readonly pendingTableHeader: Locator;
   readonly pendingTable: Locator;
@@ -19,10 +18,6 @@ export class SubCommitteeKeysOverview {
     this.header = page.getByRole("heading", {
       level: 1,
       name: "Sleutels van GSB's beheren",
-    });
-    this.subHeader = page.getByRole("heading", {
-      level: 2,
-      name: "Voeg de publieke sleutels van alle GSB's in de kieskring toe",
     });
     this.upload = page.getByRole("button", { name: "Bestand kiezen" });
     this.pendingTableHeader = page.getByRole("heading", {

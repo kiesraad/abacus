@@ -754,7 +754,7 @@ async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
                 "88fc", "771b", "", "a7c5",
                 "a5a3", "aca7", "acbe", "ee24",
             ],
-            "election_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
 
                 "0e5b", "7360", "6c66", "4093",

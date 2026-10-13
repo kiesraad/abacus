@@ -2,7 +2,7 @@
 
 use std::net::SocketAddr;
 
-use abacus::eml::polling_stations_from_eml_str;
+use abacus::{domain::polling_station::PollingStationType, eml::polling_stations_from_eml_str};
 use async_zip::base::read::mem::ZipFileReader;
 use axum::http::{HeaderValue, StatusCode};
 use reqwest::Response;
@@ -1190,6 +1190,68 @@ async fn test_import_correct_file(pool: SqlitePool) {
     assert_eq!(committee_session["status"], "in_preparation");
 }
 
+/// Address, postal code, locality and type of the "Melkweg" polling station in a response body.
+fn melkweg_location(body: &serde_json::Value) -> serde_json::Value {
+    let ps = body["polling_stations"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|ps| ps["name"] == "Melkweg")
+        .unwrap();
+    serde_json::json!([
+        ps["address"],
+        ps["postal_code"],
+        ps["locality"],
+        ps["polling_station_type"],
+    ])
+}
+
+/// Checks that imported locations reach the API and database, the edge cases are covered by
+/// the unit tests in the `eml` module.
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
+async fn test_import_file_with_locations(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let election_id = 6;
+    let data = include_str!("../../src/eml/tests/eml110b_v1_3_1.eml.xml");
+    let expected = serde_json::json!([
+        "Lijnbaansgracht 234A bis Ingang achterom",
+        "1017 PH",
+        "Amsterdam",
+        "FixedLocation"
+    ]);
+
+    let validate_response =
+        import_validate_polling_stations(&addr, &coordinator_cookie, election_id, data).await;
+    assert_eq!(validate_response.status(), StatusCode::OK);
+    let body: serde_json::Value = validate_response.json().await.unwrap();
+    assert_eq!(melkweg_location(&body), expected);
+
+    let import_response = import_polling_stations(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        "eml110b_v1_3_1.eml.xml",
+        data.into(),
+    )
+    .await;
+    assert_eq!(import_response.status(), StatusCode::OK);
+
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(melkweg_location(&body), expected);
+}
+
 async fn check_completed_to_data_entry_on<F, Fut>(
     addr: &SocketAddr,
     action: F,
@@ -1392,6 +1454,12 @@ async fn test_export_works(pool: SqlitePool) {
         .find(|ps| ps.name == "Op Rolletjes")
         .unwrap();
     assert_eq!(ps.number_of_voters, Some(0));
+
+    // Address, postal code, locality and type from the database are exported
+    assert_eq!(ps.address, "Rijksweg A12 1");
+    assert_eq!(ps.postal_code, "1234 YQ");
+    assert_eq!(ps.locality, "Heemdamseburg");
+    assert_eq!(ps.polling_station_type, Some(PollingStationType::Mobile));
 }
 
 #[test(sqlx::test(fixtures(

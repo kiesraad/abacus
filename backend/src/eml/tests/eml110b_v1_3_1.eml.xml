@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:sb="http://www.kiesraad.nl/sb-extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="110b" SchemaVersion="5">
+  <TransactionId>1</TransactionId>
+  <ManagingAuthority>
+    <AuthorityIdentifier Id="0000">Test</AuthorityIdentifier>
+    <AuthorityAddress/>
+  </ManagingAuthority>
+  <kr:Schema Version="1.3.1"/>
+  <kr:CreationDateTime>2024-05-27T17:05:57</kr:CreationDateTime>
+  <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+  <ElectionEvent>
+    <EventIdentifier/>
+    <Election>
+      <ElectionIdentifier Id="GR2022_Test">
+        <ElectionName>Gemeenteraad Test 2022</ElectionName>
+        <ElectionCategory>GR</ElectionCategory>
+        <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
+        <kr:ElectionDomain Id="0000">Test</kr:ElectionDomain>
+        <kr:ElectionDate>2022-03-16</kr:ElectionDate>
+      </ElectionIdentifier>
+      <Contest>
+        <ContestIdentifier Id="geen"/>
+        <ReportingUnit>
+          <ReportingUnitIdentifier Id="0000">Test</ReportingUnitIdentifier>
+        </ReportingUnit>
+        <VotingMethod>SPV</VotingMethod>
+        <MaxVotes>6000</MaxVotes>
+        <!-- Legacy address only -->
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Stadhuis</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1011 PN</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="1">1000</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <!-- Structured address combined with additional information, plus metadata Abacus does not store -->
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Melkweg</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>9999 ZZ</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+              <sb:Location>
+                <sb:BAGId>0363010000724220</sb:BAGId>
+                <sb:StreetName>Lijnbaansgracht</sb:StreetName>
+                <sb:Number>234</sb:Number>
+                <sb:Letter>A</sb:Letter>
+                <sb:NumberAddition>bis</sb:NumberAddition>
+                <sb:PostalCode>1017 PH</sb:PostalCode>
+                <sb:City>Amsterdam</sb:City>
+                <sb:AdditionalAddressInformation>Ingang achterom</sb:AdditionalAddressInformation>
+                <sb:DistrictName>Centrum</sb:DistrictName>
+                <sb:Website>https://www.melkweg.nl</sb:Website>
+                <sb:CountingLocation>true</sb:CountingLocation>
+              </sb:Location>
+            </Address>
+            <PollingStation Id="2">1000</PollingStation>
+            <kr:ReportingUnitType>FixedLocation</kr:ReportingUnitType>
+          </PhysicalLocation>
+        </PollingPlace>
+        <!-- Additional address information only, legacy postal code fallback -->
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Op Rolletjes</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1234 YQ</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+              <sb:Location>
+                <sb:City>Heemdamseburg</sb:City>
+                <sb:AdditionalAddressInformation>Parkeerplaats bij de Rijksweg A12, 1</sb:AdditionalAddressInformation>
+              </sb:Location>
+            </Address>
+            <PollingStation Id="3">1000</PollingStation>
+            <kr:ReportingUnitType>Mobile</kr:ReportingUnitType>
+          </PhysicalLocation>
+        </PollingPlace>
+        <!-- Only the first location is used -->
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Ziekenhuis</xal:LocalityName>
+              </Locality>
+              <sb:Location>
+                <sb:StreetName>Hoofdweg</sb:StreetName>
+              </sb:Location>
+              <sb:Location>
+                <sb:Number>7</sb:Number>
+                <sb:PostalCode>5678 AB</sb:PostalCode>
+                <sb:City>Juinen</sb:City>
+              </sb:Location>
+            </Address>
+            <PollingStation Id="4">1000</PollingStation>
+            <kr:ReportingUnitType>Special</kr:ReportingUnitType>
+          </PhysicalLocation>
+        </PollingPlace>
+        <!-- An empty postal code in the location overrides the legacy postal code -->
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Bibliotheek</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>4321 BA</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+              <sb:Location>
+                <sb:StreetName>Kerkstraat</sb:StreetName>
+                <sb:Number>3</sb:Number>
+                <sb:PostalCode></sb:PostalCode>
+              </sb:Location>
+            </Address>
+            <PollingStation Id="5">1000</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <!-- Malformed number and postal code are imported verbatim -->
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Sporthal</xal:LocalityName>
+              </Locality>
+              <sb:Location>
+                <sb:StreetName>Sportlaan</sb:StreetName>
+                <sb:Number>12-14</sb:Number>
+                <sb:PostalCode>1234ab</sb:PostalCode>
+              </sb:Location>
+            </Address>
+            <PollingStation Id="6">1000</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <!-- Surrounding whitespace is trimmed, whitespace-only parts are skipped -->
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Buurthuis</xal:LocalityName>
+              </Locality>
+              <sb:Location>
+                <sb:StreetName> </sb:StreetName>
+                <sb:Number> 5 </sb:Number>
+                <sb:PostalCode> 1234 AB </sb:PostalCode>
+                <sb:City>
+                  Juinen
+                </sb:City>
+                <sb:AdditionalAddressInformation>  Achteringang </sb:AdditionalAddressInformation>
+              </sb:Location>
+            </Address>
+            <PollingStation Id="7">1000</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+      </Contest>
+    </Election>
+  </ElectionEvent>
+</EML>

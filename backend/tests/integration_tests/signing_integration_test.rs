@@ -22,17 +22,17 @@ async fn import_election(addr: &SocketAddr, admin_cookie: &HeaderValue) -> u64 {
         .json(&serde_json::json!({
             "committee_category": "CSB",
             "election_hash": [
-                "4291", "a4e7", "c76e", "ed19",
-                "476b", "ae90", "3882", "c2dc",
-                "9162", "1950", "0e13", "0651",
-                "34ff", "c0de", "340a", "4a38"
+                "c738", "4baf", "7edc", "13e6",
+                "ede8", "ceb1", "57db", "d48a",
+                "88fc", "771b", "be49", "a7c5",
+                "a5a3", "aca7", "acbe", "ee24",
             ],
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
-                "146d", "3784", "efa2", "93b5",
-                "721a", "7578", "a43f", "0636",
-                "7281", "66a0", "acf1", "55d3",
-                "ab25", "083c", "c000", "7096"
+                "0e5b", "7360", "6c66", "4093",
+                "68e5", "f853", "1470", "b5cf",
+                "5293", "21dd", "f92e", "76b8",
+                "8ed5", "f18e", "81f6", "4fe9",
             ],
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
         }))
@@ -75,8 +75,8 @@ async fn test_certificate_import_and_gsb_count_import(pool: SqlitePool) {
     let zip = writer.close().await.unwrap().into_inner();
 
     let hash = serde_json::json!([
-        "5497", "947b", "9664", "d818", "2120", "c6ae", "9e05", "ce5b", "12bd", "3430", "b44a",
-        "778a", "cc6a", "253f", "78c2", "64f6"
+        "10a9", "c9a9", "3d71", "2fd0", "f92f", "65ac", "f4c0", "1601", "2fbe", "baee", "1293",
+        "72e3", "28a6", "65b4", "973b", "41a4"
     ]);
 
     // Validate without hash
@@ -154,8 +154,8 @@ async fn test_wrong_signature(pool: SqlitePool) {
 
     // Import with wrong signature should fail
     let hash = serde_json::json!([
-        "5497", "947b", "9664", "d818", "2120", "c6ae", "9e05", "ce5b", "12bd", "3430", "b44a",
-        "778a", "cc6a", "253f", "78c2", "64f6"
+        "10a9", "c9a9", "3d71", "2fd0", "f92f", "65ac", "f4c0", "1601", "2fbe", "baee", "1293",
+        "72e3", "28a6", "65b4", "973b", "41a4"
     ])
     .to_string();
     let hash = hash.to_string();

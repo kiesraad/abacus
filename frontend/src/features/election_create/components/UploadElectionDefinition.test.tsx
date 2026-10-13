@@ -120,7 +120,7 @@ describe("UploadElectionDefinition component", () => {
     });
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Controle digitale vingerafdruk niet gelukt");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Onjuiste vingerafdruk");
   });
 
   test("Shows an error when uploading invalid file", async () => {

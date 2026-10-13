@@ -11,6 +11,9 @@ const fileErrorCases: Record<FileErrorCase, string> = {
   data_entry_already_started: "GSB al ingevoerd",
   election_mismatch: "Tellingsbestand hoort niet bij dit CSB",
   contains_errors: "Tellingsbestand bevat fouten",
+  signature_missing: "Digitale handtekening ontbreekt",
+  signature_unknown: "Onbekende digitale handtekening",
+  no_certificates: "Geen publieke sleutel om handtekening te controleren",
   unknown: "Importeren niet gelukt",
 };
 

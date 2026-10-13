@@ -10,7 +10,7 @@ export class CheckDefinitionBasePgObj {
     this.hashInput1 = page.getByRole("textbox", { name: "Controle deel 1" });
     this.hashInput2 = page.getByRole("textbox", { name: "Controle deel 2" });
     this.next = page.getByRole("button", { name: "Volgende" });
-    this.error = page.getByRole("strong").filter({ hasText: "Controle digitale vingerafdruk niet gelukt" });
+    this.error = page.getByRole("strong").filter({ hasText: "Onjuiste vingerafdruk" });
   }
 
   async inputHash(hashInput1: string, hashInput2: string) {

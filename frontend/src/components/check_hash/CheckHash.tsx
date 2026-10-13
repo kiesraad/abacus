@@ -7,6 +7,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import type { RedactedEmlHash } from "@/types/generated/openapi";
+import { cn } from "@/utils/classnames";
 import { formatDateFull } from "@/utils/dateTime";
 import cls from "./CheckHash.module.css";
 import { RedactedHash, type Stub } from "./RedactedHash";
@@ -17,6 +18,7 @@ interface CheckHashProps {
   header: string;
   description: ReactNode;
   instructions: string;
+  signatureDescription?: string;
   errorTitle: string;
   errorDescription: string;
   redactedHash: RedactedEmlHash;
@@ -31,6 +33,7 @@ export function CheckHash({
   header,
   description,
   instructions,
+  signatureDescription,
   errorTitle,
   errorDescription,
   redactedHash,
@@ -72,7 +75,7 @@ export function CheckHash({
       if (newStub) {
         newStub.error = "";
         if (typeof value !== "string" || value.length !== 4) {
-          newStub.error = t("check_hash_hint");
+          newStub.error = t("check_hash.hint");
           stubsAreValid = false;
         } else {
           completeHash[stub.index] = value.toLowerCase();
@@ -100,13 +103,28 @@ export function CheckHash({
               </Alert>
             )}
             <p>{description}</p>
-            <div className={cls.checkHash}>
+            <div className={cn(cls.checkHash, signatureDescription && cls.success)}>
               <section>
                 <p>
                   <strong>{title}</strong>
                   <br />
                   <span className="capitalize-first">{formatDateFull(new Date(date))}</span>
                 </p>
+                {signatureDescription && (
+                  <p>
+                    <strong>{t("check_hash.signature_correct")}</strong>
+                    <br />
+                    <span>{signatureDescription}</span>
+                  </p>
+                )}
+              </section>
+            </div>
+
+            <h3>{t("check_hash.title")}</h3>
+            <p>{instructions}</p>
+
+            <div className={cls.checkHash}>
+              <section>
                 <div>
                   <span>
                     <strong>{t("digital_signature")}</strong> ({t("hashcode")}):
@@ -115,7 +133,6 @@ export function CheckHash({
                 </div>
               </section>
             </div>
-            <p>{instructions}</p>
 
             {stubs.map((stub, stubIndex) => (
               <InputField
@@ -124,8 +141,8 @@ export function CheckHash({
                 key={stub.index}
                 name={stub.index.toString()}
                 type="text"
-                label={t("check_hash_label", { stub: stubIndex + 1 })}
-                hint={t("check_hash_hint")}
+                label={t("check_hash.label", { stub: stubIndex + 1 })}
+                hint={t("check_hash.hint")}
                 error={stub.error}
                 fieldSize="medium"
                 fieldWidth="full-field-with-narrow-input"

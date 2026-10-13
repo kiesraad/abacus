@@ -5,6 +5,7 @@ import backups from "./backups.json";
 import candidate from "./candidate.json";
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
+import check_hash from "./check_hash.json";
 import checks_and_corrections from "./checks_and_corrections.json";
 import committee_category from "./committee_category.json";
 import committee_session_status from "./committee_session_status.json";
@@ -49,6 +50,7 @@ const nl = {
   candidate,
   candidates_votes,
   check_and_save,
+  check_hash,
   checks_and_corrections,
   committee_category,
   committee_session_status,

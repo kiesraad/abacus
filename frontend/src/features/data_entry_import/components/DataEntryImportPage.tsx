@@ -27,7 +27,7 @@ export function DataEntryImportPage() {
             date={state.electionDate}
             title={state.electionName}
             fileName={state.file.name}
-            fileAuthorityName={state.subCommittee.authority_name}
+            subCommittee={state.subCommittee}
             hash={state.hash}
             error={state.error}
             onSubmit={(chunks) => void onHashSubmit(chunks)}

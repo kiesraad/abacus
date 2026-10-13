@@ -60,6 +60,9 @@ export type FileErrorCase =
   | "data_entry_already_started"
   | "election_mismatch"
   | "contains_errors"
+  | "signature_missing"
+  | "signature_unknown"
+  | "no_certificates"
   | "unknown";
 
 export function fileError(fileErrorCase: FileErrorCase, vars?: Record<string, string | number>): FileImportError {
@@ -106,6 +109,18 @@ function importError(error: AnyError, electionName: string): FileImportError {
   // EmlError (e.g. unreadable EML).
   if (error.reference === "DataEntryValidationErrors" || error.reference === "EmlError") {
     return fileError("contains_errors");
+  }
+
+  if (error.reference === "SignatureMissing") {
+    return fileError("signature_missing");
+  }
+
+  if (error.reference === "SignatureUnknown") {
+    return fileError("signature_unknown");
+  }
+
+  if (error.reference === "SubCommitteeHasNoCertificates") {
+    return fileError("no_certificates");
   }
 
   // Not handled separately: InvalidCommitteeSessionStatus.

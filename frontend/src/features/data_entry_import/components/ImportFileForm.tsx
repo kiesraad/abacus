@@ -25,7 +25,7 @@ export function ImportFileForm({ error, onFileChange, isLoading }: ImportFileFor
           <FormLayout.Section>
             {error && (
               <Alert type="error" title={error.title} inline>
-                <p>{error.message}</p>
+                {error.message}
               </Alert>
             )}
 

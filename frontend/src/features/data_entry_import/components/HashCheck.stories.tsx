@@ -71,7 +71,7 @@ export const WithError: Story = {
   },
   play: async ({ canvas }) => {
     await expect(await canvas.findByRole("alert")).toHaveTextContent(
-      "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
+      "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
     );
   },
 };

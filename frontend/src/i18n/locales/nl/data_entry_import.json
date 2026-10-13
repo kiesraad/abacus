@@ -52,8 +52,8 @@
     "signature": "Bestand is afkomstig van GSB {number} {name}",
     "title": "Controleer tellingsbestand",
     "error": {
-      "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
-      "title": "Controle digitale vingerafdruk niet gelukt"
+      "description": "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
+      "title": "Onjuiste vingerafdruk"
     }
   },
   "check_and_save": {

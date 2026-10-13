@@ -31,9 +31,8 @@ const meta = {
     date: "2026-03-18",
     instructions:
       "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
-    errorTitle: "Controle digitale vingerafdruk niet gelukt",
-    errorDescription:
-      "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
+    errorTitle: "Onjuiste vingerafdruk",
+    errorDescription: "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
     redactedHash,
     error: undefined,
     onSubmit: fn(),
@@ -81,7 +80,7 @@ export const ElectionWithError: Story = {
   },
   play: async ({ canvas }) => {
     await expect(await canvas.findByRole("alert")).toHaveTextContent(
-      "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
+      "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
     );
   },
 };
@@ -111,7 +110,7 @@ export const CandidatesWithError: Story = {
   },
   play: async ({ canvas }) => {
     await expect(await canvas.findByRole("alert")).toHaveTextContent(
-      "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
+      "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
     );
   },
 };

@@ -32,8 +32,8 @@ function renderPage(error = false) {
       header={"Controleer bestand"}
       description={"Het bestand <naam bestand> is geïmporteerd etc etc"}
       instructions={"Vul ter controle de afgeschermde delen in."}
-      errorTitle={"Controle digitale vingerafdruk niet gelukt"}
-      errorDescription={"Controleer of de ingevulde controle-delen overeenkomen."}
+      errorTitle={"Onjuiste vingerafdruk"}
+      errorDescription={"De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw."}
       redactedHash={{
         chunks: hashChunks,
         redacted_indexes: [4, 11],
@@ -112,7 +112,7 @@ describe("CheckHash component", () => {
     await user.type(inputPart2, "123");
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Controle digitale vingerafdruk niet gelukt");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Onjuiste vingerafdruk");
     expect(inputPart1).not.toBeInvalid();
     expect(inputPart2).toBeInvalid();
 
@@ -124,7 +124,7 @@ describe("CheckHash component", () => {
 
     expect(await screen.findByRole("heading", { level: 2, name: "Controleer bestand" })).toBeVisible();
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Controle digitale vingerafdruk niet gelukt");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Onjuiste vingerafdruk");
 
     const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
     expect(inputPart1).not.toBeInvalid();

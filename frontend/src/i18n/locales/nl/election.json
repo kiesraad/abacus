@@ -19,8 +19,8 @@
     "election_description": "Het bestand <file>filename</file> bevat de instellingen voor de volgende verkiezing:",
     "election_title": "Controleer verkiezingsdefinitie",
     "error": {
-      "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
-      "title": "Controle digitale vingerafdruk niet gelukt"
+      "description": "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
+      "title": "Onjuiste vingerafdruk"
     },
     "list_name": "{location}, kandidatenlijsten {name}",
     "polling_station_title": "Controleer stembureaus"

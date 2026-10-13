@@ -190,7 +190,7 @@ describe("UploadCandidatesDefinition component", () => {
       );
       await submitHash();
 
-      expect(await screen.findByRole("alert")).toHaveTextContent("Controle digitale vingerafdruk niet gelukt");
+      expect(await screen.findByRole("alert")).toHaveTextContent("Onjuiste vingerafdruk");
       expect(dispatch).not.toHaveBeenCalled();
       expect(router.state.location.pathname).toEqual("/");
     });

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
-use strum::VariantNames;
+use strum::{VariantArray, VariantNames};
 use utoipa::ToSchema;
 
 use crate::domain::committee_session::{
@@ -12,6 +12,7 @@ use crate::domain::committee_session::{
     Serialize,
     Deserialize,
     VariantNames,
+    VariantArray,
     Clone,
     Copy,
     Debug,

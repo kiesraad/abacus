@@ -483,8 +483,8 @@ impl From<DataEntryImportError> for APIError {
             DataEntryImportError::EmlZipError(message) => {
                 APIError::Unprocessable(message, ErrorReference::ZipError)
             }
-            DataEntryImportError::CommitteeSessionAlreadyCompleted => APIError::Unprocessable(
-                "Committee session already completed".into(),
+            DataEntryImportError::InvalidCommitteeSessionStatus => APIError::Unprocessable(
+                "Invalid committee session status".into(),
                 ErrorReference::InvalidCommitteeSessionStatus,
             ),
             DataEntryImportError::SubCommitteeDataEntryAlreadyImported => APIError::Unprocessable(

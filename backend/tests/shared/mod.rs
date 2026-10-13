@@ -721,7 +721,7 @@ pub async fn post_multipart(url: &str, cookie: &HeaderValue, parts: &[(&str, &[u
 pub async fn import_certificate(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u64,
+    election_id: u32,
     certificate: &str,
 ) -> Response {
     let url = format!("http://{addr}/api/elections/{election_id}/sub_committee_certificates");

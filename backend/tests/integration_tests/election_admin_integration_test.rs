@@ -1,12 +1,11 @@
 #![cfg(test)]
 
-use async_zip::{Compression, ZipEntryBuilder, tokio::write::ZipFileWriter};
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
-    shared::{FixtureUser::*, get_election_details, get_statuses, login, post_multipart},
+    shared::{FixtureUser::*, get_election_details, get_statuses, login},
     utils::serve_api,
 };
 

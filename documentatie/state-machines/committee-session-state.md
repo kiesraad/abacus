@@ -9,6 +9,9 @@ Follow the regular (uninterrupted) lines and use `subcommittee` (ignore `polling
 > **Note:** The subcommittee is automatically created when a CSB election is created.  
 > Therefore the status will move directly from `Created` to `InPreparation`.
 
+> **Note:** Data entry import is allowed during the `DataEntry` and `Paused` states.  
+> The `Paused` state means that only manual data entry is paused.
+
 **GSB**  
 Follow the regular (uninterrupted) lines combined with the dotted lines.
 

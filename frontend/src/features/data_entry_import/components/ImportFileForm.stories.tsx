@@ -13,6 +13,7 @@ const fileErrorCases: Record<FileErrorCase, string> = {
   contains_errors: "Tellingsbestand bevat fouten",
   signature_missing: "Digitale handtekening ontbreekt",
   signature_unknown: "Onbekende digitale handtekening",
+  no_certificates: "Geen publieke sleutel om handtekening te controleren",
   unknown: "Importeren niet gelukt",
 };
 

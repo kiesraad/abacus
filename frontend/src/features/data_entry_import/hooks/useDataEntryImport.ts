@@ -62,6 +62,7 @@ export type FileErrorCase =
   | "contains_errors"
   | "signature_missing"
   | "signature_unknown"
+  | "no_certificates"
   | "unknown";
 
 export function fileError(fileErrorCase: FileErrorCase, vars?: Record<string, string | number>): FileImportError {
@@ -116,6 +117,10 @@ function importError(error: AnyError, electionName: string): FileImportError {
 
   if (error.reference === "SignatureUnknown") {
     return fileError("signature_unknown");
+  }
+
+  if (error.reference === "SubCommitteeHasNoCertificates") {
+    return fileError("no_certificates");
   }
 
   // Not handled separately: InvalidCommitteeSessionStatus.

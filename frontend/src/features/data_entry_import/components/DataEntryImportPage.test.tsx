@@ -141,6 +141,11 @@ describe("DataEntryImportPage", () => {
       { status: 422, reference: "EmlError", title: "Tellingsbestand bevat fouten" },
       { status: 422, reference: "SignatureMissing", title: "Digitale handtekening ontbreekt" },
       { status: 422, reference: "SignatureUnknown", title: "Onbekende digitale handtekening" },
+      {
+        status: 422,
+        reference: "SubCommitteeHasNoCertificates",
+        title: "Geen publieke sleutel om handtekening te controleren",
+      },
       { status: 422, reference: "InvalidCommitteeSessionStatus", title: "Importeren niet gelukt" },
       { status: 500, reference: "InternalServerError", title: "Importeren niet gelukt" },
     ] satisfies {

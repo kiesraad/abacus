@@ -39,7 +39,11 @@
     },
     "signature_unknown": {
       "title": "Onbekende digitale handtekening",
-      "description": "De handtekening van het digitale bestand komt niet overeen met de publieke sleutel van het GSB.<ul><li>Controleer bij de beheerder of de publieke sleutel van dit GSB is geïmporteerd.</li><li>Blijft de fout en vertrouw je het papieren proces-verbaal? Laat het papieren proces-verbaal dan 2× invoeren in Abacus.</li></ul>"
+      "description": "De handtekening van het digitale bestand komt niet overeen met de publieke sleutel van het GSB. Blijft de fout en vertrouw je het papieren proces-verbaal? Laat het papieren proces-verbaal dan 2× invoeren in Abacus."
+    },
+    "no_certificates": {
+      "title": "Geen publieke sleutel om handtekening te controleren",
+      "description": "De geldigheid van dit tellingsbestand kan daardoor niet worden gecontroleerd.<ul><li>Controleer bij de beheerder of de publieke sleutel van dit GSB is geïmporteerd.</li><li>Blijft de fout en vertrouw je het papieren proces-verbaal? Laat het papieren proces-verbaal dan 2× invoeren in Abacus.</li></ul>"
     },
     "unknown": {
       "title": "Importeren niet gelukt",

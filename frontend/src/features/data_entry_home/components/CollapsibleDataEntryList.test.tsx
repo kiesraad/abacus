@@ -1,4 +1,4 @@
-import { userEvent } from "@testing-library/user-event/dist/cjs/index.js";
+import { userEvent } from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
 import * as ReactRouter from "react-router";
 import { describe, expect, test, vi } from "vitest";

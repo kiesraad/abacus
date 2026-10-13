@@ -1,4 +1,4 @@
-import { userEvent } from "@testing-library/user-event/dist/cjs/index.js";
+import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 import alertCls from "@/components/ui/Alert/Alert.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";

@@ -18,9 +18,7 @@ import type {
   CertificateDetailsResponse,
   DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PATH,
 } from "@/types/generated/openapi";
-import { formatDateFullWithoutWeekday } from "@/utils/dateTime";
-
-const formatDate = (date: string) => formatDateFullWithoutWeekday(new Date(date));
+import { getCertificateInfo } from "../utils/certificate";
 
 export function ElectionCertificatePage() {
   const { election, showKeypairReminder, refetch } = useElection();
@@ -83,17 +81,7 @@ export function ElectionCertificatePage() {
                   title={`${t("election_certificate.certificate")} ${committee} ${certificate.election_identifier}`}
                   subtitle={t("election_certificate.download_file")}
                 >
-                  {t("election_certificate.election_identifier")}: {certificate.election_identifier}
-                  <br />
-                  {t("election_certificate.organizational_unit")}: {certificate.organizational_unit}
-                  <br />
-                  {t("election_certificate.common_name")}: {certificate.common_name}
-                  <br />
-                  {t("election_certificate.not_before")}: {formatDate(certificate.not_before)}
-                  <br />
-                  {t("election_certificate.not_after")}: {formatDate(certificate.not_after)}
-                  <br />
-                  {t("election_certificate.signature_algorithm")}: {certificate.signature_algorithm}
+                  {getCertificateInfo(certificate)}
                 </DownloadButton>
               ) : (
                 t("loading")

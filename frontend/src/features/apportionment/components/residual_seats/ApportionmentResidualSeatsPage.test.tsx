@@ -1,5 +1,5 @@
 import { render as rtlRender } from "@testing-library/react";
-import { userEvent } from "@testing-library/user-event/dist/cjs/index.js";
+import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";

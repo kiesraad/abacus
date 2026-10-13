@@ -12,8 +12,10 @@ import { createRandomUsername } from "e2e-tests/helpers-utils/e2e-test-utils";
 import {
   type Eml230b,
   eml110a,
+  eml110a_AB,
   eml110a_less_than_19_seats,
   eml230b,
+  eml230b_AB_more_than_45_candidates,
   eml230b_more_than_45_candidates,
 } from "e2e-tests/test-data/eml-files";
 import {
@@ -75,6 +77,8 @@ type Fixtures = {
   emptyElectionGSBDSO: Election;
   // CSB election with >= 19 seats
   emptyElectionCSBLargeCouncil: Election;
+  // CSB election for Water Authority
+  emptyElectionCSBWS: Election;
   // CSB election with < 19 seats
   emptyElectionCSBSmallCouncil: Election;
   // GSB CSO election with two polling stations
@@ -241,6 +245,25 @@ export const test = base.extend<Fixtures>({
         election_hash: eml110a_less_than_19_seats.fullHash,
         candidate_data,
         candidate_hash: eml230b_more_than_45_candidates.fullHash,
+      },
+    });
+    expect(electionResponse.ok()).toBeTruthy();
+    const election = (await electionResponse.json()) as Election;
+
+    await use(election);
+  },
+  emptyElectionCSBWS: async ({ adminOne }, use) => {
+    const { request } = adminOne;
+    const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
+    const election_data = await readFile(eml110a_AB.path, "utf8");
+    const candidate_data = await readFile(eml230b_AB_more_than_45_candidates.path, "utf8");
+    const electionResponse = await request.post(url, {
+      data: {
+        committee_category: "CSB",
+        election_data,
+        election_hash: eml110a_AB.fullHash,
+        candidate_data,
+        candidate_hash: eml230b_AB_more_than_45_candidates.fullHash,
       },
     });
     expect(electionResponse.ok()).toBeTruthy();

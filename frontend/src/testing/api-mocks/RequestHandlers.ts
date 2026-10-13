@@ -131,6 +131,7 @@ import type {
   SaveDataEntryResponse,
   SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS,
   SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY,
   SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS,
   SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH,
   SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS,
@@ -381,7 +382,7 @@ export const CSBSubCommitteeCertificatesRequestHandler = http.get<
 
 export const CSBSubCommitteeCertificateAddRequestHandler = http.post<
   ParamsToString<SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS>,
-  null,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY,
   AddSubCommitteeCertificateResponse
 >("/api/elections/2/sub_committee_certificates" satisfies SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH, () =>
   HttpResponse.json(addCertificateResponse, { status: 201 }),

@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
-export class CheckDefinitionBasePgObj {
+export class CheckHashBasePgObj {
   readonly hashInput1: Locator;
   readonly hashInput2: Locator;
   readonly next: Locator;

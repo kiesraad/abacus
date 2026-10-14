@@ -32,6 +32,8 @@ fn bind_listener(port: u16) -> Result<TcpListener, AppError> {
     let socket = Socket::new(Domain::IPV6, Type::STREAM, Some(Protocol::TCP))?;
     socket.set_nonblocking(true)?;
     socket.set_only_v6(false)?;
+    // On Windows, SO_REUSEADDR allows multiple listeners to bind to the same port.
+    #[cfg(not(windows))]
     socket.set_reuse_address(true)?;
 
     let address = SocketAddr::from((Ipv6Addr::UNSPECIFIED, port));
@@ -216,4 +218,23 @@ async fn run() -> Result<(), AppError> {
     }
     #[cfg(not(feature = "tls"))]
     abacus::start_server(pool, listener, enable_airgap_detection, backup_config).await
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn cannot_bind_listener_to_port_already_in_use() {
+        let listener = bind_listener(0).unwrap();
+        let port = listener.local_addr().unwrap().port();
+
+        assert!(matches!(
+            bind_listener(port),
+            Err(AppError::PortAlreadyInUse(p)) if p == port
+        ));
+
+        drop(listener);
+        bind_listener(port).unwrap();
+    }
 }

@@ -746,9 +746,9 @@ dependencies = [
 
 [[package]]
 name = "eml-nl"
-version = "0.8.0"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d3921300ed9c9195ce5f2446299f1b3f3d92ac85b15ff078da9a532e0034e4b"
+checksum = "cac8745c084803198c13b996dd86689f7de10183f87698ca4a71477186ebdf2f"
 dependencies = [
  "chrono",
  "quick-xml",

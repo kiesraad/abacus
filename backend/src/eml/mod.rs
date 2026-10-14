@@ -1,4 +1,4 @@
-use std::{num::NonZeroU64, str::FromStr as _};
+use std::{collections::HashMap, num::NonZeroU64, str::FromStr as _};
 
 pub mod committees;
 mod count;
@@ -11,17 +11,18 @@ use eml_nl::{
     EMLError, EMLVersion,
     common::{
         AuthorityIdentifier, ContestIdentifier, ElectionTree, ManagingAuthority, PersonName,
-        ReportingUnitIdentifier,
+        QualifyingAddress, ReportingUnitIdentifier,
     },
     documents::{
         candidate_lists::{
             CandidateLists, CandidateListsAffiliation, CandidateListsCandidate,
-            CandidateListsContest, QualifyingAddress,
+            CandidateListsContest,
         },
         election_count::{
             AffiliationSelection, CountType, ElectionCount, ElectionCountContest,
-            ElectionCountSelection, InvestigationReason, RejectedVotesReason, ReportingUnitVotes,
-            ReportingUnitVotesBuilder, UncountedVotesReason,
+            ElectionCountContestBuilder, ElectionCountSelection, InvestigationReason,
+            RejectedVotesReason, ReportingUnitVotes, ReportingUnitVotesBuilder,
+            UncountedVotesReason,
         },
         election_definition::{ElectionDefinition, ElectionDefinitionRegisteredParty},
         election_result::{
@@ -42,12 +43,13 @@ pub use hash::{EmlHash, RedactedEmlHash};
 use crate::{
     domain::{
         committee_session::CommitteeSession,
-        data_entry::DataEntrySourceNumber,
+        data_entry::{DataEntrySource, DataEntrySourceNumber},
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
             ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
             RegisteredPoliticalGroup, VoteCountingMethod,
         },
+        report::structs::ResultsInputData,
         results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
         tabulation::{CommitteeSpecificTotals, ElectionTotals},
     },
@@ -403,21 +405,25 @@ impl Candidate {
                 .or(Err(EMLImportError::InvalidCandidate))?,
             initials: can
                 .full_name
-                .person_name
-                .get_initials()
+                .as_ref()
+                .and_then(|n| n.person_name.get_initials())
                 .unwrap_or_default()
                 .to_string(),
             first_name: can
                 .full_name
-                .person_name
-                .get_first_name()
+                .as_ref()
+                .and_then(|n| n.person_name.get_first_name())
                 .map(str::to_string),
             last_name_prefix: can
                 .full_name
-                .person_name
-                .get_name_prefix()
+                .as_ref()
+                .and_then(|n| n.person_name.get_name_prefix())
                 .map(str::to_string),
-            last_name: can.full_name.person_name.get_last_name().to_string(),
+            last_name: can
+                .full_name
+                .as_ref()
+                .map(|n| n.person_name.get_last_name().to_string())
+                .ok_or(EMLImportError::MissingLastName)?,
             locality: can
                 .qualifying_address
                 .as_ref()
@@ -480,6 +486,44 @@ impl ElectionDomain {
             self.id.as_ref().map(ElectionDomainId::new).transpose()?,
             self.name.clone(),
         ))
+    }
+}
+
+pub struct CountResultsData<'a> {
+    pub results: &'a [(DataEntrySource, crate::domain::results::Results)],
+    pub previous_results:
+        &'a HashMap<DataEntrySourceNumber, (DataEntrySource, crate::domain::results::Results)>,
+    pub totals: &'a ElectionTotals,
+    pub previous_totals: Option<&'a ElectionTotals>,
+}
+
+impl<'a> CountResultsData<'a> {
+    /// Create a `CountResultsData` from each of the components.
+    pub fn new(
+        results: &'a [(DataEntrySource, crate::domain::results::Results)],
+        previous_results: &'a HashMap<
+            DataEntrySourceNumber,
+            (DataEntrySource, crate::domain::results::Results),
+        >,
+        totals: &'a ElectionTotals,
+        previous_totals: Option<&'a ElectionTotals>,
+    ) -> Self {
+        Self {
+            results,
+            previous_results,
+            totals,
+            previous_totals,
+        }
+    }
+
+    /// Create a `CountResultsData` from a `ResultsInputData` reference.
+    pub fn from_results_input_data(results_input: &'a ResultsInputData) -> Self {
+        Self::new(
+            &results_input.results,
+            &results_input.previous_results,
+            &results_input.totals,
+            results_input.previous_totals.as_ref(),
+        )
     }
 }
 
@@ -698,11 +742,7 @@ impl ElectionWithPoliticalGroups {
         &self,
         transaction_id: Option<u64>,
         committee_session: &CommitteeSession,
-        results: &[(
-            crate::domain::data_entry::DataEntrySource,
-            crate::domain::results::Results,
-        )],
-        totals: &ElectionTotals,
+        data: &CountResultsData,
         timestamp: DateTime<Local>,
     ) -> Result<ElectionCount, EMLError> {
         let mut builder = ElectionCount::builder()
@@ -726,7 +766,7 @@ impl ElectionWithPoliticalGroups {
             } else {
                 eml_nl::common::PhaseCode::FirstSession
             })
-            .contests([self.as_eml_count_contest(committee_session, results, totals)?]);
+            .contests([self.as_eml_count_contest(committee_session, data)?]);
         match self.counting_method {
             Some(VoteCountingMethod::CSO) => {
                 builder = builder.counting_method(eml_nl::common::CountingMethodCode::CSO)
@@ -742,77 +782,139 @@ impl ElectionWithPoliticalGroups {
     fn as_eml_count_contest(
         &self,
         committee_session: &CommitteeSession,
-        results: &[(
-            crate::domain::data_entry::DataEntrySource,
-            crate::domain::results::Results,
-        )],
-        totals: &ElectionTotals,
+        data: &CountResultsData,
     ) -> Result<ElectionCountContest, EMLError> {
         let mut builder = ElectionCountContest::builder()
-            .identifier(ContestIdentifier::geen())
-            .total_eligible_voter_count(self.get_eligible_voter_count(totals))
-            .total_candidate_votes_count(totals.votes_counts.total_votes_candidates_count)
+            .identifier(self.district.as_contest_identifier()?)
+            .total_votes_selections(self.as_eml_count_selections(
+                &data.totals.political_group_votes,
+                data.previous_totals.map(|pt| &pt.political_group_votes[..]),
+            )?);
+
+        builder = self.add_totals(builder, data);
+        builder = self.add_previous_totals(builder, data);
+
+        // Do not include reporting unit votes if this is the CSB for a Municipal election
+        if !(self.committee_category == CommitteeCategory::CSB
+            && self.category == crate::domain::election::ElectionCategory::Municipal)
+        {
+            builder = builder.reporting_unit_votes(
+                data.results
+                    .iter()
+                    .map(|(data_source, source_results)| {
+                        let source_previous_results = data
+                            .previous_results
+                            .get(&data_source.number())
+                            .map(|(source, results)| (source, results));
+                        self.as_eml_reporting_unit_votes(
+                            committee_session,
+                            data_source,
+                            source_results,
+                            source_previous_results,
+                            &data.totals.committee_specific,
+                        )
+                    })
+                    .collect::<Result<Vec<_>, EMLError>>()?,
+            );
+        }
+
+        builder.build()
+    }
+
+    fn add_totals(
+        &self,
+        mut builder: ElectionCountContestBuilder,
+        data: &CountResultsData,
+    ) -> ElectionCountContestBuilder {
+        builder = builder
+            .total_eligible_voter_count(self.get_eligible_voter_count(data.totals))
+            .total_candidate_votes_count(data.totals.votes_counts.total_votes_candidates_count)
             .total_rejected_votes(
                 RejectedVotesReason::Blank,
-                totals.votes_counts.blank_votes_count,
+                data.totals.votes_counts.blank_votes_count,
             )
             .total_rejected_votes(
                 RejectedVotesReason::Invalid,
-                totals.votes_counts.invalid_votes_count,
+                data.totals.votes_counts.invalid_votes_count,
             )
             .total_uncounted_votes(
                 UncountedVotesReason::ValidPollCards,
-                totals.voters_counts.poll_card_count,
+                data.totals.voters_counts.poll_card_count,
             )
             .total_uncounted_votes(
                 UncountedVotesReason::ValidProxyCertificates,
-                totals.voters_counts.proxy_certificate_count,
+                data.totals.voters_counts.proxy_certificate_count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::AdmittedVoters,
+                data.totals.voters_counts.total_admitted_voters_count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::MoreBallotsCounted,
+                data.totals.differences_counts.more_ballots_count.count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::FewerBallotsCounted,
+                data.totals.differences_counts.fewer_ballots_count.count,
             );
 
-        if let Some(voter_card_count) = totals.voters_counts.voter_card_count {
+        if let Some(voter_card_count) = data.totals.voters_counts.voter_card_count {
             builder = builder
                 .total_uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count);
         }
 
-        let builder = builder
-            .total_uncounted_votes(
-                UncountedVotesReason::AdmittedVoters,
-                totals.voters_counts.total_admitted_voters_count,
-            )
-            .total_uncounted_votes(
-                UncountedVotesReason::MoreBallotsCounted,
-                totals.differences_counts.more_ballots_count.count,
-            )
-            .total_uncounted_votes(
-                UncountedVotesReason::FewerBallotsCounted,
-                totals.differences_counts.fewer_ballots_count.count,
-            )
-            .total_votes_selections(self.as_eml_count_selections(&totals.political_group_votes)?);
+        builder
+    }
 
-        // GSB elections include reporting unit votes in the count
-        let builder = if self.committee_category == CommitteeCategory::GSB {
-            let CommitteeSpecificTotals::GSB(ref gsb_totals) = totals.committee_specific else {
-                unreachable!();
-            };
+    fn add_previous_totals(
+        &self,
+        mut builder: ElectionCountContestBuilder,
+        data: &CountResultsData,
+    ) -> ElectionCountContestBuilder {
+        if let Some(previous_totals) = data.previous_totals {
+            if let Some(voter_card_count) = previous_totals.voters_counts.voter_card_count {
+                builder = builder.previous_total_uncounted_votes(
+                    UncountedVotesReason::ValidVoterCards,
+                    voter_card_count,
+                );
+            }
 
-            builder.reporting_unit_votes(
-                results
-                    .iter()
-                    .map(|(data_source, ps_res)| {
-                        self.as_eml_reporting_unit_votes(
-                            committee_session,
-                            data_source,
-                            ps_res,
-                            gsb_totals,
-                        )
-                    })
-                    .collect::<Result<Vec<_>, EMLError>>()?,
-            )
-        } else {
-            builder
-        };
+            builder = builder
+                .previous_total_eligible_voter_count(self.get_eligible_voter_count(previous_totals))
+                .previous_total_candidate_votes_count(
+                    previous_totals.votes_counts.total_votes_candidates_count,
+                )
+                .previous_total_rejected_votes(
+                    RejectedVotesReason::Blank,
+                    previous_totals.votes_counts.blank_votes_count,
+                )
+                .previous_total_rejected_votes(
+                    RejectedVotesReason::Invalid,
+                    previous_totals.votes_counts.invalid_votes_count,
+                )
+                .previous_total_uncounted_votes(
+                    UncountedVotesReason::ValidPollCards,
+                    previous_totals.voters_counts.poll_card_count,
+                )
+                .previous_total_uncounted_votes(
+                    UncountedVotesReason::ValidProxyCertificates,
+                    previous_totals.voters_counts.proxy_certificate_count,
+                )
+                .previous_total_uncounted_votes(
+                    UncountedVotesReason::AdmittedVoters,
+                    previous_totals.voters_counts.total_admitted_voters_count,
+                )
+                .previous_total_uncounted_votes(
+                    UncountedVotesReason::MoreBallotsCounted,
+                    previous_totals.differences_counts.more_ballots_count.count,
+                )
+                .previous_total_uncounted_votes(
+                    UncountedVotesReason::FewerBallotsCounted,
+                    previous_totals.differences_counts.fewer_ballots_count.count,
+                );
+        }
 
-        builder.build()
+        builder
     }
 
     /// Depending on the context of the totals coming from GSB or from CSB, the number of voters source is different.
@@ -826,11 +928,17 @@ impl ElectionWithPoliticalGroups {
     fn as_eml_count_selections(
         &self,
         votes: &[PoliticalGroupCandidateVotes],
+        previous_votes: Option<&[PoliticalGroupCandidateVotes]>,
     ) -> Result<Vec<ElectionCountSelection>, EMLError> {
         let mut selections = vec![];
 
         for pg in votes {
             let epg = self.political_groups.iter().find(|p| p.number == pg.number);
+            let previous_pg = previous_votes.and_then(|pv| {
+                pv.iter()
+                    .find(|previous_pg| previous_pg.number == pg.number)
+            });
+
             selections.push(
                 ElectionCountSelection::builder()
                     .affiliation(AffiliationSelection::new(
@@ -838,16 +946,23 @@ impl ElectionWithPoliticalGroups {
                         epg.map(|p| p.registered_name.as_str()).unwrap_or(""),
                     ))
                     .valid_votes(pg.total)
+                    .previous_valid_votes_option(previous_pg.map(|pg| pg.total))
                     .build()?,
             );
 
             for can in &pg.candidate_votes {
+                let previous_can = previous_pg.and_then(|p| {
+                    p.candidate_votes
+                        .iter()
+                        .find(|prev_can| prev_can.number == can.number)
+                });
                 selections.push(
                     ElectionCountSelection::builder()
                         .candidate(CandidateId::from_str(
                             &can.number.as_internal_u32().to_string(),
                         )?)
                         .valid_votes(can.votes)
+                        .previous_valid_votes_option(previous_can.map(|pc| pc.votes))
                         .build()?,
                 );
             }
@@ -856,13 +971,13 @@ impl ElectionWithPoliticalGroups {
         Ok(selections)
     }
 
-    #[expect(clippy::too_many_lines)]
     fn as_eml_reporting_unit_votes(
         &self,
         committee_session: &CommitteeSession,
-        data_source: &crate::domain::data_entry::DataEntrySource,
+        data_source: &DataEntrySource,
         results: &crate::domain::results::Results,
-        gsb_totals: &crate::domain::tabulation::GSBTotals,
+        previous_results: Option<(&DataEntrySource, &crate::domain::results::Results)>,
+        committee_specific_totals: &crate::domain::tabulation::CommitteeSpecificTotals,
     ) -> Result<ReportingUnitVotes, EMLError> {
         let mut builder = ReportingUnitVotes::builder()
             .identifier(ReportingUnitIdentifier::new(
@@ -878,7 +993,30 @@ impl ElectionWithPoliticalGroups {
                     .map(|t| t.as_eml_reporting_unit_type()),
                 _ => None,
             })
-            .selections(self.as_eml_count_selections(results.political_group_votes())?)
+            .selections(self.as_eml_count_selections(
+                results.political_group_votes(),
+                previous_results.map(|pr| pr.1.political_group_votes()),
+            )?);
+
+        builder = self.add_unit_votes(builder, data_source, results);
+        builder = self.add_unit_previous(builder, previous_results);
+
+        builder = add_reporting_unit_investigations(
+            builder,
+            committee_session,
+            data_source,
+            committee_specific_totals,
+        );
+        builder.build()
+    }
+
+    fn add_unit_votes(
+        &self,
+        mut builder: ReportingUnitVotesBuilder,
+        data_source: &DataEntrySource,
+        results: &crate::domain::results::Results,
+    ) -> ReportingUnitVotesBuilder {
+        builder = builder
             .eligible_voter_count(match results {
                 crate::domain::results::Results::DSOFirstSession(_)
                 | crate::domain::results::Results::DSONextSession(_)
@@ -904,14 +1042,7 @@ impl ElectionWithPoliticalGroups {
             .uncounted_votes(
                 UncountedVotesReason::ValidProxyCertificates,
                 results.voters_counts().proxy_certificate_count,
-            );
-
-        if let Some(voter_card_count) = results.voters_counts().voter_card_count {
-            builder =
-                builder.uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count);
-        }
-
-        builder = builder
+            )
             .uncounted_votes(
                 UncountedVotesReason::AdmittedVoters,
                 results.voters_counts().total_admitted_voters_count,
@@ -925,9 +1056,72 @@ impl ElectionWithPoliticalGroups {
                 *results.differences_counts().fewer_ballots_count,
             );
 
-        builder =
-            add_reporting_unit_investigations(builder, committee_session, data_source, gsb_totals);
-        builder.build()
+        if let Some(voter_card_count) = results.voters_counts().voter_card_count {
+            builder =
+                builder.uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count);
+        }
+
+        builder
+    }
+
+    fn add_unit_previous(
+        &self,
+        mut builder: ReportingUnitVotesBuilder,
+        results: Option<(&DataEntrySource, &crate::domain::results::Results)>,
+    ) -> ReportingUnitVotesBuilder {
+        if let Some((previous_data_source, previous_results)) = results {
+            builder = builder
+                .previous_eligible_voter_count(match previous_results {
+                    crate::domain::results::Results::DSOFirstSession(_)
+                    | crate::domain::results::Results::DSONextSession(_)
+                    | crate::domain::results::Results::CSOFirstSession(_)
+                    | crate::domain::results::Results::CSONextSession(_) => {
+                        previous_data_source.eml_eligible_voter_count().unwrap_or(0)
+                    }
+                    crate::domain::results::Results::GSB(gsb_results) => {
+                        gsb_results.number_of_voters
+                    }
+                })
+                .previous_candidate_votes_count(
+                    previous_results.votes_counts().total_votes_candidates_count,
+                )
+                .previous_rejected_votes(
+                    RejectedVotesReason::Blank,
+                    previous_results.votes_counts().blank_votes_count,
+                )
+                .previous_rejected_votes(
+                    RejectedVotesReason::Invalid,
+                    previous_results.votes_counts().invalid_votes_count,
+                )
+                .previous_uncounted_votes(
+                    UncountedVotesReason::ValidPollCards,
+                    previous_results.voters_counts().poll_card_count,
+                )
+                .previous_uncounted_votes(
+                    UncountedVotesReason::ValidProxyCertificates,
+                    previous_results.voters_counts().proxy_certificate_count,
+                )
+                .previous_uncounted_votes(
+                    UncountedVotesReason::AdmittedVoters,
+                    previous_results.voters_counts().total_admitted_voters_count,
+                )
+                .previous_uncounted_votes(
+                    UncountedVotesReason::MoreBallotsCounted,
+                    *previous_results.differences_counts().more_ballots_count,
+                )
+                .previous_uncounted_votes(
+                    UncountedVotesReason::FewerBallotsCounted,
+                    *previous_results.differences_counts().fewer_ballots_count,
+                );
+
+            if let Some(voter_card_count) = previous_results.voters_counts().voter_card_count {
+                builder = builder.previous_uncounted_votes(
+                    UncountedVotesReason::ValidVoterCards,
+                    voter_card_count,
+                );
+            }
+        }
+        builder
     }
 
     pub fn as_result_eml(
@@ -1061,15 +1255,16 @@ fn add_reporting_unit_investigations(
     mut builder: ReportingUnitVotesBuilder,
     committee_session: &CommitteeSession,
     data_source: &crate::domain::data_entry::DataEntrySource,
-    gsb_totals: &crate::domain::tabulation::GSBTotals,
+    committee_specific_totals: &crate::domain::tabulation::CommitteeSpecificTotals,
 ) -> ReportingUnitVotesBuilder {
-    use crate::domain::tabulation::GSBTotals;
+    use crate::domain::tabulation::{CommitteeSpecificTotals, GSBTotals};
+
     if !committee_session.is_next_session() {
-        let DataEntrySourceNumber::PollingStation(ref number) = data_source.number() else {
-            unreachable!()
-        };
-        match gsb_totals {
-            GSBTotals::DSO(investigations) => {
+        match committee_specific_totals {
+            CommitteeSpecificTotals::GSB(GSBTotals::DSO(investigations)) => {
+                let DataEntrySourceNumber::PollingStation(ref number) = data_source.number() else {
+                    unreachable!()
+                };
                 builder = builder
                     .investigation(
                         InvestigationReason::UnexplainedDifference,
@@ -1084,7 +1279,10 @@ fn add_reporting_unit_investigations(
                         investigations.corrected_results.contains(number),
                     )
             }
-            GSBTotals::CSO(investigations) => {
+            CommitteeSpecificTotals::GSB(GSBTotals::CSO(investigations)) => {
+                let DataEntrySourceNumber::PollingStation(ref number) = data_source.number() else {
+                    unreachable!()
+                };
                 builder = builder
                     .investigation(
                         InvestigationReason::OtherReason,
@@ -1098,6 +1296,9 @@ fn add_reporting_unit_investigations(
                         InvestigationReason::AdmittedVotersReestablished,
                         investigations.admitted_voters_recounted.contains(number),
                     )
+            }
+            _ => {
+                // other committee specific totals have no investigations
             }
         }
     };
@@ -1291,7 +1492,12 @@ mod tests {
 
     fn source_and_results_gsb(voter_card_count: Option<Count>) -> (DataEntrySource, Results) {
         let mut results = example_results();
-        results.voters_counts_mut().voter_card_count = voter_card_count;
+        if let Some(vcc) = voter_card_count {
+            results.votes_counts_mut().invalid_votes_count += vcc;
+            results.votes_counts_mut().total_votes_cast_count += vcc;
+            results.voters_counts_mut().voter_card_count = Some(vcc);
+            results.voters_counts_mut().total_admitted_voters_count += vcc;
+        }
 
         (
             DataEntrySource::PollingStation(PollingStationForSession::First(
@@ -1464,7 +1670,12 @@ mod tests {
         let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
 
         let eml_count = election
-            .as_count_eml(None, &committee_session, &[], &totals, Local::now())
+            .as_count_eml(
+                None,
+                &committee_session,
+                &CountResultsData::new(&[], &HashMap::new(), &totals, None),
+                Local::now(),
+            )
             .unwrap();
         assert_eq!(
             eml_count
@@ -1485,7 +1696,12 @@ mod tests {
         let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
 
         let eml_count = election
-            .as_count_eml(None, &committee_session, &[], &totals, Local::now())
+            .as_count_eml(
+                None,
+                &committee_session,
+                &CountResultsData::new(&[], &HashMap::new(), &totals, None),
+                Local::now(),
+            )
             .unwrap();
         assert_eq!(
             eml_count
@@ -1592,7 +1808,10 @@ mod tests {
         };
 
         let result_csb = election
-            .as_eml_count_contest(&committee_session, &[], &totals)
+            .as_eml_count_contest(
+                &committee_session,
+                &CountResultsData::new(&[], &HashMap::new(), &totals, None),
+            )
             .unwrap();
         let total_votes_csb = result_csb.total_votes.unwrap();
         assert_eq!(
@@ -1611,7 +1830,15 @@ mod tests {
         let committee_session = committee_session_fixture(election.id);
         let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
         let result_gsb = election
-            .as_eml_count_contest(&committee_session, &[source_and_results_gsb(None)], &totals)
+            .as_eml_count_contest(
+                &committee_session,
+                &CountResultsData::new(
+                    &[source_and_results_gsb(None)],
+                    &HashMap::new(),
+                    &totals,
+                    None,
+                ),
+            )
             .unwrap();
 
         let total_votes_gsb = result_gsb.total_votes.unwrap();
@@ -1646,8 +1873,12 @@ mod tests {
         let result = election
             .as_eml_count_contest(
                 &committee_session,
-                &[source_and_results_gsb(Some(17))],
-                &totals,
+                &CountResultsData::new(
+                    &[source_and_results_gsb(Some(17))],
+                    &HashMap::new(),
+                    &totals,
+                    None,
+                ),
             )
             .unwrap();
 
@@ -1665,6 +1896,73 @@ mod tests {
                 .first()
                 .unwrap()
                 .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(17u64))
+        );
+    }
+
+    #[test]
+    fn test_as_eml_count_contest_with_previous_values() {
+        let election = election_fixture(
+            ElectionCategory::WaterAuthority,
+            CommitteeCategory::GSB,
+            &[2, 2],
+        );
+        let committee_session = committee_session_fixture(election.id);
+        let (prev_source, prev_results) = source_and_results_gsb(Some(17));
+        let (new_source, new_results) = source_and_results_gsb(Some(42));
+        let totals =
+            ElectionTotals::tabulate(&election, &[(new_source.clone(), new_results.clone())])
+                .unwrap();
+        let prev_totals =
+            ElectionTotals::tabulate(&election, &[(prev_source.clone(), prev_results.clone())])
+                .unwrap();
+
+        let result = election
+            .as_eml_count_contest(
+                &committee_session,
+                &CountResultsData::new(
+                    &[(new_source, new_results)],
+                    &HashMap::from([(prev_source.number(), (prev_source, prev_results))]),
+                    &totals,
+                    Some(&prev_totals),
+                ),
+            )
+            .unwrap();
+
+        assert_eq!(
+            result
+                .total_votes
+                .as_ref()
+                .unwrap()
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(42u64))
+        );
+        assert_eq!(
+            result
+                .total_votes
+                .as_ref()
+                .unwrap()
+                .previous_uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(17u64))
+        );
+        assert_eq!(
+            result
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(42u64))
+        );
+        assert_eq!(
+            result
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .previous_uncounted_votes
                 .get(&UncountedVotesReason::ValidVoterCards),
             Some(&StringValue::from_value(17u64))
         );

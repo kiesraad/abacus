@@ -40,6 +40,7 @@ yanked = "deny"
 ignore = [
     { id = "RUSTSEC-2024-0320", reason = "yaml-rust is transitively used by Typst, see https://github.com/trishume/syntect/issues/537" },
     { id = "RUSTSEC-2024-0436", reason = "paste is transitively used by Typst (biblatex, https://github.com/typst/biblatex/issues/87) and by utoipa-axum; unmaintained but no vulnerability" },
+    { id = "RUSTSEC-2024-0449", reason = "unsafe-libyaml is transitively used by Typst and will be replaced in a future release, see https://github.com/typst/hayagriva/pull/502; unmaintained but no vulnerability" },
     { id = "RUSTSEC-2025-0141", reason = "bincode is used by Typst, see https://github.com/trishume/syntect/issues/606" },
     { id = "RUSTSEC-2026-0192", reason = "ttf-parser is unmaintained; Typst does not have a fix, see https://github.com/kiesraad/abacus/issues/3849 for direct usage" },
     { id = "RUSTSEC-2026-0194", reason = "quick-xml <0.41 DoS (quadratic duplicate-attribute check) pulled transitively by Typst (citationberg, plist); no release depending on quick-xml >=0.41 available upstream yet, see https://github.com/tafia/quick-xml/issues/969" },

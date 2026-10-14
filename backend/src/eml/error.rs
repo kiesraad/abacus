@@ -31,6 +31,7 @@ pub enum EMLImportError {
     MissingPollingStations,
     MissingPreferenceThreshold,
     MissingSubcategory,
+    MissingLastName,
     Needs110a,
     Needs110b,
     Needs230b,

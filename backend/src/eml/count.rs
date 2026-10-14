@@ -183,6 +183,8 @@ fn uncounted_votes(
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use chrono::Local;
     use eml_nl::{
         common::ContestIdentifier,
@@ -195,14 +197,17 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::{
-        committee_session::committee_session_fixture,
-        data_entry::{DataEntryId, DataEntrySource},
-        election::{CommitteeCategory, tests::election_fixture},
-        results::Results,
-        sub_committee::{SubCommitteeFirstSession, SubCommitteeId},
-        tabulation::ElectionTotals,
-        validate::Validate,
+    use crate::{
+        domain::{
+            committee_session::committee_session_fixture,
+            data_entry::{DataEntryId, DataEntrySource},
+            election::{CommitteeCategory, tests::election_fixture},
+            results::Results,
+            sub_committee::{SubCommitteeFirstSession, SubCommitteeId},
+            tabulation::ElectionTotals,
+            validate::Validate,
+        },
+        eml::CountResultsData,
     };
 
     fn gsb_results_fixture() -> GSBResults {
@@ -264,7 +269,12 @@ mod tests {
         let totals = ElectionTotals::tabulate(&election, &entries).unwrap();
 
         election
-            .as_count_eml(None, &committee_session, &entries, &totals, Local::now())
+            .as_count_eml(
+                None,
+                &committee_session,
+                &CountResultsData::new(&entries, &HashMap::new(), &totals, None),
+                Local::now(),
+            )
             .unwrap()
     }
 

@@ -4,6 +4,9 @@ use std::{
     process,
 };
 
+#[cfg(windows)]
+use std::os::windows::io::AsSocket;
+
 use abacus::{AppError, create_sqlite_pool, infra::backup::BackupConfig};
 use clap::Parser;
 use socket2::{Domain, Protocol, Socket, Type};
@@ -35,6 +38,8 @@ fn bind_listener(port: u16) -> Result<TcpListener, AppError> {
     // On Windows, SO_REUSEADDR allows multiple listeners to bind to the same port.
     #[cfg(not(windows))]
     socket.set_reuse_address(true)?;
+    #[cfg(windows)]
+    windows_socket::set_exclusive_address_use(socket.as_socket())?;
 
     let address = SocketAddr::from((Ipv6Addr::UNSPECIFIED, port));
     socket.bind(&address.into()).map_err(|e| match e.kind() {
@@ -229,12 +234,37 @@ mod tests {
         let listener = bind_listener(0).unwrap();
         let port = listener.local_addr().unwrap().port();
 
-        assert!(matches!(
-            bind_listener(port),
-            Err(AppError::PortAlreadyInUse(p)) if p == port
-        ));
+        let error = bind_listener(port).unwrap_err();
+        assert!(matches!(error, AppError::PortAlreadyInUse(p) if p == port));
 
         drop(listener);
         bind_listener(port).unwrap();
+    }
+
+    #[cfg(windows)]
+    #[tokio::test]
+    async fn exclusive_listener_prevents_takeover() {
+        let listener = bind_listener(0).unwrap();
+        let port = listener.local_addr().unwrap().port();
+
+        use std::net::Ipv4Addr;
+        for address in [
+            SocketAddr::from((Ipv4Addr::LOCALHOST, port)),
+            SocketAddr::from((Ipv6Addr::LOCALHOST, port)),
+            SocketAddr::from((Ipv6Addr::UNSPECIFIED, port)),
+        ] {
+            let domain = if address.is_ipv4() {
+                Domain::IPV4
+            } else {
+                Domain::IPV6
+            };
+            let competitor = Socket::new(domain, Type::STREAM, Some(Protocol::TCP)).unwrap();
+            competitor.set_reuse_address(true).unwrap();
+
+            let error = competitor
+                .bind(&address.into())
+                .expect_err("SO_REUSEADDR must not allow takeover of the Abacus listener");
+            assert_eq!(error.kind(), ErrorKind::PermissionDenied, "{address}");
+        }
     }
 }

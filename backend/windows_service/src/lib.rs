@@ -1,3 +1,4 @@
+#![cfg(windows)]
 //! Provides functionality to run the Abacus server as a Windows service.
 //!
 //! This crate registers `abacus.exe --service` at the Windows service control manager (SCM).
@@ -10,7 +11,6 @@
 //! on every start.
 //! [`uninstall`] stops and removes the service.
 //! Both need administrator privileges.
-#![cfg(windows)]
 
 use std::{
     ffi::{OsStr, OsString},

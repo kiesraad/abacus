@@ -20,7 +20,7 @@ eml_signature = { path = "./eml_signature" }
 pdf_gen = { path = "./pdf_gen/wrapper" }
 pdf_gen_impl = { path = "./pdf_gen/impl" }
 pdf_gen_types = { path = "./pdf_gen/types" }
-async_zip = { version = "0.0.18", features = ["tokio", "deflate", "chrono"] }
+async_zip = { version = "0.0.19", features = ["tokio", "deflate", "chrono"] }
 axum = { version = "0.8", features = ["macros", "multipart", "tracing", "tokio"] }
 axum-extra = { version = "0.12", default-features = false, features = [
     "attachment",
@@ -96,8 +96,8 @@ icu_collator = "2.2.0"
 icu_locale_core = "2.2.0"
 tokio.workspace = true
 memory-serve = { version = "2.1.0", optional = true, features = ["force-embed"] }
-utoipa = { version = "5.4.0", features = ["axum_extras", "chrono"] }
-utoipa-axum = "0.2.0"
+utoipa = { version = "6.0.0", features = ["axum_extras", "chrono"] }
+utoipa-axum = "0.3.0"
 utoipa-swagger-ui = { version = "9.0.2", features = ["axum"], optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -105,7 +105,7 @@ sqlx = { version = "0.9.0", features = ["runtime-tokio", "sqlite", "chrono", "sq
 tower = "0.5"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 tracing.workspace = true
-tower-http = { version = "0.6", features = ["set-header", "trace"] }
+tower-http = { version = "0.7", features = ["set-header", "trace"] }
 sha2 = "0.11.0"
 sha1 = "0.11.0"
 argon2 = { version = "0.5.3", features = ["std"] }

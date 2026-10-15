@@ -232,6 +232,10 @@ For TLS (HTTPS) support, when the `tls` feature is enabled, the following depend
 - `rustls`: TLS implementation, on the audited `aws-lc-rs` provider.
 - `axum-server`: HTTPS serving for `axum`, with graceful shutdown.
 
+The `abacus-windows-service` crate (Windows only, see [Windows service](#windows-service)) additionally uses:
+
+- `windows-service`: install, uninstall and handle a Windows service.
+
 Additionally, the following development dependencies are used:
 
 - `test-log`: show tracing messages while running tests
@@ -304,3 +308,17 @@ A development build also supports the following arguments:
   -s, --seed-data            Seed the database with initial data using the fixtures [env: ABACUS_SEED_DATA=]
   -r, --reset-database       Reset the database [env: ABACUS_RESET_DATABASE=]
 ```
+
+### Windows service
+
+On Windows, the abacus binary can run as a Windows service. This is implemented in the `abacus-windows-service` crate.  
+From an administrator prompt:
+
+```
+abacus.exe --service --install    Install and start the service
+abacus.exe --service --uninstall  Stop and uninstall the service
+```
+
+Any other arguments given to `--service --install` are stored with the service and passed on to the server every time it starts, e.g. `abacus.exe --service --install --port 8443`.
+
+The service runs as LocalSystem and starts `abacus.exe` as a child process. The output is written to `abacus.out.log` and `abacus.err.log` next to the executable. If logs exist when the service starts, they will be renamed with a timestamp suffix. If there is a failure, it writes an `abacus.<timestamp>.crash.log` file. 

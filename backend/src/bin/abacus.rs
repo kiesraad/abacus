@@ -122,6 +122,21 @@ struct Args {
     /// Show version
     #[arg(short = 'V', long)]
     version: bool,
+
+    /// Run as a Windows service
+    #[cfg(windows)]
+    #[arg(long)]
+    service: bool,
+
+    /// Install and start the Windows service
+    #[cfg(windows)]
+    #[arg(long, requires = "service", conflicts_with = "uninstall")]
+    install: bool,
+
+    /// Stop and uninstall the Windows service
+    #[cfg(windows)]
+    #[arg(long, requires = "service", conflicts_with = "install")]
+    uninstall: bool,
 }
 
 /// Main entry point for the application. Sets up the database, and starts the
@@ -154,6 +169,36 @@ fn init_tls(tls_dir: &std::path::Path) -> Result<(), AppError> {
     Ok(())
 }
 
+/// Run, install or uninstall the Windows service.
+#[cfg(windows)]
+fn run_windows_service(args: &Args) -> Result<(), AppError> {
+    use std::ffi::OsString;
+
+    // Get launch arguments by filtering out service-related flags
+    let server_arguments: Vec<OsString> = std::env::args_os()
+        .skip(1)
+        .filter(|arg| {
+            !matches!(
+                arg.to_str(),
+                Some("--service" | "--install" | "--uninstall")
+            )
+        })
+        .collect();
+
+    let result = if args.install {
+        let launch_arguments = std::iter::once(OsString::from("--service"))
+            .chain(server_arguments)
+            .collect();
+        abacus_windows_service::install(launch_arguments)
+    } else if args.uninstall {
+        abacus_windows_service::uninstall()
+    } else {
+        abacus_windows_service::run(server_arguments)
+    };
+
+    result.map_err(|e| AppError::WindowsService(e.to_string()))
+}
+
 async fn run() -> Result<(), AppError> {
     tracing_subscriber::fmt()
         .with_env_filter(
@@ -173,6 +218,13 @@ async fn run() -> Result<(), AppError> {
     #[cfg(feature = "tls")]
     if args.init_tls {
         return init_tls(&args.tls_dir);
+    }
+
+    // The service control manager runs this process, which in turn runs the server as a child
+    // process (see the `abacus-windows-service` crate).
+    #[cfg(windows)]
+    if args.service {
+        return run_windows_service(&args);
     }
 
     let pool = create_sqlite_pool(

@@ -35,7 +35,12 @@ fn bind_listener(port: u16) -> Result<TcpListener, AppError> {
     let socket = Socket::new(Domain::IPV6, Type::STREAM, Some(Protocol::TCP))?;
     socket.set_nonblocking(true)?;
     socket.set_only_v6(false)?;
-    // On Windows, SO_REUSEADDR allows multiple listeners to bind to the same port.
+    // On Unix-like OSes, enabling SO_REUSEADDR prevents 'port is in use' errors
+    // when restarting the Abacus server, by allowing the socket to bind to the
+    // port even if it is in the `TIME_WAIT` state.
+    //
+    // However, on Windows, SO_REUSEADDR allows multiple listeners to bind to
+    // the same port, so we leave the option disabled.
     #[cfg(not(windows))]
     socket.set_reuse_address(true)?;
     #[cfg(windows)]

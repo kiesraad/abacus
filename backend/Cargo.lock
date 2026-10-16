@@ -55,6 +55,7 @@ dependencies = [
 name = "abacus-windows-service"
 version = "1.1.0"
 dependencies = [
+ "tokio",
  "windows-service",
 ]
 

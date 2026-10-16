@@ -181,18 +181,14 @@ fn init_tls(tls_dir: &std::path::Path) -> Result<(), AppError> {
 fn run_windows_service(args: &Args) -> Result<(), AppError> {
     use std::ffi::OsString;
 
-    // Get launch arguments by filtering out service-related flags
-    let server_arguments: Vec<OsString> = std::env::args_os()
-        .skip(1)
-        .filter(|arg| {
+    let result = if args.install {
+        // Get launch arguments by filtering out service-related flags
+        let server_arguments = std::env::args_os().skip(1).filter(|arg| {
             !matches!(
                 arg.to_str(),
                 Some("--service" | "--install" | "--uninstall")
             )
-        })
-        .collect();
-
-    let result = if args.install {
+        });
         let launch_arguments = std::iter::once(OsString::from("--service"))
             .chain(server_arguments)
             .collect();
@@ -200,22 +196,30 @@ fn run_windows_service(args: &Args) -> Result<(), AppError> {
     } else if args.uninstall {
         abacus_windows_service::uninstall()
     } else {
-        abacus_windows_service::run(server_arguments)
+        // The SCM calls this on a thread it creates itself, without the arguments or the runtime
+        // of this process, so it parses the command line again and creates a runtime of its own
+        abacus_windows_service::run(|shutdown| {
+            let args = Args::parse();
+            tokio::runtime::Runtime::new()
+                .map_err(AppError::Io)
+                .and_then(|runtime| runtime.block_on(run_server(args.server, shutdown)))
+                .inspect_err(|e| error!("{e}"))
+                .is_ok()
+        })
     };
 
     result.map_err(|e| AppError::WindowsService(e.to_string()))
 }
 
 async fn run() -> Result<(), AppError> {
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            EnvFilter::builder()
-                .with_default_directive(LevelFilter::INFO.into())
-                .from_env()?,
-        )
-        .init();
-
     let args = Args::parse();
+
+    let log = tracing_subscriber::fmt().with_env_filter(
+        EnvFilter::builder()
+            .with_default_directive(LevelFilter::INFO.into())
+            .from_env()?,
+    );
+
     if args.version {
         println!(env!("ABACUS_GIT_VERSION"));
         return Ok(());
@@ -224,16 +228,24 @@ async fn run() -> Result<(), AppError> {
     // Create the CA and exit, without touching the database or starting the server.
     #[cfg(feature = "tls")]
     if args.init_tls {
-        return init_tls(&args.tls_dir);
+        return init_tls(&args.server.tls_dir);
     }
 
-    // The service control manager runs this process, which in turn runs the server as a child
-    // process (see the `abacus-windows-service` crate).
     #[cfg(windows)]
     if args.service {
+        // If not installing or uninstalling, set up logging for the service.
+        if !args.install && !args.uninstall {
+            let log_file = abacus_windows_service::create_log_file()
+                .map_err(|e| AppError::WindowsService(e.to_string()))?;
+            log.with_writer(std::sync::Mutex::new(log_file))
+                .with_ansi(false)
+                .init();
+        }
+
         return run_windows_service(&args);
     }
 
+    log.init();
     run_server(args.server, abacus::shutdown_signal()).await
 }
 

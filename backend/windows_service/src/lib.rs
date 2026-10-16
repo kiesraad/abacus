@@ -2,9 +2,9 @@
 //! Provides functionality to run the Abacus server as a Windows service.
 //!
 //! This crate registers `abacus.exe --service` at the Windows service control manager (SCM).
-//! It handles starting the server process, logging the output and responding to SCM requests.
-//! Logs are written to `abacus.out.log` and `abacus.err.log` next to the executable. If a
-//! previous log file exists, it will be renamed with a timestamp before creating a new log file.
+//!
+//! The server logs to `abacus.log` next to the executable. If a previous log file exists,
+//! it will be renamed with a timestamp before creating a new log file.
 //! If a crash occurs, it will be logged to a separate file with a timestamp.
 //!
 //! [`install`] registers the service and starts it. Any extra arguments passed will be included
@@ -15,14 +15,15 @@
 use std::{
     ffi::{OsStr, OsString},
     fmt, fs,
-    io::{self, Read, Write},
-    path::Path,
-    process::{Command, Stdio},
-    sync::{OnceLock, mpsc},
-    thread::{self, JoinHandle},
+    future::Future,
+    io::{self, Write},
+    pin::Pin,
+    sync::{Arc, OnceLock},
+    thread,
     time::{Duration, Instant, SystemTime},
 };
 
+use tokio::sync::Notify;
 use windows_service::{
     define_windows_service,
     service::{
@@ -39,8 +40,8 @@ const SERVICE_DISPLAY_NAME: &str = "Abacus service";
 const SERVICE_DESCRIPTION: &str = "Windows service running the Abacus server";
 const SERVICE_TYPE: ServiceType = ServiceType::OWN_PROCESS;
 
-/// Polling interval for the server process status check.
-const SERVER_POLL_INTERVAL: Duration = Duration::from_secs(1);
+/// How long the SCM should wait for the server to shut down gracefully after a stop request
+const STOP_WAIT_HINT: Duration = Duration::from_secs(15);
 /// How long [`uninstall`] waits for service removal
 const UNINSTALL_TIMEOUT: Duration = Duration::from_secs(5);
 
@@ -77,12 +78,24 @@ impl From<io::Error> for Error {
     }
 }
 
-/// Command line arguments for the server process.
-static SERVER_ARGUMENTS: OnceLock<Vec<OsString>> = OnceLock::new();
+/// Signal to shut the server down, which completes when the SCM asks the service to stop.
+pub type ShutdownSignal = Pin<Box<dyn Future<Output = ()> + Send>>;
 
-/// Run as a Windows service with given arguments.
-pub fn run(server_arguments: Vec<OsString>) -> Result<(), Error> {
-    SERVER_ARGUMENTS.set(server_arguments).expect("already set");
+/// The function that runs the server. Set by [`run`] before the SCM calls [`service_main`].
+static RUN_SERVER: OnceLock<fn(ShutdownSignal) -> bool> = OnceLock::new();
+
+/// Store the given server function so that it can be called by the service main function.
+pub fn run(run_server: fn(ShutdownSignal) -> bool) -> Result<(), Error> {
+    let _ = RUN_SERVER.set(run_server);
+
+    // A service starts in the Windows system directory.
+    // Set current directory to the executable's directory.
+    let current_exe = std::env::current_exe()?;
+    std::env::set_current_dir(
+        current_exe
+            .parent()
+            .expect("path should have a parent directory"),
+    )?;
 
     // A service has no console to report panics on, so write them to a file instead
     std::panic::set_hook(Box::new(|info| log_crash(&info.to_string())));
@@ -104,74 +117,29 @@ fn service_main(_arguments: Vec<OsString>) {
     }
 }
 
-/// Run the server until a stop request is received or the server exits by itself.
+/// Run the server until it SCM requests to stop it or it stops by itself.
 fn run_service() -> Result<(), Error> {
-    // Create a channel to be able to poll a stop event from the service worker loop.
-    let (stop_tx, stop_rx) = mpsc::channel();
+    // Notified when the SCM asks the service to stop
+    let stop = Arc::new(Notify::new());
 
     // Define system service event handler that will be receiving service events.
-    let event_handler = move |control_event| match control_event {
-        // Notifies a service to report its current status information to the service
-        // control manager. Always return NoError even if not implemented.
-        ServiceControl::Interrogate => ServiceControlHandlerResult::NoError,
-        ServiceControl::Stop | ServiceControl::Shutdown => {
-            let _ = stop_tx.send(());
-            ServiceControlHandlerResult::NoError
+    let event_handler = {
+        let stop = Arc::clone(&stop);
+        move |control_event| match control_event {
+            // Notifies a service to report its current status information to the service
+            // control manager. Always return NoError even if not implemented.
+            ServiceControl::Interrogate => ServiceControlHandlerResult::NoError,
+            ServiceControl::Stop | ServiceControl::Shutdown => {
+                stop.notify_one();
+                ServiceControlHandlerResult::NoError
+            }
+            _ => ServiceControlHandlerResult::NotImplemented,
         }
-        _ => ServiceControlHandlerResult::NotImplemented,
     };
 
     // Register system service event handler.
     // The returned status handle should be used to report service status changes to the system.
     let status_handle = service_control_handler::register(SERVICE_NAME, event_handler)?;
-
-    match run_server(status_handle, &stop_rx) {
-        Ok(exit_code) => report_status(status_handle, ServiceState::Stopped, exit_code),
-        Err(error) => {
-            report_status(
-                status_handle,
-                ServiceState::Stopped,
-                ServiceExitCode::ServiceSpecific(1),
-            )?;
-            Err(error)
-        }
-    }
-}
-
-/// Starts the server process.
-fn run_server(
-    status_handle: ServiceStatusHandle,
-    stop_rx: &mpsc::Receiver<()>,
-) -> Result<ServiceExitCode, Error> {
-    let current_exe = std::env::current_exe()?;
-    let server_arguments = SERVER_ARGUMENTS
-        .get()
-        .expect("should be set before the service is started");
-
-    let stdout_log = create_log(&current_exe, "out")?;
-    let stderr_log = create_log(&current_exe, "err")?;
-
-    let mut server = Command::new(&current_exe)
-        .args(server_arguments)
-        // A service starts in the Windows system directory.
-        // Set current directory to the executable's directory.
-        .current_dir(
-            current_exe
-                .parent()
-                .expect("path should have a parent directory"),
-        )
-        .stdin(Stdio::null())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()?;
-    let stdout_thread = copy_to_log(
-        server.stdout.take().expect("stdout should be piped"),
-        stdout_log,
-    );
-    let stderr_thread = copy_to_log(
-        server.stderr.take().expect("stderr should be piped"),
-        stderr_log,
-    );
 
     report_status(
         status_handle,
@@ -179,32 +147,27 @@ fn run_server(
         ServiceExitCode::NO_ERROR,
     )?;
 
-    let exit_code = loop {
-        if let Some(exit_status) = server.try_wait()? {
-            // The server exited by itself: report its exit code, so that the failure is visible
-            // in the service status
-            break match exit_status.code() {
-                Some(0) => ServiceExitCode::NO_ERROR,
-                Some(code) => ServiceExitCode::ServiceSpecific(code.cast_unsigned()),
-                None => ServiceExitCode::ServiceSpecific(1),
-            };
-        }
+    let stop_requested = Box::pin(async move {
+        stop.notified().await;
+        // Shutting down gracefully takes a while, so tell the SCM to wait for it
+        let _ = report_status(
+            status_handle,
+            ServiceState::StopPending,
+            ServiceExitCode::NO_ERROR,
+        );
+    });
+    let run_server = RUN_SERVER
+        .get()
+        .expect("should be set before the service is started");
 
-        match stop_rx.recv_timeout(SERVER_POLL_INTERVAL) {
-            Err(mpsc::RecvTimeoutError::Timeout) => {}
-            Ok(()) | Err(mpsc::RecvTimeoutError::Disconnected) => {
-                server.kill()?;
-                server.wait()?;
-                break ServiceExitCode::NO_ERROR;
-            }
-        }
+    // Run the server and pass the ShutdownSignal to it.
+    let exit_code = if run_server(stop_requested) {
+        ServiceExitCode::NO_ERROR
+    } else {
+        ServiceExitCode::ServiceSpecific(1)
     };
 
-    // The server has exited, so its output has ended and the log threads finish
-    stdout_thread.join().expect("should not panic")?;
-    stderr_thread.join().expect("should not panic")?;
-
-    Ok(exit_code)
+    report_status(status_handle, ServiceState::Stopped, exit_code)
 }
 
 /// Report the service state
@@ -218,6 +181,11 @@ fn report_status(
     } else {
         ServiceControlAccept::empty()
     };
+    let wait_hint = if current_state == ServiceState::StopPending {
+        STOP_WAIT_HINT
+    } else {
+        Duration::default()
+    };
 
     status_handle.set_service_status(ServiceStatus {
         service_type: SERVICE_TYPE,
@@ -225,7 +193,7 @@ fn report_status(
         controls_accepted,
         exit_code,
         checkpoint: 0,
-        wait_hint: Duration::default(),
+        wait_hint,
         process_id: None,
     })?;
     Ok(())
@@ -233,23 +201,16 @@ fn report_status(
 
 /// Create the log file next to the executable. If the file exists,
 /// it will be renamed with a timestamp before creating a new log file.
-fn create_log(current_exe: &Path, name: &str) -> io::Result<fs::File> {
-    let path = current_exe.with_extension(format!("{name}.log"));
+pub fn create_log_file() -> Result<fs::File, Error> {
+    let current_exe = std::env::current_exe()?;
+    let path = current_exe.with_extension("log");
     if path.exists() {
         fs::rename(
             &path,
-            current_exe.with_extension(format!("{}.{}.log", unix_timestamp(), name)),
+            current_exe.with_extension(format!("{}.log", unix_timestamp())),
         )?;
     }
-    fs::File::create(path)
-}
-
-/// Copy output to the log file on a background thread
-fn copy_to_log(
-    mut output: impl Read + Send + 'static,
-    mut log: fs::File,
-) -> JoinHandle<io::Result<u64>> {
-    thread::spawn(move || io::copy(&mut output, &mut log))
+    Ok(fs::File::create(path)?)
 }
 
 /// Write a crash report to a new file next to the executable.

@@ -321,4 +321,4 @@ abacus.exe --service --uninstall  Stop and uninstall the service
 
 Any other arguments given to `--service --install` are stored with the service and passed on to the server every time it starts, e.g. `abacus.exe --service --install --port 8443`.
 
-The service runs as LocalSystem and starts `abacus.exe` as a child process. The output is written to `abacus.out.log` and `abacus.err.log` next to the executable. If logs exist when the service starts, they will be renamed with a timestamp suffix. If there is a failure, it writes an `abacus.<timestamp>.crash.log` file. 
+The service runs as `LocalSystem` and runs the server in the service process. The output is written to `abacus.log` next to the executable. If logs exist when the service starts, they will be renamed with a timestamp suffix. If there is a failure, it writes an `abacus.<timestamp>.crash.log` file. 

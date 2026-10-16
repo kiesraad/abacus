@@ -4,7 +4,7 @@ use std::{
     process,
 };
 
-use abacus::{AppError, create_sqlite_pool, infra::backup::BackupConfig};
+use abacus::{AppError, ShutdownSignal, create_sqlite_pool, infra::backup::BackupConfig};
 use clap::Parser;
 use socket2::{Domain, Protocol, Socket, Type};
 use tokio::net::TcpListener;
@@ -77,6 +77,37 @@ fn spawn_plain_http_server(
 /// Abacus API and asset server
 #[derive(Parser, Debug)]
 struct Args {
+    #[command(flatten)]
+    server: ServerConfig,
+
+    /// Create the TLS directory and CA certificate (if missing) and exit without starting the server
+    #[cfg(feature = "tls")]
+    #[arg(long)]
+    init_tls: bool,
+
+    /// Show version
+    #[arg(short = 'V', long)]
+    version: bool,
+
+    /// Run as a Windows service
+    #[cfg(windows)]
+    #[arg(long)]
+    service: bool,
+
+    /// Install and start the Windows service
+    #[cfg(windows)]
+    #[arg(long, requires = "service", conflicts_with = "uninstall")]
+    install: bool,
+
+    /// Stop and uninstall the Windows service
+    #[cfg(windows)]
+    #[arg(long, requires = "service", conflicts_with = "install")]
+    uninstall: bool,
+}
+
+/// Settings of the server, the same in a console and as a Windows service
+#[derive(clap::Args, Debug)]
+struct ServerConfig {
     /// Server port, optional
     #[arg(short, long, default_value_t = get_default_port(), env = "ABACUS_PORT")]
     port: u16,
@@ -99,11 +130,6 @@ struct Args {
     #[arg(long, default_value_t = default_http_port(), env = "ABACUS_HTTP_PORT")]
     http_port: u16,
 
-    /// Create the TLS directory and CA certificate (if missing) and exit without starting the server
-    #[cfg(feature = "tls")]
-    #[arg(long)]
-    init_tls: bool,
-
     /// Seed the database with initial data using the fixtures
     #[cfg(feature = "dev-database")]
     #[arg(short, long, env = "ABACUS_SEED_DATA")]
@@ -118,25 +144,6 @@ struct Args {
     #[cfg(not(feature = "airgap-detection"))]
     #[arg(short, long, env = "ABACUS_AIRGAP_DETECTION")]
     airgap_detection: bool,
-
-    /// Show version
-    #[arg(short = 'V', long)]
-    version: bool,
-
-    /// Run as a Windows service
-    #[cfg(windows)]
-    #[arg(long)]
-    service: bool,
-
-    /// Install and start the Windows service
-    #[cfg(windows)]
-    #[arg(long, requires = "service", conflicts_with = "uninstall")]
-    install: bool,
-
-    /// Stop and uninstall the Windows service
-    #[cfg(windows)]
-    #[arg(long, requires = "service", conflicts_with = "install")]
-    uninstall: bool,
 }
 
 /// Main entry point for the application. Sets up the database, and starts the
@@ -227,34 +234,38 @@ async fn run() -> Result<(), AppError> {
         return run_windows_service(&args);
     }
 
+    run_server(args.server, abacus::shutdown_signal()).await
+}
+
+async fn run_server(config: ServerConfig, shutdown: ShutdownSignal) -> Result<(), AppError> {
     let pool = create_sqlite_pool(
-        &args.database,
+        &config.database,
         #[cfg(feature = "dev-database")]
-        args.reset_database,
+        config.reset_database,
         #[cfg(feature = "dev-database")]
-        args.seed_data,
+        config.seed_data,
     )
     .await?;
 
-    let backup_config = BackupConfig::new(args.backup_dir);
+    let backup_config = BackupConfig::new(config.backup_dir);
 
     // Enable airgap detection if the feature is enabled or if the command line argument is set.
     #[cfg(feature = "airgap-detection")]
     let enable_airgap_detection = true;
 
     #[cfg(not(feature = "airgap-detection"))]
-    let enable_airgap_detection = args.airgap_detection;
+    let enable_airgap_detection = config.airgap_detection;
 
-    let listener = bind_listener(args.port)?;
+    let listener = bind_listener(config.port)?;
 
     // When compiled with the `tls` feature the server always serves HTTPS.
     #[cfg(feature = "tls")]
     {
-        let certificates = abacus::infra::tls::load_or_generate(&args.tls_dir)?;
+        let certificates = abacus::infra::tls::load_or_generate(&config.tls_dir)?;
         let tls_config = certificates.server_config()?;
         let ca = std::sync::Arc::new(certificates.ca);
 
-        spawn_plain_http_server(args.http_port, args.port, ca.clone());
+        spawn_plain_http_server(config.http_port, config.port, ca.clone());
 
         abacus::start_server_tls(
             pool,
@@ -263,9 +274,17 @@ async fn run() -> Result<(), AppError> {
             backup_config,
             tls_config,
             ca,
+            shutdown,
         )
         .await
     }
     #[cfg(not(feature = "tls"))]
-    abacus::start_server(pool, listener, enable_airgap_detection, backup_config).await
+    abacus::start_server(
+        pool,
+        listener,
+        enable_airgap_detection,
+        backup_config,
+        shutdown,
+    )
+    .await
 }

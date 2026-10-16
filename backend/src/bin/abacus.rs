@@ -141,9 +141,8 @@ struct Args {
 
 /// Main entry point for the application. Sets up the database, and starts the
 /// API server and in-memory file router on port 8080.
-#[tokio::main]
-async fn main() {
-    if let Err(e) = run().await {
+fn main() {
+    if let Err(e) = run() {
         error!("{e}");
         process::exit(1);
     }
@@ -189,13 +188,10 @@ fn run_windows_service(args: &Args) -> Result<(), AppError> {
     } else if args.uninstall {
         abacus_windows_service::uninstall()
     } else {
-        // The SCM calls this on a thread it creates itself, without the arguments or the runtime
-        // of this process, so it parses the command line again and creates a runtime of its own
+        // The SCM calls this on a thread it creates itself, without the arguments
+        // of this process, so it parses the command line again
         abacus_windows_service::run(|shutdown| {
-            let args = Args::parse();
-            tokio::runtime::Runtime::new()
-                .map_err(AppError::Io)
-                .and_then(|runtime| runtime.block_on(run_server(args, shutdown)))
+            run_server(Args::parse(), shutdown)
                 .inspect_err(|e| error!("{e}"))
                 .is_ok()
         })
@@ -204,7 +200,7 @@ fn run_windows_service(args: &Args) -> Result<(), AppError> {
     result.map_err(|e| AppError::WindowsService(e.to_string()))
 }
 
-async fn run() -> Result<(), AppError> {
+fn run() -> Result<(), AppError> {
     let args = Args::parse();
 
     let log = tracing_subscriber::fmt().with_env_filter(
@@ -243,10 +239,15 @@ async fn run() -> Result<(), AppError> {
         return run_windows_service(&args);
     }
 
-    run_server(args, abacus::shutdown_signal()).await
+    run_server(args, abacus::shutdown_signal())
 }
 
-async fn run_server(args: Args, shutdown: ShutdownSignal) -> Result<(), AppError> {
+/// Create a runtime and serve until `shutdown` completes.
+fn run_server(args: Args, shutdown: ShutdownSignal) -> Result<(), AppError> {
+    tokio::runtime::Runtime::new()?.block_on(serve(args, shutdown))
+}
+
+async fn serve(args: Args, shutdown: ShutdownSignal) -> Result<(), AppError> {
     let pool = create_sqlite_pool(
         &args.database,
         #[cfg(feature = "dev-database")]

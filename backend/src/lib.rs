@@ -1,6 +1,6 @@
 #![cfg_attr(test, allow(clippy::too_many_lines, clippy::cognitive_complexity))]
 
-use std::{future::Future, net::SocketAddr, str::FromStr};
+use std::{future::Future, net::SocketAddr, pin::Pin, str::FromStr};
 
 use api::middleware::airgap::AirgapDetection;
 use axum::{extract::FromRef, serve::ListenerExt};
@@ -97,6 +97,7 @@ pub async fn start_server(
     listener: TcpListener,
     enable_airgap_detection: bool,
     backup_config: BackupConfig,
+    shutdown_signal: ShutdownSignal,
 ) -> Result<(), AppError> {
     let app = build_app(&pool, enable_airgap_detection, backup_config)?;
 
@@ -112,7 +113,7 @@ pub async fn start_server(
         listener,
         app.into_make_service_with_connect_info::<SocketAddr>(),
     )
-    .with_graceful_shutdown(shutdown_signal())
+    .with_graceful_shutdown(shutdown_signal)
     .await?;
 
     close_and_log(pool).await;
@@ -129,6 +130,7 @@ pub async fn start_server_tls(
     backup_config: BackupConfig,
     tls_config: std::sync::Arc<rustls::ServerConfig>,
     ca: std::sync::Arc<infra::tls::CaCertificate>,
+    shutdown_signal: ShutdownSignal,
 ) -> Result<(), AppError> {
     use std::time::Duration;
 
@@ -152,7 +154,7 @@ pub async fn start_server_tls(
     let handle = axum_server::Handle::new();
     let shutdown_handle = handle.clone();
     tokio::spawn(async move {
-        shutdown_signal().await;
+        shutdown_signal.await;
         shutdown_handle.graceful_shutdown(Some(Duration::from_secs(10)));
     });
 
@@ -171,61 +173,66 @@ pub async fn start_server_tls(
     Ok(())
 }
 
+/// Future that completes when the server should shut down gracefully
+pub type ShutdownSignal = Pin<Box<dyn Future<Output = ()> + Send>>;
+
 /// Graceful shutdown signal handler.
 ///
 /// Copied from the
 /// [axum graceful-shutdown example](https://github.com/tokio-rs/axum/blob/6318b57fda6b524b4d3c7909e07946e2b246ebd2/examples/graceful-shutdown/src/main.rs)
 /// (under the MIT license).
-pub async fn shutdown_signal() {
-    let ctrl_c = async {
-        signal::ctrl_c()
-            .await
-            .expect("failed to install Ctrl+C handler");
-    };
+pub fn shutdown_signal() -> ShutdownSignal {
+    Box::pin(async {
+        let ctrl_c = async {
+            signal::ctrl_c()
+                .await
+                .expect("failed to install Ctrl+C handler");
+        };
 
-    #[cfg(unix)]
-    let terminate = async {
-        signal::unix::signal(signal::unix::SignalKind::terminate())
-            .expect("failed to install terminate signal handler")
-            .recv()
-            .await;
-    };
+        #[cfg(unix)]
+        let terminate = async {
+            signal::unix::signal(signal::unix::SignalKind::terminate())
+                .expect("failed to install terminate signal handler")
+                .recv()
+                .await;
+        };
 
-    #[cfg(unix)]
-    let quit = async {
-        signal::unix::signal(signal::unix::SignalKind::quit())
-            .expect("failed to install quit signal handler")
-            .recv()
-            .await;
-    };
+        #[cfg(unix)]
+        let quit = async {
+            signal::unix::signal(signal::unix::SignalKind::quit())
+                .expect("failed to install quit signal handler")
+                .recv()
+                .await;
+        };
 
-    #[cfg(windows)]
-    let terminate = async {
-        signal::windows::ctrl_close()
-            .expect("failed to install CTRL_CLOSE handler")
-            .recv()
-            .await
-    };
+        #[cfg(windows)]
+        let terminate = async {
+            signal::windows::ctrl_close()
+                .expect("failed to install CTRL_CLOSE handler")
+                .recv()
+                .await
+        };
 
-    #[cfg(windows)]
-    let quit = async {
-        signal::windows::ctrl_shutdown()
-            .expect("failed to install CTRL_SHUTDOWN handler")
-            .recv()
-            .await
-    };
+        #[cfg(windows)]
+        let quit = async {
+            signal::windows::ctrl_shutdown()
+                .expect("failed to install CTRL_SHUTDOWN handler")
+                .recv()
+                .await
+        };
 
-    #[cfg(not(any(unix, windows)))]
-    let terminate = std::future::pending::<()>();
+        #[cfg(not(any(unix, windows)))]
+        let terminate = std::future::pending::<()>();
 
-    #[cfg(not(any(unix, windows)))]
-    let quit = std::future::pending::<()>();
+        #[cfg(not(any(unix, windows)))]
+        let quit = std::future::pending::<()>();
 
-    tokio::select! {
-        _ = ctrl_c => {},
-        _ = terminate => {},
-        _ = quit => {},
-    }
+        tokio::select! {
+            _ = ctrl_c => {},
+            _ = terminate => {},
+            _ = quit => {},
+        }
+    })
 }
 
 #[derive(Serialize)]
@@ -304,7 +311,7 @@ mod test {
     use tokio::net::TcpListener;
 
     use super::start_server;
-    use crate::{AppError, create_sqlite_pool, infra::backup::BackupConfig};
+    use crate::{AppError, create_sqlite_pool, infra::backup::BackupConfig, shutdown_signal};
 
     pub(crate) async fn run_server_test<F, Fut>(pool: SqlitePool, test_fn: F)
     where
@@ -320,7 +327,7 @@ mod test {
         let backup_dir = tempfile::tempdir().unwrap();
         let backup_config = BackupConfig::new(backup_dir.path().to_path_buf());
         let server_task = tokio::spawn(async move {
-            start_server(pool, listener, false, backup_config)
+            start_server(pool, listener, false, backup_config, shutdown_signal())
                 .await
                 .unwrap();
         });
@@ -487,7 +494,7 @@ mod test {
 
         use crate::{
             infra::audit_log, infra::backup::BackupConfig, infra::tls::load_or_generate,
-            start_server_tls,
+            shutdown_signal, start_server_tls,
         };
 
         /// Helper to start an HTTPS server on `bind_addr` with a new CA+leaf certificate
@@ -505,9 +512,17 @@ mod test {
             let listener = TcpListener::bind(bind_addr).await.unwrap();
             let addr = listener.local_addr().unwrap();
             let task = tokio::spawn(async move {
-                start_server_tls(pool, listener, false, backup_config, server_config, ca)
-                    .await
-                    .unwrap();
+                start_server_tls(
+                    pool,
+                    listener,
+                    false,
+                    backup_config,
+                    server_config,
+                    ca,
+                    shutdown_signal(),
+                )
+                .await
+                .unwrap();
             });
             (addr, ca_pem, task)
         }

@@ -7,6 +7,7 @@ members = [
     "pdf_gen/types",
     "pdf_gen/impl",
     "pdf_gen/wrapper",
+    "windows_service",
 ]
 
 [workspace.package]
@@ -121,6 +122,9 @@ if-addrs = { workspace = true, optional = true }
 rustls = { workspace = true, optional = true }
 axum-server = { workspace = true, optional = true }
 zeroize.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+abacus-windows-service = { path = "./windows_service" }
 
 [dev-dependencies]
 http-body-util.workspace = true

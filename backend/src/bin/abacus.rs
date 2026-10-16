@@ -4,7 +4,7 @@ use std::{
     process,
 };
 
-use abacus::{AppError, create_sqlite_pool, infra::backup::BackupConfig};
+use abacus::{AppError, ShutdownSignal, create_sqlite_pool, infra::backup::BackupConfig};
 use clap::Parser;
 use socket2::{Domain, Protocol, Socket, Type};
 use tokio::net::TcpListener;
@@ -122,13 +122,27 @@ struct Args {
     /// Show version
     #[arg(short = 'V', long)]
     version: bool,
+
+    /// Run as a Windows service
+    #[cfg(windows)]
+    #[arg(long)]
+    service: bool,
+
+    /// Install and start the Windows service
+    #[cfg(windows)]
+    #[arg(long, requires = "service", conflicts_with = "uninstall")]
+    install: bool,
+
+    /// Stop and uninstall the Windows service
+    #[cfg(windows)]
+    #[arg(long, requires = "service", conflicts_with = "install")]
+    uninstall: bool,
 }
 
 /// Main entry point for the application. Sets up the database, and starts the
 /// API server and in-memory file router on port 8080.
-#[tokio::main]
-async fn main() {
-    if let Err(e) = run().await {
+fn main() {
+    if let Err(e) = run() {
         error!("{e}");
         process::exit(1);
     }
@@ -154,16 +168,61 @@ fn init_tls(tls_dir: &std::path::Path) -> Result<(), AppError> {
     Ok(())
 }
 
-async fn run() -> Result<(), AppError> {
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            EnvFilter::builder()
-                .with_default_directive(LevelFilter::INFO.into())
-                .from_env()?,
-        )
-        .init();
+/// Run, install or uninstall the Windows service.
+#[cfg(windows)]
+fn run_windows_service(args: &Args) -> Result<(), AppError> {
+    use std::ffi::OsString;
 
+    let result = if args.install {
+        // Get launch arguments by filtering out service-related flags
+        let server_arguments = std::env::args_os().skip(1).filter(|arg| {
+            !matches!(
+                arg.to_str(),
+                Some("--service" | "--install" | "--uninstall")
+            )
+        });
+        let launch_arguments = std::iter::once(OsString::from("--service"))
+            .chain(server_arguments)
+            .collect();
+        abacus_windows_service::install(launch_arguments)
+    } else if args.uninstall {
+        abacus_windows_service::uninstall()
+    } else {
+        // The SCM calls this on a thread it creates itself, without the arguments
+        // of this process, so it parses the command line again
+        abacus_windows_service::run(|shutdown| {
+            run_server(Args::parse(), shutdown)
+                .inspect_err(|e| error!("{e}"))
+                .is_ok()
+        })
+    };
+
+    result.map_err(|e| AppError::WindowsService(e.to_string()))
+}
+
+fn run() -> Result<(), AppError> {
     let args = Args::parse();
+
+    let log = tracing_subscriber::fmt().with_env_filter(
+        EnvFilter::builder()
+            .with_default_directive(LevelFilter::INFO.into())
+            .from_env()?,
+    );
+
+    #[cfg(windows)]
+    if args.service && !args.install && !args.uninstall {
+        // Log to a file, since a running Windows service has no console.
+        let log_file = abacus_windows_service::create_log_file()
+            .map_err(|e| AppError::WindowsService(e.to_string()))?;
+        log.with_writer(std::sync::Mutex::new(log_file))
+            .with_ansi(false)
+            .init();
+
+        return run_windows_service(&args);
+    }
+
+    log.init();
+
     if args.version {
         println!(env!("ABACUS_GIT_VERSION"));
         return Ok(());
@@ -175,6 +234,20 @@ async fn run() -> Result<(), AppError> {
         return init_tls(&args.tls_dir);
     }
 
+    #[cfg(windows)]
+    if args.service {
+        return run_windows_service(&args);
+    }
+
+    run_server(args, abacus::shutdown_signal())
+}
+
+/// Create a runtime and serve until `shutdown` completes.
+fn run_server(args: Args, shutdown: ShutdownSignal) -> Result<(), AppError> {
+    tokio::runtime::Runtime::new()?.block_on(serve(args, shutdown))
+}
+
+async fn serve(args: Args, shutdown: ShutdownSignal) -> Result<(), AppError> {
     let pool = create_sqlite_pool(
         &args.database,
         #[cfg(feature = "dev-database")]
@@ -211,9 +284,17 @@ async fn run() -> Result<(), AppError> {
             backup_config,
             tls_config,
             ca,
+            shutdown,
         )
         .await
     }
     #[cfg(not(feature = "tls"))]
-    abacus::start_server(pool, listener, enable_airgap_detection, backup_config).await
+    abacus::start_server(
+        pool,
+        listener,
+        enable_airgap_detection,
+        backup_config,
+        shutdown,
+    )
+    .await
 }

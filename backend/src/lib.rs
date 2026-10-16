@@ -494,7 +494,7 @@ mod test {
 
         use crate::{
             infra::audit_log, infra::backup::BackupConfig, infra::tls::load_or_generate,
-            start_server_tls,
+            shutdown_signal, start_server_tls,
         };
 
         /// Helper to start an HTTPS server on `bind_addr` with a new CA+leaf certificate

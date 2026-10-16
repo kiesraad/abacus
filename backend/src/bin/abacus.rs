@@ -213,6 +213,20 @@ async fn run() -> Result<(), AppError> {
             .from_env()?,
     );
 
+    #[cfg(windows)]
+    if args.service && !args.install && !args.uninstall {
+        // Log to a file, since a running Windows service has no console.
+        let log_file = abacus_windows_service::create_log_file()
+            .map_err(|e| AppError::WindowsService(e.to_string()))?;
+        log.with_writer(std::sync::Mutex::new(log_file))
+            .with_ansi(false)
+            .init();
+
+        return run_windows_service(&args);
+    }
+
+    log.init();
+
     if args.version {
         println!(env!("ABACUS_GIT_VERSION"));
         return Ok(());
@@ -226,19 +240,9 @@ async fn run() -> Result<(), AppError> {
 
     #[cfg(windows)]
     if args.service {
-        // If not installing or uninstalling, set up logging for the service.
-        if !args.install && !args.uninstall {
-            let log_file = abacus_windows_service::create_log_file()
-                .map_err(|e| AppError::WindowsService(e.to_string()))?;
-            log.with_writer(std::sync::Mutex::new(log_file))
-                .with_ansi(false)
-                .init();
-        }
-
         return run_windows_service(&args);
     }
 
-    log.init();
     run_server(args, abacus::shutdown_signal()).await
 }
 

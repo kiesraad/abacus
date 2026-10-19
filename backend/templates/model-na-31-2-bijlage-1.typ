@@ -53,7 +53,7 @@ Het stembureau heeft op de dag van de verkiezingen de stemmen per lijst geteld. 
 Heeft het #location_type *extra* onderzoek gedaan?
 
 #checkbox[Ja]
-#checkbox[Nee]
+#checkbox[Nee #sym.arrow.r *sla de volgende vraag van dit onderdeel over*]
 
 #block(below: 1em)
 
@@ -75,15 +75,14 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 == Aantallen kiezers en stemmen
 
 #emph_block[
-  Is in de telresultaten van het stembureau (rubriek 2.3 van het proces-verbaal van
-  het stembureau) het verschil tussen het totaal aantal getelde stemmen en het aantal
-  toegelaten kiezers volledig verklaard? Controleer daarbij ook of rubriek 2.3 van het
-  proces-verbaal van het stembureau correct is ingevuld en de verklaringen het verschil
-  daadwerkelijk verklaren.
+  Is in de telresultaten van het #underline[*stembureau*] (rubriek 2.3 van het proces-verbaal van
+  het stembureau) het aantal toegelaten kiezers (D) en het totaal aantal getelde stemmen (H) gelijk *OF* is er een verschil en is dit verschil *volledig* verklaard?
 ]
 
-#checkbox[Ja]
-#checkbox[*Nee #sym.arrow.r Hertel het aantal toegelaten kiezers (#is_local_election[stempassen en volmachten][stempassen, kiezerspassen en volmachten])*, en noteer de uitkomsten bij rubriek 3.1]
+Controleer bij verklaarde verschillen ook of rubriek 2.3 van het proces-verbaal van het stembureau correct is ingevuld en de verklaringen het verschil daadwerkelijk verklaren.
+
+#checkbox[Ja, D en H zijn gelijk *OF* het verschil is volledig verklaard]
+#checkbox[Nee #sym.arrow.r *Hertel het aantal toegelaten kiezers (#is_local_election[stempassen en volmachten][stempassen, kiezerspassen en volmachten])*, en noteer de uitkomsten bij rubriek 3.1]
 
 == Tel de stembiljetten
 

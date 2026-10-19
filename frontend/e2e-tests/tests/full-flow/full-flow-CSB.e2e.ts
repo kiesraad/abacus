@@ -148,7 +148,7 @@ for (const variant of variants) {
       await expect(committeeCategoryPage.csb).toBeChecked();
       await committeeCategoryPage.next.click();
 
-      await uploadCandidatesAndInputHash(page, variant.candidateDefinition);
+      await uploadCandidatesAndInputHash(page, variant.candidateDefinition, variant.regionName);
 
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();

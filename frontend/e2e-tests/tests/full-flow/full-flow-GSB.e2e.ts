@@ -241,7 +241,7 @@ for (const variant of variants) {
         await selectGSBPage.clickRegionFromList(variant.regionNumber);
       }
 
-      await uploadCandidatesAndInputHash(page, variant.candidateDefinition);
+      await uploadCandidatesAndInputHash(page, variant.candidateDefinition, variant.regionName);
 
       await uploadPollingStations(page, eml110b_single);
 

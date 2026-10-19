@@ -166,7 +166,7 @@ export const eml110b_zero_voters = {
 export type Eml230b = {
   filename: string;
   path: string;
-  importTitle: string;
+  electionType: string;
   importSubtitle?: string;
   hashInput1: string;
   hashInput2: string;
@@ -176,7 +176,7 @@ export type Eml230b = {
 export const eml230b: Eml230b = {
   filename: "eml230b_test.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test.eml.xml",
-  importTitle: "GR2022 Test",
+  electionType: "GR2022",
   hashInput1: "0e5b",
   hashInput2: "f18e",
   fullHash: [
@@ -202,7 +202,7 @@ export const eml230b: Eml230b = {
 export const eml230b_with_gaps: Eml230b = {
   filename: "eml230b_test_with_gaps.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml230b_test_with_gaps.eml.xml",
-  importTitle: "GR2022 Test",
+  electionType: "GR2022",
   hashInput1: "9c26",
   hashInput2: "00ed",
   fullHash: [
@@ -228,7 +228,7 @@ export const eml230b_with_gaps: Eml230b = {
 export const eml230b_more_than_45_candidates: Eml230b = {
   filename: "eml230b_test_more_than_45_candidates.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml230b_test_more_than_45_candidates.eml.xml",
-  importTitle: "GR2022 Test",
+  electionType: "GR2022",
   hashInput1: "1bbb",
   hashInput2: "bc88",
   fullHash: [
@@ -254,7 +254,7 @@ export const eml230b_more_than_45_candidates: Eml230b = {
 export const eml230b_AB: Eml230b = {
   filename: "eml230b_test_AB.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_AB.eml.xml",
-  importTitle: "AB2023 Rivier en Polder",
+  electionType: "AB2023",
   hashInput1: "69e1",
   hashInput2: "5ba4",
   fullHash: [
@@ -280,7 +280,7 @@ export const eml230b_AB: Eml230b = {
 export const eml230b_AB_more_than_45_candidates: Eml230b = {
   filename: "eml230b_test_AB_more_than_45_candidates.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml230b_test_AB_more_than_45_candidates.eml.xml",
-  importTitle: "AB2023 Rivier en Polder",
+  electionType: "AB2023",
   hashInput1: "8d5c",
   hashInput2: "651c",
   fullHash: [
@@ -306,7 +306,7 @@ export const eml230b_AB_more_than_45_candidates: Eml230b = {
 export const eml230b_PS1: Eml230b = {
   filename: "eml230b_test_PS1.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_PS1.eml.xml",
-  importTitle: "PS2023 Oost-Holland",
+  electionType: "PS2023",
   hashInput1: "d464",
   hashInput2: "6559",
   fullHash: [
@@ -332,7 +332,7 @@ export const eml230b_PS1: Eml230b = {
 export const eml230b_PS2: Eml230b = {
   filename: "eml230b_test_PS2.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_PS2.eml.xml",
-  importTitle: "PS2023 Zuid-Brabant",
+  electionType: "PS2023",
   importSubtitle: "Kieskring II ('s-Gravenveen)",
   hashInput1: "b285",
   hashInput2: "667c",

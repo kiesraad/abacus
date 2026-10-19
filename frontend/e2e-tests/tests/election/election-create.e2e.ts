@@ -53,7 +53,7 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // upload candidates list and check
-      await uploadCandidatesAndInputHash(page, eml230b);
+      await uploadCandidatesAndInputHash(page, eml230b, "Test");
 
       // upload polling stations
       await uploadPollingStations(page);
@@ -128,7 +128,7 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // upload candidates list and check
-      await uploadCandidatesAndInputHash(page, eml230b);
+      await uploadCandidatesAndInputHash(page, eml230b, "Test");
 
       // skip polling stations
       const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
@@ -210,7 +210,7 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // upload candidates list and check
-      await uploadCandidatesAndInputHash(page, eml230b);
+      await uploadCandidatesAndInputHash(page, eml230b, "Test");
 
       // upload polling stations
       await uploadPollingStations(page);
@@ -285,7 +285,7 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // upload candidates list and check
-      await uploadCandidatesAndInputHash(page, eml230b);
+      await uploadCandidatesAndInputHash(page, eml230b, "Test");
 
       // skip polling stations
       const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
@@ -398,7 +398,7 @@ test.describe("Election creation", () => {
         await committeeCategoryPage.next.click();
 
         // Upload candidate list and check hash.
-        await uploadCandidatesAndInputHash(page, variant.candidateDefinition);
+        await uploadCandidatesAndInputHash(page, variant.candidateDefinition, variant.regionName);
 
         // Check the election summary before saving.
         const checkAndSavePage = new CheckAndSavePgObj(page);
@@ -602,7 +602,7 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // upload candidates list and check hash
-      await uploadCandidatesAndInputHash(page, eml230b);
+      await uploadCandidatesAndInputHash(page, eml230b, "Test");
 
       // Now we should be at the polling station upload page
       const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
@@ -632,7 +632,7 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // upload candidates list and check hash
-      await uploadCandidatesAndInputHash(page, eml230b);
+      await uploadCandidatesAndInputHash(page, eml230b, "Test");
 
       // Now we should be at the polling station upload page
       const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
@@ -665,7 +665,7 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // upload candidates list and check hash
-      await uploadCandidatesAndInputHash(page, eml230b);
+      await uploadCandidatesAndInputHash(page, eml230b, "Test");
 
       // upload polling stations
       await uploadPollingStations(page);
@@ -710,7 +710,7 @@ test.describe("Election creation", () => {
       await expect(committeeCategoryPage.header).toBeVisible();
       await committeeCategoryPage.next.click();
 
-      await uploadCandidatesAndInputHash(page, eml230b);
+      await uploadCandidatesAndInputHash(page, eml230b, "Test");
 
       await uploadPollingStations(page, eml110b_zero_voters);
 
@@ -748,7 +748,7 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // upload candidates list and check hash
-      await uploadCandidatesAndInputHash(page, eml230b);
+      await uploadCandidatesAndInputHash(page, eml230b, "Test");
 
       // upload wrong file
       const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);

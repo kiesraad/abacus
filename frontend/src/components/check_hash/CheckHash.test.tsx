@@ -1,6 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 import { render, screen } from "@/testing/test-utils";
+import { formatDateFull } from "@/utils/dateTime";
 import { CheckHash } from "./CheckHash";
 
 const onSubmit = vi.fn();
@@ -27,8 +28,8 @@ const hashChunks = [
 function renderPage(error = false) {
   render(
     <CheckHash
-      date={"2022-03-16"}
       title={"Gemeenteraad Test 2022"}
+      subtitle={formatDateFull(new Date("2022-03-16"))}
       header={"Controleer bestand"}
       description={"Het bestand <naam bestand> is geïmporteerd etc etc"}
       instructions={"Vul ter controle de afgeschermde delen in."}

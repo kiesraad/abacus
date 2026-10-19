@@ -167,7 +167,7 @@ export type Eml230b = {
   filename: string;
   path: string;
   electionType: string;
-  importSubtitle?: string;
+  electionDistrict?: string;
   hashInput1: string;
   hashInput2: string;
   fullHash: string[];
@@ -333,7 +333,7 @@ export const eml230b_PS2: Eml230b = {
   filename: "eml230b_test_PS2.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_PS2.eml.xml",
   electionType: "PS2023",
-  importSubtitle: "Kieskring II ('s-Gravenveen)",
+  electionDistrict: "Kieskring II ('s-Gravenveen)",
   hashInput1: "b285",
   hashInput2: "667c",
   fullHash: [

@@ -129,8 +129,8 @@ export async function uploadCandidatesAndInputHash(page: Page, eml: Eml230b, reg
   await uploadCandidateDefinitionPage.uploadFile(eml.path);
   await expect(uploadCandidateDefinitionPage.main).toContainText(eml.filename);
   await expect(uploadCandidateDefinitionPage.main).toContainText(`${eml.electionType} ${region}`);
-  if (eml.importSubtitle) {
-    await expect(uploadCandidateDefinitionPage.main).toContainText(eml.importSubtitle);
+  if (eml.electionDistrict) {
+    await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionDistrict);
   }
 
   const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);

@@ -571,7 +571,8 @@ async fn test_pdf(model: PdfModel) {
 
 #[test(tokio::test)]
 async fn test_n_10_1() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -597,7 +598,8 @@ async fn test_n_10_1() {
 
 #[test(tokio::test)]
 async fn test_n_10_1_inlegvel() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -622,7 +624,8 @@ async fn test_n_10_1_inlegvel() {
 
 #[test(tokio::test)]
 async fn test_n_10_2() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -647,7 +650,8 @@ async fn test_n_10_2() {
 
 #[test(tokio::test)]
 async fn test_na_14_1_versie_1() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -675,7 +679,8 @@ async fn test_na_14_1_versie_1() {
 
 #[test(tokio::test)]
 async fn test_na_14_1_versie_2() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -713,7 +718,8 @@ async fn test_na_14_1_versie_2() {
 
 #[test(tokio::test)]
 async fn test_na_14_2() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -757,7 +763,8 @@ async fn test_na_14_2() {
 
 #[test(tokio::test)]
 async fn test_na_14_2_bijlage_1() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -793,7 +800,8 @@ async fn test_na_14_2_bijlage_1() {
 
 #[test(tokio::test)]
 async fn test_na_31_1() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -832,7 +840,8 @@ async fn test_na_31_1() {
 
 #[test(tokio::test)]
 async fn test_na_31_1_inlegvel() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -855,7 +864,8 @@ async fn test_na_31_1_inlegvel() {
 
 #[test(tokio::test)]
 async fn test_na_31_2() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -894,7 +904,8 @@ async fn test_na_31_2() {
 
 #[test(tokio::test)]
 async fn test_na_31_2_bijlage_1() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -920,7 +931,8 @@ async fn test_na_31_2_bijlage_1() {
 
 #[test(tokio::test)]
 async fn test_na_31_2_inlegvel() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -943,7 +955,8 @@ async fn test_na_31_2_inlegvel() {
 
 #[test(tokio::test)]
 async fn test_p_2a() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
@@ -1144,7 +1157,6 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
 
 #[test(tokio::test)]
 async fn test_p_22_2_bijlage_1() {
-    let mut rng = rand::rng();
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
@@ -1173,5 +1185,7 @@ async fn test_p_22_2_bijlage_1() {
         }));
 
         test_pdf(model).await;
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
     }
 }

@@ -201,6 +201,7 @@ The following dependencies (crates) are used:
 - `serde`: framework for serializing and deserializing data structures.
 - `sha2`: generating a hash of the EML_NL XML files for inclusion in the PDF.
 - `socket2`: Utilities for creating and using network sockets.
+- `windows_socket`: Local Windows-only helper for exclusive socket binding (`SO_EXCLUSIVEADDRUSE`), using `windows-sys`.
 - `sqlx`: async SQL library featuring compile-time checked queries.
 - `strum`: Converting enums from their string representation and back
 - `tokio-util`: used for download streaming.

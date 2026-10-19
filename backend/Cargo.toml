@@ -4,6 +4,7 @@ members = [
     ".",
     "apportionment",
     "eml_signature",
+    "windows_socket",
     "pdf_gen/types",
     "pdf_gen/impl",
     "pdf_gen/wrapper",
@@ -121,6 +122,9 @@ if-addrs = { workspace = true, optional = true }
 rustls = { workspace = true, optional = true }
 axum-server = { workspace = true, optional = true }
 zeroize.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows_socket = { path = "./windows_socket" }
 
 [dev-dependencies]
 http-body-util.workspace = true

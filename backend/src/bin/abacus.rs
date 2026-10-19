@@ -4,6 +4,9 @@ use std::{
     process,
 };
 
+#[cfg(windows)]
+use std::os::windows::io::AsSocket;
+
 use abacus::{AppError, create_sqlite_pool, infra::backup::BackupConfig};
 use clap::Parser;
 use socket2::{Domain, Protocol, Socket, Type};
@@ -32,7 +35,16 @@ fn bind_listener(port: u16) -> Result<TcpListener, AppError> {
     let socket = Socket::new(Domain::IPV6, Type::STREAM, Some(Protocol::TCP))?;
     socket.set_nonblocking(true)?;
     socket.set_only_v6(false)?;
+    // On Unix-like OSes, enabling SO_REUSEADDR prevents 'port is in use' errors
+    // when restarting the Abacus server, by allowing the socket to bind to the
+    // port even if it is in the `TIME_WAIT` state.
+    //
+    // However, on Windows, SO_REUSEADDR allows multiple listeners to bind to
+    // the same port, so we leave the option disabled.
+    #[cfg(not(windows))]
     socket.set_reuse_address(true)?;
+    #[cfg(windows)]
+    windows_socket::set_exclusive_address_use(socket.as_socket())?;
 
     let address = SocketAddr::from((Ipv6Addr::UNSPECIFIED, port));
     socket.bind(&address.into()).map_err(|e| match e.kind() {
@@ -216,4 +228,48 @@ async fn run() -> Result<(), AppError> {
     }
     #[cfg(not(feature = "tls"))]
     abacus::start_server(pool, listener, enable_airgap_detection, backup_config).await
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn cannot_bind_listener_to_port_already_in_use() {
+        let listener = bind_listener(0).unwrap();
+        let port = listener.local_addr().unwrap().port();
+
+        let error = bind_listener(port).unwrap_err();
+        assert!(matches!(error, AppError::PortAlreadyInUse(p) if p == port));
+
+        drop(listener);
+        bind_listener(port).unwrap();
+    }
+
+    #[cfg(windows)]
+    #[tokio::test]
+    async fn exclusive_listener_prevents_takeover() {
+        let listener = bind_listener(0).unwrap();
+        let port = listener.local_addr().unwrap().port();
+
+        use std::net::Ipv4Addr;
+        for address in [
+            SocketAddr::from((Ipv4Addr::LOCALHOST, port)),
+            SocketAddr::from((Ipv6Addr::LOCALHOST, port)),
+            SocketAddr::from((Ipv6Addr::UNSPECIFIED, port)),
+        ] {
+            let domain = if address.is_ipv4() {
+                Domain::IPV4
+            } else {
+                Domain::IPV6
+            };
+            let competitor = Socket::new(domain, Type::STREAM, Some(Protocol::TCP)).unwrap();
+            competitor.set_reuse_address(true).unwrap();
+
+            let error = competitor
+                .bind(&address.into())
+                .expect_err("SO_REUSEADDR must not allow takeover of the Abacus listener");
+            assert_eq!(error.kind(), ErrorKind::PermissionDenied, "{address}");
+        }
+    }
 }

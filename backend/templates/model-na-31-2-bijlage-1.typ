@@ -43,9 +43,9 @@ Het stembureau heeft op de dag van de verkiezingen de stemmen per lijst geteld. 
 = Extra onderzoek: opmerkingen #location_type
 
 #emph_block[
-  Het #location_type kan tijdens de zitting nadat zij de telling van het stembureau heeft afgerond, extra onderzoek uitvoeren.
+  Het #location_type kan tijdens de zitting, nadat zij de telling van het stembureau heeft afgerond, extra onderzoek uitvoeren.
   Bijvoorbeeld als er sprake is van een opvallend hoog aantal ongeldige of blanco uitgebrachte
-  stemmen. Geef in dit onderdeel aan of, en zo ja, welk extra onderzoek #location_type heeft uitgevoerd.
+  stemmen. Geef in dit onderdeel aan of, en zo ja, welk extra onderzoek het #location_type heeft uitgevoerd.
 ]
 
 #block(below: 1em)

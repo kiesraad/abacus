@@ -17,6 +17,7 @@ import {
   eml230b,
   eml230b_AB_more_than_45_candidates,
   eml230b_more_than_45_candidates,
+  eml510b,
 } from "e2e-tests/test-data/eml-files";
 import {
   dataEntryRequest,
@@ -30,6 +31,7 @@ import {
   pollingStationRequests,
 } from "e2e-tests/test-data/request-response-templates";
 import type {
+  AddSubCommitteeCertificateResponse,
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
   COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   CommitteeSession,
@@ -39,6 +41,10 @@ import type {
   ElectionDetailsResponse,
   ElectionStatusResponse,
   POLLING_STATION_CREATE_REQUEST_PATH,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH,
+  SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH,
+  SubCommittee,
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PATH,
   User,
@@ -87,6 +93,8 @@ type Fixtures = {
   electionGSBDSO: ElectionDetailsResponse;
   // CSB election with >= 19 seats and one subcommittee
   electionCSBLargeCouncil: ElectionDetailsResponse;
+  // CSB election with >= 19 seats and one subcommittee with its certificate added.
+  electionCSBLargeCouncilWithSubCommitteeCertificate: { election: Election; subCommittee: SubCommittee };
   // CSB election with < 19 seats and one subcommittee
   electionCSBSmallCouncil: ElectionDetailsResponse;
   // First data entry of the GSB CSO election
@@ -334,6 +342,28 @@ export const test = base.extend<Fixtures>({
     expect(detailsUpdateResponse.ok()).toBeTruthy();
 
     await use(electionDetails);
+  },
+  electionCSBLargeCouncilWithSubCommitteeCertificate: async ({ adminOne, electionCSBLargeCouncil }, use) => {
+    const electionId = electionCSBLargeCouncil.election.id;
+
+    // Admin: add the certificate of the sub committee.
+    const certificate = await readFile(eml510b.certificatePath, "utf8");
+    const certificateAddUrl: SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH = `/api/elections/${electionId}/sub_committee_certificates`;
+    const certificateAddBody: SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY = { data: certificate };
+    const certificateAddResponse = await adminOne.request.post(certificateAddUrl, { data: certificateAddBody });
+    expect(certificateAddResponse.status()).toBe(201);
+
+    const addedCertificate = (await certificateAddResponse.json()) as AddSubCommitteeCertificateResponse;
+
+    // Retrieve the sub committee that the certificate was added to.
+    const subCommitteesUrl: SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH = `/api/elections/${electionId}/sub_committee_certificates`;
+    const subCommitteesRes = await adminOne.request.get(subCommitteesUrl);
+    expect(subCommitteesRes.ok()).toBeTruthy();
+    const subCommittees = (await subCommitteesRes.json()) as SubCommittee[];
+    const subCommittee = subCommittees.find(({ id }) => id === addedCertificate.sub_committee_id);
+    if (!subCommittee) throw new Error(`Sub committee ${addedCertificate.sub_committee_id} not found.`);
+
+    await use({ election: electionCSBLargeCouncil.election, subCommittee });
   },
   electionCSBSmallCouncil: async ({ coordinatorOneCSB, emptyElectionCSBSmallCouncil }, use) => {
     const electionId = emptyElectionCSBSmallCouncil.id;

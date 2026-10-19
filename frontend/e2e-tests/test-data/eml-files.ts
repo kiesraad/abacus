@@ -353,3 +353,42 @@ export const eml230b_PS2: Eml230b = {
     "d5f9",
   ],
 };
+
+export type Eml510b = {
+  emlPath: string;
+  signaturePath: string;
+  certificatePath: string;
+  zipFileName: string;
+  electionDate: string;
+  hashInput1: string;
+  hashInput2: string;
+  fullHash: string[];
+};
+
+export const eml510b: Eml510b = {
+  emlPath: "../backend/src/eml/tests/eml510b_test.eml.xml",
+  signaturePath: "../backend/src/eml/tests/eml510b_test.eml.xml.signature",
+  certificatePath: "../backend/src/eml/tests/eml510b_test.crt",
+  zipFileName: "telling.eml.xml.zip",
+  electionDate: "woensdag 16 maart 2022",
+  hashInput1: "c9a9",
+  hashInput2: "41a4",
+  fullHash: [
+    "10a9",
+    "c9a9",
+    "3d71",
+    "2fd0",
+    "f92f",
+    "65ac",
+    "f4c0",
+    "1601",
+    "2fbe",
+    "baee",
+    "1293",
+    "72e3",
+    "28a6",
+    "65b4",
+    "973b",
+    "41a4",
+  ],
+};

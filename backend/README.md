@@ -233,7 +233,7 @@ For TLS (HTTPS) support, when the `tls` feature is enabled, the following depend
 - `rustls`: TLS implementation, on the audited `aws-lc-rs` provider.
 - `axum-server`: HTTPS serving for `axum`, with graceful shutdown.
 
-The `abacus-windows-service` crate (Windows only, see [Windows service](#windows-service)) additionally uses:
+The `windows-service` crate (Windows only, see [Windows service](#windows-service)) additionally uses:
 
 - `windows-service`: install, uninstall and handle a Windows service.
 
@@ -312,7 +312,7 @@ A development build also supports the following arguments:
 
 ### Windows service
 
-On Windows, the abacus binary can run as a Windows service. This is implemented in the `abacus-windows-service` crate.  
+On Windows, the abacus binary can run as a Windows service. This is implemented in the `windows-service` crate.  
 From an administrator prompt:
 
 ```

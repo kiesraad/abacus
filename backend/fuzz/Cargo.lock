@@ -36,6 +36,7 @@ dependencies = [
  "ttf-parser",
  "utoipa",
  "utoipa-axum",
+ "windows_socket",
  "zeroize",
 ]
 
@@ -2961,6 +2962,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
 dependencies = [
  "windows-link",
+]
+
+[[package]]
+name = "windows_socket"
+version = "1.1.0"
+dependencies = [
+ "windows-sys",
 ]
 
 [[package]]

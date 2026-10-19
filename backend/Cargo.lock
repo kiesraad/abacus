@@ -47,6 +47,7 @@ dependencies = [
  "utoipa",
  "utoipa-axum",
  "utoipa-swagger-ui",
+ "windows_socket",
  "zeroize",
 ]
 
@@ -5747,6 +5748,14 @@ name = "windows_i686_msvc"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66"
+
+[[package]]
+name = "windows_socket"
+version = "1.1.0"
+dependencies = [
+ "socket2",
+ "windows-sys 0.61.2",
+]
 
 [[package]]
 name = "windows_x86_64_gnu"

@@ -166,7 +166,8 @@ export const eml110b_zero_voters = {
 export type Eml230b = {
   filename: string;
   path: string;
-  electionDate: string;
+  importTitle: string;
+  importSubtitle?: string;
   hashInput1: string;
   hashInput2: string;
   fullHash: string[];
@@ -175,7 +176,7 @@ export type Eml230b = {
 export const eml230b: Eml230b = {
   filename: "eml230b_test.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test.eml.xml",
-  electionDate: "woensdag 16 maart 2022",
+  importTitle: "GR2022 Test",
   hashInput1: "0e5b",
   hashInput2: "f18e",
   fullHash: [
@@ -201,7 +202,7 @@ export const eml230b: Eml230b = {
 export const eml230b_with_gaps: Eml230b = {
   filename: "eml230b_test_with_gaps.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml230b_test_with_gaps.eml.xml",
-  electionDate: "woensdag 16 maart 2022",
+  importTitle: "GR2022 Test",
   hashInput1: "9c26",
   hashInput2: "00ed",
   fullHash: [
@@ -227,7 +228,7 @@ export const eml230b_with_gaps: Eml230b = {
 export const eml230b_more_than_45_candidates: Eml230b = {
   filename: "eml230b_test_more_than_45_candidates.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml230b_test_more_than_45_candidates.eml.xml",
-  electionDate: "woensdag 16 maart 2022",
+  importTitle: "GR2022 Test",
   hashInput1: "1bbb",
   hashInput2: "bc88",
   fullHash: [
@@ -253,7 +254,7 @@ export const eml230b_more_than_45_candidates: Eml230b = {
 export const eml230b_AB: Eml230b = {
   filename: "eml230b_test_AB.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_AB.eml.xml",
-  electionDate: "woensdag 15 maart 2023",
+  importTitle: "AB2023 Rivier en Polder",
   hashInput1: "69e1",
   hashInput2: "5ba4",
   fullHash: [
@@ -279,7 +280,7 @@ export const eml230b_AB: Eml230b = {
 export const eml230b_AB_more_than_45_candidates: Eml230b = {
   filename: "eml230b_test_AB_more_than_45_candidates.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml230b_test_AB_more_than_45_candidates.eml.xml",
-  electionDate: "woensdag 15 maart 2023",
+  importTitle: "AB2023 Rivier en Polder",
   hashInput1: "8d5c",
   hashInput2: "651c",
   fullHash: [
@@ -305,7 +306,7 @@ export const eml230b_AB_more_than_45_candidates: Eml230b = {
 export const eml230b_PS1: Eml230b = {
   filename: "eml230b_test_PS1.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_PS1.eml.xml",
-  electionDate: "woensdag 15 maart 2023",
+  importTitle: "PS2023 Oost-Holland",
   hashInput1: "d464",
   hashInput2: "6559",
   fullHash: [
@@ -331,7 +332,8 @@ export const eml230b_PS1: Eml230b = {
 export const eml230b_PS2: Eml230b = {
   filename: "eml230b_test_PS2.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_PS2.eml.xml",
-  electionDate: "woensdag 15 maart 2023",
+  importTitle: "PS2023 Zuid-Brabant",
+  importSubtitle: "Kieskring II ('s-Gravenveen)",
   hashInput1: "b285",
   hashInput2: "667c",
   fullHash: [

@@ -15,9 +15,13 @@ export class ElectionStatus {
   readonly alertDifferencesResolved: Locator;
   readonly alertFirstDataEntryResumed: Locator;
   readonly alertFirstDataEntryDiscarded: Locator;
+  readonly buttonImportCount: Locator;
+  readonly dataEntryImportSuccess: Locator;
+  readonly alertDataEntryImportSuccess: Locator;
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 1 });
+    this.buttonImportCount = page.getByRole("button", { name: "Tellingsbestand GSB importeren" });
     this.finish = page.getByRole("button", { name: "Invoerfase afronden" });
     this.errorsAndWarnings = page.getByRole("table", { name: "Fouten en waarschuwingen" });
     this.inProgress = page.getByRole("table", { name: "Invoer bezig" });
@@ -35,11 +39,16 @@ export class ElectionStatus {
     this.firstDataEntryDiscarded = page.getByRole("strong").filter({
       hasText: /^Invoer stembureau \d+ verwijderd$/,
     });
+    this.dataEntryImportSuccess = page.getByRole("strong").filter({
+      hasText: /^Tellingsbestand GSB .+ geïmporteerd$/,
+    });
 
     this.alertDifferencesResolved = page.getByRole("alert").filter({ has: this.differencesResolved });
 
     this.alertFirstDataEntryResumed = page.getByRole("alert").filter({ has: this.firstDataEntryResumed });
 
     this.alertFirstDataEntryDiscarded = page.getByRole("alert").filter({ has: this.firstDataEntryDiscarded });
+
+    this.alertDataEntryImportSuccess = page.getByRole("alert").filter({ has: this.dataEntryImportSuccess });
   }
 }

@@ -196,13 +196,13 @@ fn run_windows_service(args: &Args) -> Result<(), AppError> {
         let launch_arguments = std::iter::once(OsString::from("--service"))
             .chain(server_arguments)
             .collect();
-        abacus_windows_service::install(launch_arguments)
+        windows_service::install(launch_arguments)
     } else if args.uninstall {
-        abacus_windows_service::uninstall()
+        windows_service::uninstall()
     } else {
         // The SCM calls this on a thread it creates itself, without the arguments
         // of this process, so it parses the command line again
-        abacus_windows_service::run(|shutdown| {
+        windows_service::run(|shutdown| {
             run_server(Args::parse(), shutdown)
                 .inspect_err(|e| error!("{e}"))
                 .is_ok()
@@ -224,7 +224,7 @@ fn run() -> Result<(), AppError> {
     #[cfg(windows)]
     if args.service && !args.install && !args.uninstall {
         // Log to a file, since a running Windows service has no console.
-        let log_file = abacus_windows_service::create_log_file()
+        let log_file = windows_service::create_log_file()
             .map_err(|e| AppError::WindowsService(e.to_string()))?;
         log.with_writer(std::sync::Mutex::new(log_file))
             .with_ansi(false)

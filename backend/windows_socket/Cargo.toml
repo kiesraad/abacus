@@ -1,0 +1,20 @@
+[package]
+name = "windows_socket"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+# Allow unsafe code only in set_exclusive_address_use for the Winsock calls.
+[lints.rust]
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+undocumented_unsafe_blocks = "deny"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Networking_WinSock"] }
+
+[target.'cfg(windows)'.dev-dependencies]
+socket2 = "0.6.3"

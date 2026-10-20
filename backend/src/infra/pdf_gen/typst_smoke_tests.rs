@@ -1090,12 +1090,13 @@ async fn test_p_2a() {
     for election_category in [
         ElectionCategory::Municipal,
         ElectionCategory::WaterAuthority,
+        ElectionCategory::Provincial,
     ] {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
                 election_category,
-                CommitteeCategory::CSB,
+                CommitteeCategory::GSB,
                 None,
                 parties,
                 candidates,

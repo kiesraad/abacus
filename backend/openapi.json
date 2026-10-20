@@ -8819,7 +8819,8 @@
         "required": [
           "data_entry_id",
           "source",
-          "status"
+          "status",
+          "updated_at"
         ],
         "properties": {
           "data_entry_id": {
@@ -8857,6 +8858,11 @@
           "status": {
             "$ref": "#/components/schemas/DataEntryStatusName",
             "description": "Data entry status"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Time when the data entry was last updated"
           }
         },
         "additionalProperties": false

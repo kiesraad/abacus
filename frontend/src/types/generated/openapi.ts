@@ -1280,6 +1280,8 @@ export interface ElectionStatusResponseEntry {
   source: DataEntrySource;
   /** Data entry status */
   status: DataEntryStatusName;
+  /** Time when the data entry was last updated */
+  updated_at: string;
 }
 
 /**

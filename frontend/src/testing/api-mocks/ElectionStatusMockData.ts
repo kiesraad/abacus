@@ -1,7 +1,7 @@
 import type { ElectionStatusResponse, ElectionStatusResponseEntry } from "@/types/generated/openapi";
 
 const today = new Date();
-today.setHours(10, 20);
+today.setHours(9, 20);
 
 export const electionStatusesMock: ElectionStatusResponseEntry[] = [
   {
@@ -35,6 +35,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "definitive",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Typist", user_id: 2 },
     second_entry_user_id: 1,
     finished_at: today.toISOString(),
@@ -127,6 +128,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "first_entry_finalised",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Typist", user_id: 1 },
     finished_at: today.toISOString(),
     finalised_with_warnings: false,
@@ -146,6 +148,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "first_entry_finalised",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Typist", user_id: 2 },
     finished_at: today.toISOString(),
     finalised_with_warnings: true,
@@ -236,6 +239,7 @@ export const electionStatusesCSBMock: ElectionStatusResponseEntry[] = [
       authority_name: "Eemstricht",
     },
     status: "first_entry_finalised",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Import" },
     finished_at: today.toISOString(),
     finalised_with_warnings: false,

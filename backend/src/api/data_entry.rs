@@ -970,6 +970,8 @@ pub struct ElectionStatusResponseEntry {
     pub source: DataEntrySource,
     /// Data entry status
     pub status: DataEntryStatusName,
+    /// Time when the data entry was last updated
+    pub updated_at: DateTime<Utc>,
     /// First entry origin (import or typist user id)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = DataEntryOrigin)]

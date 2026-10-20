@@ -27,7 +27,8 @@ use tokio::sync::Notify;
 use windows_service::{
     define_windows_service,
     service::{
-        ServiceAccess, ServiceControl, ServiceControlAccept, ServiceErrorControl, ServiceExitCode,
+        ServiceAccess, ServiceAction, ServiceActionType, ServiceControl, ServiceControlAccept,
+        ServiceErrorControl, ServiceExitCode, ServiceFailureActions, ServiceFailureResetPeriod,
         ServiceInfo, ServiceStartType, ServiceState, ServiceStatus, ServiceType,
     },
     service_control_handler::{self, ServiceControlHandlerResult, ServiceStatusHandle},
@@ -44,6 +45,15 @@ const SERVICE_TYPE: ServiceType = ServiceType::OWN_PROCESS;
 const STOP_WAIT_HINT: Duration = Duration::from_secs(15);
 /// How long [`uninstall`] waits for service removal
 const UNINSTALL_TIMEOUT: Duration = Duration::from_secs(5);
+
+/// If the service stops unexpectedly, it is restarted after this delay. After the last one, it stays stopped.
+const RESTART_DELAYS: [Duration; 3] = [
+    Duration::from_secs(5),
+    Duration::from_secs(10),
+    Duration::from_secs(30),
+];
+/// After the failure actions, the failure count is reset after this period.
+const FAILURE_RESET_PERIOD: Duration = Duration::from_secs(24 * 60 * 60);
 
 /// Windows error code for a service that does not exist
 const ERROR_SERVICE_DOES_NOT_EXIST: u32 = 1060;
@@ -261,6 +271,29 @@ pub fn install(launch_arguments: Vec<OsString>) -> Result<(), Error> {
     )?;
     service.set_description(SERVICE_DESCRIPTION)?;
     service.start::<&OsStr>(&[])?;
+
+    // Restart the service according to the defined actions when it stops unexpectedly.
+    // After it runs through all the defined restart actions, it will stay stopped.
+    service.update_failure_actions(ServiceFailureActions {
+        reset_period: ServiceFailureResetPeriod::After(FAILURE_RESET_PERIOD),
+        reboot_msg: None,
+        command: None,
+        actions: Some(
+            RESTART_DELAYS
+                .iter()
+                .map(|&delay| ServiceAction {
+                    action_type: ServiceActionType::Restart,
+                    delay,
+                })
+                .chain([ServiceAction {
+                    action_type: ServiceActionType::None,
+                    delay: Duration::ZERO,
+                }])
+                .collect(),
+        ),
+    })?;
+    // Count a stop with error code as a failure
+    service.set_failure_actions_on_non_crash_failures(true)?;
 
     println!("Installed and started the Windows service \"{SERVICE_NAME}\"");
     Ok(())

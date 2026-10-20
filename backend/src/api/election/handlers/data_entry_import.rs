@@ -1239,6 +1239,7 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let data_entry_id = DataEntryId::from(801);
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
+            let hash = EmlHash::from(eml.as_bytes()).chunks.join(" ");
 
             // Empty CSB fixture data entry
             data_entry_repo::update(&mut conn, data_entry_id, &DataEntryStatus::Empty)
@@ -1274,6 +1275,7 @@ mod tests {
                     "data_entry_status": "first_entry_finalised",
                     "first_entry_origin": { "type": "Import" }
                 }),
+                Some(&format!("Election count file hash: {hash}")),
             )
             .await;
         }

@@ -6,7 +6,6 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
@@ -51,11 +50,7 @@ async function renderPage(electionId: number) {
   ]);
 
   await router.navigate(`/elections/${electionId}/status`);
-  rtlRender(
-    <MessagesProvider>
-      <Providers router={router} />
-    </MessagesProvider>,
-  );
+  rtlRender(<Providers router={router} />);
 
   return router;
 }

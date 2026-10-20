@@ -3,7 +3,6 @@ import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { CheckAndSaveSection } from "@/features/data_entry/components/check_and_save/CheckAndSaveSection";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { DataEntryClaimHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -22,15 +21,13 @@ function renderForm() {
 
   return renderReturningRouter(
     <ElectionProvider electionId={1}>
-      <MessagesProvider>
-        <DataEntryProvider
-          election={electionMockData}
-          dataEntryId={pollingStationMockData[0]!.data_entry_id!}
-          entryNumber={1}
-        >
-          <CheckAndSaveSection />
-        </DataEntryProvider>
-      </MessagesProvider>
+      <DataEntryProvider
+        election={electionMockData}
+        dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+        entryNumber={1}
+      >
+        <CheckAndSaveSection />
+      </DataEntryProvider>
     </ElectionProvider>,
   );
 }

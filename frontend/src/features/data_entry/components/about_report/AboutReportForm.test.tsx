@@ -1,7 +1,6 @@
 import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
@@ -19,15 +18,13 @@ function renderForm() {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "about_report" });
 
   return render(
-    <MessagesProvider>
-      <DataEntryProvider
-        election={electionMockData}
-        dataEntryId={pollingStationMockData[0]!.data_entry_id!}
-        entryNumber={1}
-      >
-        <DataEntrySection committeeCategory={electionMockData.committee_category} />
-      </DataEntryProvider>
-    </MessagesProvider>,
+    <DataEntryProvider
+      election={electionMockData}
+      dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+      entryNumber={1}
+    >
+      <DataEntrySection committeeCategory={electionMockData.committee_category} />
+    </DataEntryProvider>,
   );
 }
 

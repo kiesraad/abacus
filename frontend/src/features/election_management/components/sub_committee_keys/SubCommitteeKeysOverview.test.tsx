@@ -2,7 +2,6 @@ import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import alertCls from "@/components/ui/Alert/Alert.module.css";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { tx } from "@/i18n/translate";
 import { CSBSubCommitteeCertificateAddRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -20,11 +19,7 @@ import * as uploadFileSize from "@/utils/uploadFileSize";
 import { SubCommitteeKeysOverview } from "./SubCommitteeKeysOverview";
 
 const renderSubCommitteeKeysOverview = (subCommittees: SubCommittee[], withRouter: boolean) => {
-  const component = (
-    <MessagesProvider>
-      <SubCommitteeKeysOverview subCommittees={subCommittees} electionId={2} onSuccess={vi.fn()} />
-    </MessagesProvider>
-  );
+  const component = <SubCommitteeKeysOverview subCommittees={subCommittees} electionId={2} onSuccess={vi.fn()} />;
   if (withRouter) {
     return renderReturningRouter(component);
   } else {

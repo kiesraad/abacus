@@ -5,7 +5,6 @@ import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import alertCls from "@/components/ui/Alert/Alert.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import {
   CSBElectionRequestHandler,
@@ -21,11 +20,9 @@ const navigate = vi.fn();
 
 const renderSubCommitteeKeyDetailPage = () => {
   const component = (
-    <MessagesProvider>
-      <ElectionProvider electionId={2}>
-        <SubCommitteeKeysDetailPage />
-      </ElectionProvider>
-    </MessagesProvider>
+    <ElectionProvider electionId={2}>
+      <SubCommitteeKeysDetailPage />
+    </ElectionProvider>
   );
   return render(component);
 };

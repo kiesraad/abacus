@@ -2,7 +2,6 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 import alertCls from "@/components/ui/Alert/Alert.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import {
   CSBElectionRequestHandler,
   CSBSubCommitteeCertificateAddRequestHandler,
@@ -15,11 +14,9 @@ import { SubCommitteeKeysOverviewPage } from "./SubCommitteeKeysOverviewPage";
 
 const renderSubCommitteeKeysOverviewPage = () => {
   const component = (
-    <MessagesProvider>
-      <ElectionProvider electionId={2}>
-        <SubCommitteeKeysOverviewPage />
-      </ElectionProvider>
-    </MessagesProvider>
+    <ElectionProvider electionId={2}>
+      <SubCommitteeKeysOverviewPage />
+    </ElectionProvider>
   );
   return render(component);
 };

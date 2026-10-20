@@ -2,7 +2,6 @@ import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { iMessageContext } from "@/hooks/messages/MessagesContext";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import * as useUser from "@/hooks/user/useUser";
 import {
@@ -16,11 +15,7 @@ import { getAdminUser } from "@/testing/user-mock-data";
 import { UserUpdatePage } from "./UserUpdatePage";
 
 async function renderPage() {
-  render(
-    <MessagesProvider>
-      <UserUpdatePage />
-    </MessagesProvider>,
-  );
+  render(<UserUpdatePage />);
 
   expect(await screen.findByRole("heading", { level: 2, name: "Details van het account" })).toBeInTheDocument();
 }

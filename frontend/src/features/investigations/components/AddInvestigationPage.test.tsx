@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
@@ -27,11 +26,7 @@ async function renderPage() {
   ]);
 
   await router.navigate("/elections/1/investigations/add");
-  rtlRender(
-    <MessagesProvider>
-      <Providers router={router} />
-    </MessagesProvider>,
-  );
+  rtlRender(<Providers router={router} />);
 
   return router;
 }

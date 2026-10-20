@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 
 import { ApiProvider } from "@/api/ApiProvider";
-
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { getRouter, type Router } from "./router";
 
 export const Providers = ({
@@ -16,7 +16,9 @@ export const Providers = ({
 }) => {
   return (
     <ApiProvider fetchInitialUser={fetchInitialUser}>
-      <RouterProvider router={router} />
+      <MessagesProvider>
+        <RouterProvider router={router} />
+      </MessagesProvider>
     </ApiProvider>
   );
 };

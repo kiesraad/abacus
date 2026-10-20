@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import * as useElectionStatus from "@/hooks/election/useElectionStatus";
 import type { Message } from "@/hooks/messages/MessagesContext";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import * as useUser from "@/hooks/user/useUser";
 import {
@@ -56,9 +55,7 @@ async function renderDataEntryHomePage(
 
   const router = renderReturningRouter(
     <ElectionProvider electionId={1}>
-      <MessagesProvider>
-        <DataEntryHomePage />
-      </MessagesProvider>
+      <DataEntryHomePage />
     </ElectionProvider>,
   );
   expect(await screen.findByRole("heading", { level: 1, name: electionResponse.election.name })).toBeVisible();

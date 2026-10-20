@@ -2,7 +2,6 @@ import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import {
   dataEntryHasWarningsGetMockResponse,
@@ -28,9 +27,7 @@ const renderLayout = () => {
   return render(
     <TestUserProvider userRole="coordinator_gsb">
       <ElectionProvider electionId={1}>
-        <MessagesProvider>
-          <DetailLayout />
-        </MessagesProvider>
+        <DetailLayout />
       </ElectionProvider>
     </TestUserProvider>,
   );

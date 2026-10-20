@@ -3,7 +3,6 @@ import { HttpResponse, http } from "msw";
 import * as ReactRouter from "react-router";
 import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
@@ -15,11 +14,9 @@ const navigate = vi.fn();
 
 function renderOverviewPage(userRole: Role) {
   return renderReturningRouter(
-    <MessagesProvider>
-      <TestUserProvider userRole={userRole}>
-        <OverviewPage />
-      </TestUserProvider>
-    </MessagesProvider>,
+    <TestUserProvider userRole={userRole}>
+      <OverviewPage />
+    </TestUserProvider>,
   );
 }
 

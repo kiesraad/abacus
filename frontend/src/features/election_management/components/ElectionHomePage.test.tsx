@@ -36,9 +36,7 @@ const renderGSBPage = async (userRole: Role) => {
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <MessagesProvider>
-            <ElectionHomePage />
-          </MessagesProvider>
+          <ElectionHomePage />
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
@@ -53,9 +51,7 @@ const renderCSBPage = async () => {
     <TestUserProvider userRole={"coordinator_csb"}>
       <ElectionProvider electionId={2}>
         <ElectionStatusProvider electionId={2}>
-          <MessagesProvider>
-            <ElectionHomePage />
-          </MessagesProvider>
+          <ElectionHomePage />
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,

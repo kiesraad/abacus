@@ -1,7 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { ElectionListRequestHandler, UserListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
@@ -23,11 +22,7 @@ function renderWithRouter() {
       ],
     },
   ]);
-  rtlRender(
-    <MessagesProvider>
-      <Providers router={router} />,
-    </MessagesProvider>,
-  );
+  rtlRender(<Providers router={router} />);
   return router;
 }
 

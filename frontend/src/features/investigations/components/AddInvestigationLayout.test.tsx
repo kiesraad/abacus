@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
@@ -36,11 +35,7 @@ async function renderPage(section: "reason" | "print-corrigendum" | "findings") 
   ]);
 
   await router.navigate(`/elections/1/investigations/1/${section}`);
-  rtlRender(
-    <MessagesProvider>
-      <Providers router={router} />
-    </MessagesProvider>,
-  );
+  rtlRender(<Providers router={router} />);
 
   // Ensure rendering is complete
   await screen.findByRole("banner");

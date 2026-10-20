@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, test } from "vitest";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { UserListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { overrideOnce, server } from "@/testing/server";
@@ -7,11 +6,7 @@ import { render, screen } from "@/testing/test-utils";
 import { UserListPage } from "./UserListPage";
 
 async function renderPage() {
-  render(
-    <MessagesProvider>
-      <UserListPage />
-    </MessagesProvider>,
-  );
+  render(<UserListPage />);
 
   expect(await screen.findByRole("heading", { level: 1, name: "Gebruikers beheren" })).toBeVisible();
 }

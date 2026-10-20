@@ -3,7 +3,6 @@ import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { DataEntryClaimHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -21,15 +20,13 @@ import { DataEntryProvider } from "./DataEntryProvider";
 function renderForm() {
   return render(
     <ElectionProvider electionId={1}>
-      <MessagesProvider>
-        <DataEntryProvider
-          election={electionMockData}
-          dataEntryId={pollingStationMockData[0]!.data_entry_id!}
-          entryNumber={1}
-        >
-          <DataEntryProgress />
-        </DataEntryProvider>
-      </MessagesProvider>
+      <DataEntryProvider
+        election={electionMockData}
+        dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+        entryNumber={1}
+      >
+        <DataEntryProgress />
+      </DataEntryProvider>
     </ElectionProvider>,
   );
 }

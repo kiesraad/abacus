@@ -3,7 +3,6 @@ import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { iMessageContext } from "@/hooks/messages/MessagesContext";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { overrideOnce } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
@@ -13,11 +12,9 @@ import { UserCreateDetailsPage } from "./UserCreateDetailsPage";
 
 function renderPage(context: Partial<IUserCreateContext>) {
   return render(
-    <MessagesProvider>
-      <UserCreateContext.Provider value={context as IUserCreateContext}>
-        <UserCreateDetailsPage />
-      </UserCreateContext.Provider>
-    </MessagesProvider>,
+    <UserCreateContext.Provider value={context as IUserCreateContext}>
+      <UserCreateDetailsPage />
+    </UserCreateContext.Provider>,
   );
 }
 

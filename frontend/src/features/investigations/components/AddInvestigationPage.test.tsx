@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, within } from "@/testing/test-utils";
-
 import { investigationRoutes } from "../routes";
 
 async function renderPage() {
@@ -27,7 +27,11 @@ async function renderPage() {
   ]);
 
   await router.navigate("/elections/1/investigations/add");
-  rtlRender(<Providers router={router} />);
+  rtlRender(
+    <MessagesProvider>
+      <Providers router={router} />
+    </MessagesProvider>,
+  );
 
   return router;
 }

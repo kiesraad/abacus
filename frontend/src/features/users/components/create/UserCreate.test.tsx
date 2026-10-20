@@ -1,14 +1,13 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { ElectionListRequestHandler, UserListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, waitFor, within } from "@/testing/test-utils";
 import { getAdminUser } from "@/testing/user-mock-data";
-
 import { usersRoutes } from "../../routes";
 
 function renderWithRouter() {
@@ -24,7 +23,11 @@ function renderWithRouter() {
       ],
     },
   ]);
-  rtlRender(<Providers router={router} />);
+  rtlRender(
+    <MessagesProvider>
+      <Providers router={router} />,
+    </MessagesProvider>,
+  );
   return router;
 }
 

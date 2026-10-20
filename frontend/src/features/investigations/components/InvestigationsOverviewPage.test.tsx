@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { ApiProvider } from "@/api/ApiProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
@@ -24,7 +25,6 @@ import type {
   PollingStationInvestigation,
   Role,
 } from "@/types/generated/openapi";
-
 import { investigationRoutes } from "../routes";
 
 const Providers = ({
@@ -39,11 +39,13 @@ const Providers = ({
   fetchInitialUser?: boolean;
 }) => {
   return (
-    <ApiProvider fetchInitialUser={fetchInitialUser}>
-      <TestUserProvider userRole={userRole}>
-        <RouterProvider router={router} />
-      </TestUserProvider>
-    </ApiProvider>
+    <MessagesProvider>
+      <ApiProvider fetchInitialUser={fetchInitialUser}>
+        <TestUserProvider userRole={userRole}>
+          <RouterProvider router={router} />
+        </TestUserProvider>
+      </ApiProvider>
+    </MessagesProvider>
   );
 };
 

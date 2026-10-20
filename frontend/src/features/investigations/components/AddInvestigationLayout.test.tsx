@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
@@ -15,7 +16,6 @@ import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
 import type { CommitteeSessionStatus } from "@/types/generated/openapi";
-
 import { investigationRoutes } from "../routes";
 
 const navigate = vi.fn();
@@ -36,7 +36,11 @@ async function renderPage(section: "reason" | "print-corrigendum" | "findings") 
   ]);
 
   await router.navigate(`/elections/1/investigations/1/${section}`);
-  rtlRender(<Providers router={router} />);
+  rtlRender(
+    <MessagesProvider>
+      <Providers router={router} />
+    </MessagesProvider>,
+  );
 
   // Ensure rendering is complete
   await screen.findByRole("banner");

@@ -4510,7 +4510,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PollingStationRequestListResponse"
+                  "$ref": "#/components/schemas/PollingStationValidateImportResponse"
                 }
               }
             }
@@ -10554,20 +10554,6 @@
         },
         "additionalProperties": false
       },
-      "PollingStationRequestListResponse": {
-        "type": "object",
-        "required": [
-          "polling_stations"
-        ],
-        "properties": {
-          "polling_stations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PollingStationRequest"
-            }
-          }
-        }
-      },
       "PollingStationType": {
         "type": "string",
         "description": "Type of Polling station",
@@ -10576,6 +10562,24 @@
           "Special",
           "Mobile"
         ]
+      },
+      "PollingStationValidateImportResponse": {
+        "type": "object",
+        "required": [
+          "polling_stations",
+          "polling_station_definition_matches_election"
+        ],
+        "properties": {
+          "polling_station_definition_matches_election": {
+            "type": "boolean"
+          },
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationRequest"
+            }
+          }
+        }
       },
       "PollingStationsRequest": {
         "type": "object",

@@ -1314,9 +1314,30 @@ pub fn parse_polling_stations_eml_str(
 
 pub fn polling_stations_from_eml_str(
     polling_stations_data: &str,
-) -> Result<Vec<crate::domain::polling_station::PollingStationRequest>, EMLImportError> {
+) -> Result<
+    (
+        crate::domain::polling_station::PollingStationsElectionIdentifier,
+        Vec<crate::domain::polling_station::PollingStationRequest>,
+    ),
+    EMLImportError,
+> {
     let polling_stations = parse_polling_stations_eml_str(polling_stations_data)?;
-    polling_stations_from_eml(&polling_stations)
+    Ok((
+        election_identifier_from_eml(&polling_stations)?,
+        polling_stations_from_eml(&polling_stations)?,
+    ))
+}
+
+pub fn election_identifier_from_eml(
+    polling_stations: &PollingStations,
+) -> Result<crate::domain::polling_station::PollingStationsElectionIdentifier, EMLImportError> {
+    let identifier = &polling_stations.election_event.election.identifier;
+    Ok(
+        crate::domain::polling_station::PollingStationsElectionIdentifier {
+            election_id: identifier.id.cloned_value()?.value().to_owned(),
+            election_date: identifier.election_date.copied_value()?.date,
+        },
+    )
 }
 
 pub fn polling_stations_from_eml(
@@ -1418,17 +1439,6 @@ pub fn number_of_voters_from_polling_stations_eml(
         .ok_or(EMLImportError::PollingStationsWithoutContest)?;
 
     Ok(max_votes(&contest.max_votes))
-}
-
-pub fn polling_stations_eml_matches_election(
-    polling_stations: &PollingStations,
-    election: &NewElection,
-) -> Result<bool, EMLImportError> {
-    let identifier = &polling_stations.election_event.election.identifier;
-    let election_id = identifier.id.cloned_value()?;
-    let election_date = identifier.election_date.copied_value()?.date;
-    Ok(election_id.to_raw_value().as_ref() == election.election_id
-        && election_date == election.election_date)
 }
 
 impl crate::domain::polling_station::PollingStationType {
@@ -2030,7 +2040,7 @@ mod tests {
 
     /// Address, postal code, locality and type of the imported polling stations.
     fn imported_locations(xml: &str) -> Vec<(String, String, String, Option<PollingStationType>)> {
-        locations(polling_stations_from_eml_str(xml).unwrap())
+        locations(polling_stations_from_eml_str(xml).unwrap().1)
     }
 
     fn locations(
@@ -2065,7 +2075,7 @@ mod tests {
 
     #[test]
     fn test_polling_stations_from_legacy_eml() {
-        let polling_stations =
+        let (_, polling_stations) =
             polling_stations_from_eml_str(include_str!("./tests/eml110b_test.eml.xml")).unwrap();
 
         assert_eq!(polling_stations.len(), 20);
@@ -2081,7 +2091,7 @@ mod tests {
 
     #[test]
     fn test_polling_stations_from_eml_with_locations() {
-        let polling_stations =
+        let (_, polling_stations) =
             polling_stations_from_eml_str(include_str!("./tests/eml110b_v1_3_1.eml.xml")).unwrap();
 
         // The name still comes from the legacy locality name.

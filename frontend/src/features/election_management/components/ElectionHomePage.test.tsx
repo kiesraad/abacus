@@ -1,16 +1,13 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
-import type { ReactNode } from "react";
 import * as ReactRouter from "react-router";
-import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { ApiProvider } from "@/api/ApiProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import {
   getCommitteeSessionListMockData,
   getCSBCommitteeSessionMockData,
@@ -22,7 +19,7 @@ import {
   DismissPublicKeyUploadReminderRequestHandler,
   ElectionRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { getRouter, type Router } from "@/testing/router";
+import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
@@ -276,29 +273,6 @@ describe("ElectionHomePage", () => {
     test("Shows error page when start data entry call returns an error", async () => {
       // error is expected
       vi.spyOn(console, "error").mockImplementation(() => {});
-      const Providers = ({
-        children,
-        router = getRouter(children),
-        fetchInitialUser = false,
-      }: {
-        children?: ReactNode;
-        router?: Router;
-        fetchInitialUser?: boolean;
-      }) => {
-        return (
-          <ApiProvider fetchInitialUser={fetchInitialUser}>
-            <TestUserProvider userRole="coordinator_gsb">
-              <ElectionProvider electionId={1}>
-                <ElectionStatusProvider electionId={1}>
-                  <MessagesProvider>
-                    <RouterProvider router={router} />
-                  </MessagesProvider>
-                </ElectionStatusProvider>
-              </ElectionProvider>
-            </TestUserProvider>
-          </ApiProvider>
-        );
-      };
       const router = setupTestRouter([
         {
           Component: null,
@@ -306,6 +280,7 @@ describe("ElectionHomePage", () => {
           children: [
             {
               path: "elections/:electionId",
+              Component: ElectionLayout,
               children: electionManagementRoutes,
             },
           ],
@@ -328,7 +303,7 @@ describe("ElectionHomePage", () => {
 
       await router.navigate("/elections/1");
 
-      rtlRender(<Providers router={router} />);
+      rtlRender(<Providers router={router} userRole="coordinator_gsb" />);
 
       expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraad Heemdamseburg 2026" })).toBeVisible();
       expect(

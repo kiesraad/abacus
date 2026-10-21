@@ -206,7 +206,7 @@ begin
           else
             MsgBox('De database, back-ups en logbestanden konden niet volledig worden verwijderd. Verwijder de map ' + DataDir() + ' handmatig.', mbError, MB_OK);
         end;
-        IDNO: MsgBox('Database, backups en logs worden behouden.', mbInformation, MB_OK);
+        IDNO: MsgBox('Database, back-ups en logbestanden zijn niet verwijderd. Ze blijven beschikbaar in de map ' + DataDir(), mbInformation, MB_OK);
       end;
 
       // Delete the CA from the machine root store by name and delete firewall rule

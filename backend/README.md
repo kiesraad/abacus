@@ -36,14 +36,6 @@ This will create the database, run the migrations, and seed the database with
 test data. The API server will now be available at http://localhost:8080. For
 more detailed instructions please read the rest of this README.
 
-### Building
-
-First run `sqlx database setup` to create the SQLite database. Then use 
-`cargo build` to build the project.
-
-To make a release build, use `cargo build --release`.
-The built binary will be located in `target/release/`.
-
 ### Running
 
 Use `cargo run` to run the API on port 8080 (http://localhost:8080).
@@ -89,6 +81,36 @@ numbers but omits type and variable information. To inspect variables in a debug
       debug = 2
 
 [debug]: https://doc.rust-lang.org/cargo/reference/profiles.html#debug
+
+## Building
+
+First run `sqlx database setup` to create the SQLite database. Then use
+`cargo build` to build the project.
+
+To make a release build, use `cargo build --release`.
+The built binary will be located in `target/release/`.
+
+### Production release build
+
+A production release build for Abacus contains the following features:
+- `memory-serve`
+- `embed-typst`
+- `airgap-detection`
+- `tls`
+
+and does not contain the following (default) features:
+- `openapi`
+- `dev-database`
+
+To build a production release, use:
+
+```shell
+# Build frontend, for memory-serve
+pnpm --dir ../frontend run build
+
+# Run backend with the correct features enabled
+cargo build --locked --release --no-default-features --features memory-serve,embed-typst,airgap-detection,tls
+```
 
 ### Air gap detection
 

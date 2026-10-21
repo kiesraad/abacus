@@ -108,7 +108,7 @@ To build a production release, use:
 # Build frontend, for memory-serve
 pnpm --dir ../frontend run build
 
-# Run backend with the correct features enabled
+# Build backend with the correct features enabled
 cargo build --locked --release --no-default-features --features memory-serve,embed-typst,airgap-detection,tls
 ```
 

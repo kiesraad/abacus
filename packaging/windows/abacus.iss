@@ -90,11 +90,11 @@ Filename: "https://localhost"; Description: "Open Abacus Interface"; Flags: shel
 
 [Messages]
 WizardReady=Klaar om [name] te installeren
-ReadyLabel1=U gaat de [name] server installeren op deze computer.
+ReadyLabel1=Abacus wordt op deze computer geïnstalleerd.
 ReadyLabel2b={#MyAppName} wordt geïnstalleerd als Windows-service. De service start automatisch wanneer Windows opstart.
 
-FinishedHeadingLabel=[name] is geïnstalleerd
-FinishedLabel=De installatie van [name] server is klaar. De server draait als Windows-service en start automatisch wanneer de computer opstart.%n%nU kunt Abacus inrichten via de snelkoppeling ‘Open [name] in browser’ op het bureaublad.
+FinishedHeadingLabel=Abacus is geïnstalleerd en gestart.
+FinishedLabel=Abacus is klaar voor gebruik en start voortaan automatisch wanneer de computer wordt aangezet.%n%nDubbelklik op de snelkoppeling ‘Open Abacus in browser’ op het bureaublad om gebruikers aan te maken en verkiezingen in te richten.
 
 [Code]
 function AppExe(): String;
@@ -195,16 +195,16 @@ begin
       // Stop and uninstall the service first to remove any file locks
       RunStep('Het verwijderen van de Abacus-service', AppExe(), '--service --uninstall', '');
 
-      case TaskDialogMsgBox('Database, backups en logs verwijderen?',
-                   'De database bevat alle verkiezingsdetails, ingevoerde data en gemaakte processen-verbaal. Ook alle gemaakte backups en logs worden verwijderd.' + #13#10#13#10 + 'Als u de database verwijdert, gaan deze gegevens definitief verloren.',
+      case TaskDialogMsgBox('Database, back-ups en logbestanden verwijderen?',
+                   'De database bevat alle verkiezingsgegevens, ingevoerde gegevens en gemaakte processen-verbaal. Ook alle back-ups en logbestanden worden verwijderd.' + #13#10#13#10 + 'Let op: Verwijderde gegevens kunnen niet worden hersteld.',
                     mbConfirmation,
-                    MB_YESNO, ['Database, backups en logs verwijderen', 'Bewaren'],
+                    MB_YESNO, ['Verwijder database, back-ups en logbestanden', 'Gegevens bewaren'],
                     0) of
         IDYES: begin
           if DelTree(DataDir(), True, True, True) then
-            MsgBox('Database, backups en logs zijn verwijderd.', mbInformation, MB_OK)
+            MsgBox('Database, back-ups en logbestanden zijn verwijderd.', mbInformation, MB_OK)
           else
-            MsgBox('Database, backups en logs konden niet volledig worden verwijderd. Verwijder de map ' + DataDir() + ' handmatig.', mbError, MB_OK);
+            MsgBox('De database, back-ups en logbestanden konden niet volledig worden verwijderd. Verwijder de map ' + DataDir() + ' handmatig.', mbError, MB_OK);
         end;
         IDNO: MsgBox('Database, backups en logs worden behouden.', mbInformation, MB_OK);
       end;

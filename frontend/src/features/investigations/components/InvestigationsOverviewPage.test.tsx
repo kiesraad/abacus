@@ -1,23 +1,18 @@
 import { render as rtlRender, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
-import type { ReactNode } from "react";
-import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ApiProvider } from "@/api/ApiProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { getRouter, type Router } from "@/testing/router";
+import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
-import { TestUserProvider } from "@/testing/TestUserProvider";
 import { screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
 import type {
   ElectionDetailsResponse,
@@ -26,28 +21,6 @@ import type {
   Role,
 } from "@/types/generated/openapi";
 import { investigationRoutes } from "../routes";
-
-const Providers = ({
-  children,
-  router = getRouter(children),
-  userRole,
-  fetchInitialUser = false,
-}: {
-  children?: ReactNode;
-  router?: Router;
-  userRole: Role;
-  fetchInitialUser?: boolean;
-}) => {
-  return (
-    <MessagesProvider>
-      <ApiProvider fetchInitialUser={fetchInitialUser}>
-        <TestUserProvider userRole={userRole}>
-          <RouterProvider router={router} />
-        </TestUserProvider>
-      </ApiProvider>
-    </MessagesProvider>
-  );
-};
 
 async function renderPage(userRole: Role) {
   const router = setupTestRouter([

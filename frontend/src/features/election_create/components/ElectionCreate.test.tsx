@@ -1,11 +1,7 @@
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { HttpHandler } from "msw";
-import type { ReactNode } from "react";
-import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { ApiProvider } from "@/api/ApiProvider";
-import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import {
   csbElectionMockData,
@@ -26,9 +22,9 @@ import {
   GSBGRElectionImportRequestHandler,
   GSBPSElectionImportRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { getRouter, type Router } from "@/testing/router";
+import { Providers } from "@/testing/Providers";
+import type { Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
-import { TestUserProvider } from "@/testing/TestUserProvider";
 import { screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import type {
   CommitteeCategory,
@@ -38,26 +34,6 @@ import type {
   VoteCountingMethod,
 } from "@/types/generated/openapi";
 import { electionCreateRoutes } from "../routes";
-
-const Providers = ({
-  children,
-  router = getRouter(children),
-  fetchInitialUser = false,
-}: {
-  children?: ReactNode;
-  router?: Router;
-  fetchInitialUser?: boolean;
-}) => {
-  return (
-    <MessagesProvider>
-      <ApiProvider fetchInitialUser={fetchInitialUser}>
-        <TestUserProvider userRole="administrator">
-          <RouterProvider router={router} />
-        </TestUserProvider>
-      </ApiProvider>
-    </MessagesProvider>
-  );
-};
 
 function renderWithRouter() {
   const router = setupTestRouter([
@@ -77,7 +53,7 @@ function renderWithRouter() {
       ],
     },
   ]);
-  rtlRender(<Providers router={router} />);
+  rtlRender(<Providers router={router} userRole="administrator" />);
   return router;
 }
 

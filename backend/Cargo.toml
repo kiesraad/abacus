@@ -8,6 +8,7 @@ members = [
     "pdf_gen/types",
     "pdf_gen/impl",
     "pdf_gen/wrapper",
+    "windows_service",
 ]
 
 [workspace.package]
@@ -125,6 +126,7 @@ zeroize.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows_socket = { path = "./windows_socket" }
+windows-service = { path = "./windows_service" }
 
 [dev-dependencies]
 http-body-util.workspace = true

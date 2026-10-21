@@ -1,0 +1,13 @@
+[package]
+name = "windows-service"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+tokio.workspace = true
+windows-service = "0.8.1"
+
+[lints]
+workspace = true

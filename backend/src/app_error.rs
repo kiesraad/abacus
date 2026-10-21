@@ -11,6 +11,7 @@ pub enum AppError {
     PortAlreadyInUse(u16),
     PermissionDeniedToBindPort(u16),
     Tls(String),
+    WindowsService(String),
     // sqlite specific
     DatabaseBusy(String),
     DatabaseReadOnly(String),
@@ -149,6 +150,7 @@ impl std::fmt::Display for AppError {
             }
             AppError::StdError(msg) => write!(f, "{}", msg),
             AppError::Tls(e) => write!(f, "TLS error: {}", e),
+            AppError::WindowsService(e) => write!(f, "Windows service error: {}", e),
         }
     }
 }

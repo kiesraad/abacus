@@ -91,7 +91,7 @@ Filename: "https://localhost"; Description: "Open Abacus Interface"; Flags: shel
 [Messages]
 WizardReady=Klaar om [name] te installeren
 ReadyLabel1=Abacus wordt op deze computer geïnstalleerd.
-ReadyLabel2b={#MyAppName} wordt geïnstalleerd als Windows-service. De service start automatisch wanneer Windows opstart.
+ReadyLabel2b={#MyAppName} wordt geïnstalleerd als Windows-service. De service start automatisch wanneer Windows opstart.%n%nLet op: Volgens de aansluitvoorschriften mag de computer waarop Abacus wordt geïnstalleerd, tijdens en na de installatie niet verbonden zijn met het internet.
 
 FinishedHeadingLabel=Abacus is geïnstalleerd en gestart.
 FinishedLabel=Abacus is klaar voor gebruik en start voortaan automatisch wanneer de computer wordt aangezet.%n%nDubbelklik op de snelkoppeling ‘Open Abacus in browser’ op het bureaublad om gebruikers aan te maken en verkiezingen in te richten.

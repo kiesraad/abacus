@@ -227,7 +227,7 @@ The following dependencies (crates) are used:
 - `windows_socket`: Local Windows-only helper for exclusive socket binding (`SO_EXCLUSIVEADDRUSE`), using `windows-sys`.
 - `sqlx`: async SQL library featuring compile-time checked queries.
 - `strum`: Converting enums from their string representation and back
-- `tokio-util`: used for download streaming.
+- `tokio-util`: used for download streaming and reading ZIP entries with a size limit.
 - `tokio`: runtime for writing asynchronous applications.
 - `tower-http`: Tower middleware and utilities for HTTP clients and servers.
 - `tower`: a library of modular and reusable components for building robust networking clients and servers.

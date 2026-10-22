@@ -12,6 +12,8 @@ use eml_nl::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{SqliteConnection, SqlitePool};
+use tokio::io::AsyncReadExt;
+use tokio_util::compat::FuturesAsyncReadCompatExt;
 use utoipa::ToSchema;
 
 use crate::{
@@ -33,6 +35,12 @@ use crate::{
     },
     service::{SignatureError, verify_signature},
 };
+
+/// Protect against ZIP bombs: maximum size of a file in the ZIP after
+/// decompression. The largest expected count (510b) estimated at 200 MB
+/// including previous results. Count EMLs compress about 40x with deflate,
+/// which fits well within the request body limit (`MAX_BODY_SIZE_MB`).
+const MAX_UNCOMPRESSED_SIZE: u64 = 512 * 1024 * 1024;
 
 #[derive(Debug)]
 pub enum DataEntryImportError {
@@ -297,7 +305,7 @@ async fn validate_import(
     let (filename, eml_bytes) = read_eml_from_zip(&reader).await?;
     check_hash(&eml_bytes, hash)?;
 
-    let eml = String::from_utf8(eml_bytes.clone())
+    let eml = String::from_utf8(eml_bytes)
         .map_err(|_| EMLError::custom("EML file is not valid UTF-8"))?;
     let definition = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict).ok()?;
 
@@ -338,7 +346,7 @@ async fn validate_import(
 
     let (_, signature) = read_signature_from_zip(&reader, &filename).await?;
 
-    verify_signature(conn, sub_committee.id, &eml_bytes, &signature).await?;
+    verify_signature(conn, sub_committee.id, eml.as_bytes(), &signature).await?;
 
     // The state machine validates results, report validation errors as import errors
     let results = Results::GSB(GSBResults::from_eml_count(&definition, election.category)?);
@@ -414,10 +422,10 @@ async fn read_exactly_one_file(
 
     let mut files = entries.filter_map(|(index, entry)| {
         let filename = entry.filename().as_str().ok()?;
-        filter(filename).then_some((index, entry, filename.to_string()))
+        filter(filename).then_some((index, filename.to_string()))
     });
 
-    let Some((index, entry, filename)) = files.next() else {
+    let Some((index, filename)) = files.next() else {
         return Ok(None);
     };
 
@@ -427,25 +435,54 @@ async fn read_exactly_one_file(
         );
     }
 
-    // Protect against ZIP bombs, max 128 MB after decompression
-    let max_size = 128 * 1024 * 1024;
-    if entry.uncompressed_size() > max_size {
-        return Err(APIError::ContentTooLarge(
-            format!("{file} too large"),
-            ErrorReference::RequestPayloadTooLarge,
-        ));
-    }
-
-    let mut data = Vec::new();
-    reader
-        .reader_with_entry(index)
-        .await
-        .map_err(|_| DataEntryImportError::EmlZipError("Invalid ZIP file".to_string()))?
-        .read_to_end_checked(&mut data)
-        .await
-        .map_err(|_| DataEntryImportError::EmlZipError("Invalid ZIP file".to_string()))?;
+    let data = read_entry_limited(reader, index, file, MAX_UNCOMPRESSED_SIZE).await?;
 
     Ok(Some((filename, data)))
+}
+
+/// Read and decompress a ZIP entry, failing when it is larger than `max_size`.
+/// The uncompressed size in the ZIP metadata can be forged, so the number of
+/// decompressed bytes is limited as well.
+async fn read_entry_limited(
+    reader: &ZipFileReader,
+    index: usize,
+    file: &str,
+    max_size: u64,
+) -> Result<Vec<u8>, APIError> {
+    let too_large = || {
+        APIError::ContentTooLarge(
+            format!("{file} too large"),
+            ErrorReference::RequestPayloadTooLarge,
+        )
+    };
+    let invalid_zip = || DataEntryImportError::EmlZipError("Invalid ZIP file".to_string());
+
+    let entry_reader = reader
+        .reader_with_entry(index)
+        .await
+        .map_err(|_| invalid_zip())?;
+    if entry_reader.entry().uncompressed_size() > max_size {
+        return Err(too_large());
+    }
+
+    // Read one byte more than allowed, to detect content exceeding the maximum size
+    let mut entry_reader = entry_reader.compat();
+    let mut data = Vec::new();
+    (&mut entry_reader)
+        .take(max_size + 1)
+        .read_to_end(&mut data)
+        .await
+        .map_err(|_| invalid_zip())?;
+    if data.len() as u64 > max_size {
+        return Err(too_large());
+    }
+
+    let entry_reader = entry_reader.get_mut();
+    if entry_reader.compute_hash() != entry_reader.entry().crc32() {
+        return Err(invalid_zip().into());
+    }
+
+    Ok(data)
 }
 
 #[cfg(test)]
@@ -647,7 +684,7 @@ mod tests {
         #[test(tokio::test)]
         async fn test_too_large() {
             let entry = ZipEntryBuilder::new("count.eml.xml".into(), Compression::Deflate)
-                .uncompressed_size(128 * 1024 * 1024 + 1u64);
+                .uncompressed_size(MAX_UNCOMPRESSED_SIZE + 1);
             let mut writer = ZipFileWriter::with_tokio(Vec::new());
             writer
                 .write_entry_whole_precompressed(entry, b"")
@@ -701,6 +738,67 @@ mod tests {
                 read_signature_from_zip(&reader, "Telling_GR2026_Heemdamseburg.eml.xml").await,
                 Err(APIError::Unprocessable(message, ErrorReference::SignatureMissing))
                     if message == "Signature matching EML missing"
+            );
+        }
+    }
+
+    mod read_entry_limited {
+        use async_zip::base::write::{compress, crc32};
+        use test_log::test;
+
+        use super::*;
+
+        /// Create a ZIP reader with a single compressed entry, with the given
+        /// uncompressed size and CRC in its metadata
+        async fn zip_with_metadata(data: &[u8], uncompressed_size: u64, crc: u32) -> ZipFileReader {
+            let entry = ZipEntryBuilder::new("count.eml.xml".into(), Compression::Deflate)
+                .uncompressed_size(uncompressed_size)
+                .crc32(crc)
+                .build();
+            let compressed = compress(&entry, data).await;
+            let mut writer = ZipFileWriter::with_tokio(Vec::new());
+            writer
+                .write_entry_whole_precompressed(entry, &compressed)
+                .await
+                .unwrap();
+            let zip = writer.close().await.unwrap().into_inner();
+            ZipFileReader::new(zip).await.unwrap()
+        }
+
+        #[test(tokio::test)]
+        async fn test_at_max_size() {
+            let data = vec![b'a'; 1024];
+            let reader = zip_with_metadata(&data, 1024, crc32(&data)).await;
+
+            let result = read_entry_limited(&reader, 0, "EML file", 1024).await;
+            assert_eq!(result.unwrap(), data);
+        }
+
+        #[test(tokio::test)]
+        async fn test_forged_uncompressed_size() {
+            // Metadata forged as 10 bytes, but the entry decompresses to 2 KiB
+            let data = vec![b'a'; 2048];
+            let reader = zip_with_metadata(&data, 10, crc32(&data)).await;
+
+            assert_matches!(
+                read_entry_limited(&reader, 0, "EML file", 1024).await,
+                Err(APIError::ContentTooLarge(
+                    message,
+                    ErrorReference::RequestPayloadTooLarge
+                ))
+                    if message == "EML file too large"
+            );
+        }
+
+        #[test(tokio::test)]
+        async fn test_invalid_crc() {
+            let data = vec![b'a'; 1024];
+            let reader = zip_with_metadata(&data, 1024, crc32(&data) ^ 1).await;
+
+            assert_matches!(
+                read_entry_limited(&reader, 0, "EML file", 1024).await,
+                Err(APIError::Unprocessable(message, ErrorReference::ZipError))
+                    if message == "Invalid ZIP file"
             );
         }
     }

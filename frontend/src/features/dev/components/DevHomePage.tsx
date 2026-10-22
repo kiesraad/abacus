@@ -27,7 +27,12 @@ function getElectionNameWithDetails(election: Election) {
     election.committee_category === "GSB"
       ? `(${election.committee_category} ${election.counting_method})`
       : `(${election.committee_category})`;
-  return `${election.name} ${electionDetails}`;
+
+  if (election.committee_category === "GSB" && election.category !== "Municipal") {
+    return `${election.name} - ${election.authority_region} ${electionDetails}`;
+  } else {
+    return `${election.name} ${electionDetails}`;
+  }
 }
 
 function Links() {

@@ -46,7 +46,7 @@ aws-lc-rs = "1"
 # No stable `cms` release supports der 0.8 / x509-cert 0.3 yet, see
 # https://github.com/RustCrypto/formats/pull/2393. Keep `builder` off: it signs
 # the `signedAttrs` DER rather than the EML bytes, and pulls in the `rsa` crate.
-cms = { version = "=0.3.0-pre.2", default-features = false, features = ["std"] }
+cms = { version = "=0.3.0-rc.0", default-features = false, features = ["std"] }
 rustls-pki-types = "1"
 if-addrs = "0.15"
 rustls = "0.23"
@@ -107,7 +107,7 @@ sqlx = { version = "0.9.0", features = ["runtime-tokio", "sqlite", "chrono", "sq
 tower = "0.5"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 tracing.workspace = true
-tower-http = { version = "0.6", features = ["set-header", "trace"] }
+tower-http = { version = "0.7", features = ["set-header", "trace"] }
 sha2 = "0.11.0"
 sha1 = "0.11.0"
 argon2 = { version = "0.5.3", features = ["std"] }

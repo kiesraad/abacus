@@ -14,9 +14,12 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::middleware::authentication::{
-        RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
-        error::AuthenticationError,
+    api::{
+        middleware::authentication::{
+            RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+            error::AuthenticationError,
+        },
+        user::ValidateUserRequest,
     },
     domain::role::Role,
     error::ErrorReference,
@@ -276,6 +279,16 @@ pub struct AccountUpdateRequest {
     pub fullname: Option<String>,
 }
 
+impl ValidateUserRequest for AccountUpdateRequest {
+    fn username(&self) -> Option<&str> {
+        None
+    }
+
+    fn fullname(&self) -> Option<&str> {
+        self.fullname.as_deref()
+    }
+}
+
 /// Get current logged-in user endpoint
 #[utoipa::path(
   get,
@@ -314,6 +327,8 @@ async fn account_update(
     if user.username() != account.username {
         return Err(AuthenticationError::UserNotFound.into());
     }
+
+    account.validate()?;
 
     // Update the password
     user_repo::update_password(&mut tx, user.id(), &account.username, &account.password).await?;
@@ -516,6 +531,7 @@ async fn logout(
 
 #[cfg(test)]
 mod tests {
+    use http_body_util::BodyExt;
     use test_log::test;
 
     use super::*;
@@ -650,5 +666,36 @@ mod tests {
 
         let response = admin_exists(State(pool.clone())).await;
         assert_eq!(response.unwrap(), StatusCode::NO_CONTENT);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_account_update_fullname_invalid(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let user = user_repo::get_by_username(&mut conn, "typist1")
+            .await
+            .unwrap()
+            .unwrap();
+
+        let request = AccountUpdateRequest {
+            username: user.username().to_string(),
+            password: "".to_string(),
+            fullname: Some("Invalid\tFullname".to_string()),
+        };
+
+        let response = account_update(
+            user,
+            State(pool.clone()),
+            AuditService::new(None, None),
+            Json(request),
+        )
+        .await
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::InvalidFullname);
+        assert_eq!(result.error, "Invalid character");
     }
 }

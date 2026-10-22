@@ -72,6 +72,11 @@ function renderWithRouter() {
               path: "create",
               children: electionCreateRoutes,
             },
+            {
+              path: ":electionId",
+              element: <div>test</div>,
+              handle: { public: true },
+            },
           ],
         },
       ],
@@ -469,12 +474,13 @@ describe("Election create pages", () => {
       });
     });
 
-    async function saveElection(election: Election) {
+    async function saveElection(election: Election, router: Router) {
       const user = userEvent.setup();
       expect(await screen.findByRole("heading", { name: "Controleren en opslaan" })).toBeVisible();
       await user.click(screen.getByRole("button", { name: "Opslaan" }));
 
       await waitFor(() => {
+        expect(router.state.location.pathname).toEqual(`/elections/1`);
         expect(pushMessage).toHaveBeenCalledWith({
           title: `Verkiezing ${election.committee_category} ${election.name} toegevoegd`,
         });
@@ -561,21 +567,21 @@ describe("Election create pages", () => {
       await user.click(screen.getByRole("button", { name: "Volgende" }));
 
       // check and save
-      await saveElection(election);
+      await saveElection(election, router);
     });
 
     test("CSB for municipal election", async () => {
       server.use(CSBGRElectionImportRequestHandler);
       const router = renderWithRouter();
       await importDefinitions(router, file, csbElectionMockData);
-      await saveElection(csbElectionMockData);
+      await saveElection(csbElectionMockData, router);
     });
 
     test("CSB for water authority election", async () => {
       server.use(CSBABElectionImportRequestHandler);
       const router = renderWithRouter();
       await importDefinitions(router, file, csbWaterAuthorityElectionMockData);
-      await saveElection(csbWaterAuthorityElectionMockData);
+      await saveElection(csbWaterAuthorityElectionMockData, router);
     });
   });
 });

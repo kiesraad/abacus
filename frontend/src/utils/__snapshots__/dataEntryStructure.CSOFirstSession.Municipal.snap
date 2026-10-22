@@ -79,8 +79,8 @@
             "short_label": "Nee",
           },
         ],
-        "short_title": "Verschil tussen getelde stemmen en toegelaten kiezers volledig verklaard?",
-        "title": "Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?",
+        "short_title": "Zijn D en H gelijk of is het verschil volledig verklaard?",
+        "title": "Is in de telresultaten van het stembureau het aantal toegelaten kiezers (D) en het totaal aantal getelde stemmen (H) gelijk OF is er een verschil en is dit verschil volledig verklaard?",
         "type": "checkboxes",
       },
       {

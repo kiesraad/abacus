@@ -313,6 +313,7 @@ async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   responses(
       (status = 200, description = "The logged in user", body = LoginResponse),
       (status = 400, description = "Bad request", body = ErrorResponse),
+      (status = 422, description = "Invalid fullname", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
@@ -402,6 +403,7 @@ impl ValidateUserRequest for CreateFirstAdminRequest {
     responses(
         (status = 201, description = "First admin user created", body = User),
         (status = 403, description = "Forbidden, an active user already exists", body = ErrorResponse),
+        (status = 422, description = "Invalid username or fullname", body = ErrorResponse),
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),

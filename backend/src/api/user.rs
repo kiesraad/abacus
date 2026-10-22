@@ -158,6 +158,7 @@ impl ValidateUserRequest for UpdateUserRequest {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
+        (status = 422, description = "Invalid username or fullname", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -236,6 +237,7 @@ async fn user_get(
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
+        (status = 422, description = "Invalid fullname", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(

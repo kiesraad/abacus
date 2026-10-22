@@ -89,9 +89,8 @@ Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /quiet /norestart"; S
 Filename: "https://localhost"; Description: "Open Abacus Interface"; Flags: shellexec postinstall skipifsilent
 
 [Messages]
-WizardReady=Klaar om [name] te installeren
-ReadyLabel1=Abacus wordt op deze computer geïnstalleerd.
-ReadyLabel2b={#MyAppName} wordt geïnstalleerd als Windows-service. De service start automatisch wanneer Windows opstart.%n%nLet op: Volgens de aansluitvoorschriften mag de computer waarop Abacus wordt geïnstalleerd, tijdens en na de installatie niet verbonden zijn met het internet.
+WizardReady=Klaar om Abacus te installeren
+ReadyLabel2b=Abacus wordt op deze computer geïnstalleerd.%n%nAbacus wordt geïnstalleerd als Windows-service. De service start automatisch wanneer Windows opstart.%n%nLet op: Volgens de aansluitvoorschriften mag de computer waarop Abacus wordt geïnstalleerd, tijdens en na de installatie niet verbonden zijn met het internet.
 
 FinishedHeadingLabel=Abacus is geïnstalleerd en gestart.
 FinishedLabel=Abacus is klaar voor gebruik en start voortaan automatisch wanneer de computer wordt aangezet.%n%nDubbelklik op de snelkoppeling ‘Open Abacus in browser’ op het bureaublad om gebruikers aan te maken en verkiezingen in te richten.
@@ -144,6 +143,13 @@ begin
   WizardForm.WizardSmallBitmapImage.Top := WizardForm.WizardSmallBitmapImage.Top + ScaleY(10);
   WizardForm.WizardSmallBitmapImage.Height := WizardForm.WizardSmallBitmapImage.Height - ScaleY(10);
   WizardForm.WizardSmallBitmapImage.Width := WizardForm.WizardSmallBitmapImage.Width - ScaleY(10);
+
+  // Adjust position of text on the first page
+  WizardForm.PageDescriptionLabel.Visible := False;
+  WizardForm.InnerNotebook.Left := WizardForm.PageNameLabel.Left;
+  WizardForm.InnerNotebook.Top := WizardForm.PageNameLabel.Top + 2 * WizardForm.PageNameLabel.Height;
+  WizardForm.InnerNotebook.Width := WizardForm.WizardSmallBitmapImage.Left - ScaleX(8) - WizardForm.InnerNotebook.Left;
+  WizardForm.InnerNotebook.BringToFront;
 end;
 
 function InitializeSetup(): Boolean;

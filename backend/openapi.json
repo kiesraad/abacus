@@ -6554,22 +6554,22 @@
           "checks_and_corrections_present": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/ChecksAndCorrectionsPresent",
                 "description": "Whether the extra page \"controles en correcties\" is inserted in the report\n(\"Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?\")"
+              },
+              {
+                "type": "null"
               }
             ]
           },
           "corrigendum_present": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/CorrigendumPresent",
                 "description": "Whether a corrigendum accompanies the report\n(\"Is er een corrigendum bij het papieren proces-verbaal aanwezig?\")"
+              },
+              {
+                "type": "null"
               }
             ]
           }

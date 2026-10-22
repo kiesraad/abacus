@@ -384,6 +384,16 @@ pub struct CreateFirstAdminRequest {
     pub temp_password: String,
 }
 
+impl ValidateUserRequest for CreateFirstAdminRequest {
+    fn username(&self) -> Option<&str> {
+        Some(&self.username)
+    }
+
+    fn fullname(&self) -> Option<&str> {
+        Some(&self.fullname)
+    }
+}
+
 /// Create the first admin user, only allowed if no users exist yet
 #[utoipa::path(
     post,
@@ -406,6 +416,8 @@ async fn create_first_admin(
     if user_repo::has_active_users(&mut tx).await? {
         return Err(AuthenticationError::AlreadyInitialised.into());
     }
+
+    admin_request.validate()?;
 
     // Delete any existing admin user
     let users = user_repo::list(&mut tx, None).await?;
@@ -638,6 +650,30 @@ mod tests {
         .await;
 
         assert!(response.is_err());
+    }
+
+    #[test(sqlx::test)]
+    async fn test_create_first_admin_fullname_invalid(pool: SqlitePool) {
+        let admin_request = CreateFirstAdminRequest {
+            username: "admin".to_string(),
+            fullname: "Admin\tUser".to_string(),
+            temp_password: "admin_password".to_string(),
+        };
+
+        let response = create_first_admin(
+            State(pool.clone()),
+            AuditService::new(None, None),
+            Json(admin_request),
+        )
+        .await
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::InvalidFullname);
+        assert_eq!(result.error, "Invalid character");
     }
 
     #[test(sqlx::test)]

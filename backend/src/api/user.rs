@@ -114,7 +114,11 @@ pub trait ValidateUserRequest {
         is_valid_char: impl Fn(char) -> bool,
     ) -> Result<(), String> {
         if let Some(input) = input {
-            if input.chars().count() > 255 {
+            if input.is_empty() {
+                return Err("Empty".to_string());
+            };
+
+            if input.chars().nth(255).is_some() {
                 return Err("Too long".to_string());
             };
 
@@ -469,6 +473,17 @@ mod tests {
         }
 
         #[test]
+        fn test_username_empty() {
+            assert_matches!(
+                CreateUserRequest::from_username("")
+                    .validate()
+                    .unwrap_err(),
+                APIError::Unprocessable(msg, ErrorReference::InvalidUsername)
+                    if msg == "Empty"
+            );
+        }
+
+        #[test]
         fn test_username_too_long() {
             let mut username = "A".repeat(255);
             assert!(
@@ -535,6 +550,25 @@ mod tests {
 
                 );
             }
+        }
+
+        #[test]
+        fn test_fullname_empty() {
+            assert_matches!(
+                CreateUserRequest::from_fullname("")
+                    .validate()
+                    .unwrap_err(),
+                APIError::Unprocessable(msg, ErrorReference::InvalidFullname)
+                    if msg == "Empty"
+            );
+
+            assert_matches!(
+                UpdateUserRequest::from_fullname("")
+                    .validate()
+                    .unwrap_err(),
+                APIError::Unprocessable(msg, ErrorReference::InvalidFullname)
+                    if msg == "Empty"
+            );
         }
 
         #[test]

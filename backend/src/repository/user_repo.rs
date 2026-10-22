@@ -136,11 +136,12 @@ pub async fn authenticate(
         verify_password(
             password,
             &HashedPassword::from(DUMMY_PASSWORD_HASH.to_string()),
-        );
+        )
+        .await?;
         return Err(AuthenticationError::UserNotFound);
     };
 
-    if verify_password(password, &user.password_hash) {
+    if verify_password(password, &user.password_hash).await? {
         Ok(user)
     } else {
         Err(AuthenticationError::InvalidPassword)
@@ -157,7 +158,7 @@ pub async fn create(
     role: Role,
 ) -> Result<User, AuthenticationError> {
     let password_hash: HashedPassword =
-        hash_password(&ValidatedPassword::new(username, password, None)?)?;
+        hash_password(&ValidatedPassword::new(username, password, None).await?).await?;
 
     let user = sqlx::query_as!(
         User,
@@ -222,11 +223,9 @@ pub async fn update_password(
         .await?
         .password_hash;
 
-    let password_hash = hash_password(&ValidatedPassword::new(
-        username,
-        new_password,
-        Some(&old_password),
-    )?)?;
+    let password_hash =
+        hash_password(&ValidatedPassword::new(username, new_password, Some(&old_password)).await?)
+            .await?;
 
     sqlx::query!(
         r#"UPDATE users SET password_hash = ?, needs_password_change = FALSE WHERE id = ?"#,
@@ -263,7 +262,8 @@ pub async fn set_temporary_password(
     temp_password: &str,
 ) -> Result<(), AuthenticationError> {
     let username = username_by_id(conn, user_id).await?;
-    let password_hash = hash_password(&ValidatedPassword::new(&username, temp_password, None)?)?;
+    let password_hash =
+        hash_password(&ValidatedPassword::new(&username, temp_password, None).await?).await?;
     sqlx::query!(
         r#"UPDATE users SET password_hash = ?, needs_password_change = TRUE WHERE id = ?"#,
         password_hash,

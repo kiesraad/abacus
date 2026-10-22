@@ -20,7 +20,7 @@ const MIN_PASSWORD_LEN: usize = 13;
 pub(crate) const DUMMY_PASSWORD_HASH: &str = "$argon2id$v=19$m=19456,t=2,p=1$ySkT+RWXZ+VGKh0wxfz9kA$aCyyi3a6ok9WaKiX5Jvacrxi9ifPxTOQ8wba40rVAbg";
 
 impl<'pw> ValidatedPassword<'pw> {
-    pub fn new(
+    pub async fn new(
         username: &str,
         password: &'pw str,
         old_password: Option<&HashedPassword>,
@@ -37,7 +37,7 @@ impl<'pw> ValidatedPassword<'pw> {
 
         // Password cannot be the same as the old password
         match old_password {
-            Some(old_pw) if verify_password(password, old_pw) => {
+            Some(old_pw) if verify_password(password, old_pw).await? => {
                 Err(AuthenticationError::PasswordRejectionSameAsOld)
             }
             Some(_) | None => Ok(Self(password)),
@@ -68,33 +68,47 @@ impl From<String> for HashedPassword {
 }
 
 /// Hash a string password with Argon2id v19 and return the string representation of the hash/salt/params
-pub(crate) fn hash_password(
-    password: &ValidatedPassword,
+pub(crate) async fn hash_password(
+    password: &ValidatedPassword<'_>,
 ) -> Result<HashedPassword, AuthenticationError> {
-    let salt = SaltString::generate(&mut OsRng);
+    let password = password.0.to_owned();
 
-    // Argon2id v19
-    let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, Params::default());
+    tokio::task::spawn_blocking(move || {
+        let salt = SaltString::generate(&mut OsRng);
 
-    Ok(HashedPassword(
-        argon2
-            .hash_password(password.0.as_bytes(), &salt)?
-            .to_string(),
-    ))
+        // Argon2id v19
+        let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, Params::default());
+
+        Ok(HashedPassword(
+            argon2
+                .hash_password(password.as_bytes(), &salt)?
+                .to_string(),
+        ))
+    })
+    .await?
 }
 
 /// Verify a password against a password hash created with hash_password
-pub(crate) fn verify_password(password: &str, password_hash: &HashedPassword) -> bool {
-    let Ok(parsed_hash) = PasswordHash::new(&password_hash.0) else {
-        return false;
-    };
+pub(crate) async fn verify_password(
+    password: &str,
+    password_hash: &HashedPassword,
+) -> Result<bool, AuthenticationError> {
+    let password = password.to_owned();
+    let password_hash = password_hash.clone();
 
-    // Argon2id v19
-    let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, Params::default());
+    Ok(tokio::task::spawn_blocking(move || {
+        let Ok(parsed_hash) = PasswordHash::new(&password_hash.0) else {
+            return false;
+        };
 
-    argon2
-        .verify_password(password.as_bytes(), &parsed_hash)
-        .is_ok()
+        // Argon2id v19
+        let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, Params::default());
+
+        argon2
+            .verify_password(password.as_bytes(), &parsed_hash)
+            .is_ok()
+    })
+    .await?)
 }
 
 #[cfg(test)]
@@ -103,79 +117,107 @@ mod tests {
 
     use super::*;
 
-    #[test]
-    fn test_hash_password_and_verify() {
+    #[test(tokio::test)]
+    async fn test_hash_password_and_verify() {
         let password = "password";
-        let hash = hash_password(&ValidatedPassword(password)).unwrap();
+        let hash = hash_password(&ValidatedPassword(password)).await.unwrap();
 
-        assert!(verify_password(password, &hash));
-        assert!(!verify_password("wrong_password", &hash));
-        assert!(!verify_password(
-            password,
-            &HashedPassword(hash.replace("$argon2id$v=19", "$argon2id$v=16"))
-        ));
+        assert!(verify_password(password, &hash).await.unwrap());
+        assert!(!verify_password("wrong_password", &hash).await.unwrap());
+        assert!(
+            !verify_password(
+                password,
+                &HashedPassword(hash.replace("$argon2id$v=19", "$argon2id$v=16"))
+            )
+            .await
+            .unwrap()
+        );
     }
 
-    #[test]
-    fn test_password_hash_format() {
+    #[test(tokio::test)]
+    async fn test_password_hash_format() {
         let password = ValidatedPassword("CoordinatorPassword01");
-        let hash = hash_password(&password).unwrap();
+        let hash = hash_password(&password).await.unwrap();
 
         dbg!(&hash);
 
         assert!(hash.starts_with("$argon2id$v=19$m="));
     }
 
-    #[test]
-    fn test_dummy_password_hash_matches_current_params() {
-        let hash = hash_password(&ValidatedPassword("TotallyValidP4ssW0rd")).unwrap();
+    #[test(tokio::test)]
+    async fn test_dummy_password_hash_matches_current_params() {
+        let hash = hash_password(&ValidatedPassword("TotallyValidP4ssW0rd"))
+            .await
+            .unwrap();
 
         // Get and compare the parameters by getting everything before the last two '$' characters
         assert_eq!(
             hash.rsplitn(3, '$').last(),
             DUMMY_PASSWORD_HASH.rsplitn(3, '$').last()
         );
-        assert!(verify_password(
-            "TotallyValidP4ssW0rd",
-            &HashedPassword::from(DUMMY_PASSWORD_HASH.to_string())
-        ));
-    }
-
-    #[test]
-    fn test_password_too_short_error() {
-        assert!(ValidatedPassword::new("test_user", "too_short", None).is_err());
-    }
-
-    #[test]
-    fn test_password_same_error() {
-        let unhashed = "TotallyValidP4ssW0rd";
-        let hashed = hash_password(&ValidatedPassword(unhashed)).unwrap();
-        assert!(ValidatedPassword::new("test_user", unhashed, Some(&hashed)).is_err());
-    }
-
-    #[test]
-    fn test_password_valid() {
-        assert!(ValidatedPassword::new("test_user", "TotallyValidP4ssW0rd", None).is_ok());
-    }
-
-    #[test]
-    fn test_password_not_same_valid() {
-        let old_password = hash_password(&ValidatedPassword("TotallyValidP4ssW0rd")).unwrap();
         assert!(
-            ValidatedPassword::new("test_user", "TotallyValidNewP4ssW0rd", Some(&old_password))
+            verify_password(
+                "TotallyValidP4ssW0rd",
+                &HashedPassword::from(DUMMY_PASSWORD_HASH.to_string())
+            )
+            .await
+            .unwrap()
+        );
+    }
+
+    #[test(tokio::test)]
+    async fn test_password_too_short_error() {
+        assert!(
+            ValidatedPassword::new("test_user", "too_short", None)
+                .await
+                .is_err()
+        );
+    }
+
+    #[test(tokio::test)]
+    async fn test_password_same_error() {
+        let unhashed = "TotallyValidP4ssW0rd";
+        let hashed = hash_password(&ValidatedPassword(unhashed)).await.unwrap();
+        assert!(
+            ValidatedPassword::new("test_user", unhashed, Some(&hashed))
+                .await
+                .is_err()
+        );
+    }
+
+    #[test(tokio::test)]
+    async fn test_password_valid() {
+        assert!(
+            ValidatedPassword::new("test_user", "TotallyValidP4ssW0rd", None)
+                .await
                 .is_ok()
         );
     }
 
-    #[test]
-    fn test_password_same_as_username_error() {
-        let old_password = hash_password(&ValidatedPassword("TotallyValidP4ssW0rd")).unwrap();
+    #[test(tokio::test)]
+    async fn test_password_not_same_valid() {
+        let old_password = hash_password(&ValidatedPassword("TotallyValidP4ssW0rd"))
+            .await
+            .unwrap();
+        assert!(
+            ValidatedPassword::new("test_user", "TotallyValidNewP4ssW0rd", Some(&old_password))
+                .await
+                .is_ok()
+        );
+    }
+
+    #[test(tokio::test)]
+    async fn test_password_same_as_username_error() {
+        let old_password = hash_password(&ValidatedPassword("TotallyValidP4ssW0rd"))
+            .await
+            .unwrap();
         assert!(
             ValidatedPassword::new(
                 "UsernameButAlsoValidPassword01",
                 "UsernameButAlsoValidPassword01",
                 Some(&old_password)
             )
+            .await
             .is_err()
         );
     }

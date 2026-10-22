@@ -6,6 +6,7 @@ use argon2::{
 };
 use serde::Deserialize;
 use sqlx::Type;
+use tokio::sync::Semaphore;
 
 use super::error::AuthenticationError;
 
@@ -18,6 +19,9 @@ const MIN_PASSWORD_LEN: usize = 13;
 /// Pre-computed Argon2id hash of "TotallyValidP4ssW0rd" (with default parameters)
 /// Used as a dummy hash against timing attacks when the user does not exist.
 pub(crate) const DUMMY_PASSWORD_HASH: &str = "$argon2id$v=19$m=19456,t=2,p=1$ySkT+RWXZ+VGKh0wxfz9kA$aCyyi3a6ok9WaKiX5Jvacrxi9ifPxTOQ8wba40rVAbg";
+
+/// Limits concurrent Argon2 runs to 4.
+static HASH_PERMITS: Semaphore = Semaphore::const_new(4);
 
 impl<'pw> ValidatedPassword<'pw> {
     pub async fn new(
@@ -72,8 +76,11 @@ pub(crate) async fn hash_password(
     password: &ValidatedPassword<'_>,
 ) -> Result<HashedPassword, AuthenticationError> {
     let password = password.0.to_owned();
+    let permit = HASH_PERMITS.acquire().await?;
 
     tokio::task::spawn_blocking(move || {
+        // Hold the permit until hashing is done
+        let _permit = permit;
         let salt = SaltString::generate(&mut OsRng);
 
         // Argon2id v19
@@ -95,8 +102,11 @@ pub(crate) async fn verify_password(
 ) -> Result<bool, AuthenticationError> {
     let password = password.to_owned();
     let password_hash = password_hash.clone();
+    let permit = HASH_PERMITS.acquire().await?;
 
     Ok(tokio::task::spawn_blocking(move || {
+        // Hold the permit until hashing is done
+        let _permit = permit;
         let Ok(parsed_hash) = PasswordHash::new(&password_hash.0) else {
             return false;
         };
@@ -113,6 +123,8 @@ pub(crate) async fn verify_password(
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     use test_log::test;
 
     use super::*;
@@ -220,5 +232,20 @@ mod tests {
             .await
             .is_err()
         );
+    }
+
+    #[test(tokio::test)]
+    async fn test_hash_password_waits_for_permit() {
+        let permits = HASH_PERMITS.acquire_many(4).await.unwrap();
+
+        let result = tokio::time::timeout(
+            Duration::from_millis(50),
+            hash_password(&ValidatedPassword("password")),
+        )
+        .await;
+        assert!(result.is_err(), "should wait for permit");
+
+        drop(permits);
+        assert!(hash_password(&ValidatedPassword("password")).await.is_ok());
     }
 }

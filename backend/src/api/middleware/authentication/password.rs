@@ -15,6 +15,10 @@ pub(crate) struct ValidatedPassword<'a>(&'a str);
 /// Minimum length of a password
 const MIN_PASSWORD_LEN: usize = 13;
 
+/// Pre-computed Argon2id hash of "TotallyValidP4ssW0rd" (with default parameters)
+/// Used as a dummy hash against timing attacks when the user does not exist.
+pub(crate) const DUMMY_PASSWORD_HASH: &str = "$argon2id$v=19$m=19456,t=2,p=1$ySkT+RWXZ+VGKh0wxfz9kA$aCyyi3a6ok9WaKiX5Jvacrxi9ifPxTOQ8wba40rVAbg";
+
 impl<'pw> ValidatedPassword<'pw> {
     pub fn new(
         username: &str,
@@ -120,6 +124,21 @@ mod tests {
         dbg!(&hash);
 
         assert!(hash.starts_with("$argon2id$v=19$m="));
+    }
+
+    #[test]
+    fn test_dummy_password_hash_matches_current_params() {
+        let hash = hash_password(&ValidatedPassword("TotallyValidP4ssW0rd")).unwrap();
+
+        // Get and compare the parameters by getting everything before the last two '$' characters
+        assert_eq!(
+            hash.rsplitn(3, '$').last(),
+            DUMMY_PASSWORD_HASH.rsplitn(3, '$').last()
+        );
+        assert!(verify_password(
+            "TotallyValidP4ssW0rd",
+            &HashedPassword::from(DUMMY_PASSWORD_HASH.to_string())
+        ));
     }
 
     #[test]

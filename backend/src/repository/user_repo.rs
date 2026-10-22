@@ -6,16 +6,14 @@ use utoipa::ToSchema;
 use crate::{
     api::middleware::authentication::{
         error::AuthenticationError,
-        password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
+        password::{
+            DUMMY_PASSWORD_HASH, HashedPassword, ValidatedPassword, hash_password, verify_password,
+        },
     },
     domain::{identifier::id, role::Role},
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
-
-/// Pre-computed Argon2id hash of "TotallyValidP4ssW0rd". This hash is never verified, only used in a fixture.
-#[cfg(test)]
-const TEST_USER_PASSWORD_HASH: &str = "$argon2id$v=19$m=19456,t=2,p=1$ySkT+RWXZ+VGKh0wxfz9kA$aCyyi3a6ok9WaKiX5Jvacrxi9ifPxTOQ8wba40rVAbg";
 
 id!(UserId);
 
@@ -106,7 +104,7 @@ impl User {
             fullname: Some("Full Name".to_string()),
             role,
             needs_password_change: false,
-            password_hash: HashedPassword::from(TEST_USER_PASSWORD_HASH.to_string()),
+            password_hash: HashedPassword::from(DUMMY_PASSWORD_HASH.to_string()),
             last_activity_at: None,
             is_logged_in: false,
             updated_at: Utc::now(),
@@ -130,10 +128,17 @@ pub async fn authenticate(
     // acquire a connection from the pool and drop it before verifying the password,
     // to ensure that the connection is not held open for too long
     let mut conn = pool.acquire().await?;
-    let Some(user) = get_by_username(&mut conn, username).await? else {
+    let user = get_by_username(&mut conn, username).await?;
+    drop(conn);
+
+    let Some(user) = user else {
+        // User not found, perform dummy verification to mitigate timing attacks
+        verify_password(
+            password,
+            &HashedPassword::from(DUMMY_PASSWORD_HASH.to_string()),
+        );
         return Err(AuthenticationError::UserNotFound);
     };
-    drop(conn);
 
     if verify_password(password, &user.password_hash) {
         Ok(user)
@@ -660,7 +665,7 @@ mod tests {
             role: Role::TypistGSB,
             needs_password_change: false,
             password_hash: password::HashedPassword::from(
-                super::TEST_USER_PASSWORD_HASH.to_string(),
+                password::DUMMY_PASSWORD_HASH.to_string(),
             ),
             last_activity_at: None,
             is_logged_in: false,

@@ -15,6 +15,7 @@ import {
   electionMockData,
   gsbListMockData,
   provincialElectionMockData,
+  provincialElectionPS2MockData,
   waterAuthorityElectionMockData,
 } from "@/testing/api-mocks/ElectionMockData";
 import {
@@ -154,6 +155,8 @@ async function importDefinitions(
   router: Router,
   file: File,
   election: Election = electionMockData,
+  electionIdentifier: string = "GR2026 Heemdamseburg",
+  electionDistrict?: string,
   gsbSelected?: RegionDetails,
 ) {
   await uploadElectionDefinition(router, file, election);
@@ -163,6 +166,10 @@ async function importDefinitions(
     await selectGSB(election, gsbSelected);
   }
   await uploadCandidateDefinition(file, election, gsbSelected?.key);
+  expect(screen.getByText(electionIdentifier)).toBeVisible();
+  if (electionDistrict) {
+    expect(screen.getByText(electionDistrict)).toBeVisible();
+  }
   await inputCandidateHash(election, gsbSelected?.key);
 }
 
@@ -485,6 +492,8 @@ describe("Election create pages", () => {
       name: string;
       election: Election;
       countingMethod: VoteCountingMethod;
+      electionIdentifier: string;
+      electionDistrict?: string;
       gsbSelected?: RegionDetails;
       importHandler: HttpHandler;
     };
@@ -493,6 +502,7 @@ describe("Election create pages", () => {
       {
         name: "GSB AB CSO",
         election: waterAuthorityElectionMockData,
+        electionIdentifier: "AB2027 Rivier en Polder",
         gsbSelected: gsbListMockData[0]!,
         countingMethod: "CSO",
         importHandler: GSBABElectionImportRequestHandler,
@@ -500,6 +510,7 @@ describe("Election create pages", () => {
       {
         name: "GSB AB DSO",
         election: waterAuthorityElectionMockData,
+        electionIdentifier: "AB2027 Rivier en Polder",
         gsbSelected: gsbListMockData[0]!,
         countingMethod: "DSO",
         importHandler: GSBABElectionImportRequestHandler,
@@ -507,36 +518,48 @@ describe("Election create pages", () => {
       {
         name: "GSB GR CSO",
         election: electionMockData,
+        electionIdentifier: "GR2026 Heemdamseburg",
         countingMethod: "CSO",
         importHandler: GSBGRElectionImportRequestHandler,
       },
       {
         name: "GSB GR DSO",
         election: electionMockData,
+        electionIdentifier: "GR2026 Heemdamseburg",
         countingMethod: "DSO",
         importHandler: GSBGRElectionImportRequestHandler,
       },
       {
-        name: "GSB PS CSO",
+        name: "GSB PS1 CSO",
         election: provincialElectionMockData,
+        electionIdentifier: "PS2027 Oost-Holland",
         gsbSelected: gsbListMockData[0]!,
         countingMethod: "CSO",
         importHandler: GSBPSElectionImportRequestHandler,
       },
       {
-        name: "GSB PS DSO",
-        election: provincialElectionMockData,
+        name: "GSB PS2 DSO",
+        election: provincialElectionPS2MockData,
+        electionIdentifier: "PS2027 Oost-Holland",
+        electionDistrict: "Kieskring II (Juinen)",
         gsbSelected: gsbListMockData[0]!,
         countingMethod: "DSO",
         importHandler: GSBPSElectionImportRequestHandler,
       },
     ];
 
-    test.each(gsbFlows)("$name", async ({ election, countingMethod, gsbSelected, importHandler }) => {
+    test.each(gsbFlows)("$name", async ({
+      election,
+      countingMethod,
+      electionIdentifier,
+      electionDistrict,
+      gsbSelected,
+      importHandler,
+    }) => {
       server.use(importHandler);
       const router = renderWithRouter();
       const user = userEvent.setup();
-      await importDefinitions(router, file, election, gsbSelected);
+      await importDefinitions(router, file, election, electionIdentifier, electionDistrict, gsbSelected);
 
       const location = gsbSelected?.name ?? election.location;
 
@@ -567,14 +590,14 @@ describe("Election create pages", () => {
     test("CSB for municipal election", async () => {
       server.use(CSBGRElectionImportRequestHandler);
       const router = renderWithRouter();
-      await importDefinitions(router, file, csbElectionMockData);
+      await importDefinitions(router, file, csbElectionMockData, "GR2026 Heemdamseburg");
       await saveElection(csbElectionMockData);
     });
 
     test("CSB for water authority election", async () => {
       server.use(CSBABElectionImportRequestHandler);
       const router = renderWithRouter();
-      await importDefinitions(router, file, csbWaterAuthorityElectionMockData);
+      await importDefinitions(router, file, csbWaterAuthorityElectionMockData, "AB2027 Rivier en Polder");
       await saveElection(csbWaterAuthorityElectionMockData);
     });
   });

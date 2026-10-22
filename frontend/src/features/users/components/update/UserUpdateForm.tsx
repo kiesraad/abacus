@@ -18,6 +18,11 @@ export interface UserUpdateFormProps {
   onAbort: () => void;
 }
 
+interface FormError {
+  title: string;
+  message?: string;
+}
+
 type ValidationErrors = Partial<UpdateUserRequest>;
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
@@ -26,10 +31,12 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>();
   const updatePath: USER_UPDATE_REQUEST_PATH = `/api/users/${user.id}`;
   const { update, isLoading } = useCrud<User>({ updatePath });
+  const [formError, setFormError] = useState<FormError>();
   const [error, setError] = useState<ErrorReference | null>(null);
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFormError(undefined);
     const formData = new StringFormData(event.currentTarget);
 
     const userUpdate: UpdateUserRequest = {};
@@ -56,15 +63,27 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
       void update(userUpdate).then((result) => {
         if (isSuccess(result)) {
           onSaved(result.data);
-        } else if (
-          result instanceof ApiError &&
-          (result.reference === "PasswordRejectionSameAsOld" ||
-            result.reference === "PasswordRejectionSameAsUsername" ||
-            result.reference === "PasswordRejectionTooShort")
-        ) {
-          setValidationErrors({ temp_password: t(`error.api_error.${result.reference}`) });
-        } else if (result instanceof ApiError) {
-          setError(result.reference);
+          return;
+        }
+
+        if (result instanceof ApiError) {
+          switch (result.reference) {
+            case "InvalidFullname":
+              setFormError({
+                title: t("error.api_error.InvalidFullname"),
+                message: t("users.invalid_fullname"),
+              });
+              setValidationErrors({ fullname: t("users.invalid_fullname") });
+              return;
+            case "PasswordRejectionSameAsOld":
+            case "PasswordRejectionSameAsUsername":
+            case "PasswordRejectionTooShort":
+              setValidationErrors({ temp_password: t(`error.api_error.${result.reference}`) });
+              return;
+            default:
+              setError(result.reference);
+              return;
+          }
         }
       });
     }
@@ -76,6 +95,15 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
         <FormLayout.Alert>
           <Alert type="error">
             <strong className="heading-md">{t(`error.api_error.${error}`)}</strong>
+          </Alert>
+        </FormLayout.Alert>
+      )}
+
+      {formError && (
+        <FormLayout.Alert>
+          <Alert type="error">
+            <strong className="heading-md">{formError.title}</strong>
+            <p>{formError.message}</p>
           </Alert>
         </FormLayout.Alert>
       )}

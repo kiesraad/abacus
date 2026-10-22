@@ -5,7 +5,7 @@ import { UserUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import type { USER_UPDATE_REQUEST_PATH, User } from "@/types/generated/openapi";
+import type { ErrorResponse, USER_UPDATE_REQUEST_PATH, User } from "@/types/generated/openapi";
 
 import { UserUpdateForm } from "./UserUpdateForm";
 
@@ -117,14 +117,14 @@ describe("UserUpdateForm", () => {
         error: "PasswordRejectionTooShort",
         expectedErrorMessage: "Het wachtwoord moet minimaal 13 karakters lang zijn.",
       },
-    ])("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
+    ] as const)("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
       const { onSaved } = await renderForm();
       const user = userEvent.setup();
       overrideOnce("put", "/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
         reference: error,
-      });
+      } satisfies ErrorResponse);
 
       expect(screen.queryByLabelText("Nieuw wachtwoord")).not.toBeInTheDocument();
       await user.click(screen.getByRole("button", { name: "Wijzig wachtwoord" }));
@@ -148,5 +148,28 @@ describe("UserUpdateForm", () => {
       expect(updateUser).toHaveBeenCalledWith({ temp_password: "Wachtwoord01234" });
       expect(onSaved).toHaveBeenCalledExactlyOnceWith(userMockData[0]);
     });
+  });
+
+  test("Invalid fullname", async () => {
+    const { onSaved } = await renderForm({ fullname: "Voor en Achternaam" });
+    const user = userEvent.setup();
+    overrideOnce("put", "/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
+      error: "Invalid character",
+      fatal: false,
+      reference: "InvalidFullname",
+    } satisfies ErrorResponse);
+
+    const fullname = await screen.findByRole("textbox", { name: "Volledige naam" });
+
+    await user.type(fullname, "Volledige naam");
+    await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      ["Volledige naam bevat ongeldige tekens", "In de volledige naam mogen geen tabs of enter zitten."].join(""),
+    );
+
+    expect(fullname).toBeInvalid();
+    expect(fullname).toHaveAccessibleErrorMessage("In de volledige naam mogen geen tabs of enter zitten.");
+    expect(onSaved).not.toHaveBeenCalled();
   });
 });

@@ -1349,6 +1349,11 @@ pub fn polling_stations_from_eml(
         .contests
         .first()
         .ok_or(EMLImportError::PollingStationsWithoutContest)?;
+
+    if contest.polling_places.is_empty() {
+        return Err(EMLImportError::MissingPollingStations);
+    }
+
     let mut result = vec![];
     for ps in &contest.polling_places {
         let physical_location = &ps.physical_location;

@@ -83,7 +83,7 @@ type TestVariant = {
 
 const variants: TestVariant[] = [
   {
-    name: "GR CSO",
+    name: "GR-CSO",
     electionDefinition: eml110a,
     candidateDefinition: eml230b,
     countingMethod: "CSO",
@@ -94,7 +94,7 @@ const variants: TestVariant[] = [
     dataEntry: noRecountNoDifferencesDataEntry,
   },
   {
-    name: "GR DSO",
+    name: "GR-DSO",
     electionDefinition: eml110a,
     candidateDefinition: eml230b,
     countingMethod: "DSO",
@@ -105,7 +105,7 @@ const variants: TestVariant[] = [
     dataEntry: checksAndCorrectionsDataEntryDSO,
   },
   {
-    name: "WS CSO",
+    name: "WS-CSO",
     electionDefinition: eml110a_AB,
     candidateDefinition: eml230b_AB,
     countingMethod: "CSO",
@@ -117,7 +117,7 @@ const variants: TestVariant[] = [
     dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntry,
   },
   {
-    name: "WS DSO",
+    name: "WS-DSO",
     electionDefinition: eml110a_AB,
     candidateDefinition: eml230b_AB,
     countingMethod: "DSO",
@@ -129,7 +129,7 @@ const variants: TestVariant[] = [
     dataEntry: checksAndCorrectionsWithVoterCardCountDataEntryDSO,
   },
   {
-    name: "PS1 CSO",
+    name: "PS1-CSO",
     electionDefinition: eml110a_PS1,
     candidateDefinition: eml230b_PS1,
     countingMethod: "CSO",
@@ -141,7 +141,7 @@ const variants: TestVariant[] = [
     dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntry,
   },
   {
-    name: "PS2 DSO",
+    name: "PS2-DSO",
     electionDefinition: eml110a_PS2,
     candidateDefinition: eml230b_PS2,
     countingMethod: "DSO",

@@ -550,9 +550,13 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user_repo::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
-            .await
-            .unwrap();
+        user_repo::set_temporary_password(
+            &mut conn,
+            UserId::from(1),
+            &password::hash_test_password("Admin1Password01").await,
+        )
+        .await
+        .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -613,9 +617,13 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user_repo::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
-            .await
-            .unwrap();
+        user_repo::set_temporary_password(
+            &mut conn,
+            UserId::from(1),
+            &password::hash_test_password("Admin1Password01").await,
+        )
+        .await
+        .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -651,9 +659,13 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user_repo::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
-            .await
-            .unwrap();
+        user_repo::set_temporary_password(
+            &mut conn,
+            UserId::from(1),
+            &password::hash_test_password("Admin1Password01").await,
+        )
+        .await
+        .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 

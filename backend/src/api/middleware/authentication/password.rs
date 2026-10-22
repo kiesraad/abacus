@@ -95,6 +95,11 @@ pub(crate) async fn hash_password(
     .await?
 }
 
+#[cfg(test)]
+pub(crate) async fn hash_test_password(password: &str) -> HashedPassword {
+    hash_password(&ValidatedPassword(password)).await.unwrap()
+}
+
 /// Verify a password against a password hash created with hash_password
 pub(crate) async fn verify_password(
     password: &str,

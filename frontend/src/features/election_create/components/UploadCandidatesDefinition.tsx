@@ -20,10 +20,14 @@ import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
 function getSubtitle(election: NewElection) {
   if (election.sub_category === "PS2") {
-    if (election.district.district === "Specific") {
-      return `${t("election.district")} ${getDistrictNumber(election.district)} (${election.district.name})`;
-    } else if (election.district.district === "All") {
-      return t("election.all_districts");
+    switch (election.committee_category) {
+      case "GSB":
+        if (election.district.district === "Specific") {
+          return `${t("election.district")} ${getDistrictNumber(election.district)} (${election.district.name})`;
+        }
+        break;
+      case "CSB":
+        return t("election.all_districts");
     }
   }
   return undefined;
@@ -129,7 +133,7 @@ export function UploadCandidatesDefinition() {
 
     return (
       <CheckHash
-        title={`${state.election.election_id.split("_")[0]} ${state.election.authority_region}`}
+        title={`${state.election.election_id.split("_")[0]} ${state.election.domain?.name}`}
         subtitle={getSubtitle(state.election)}
         header={t("election.check_eml.candidates_title")}
         description={tx("election.check_eml.candidates_description", {

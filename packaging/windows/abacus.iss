@@ -96,6 +96,10 @@ FinishedHeadingLabel=Abacus is geïnstalleerd en gestart.
 FinishedLabel=Abacus is klaar voor gebruik en start voortaan automatisch wanneer de computer wordt aangezet.%n%nDubbelklik op de snelkoppeling ‘Open Abacus in browser’ op het bureaublad om gebruikers aan te maken en verkiezingen in te richten.
 
 [Code]
+var
+  // Indicates if installing or starting the service failed, so it can be used to report it on the last page
+  ServiceFailed: Boolean;
+
 function AppExe(): String;
 begin
   Result := ExpandConstant('{app}\{#MyAppExeName}');
@@ -137,6 +141,35 @@ begin
   WizardForm.FilenameLabel.Caption := '';
 end;
 
+// Check if the service keeps running. If PowerShell is unavailable, fall back to more simple sc.exe running check
+function ServiceKeepsRunning(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  if Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'),
+      '-NoProfile -NonInteractive -Command "$s = Get-Service Abacus; foreach ($i in 1..10) { Start-Sleep -Milliseconds 500; $s.Refresh(); if ($s.Status -eq ''Stopped'') { exit 1 } }"',
+      '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+    Result := (ResultCode = 0)
+  else
+  begin
+    Sleep(5000);
+    Result := Succeeds(ExpandConstant('{cmd}'), '/c sc.exe query Abacus | findstr /c:RUNNING');
+  end;
+end;
+
+// Gets the last x lines of the log, returns empty if there is no log
+function LogTail(const Count: Integer): String;
+var
+  Lines: TArrayOfString;
+  I: Integer;
+begin
+  Result := '';
+  if LoadStringsFromFile(DataDir() + '\logs\abacus.log', Lines) then
+    for I := GetArrayLength(Lines) - Count to GetArrayLength(Lines) - 1 do
+      if I >= 0 then
+        Result := Result + #13#10 + Lines[I];
+end;
+
 procedure InitializeWizard();
 begin
   // Spacing of icon
@@ -144,7 +177,7 @@ begin
   WizardForm.WizardSmallBitmapImage.Height := WizardForm.WizardSmallBitmapImage.Height - ScaleY(10);
   WizardForm.WizardSmallBitmapImage.Width := WizardForm.WizardSmallBitmapImage.Width - ScaleY(10);
 
-  // Adjust position of text on the first page
+  // Adjust position of text on the first/install page
   WizardForm.PageDescriptionLabel.Visible := False;
   WizardForm.InnerNotebook.Left := WizardForm.PageNameLabel.Left;
   WizardForm.InnerNotebook.Top := WizardForm.PageNameLabel.Top + 2 * WizardForm.PageNameLabel.Height;
@@ -157,7 +190,13 @@ begin
   // Check if an installation already exists
   Result := not FileExists(ExpandConstant('{autopf}\{#MyAppName}\{#MyAppExeName}'));
   if not Result then
-    MsgBox('Abacus is al geïnstalleerd op deze computer. Verwijder eerst de bestaande installatie en start daarna deze installatie opnieuw.', mbError, MB_OK);
+    MsgBox('Abacus is al geïnstalleerd op deze computer. Verwijder eerst de bestaande installatie en start daarna deze installatie opnieuw.', mbError, MB_OK)
+  // Check if a service named Abacus already exists
+  else if Succeeds(ExpandConstant('{sys}\sc.exe'), 'query Abacus') then
+  begin
+    Result := False;
+    MsgBox('Er bestaat al een Windows-service met de naam Abacus op deze computer. Verwijder deze service eerst en start daarna deze installatie opnieuw.', mbError, MB_OK);
+  end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -190,8 +229,34 @@ begin
 
       // Install and start the service
       ShowStatus('Abacus-service installeren...');
-      RunStep('Het installeren van de Abacus-service', AppExe(), '--service --install', '');
+      ServiceFailed := not RunStep('Het installeren van de Abacus-service', AppExe(), '--service --install',
+        'Bekijk de logbestanden via de snelkoppeling ‘Abacus data’ op het bureaublad voor meer informatie.');
+
+      if not ServiceFailed then
+      begin
+        ShowStatus('Abacus starten...');
+        ServiceFailed := not ServiceKeepsRunning();
+        if ServiceFailed then
+          MsgBox('Het starten van Abacus is mislukt.' + #13#10 + LogTail(5) + #13#10#13#10 +
+            'Bekijk de logbestanden via de snelkoppeling ‘Abacus data’ op het bureaublad voor meer informatie.', mbError, MB_OK);
+      end;
     end;
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+var
+  I: Integer;
+begin
+  if (CurPageID = wpFinished) and ServiceFailed then
+  begin
+    // On failure to install/start service, adjust text
+    WizardForm.FinishedHeadingLabel.Caption := 'Abacus is niet gestart.';
+    WizardForm.FinishedLabel.Caption := 'Abacus is geïnstalleerd, maar kon niet worden gestart. Bekijk de logbestanden via de snelkoppeling ‘Abacus data’ op het bureaublad voor meer informatie.';
+    
+    // Uncheck run list items
+    for I := 0 to WizardForm.RunList.Items.Count - 1 do
+      WizardForm.RunList.Checked[I] := False;
+  end;
 end;
 
 procedure CurUninstallStepChanged(CurStep: TUninstallStep);

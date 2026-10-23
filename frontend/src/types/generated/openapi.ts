@@ -1400,6 +1400,7 @@ export const errorReferenceValues = [
   "DataEntryGetNotAllowed",
   "DataEntryNotAllowed",
   "DataEntryValidationErrors",
+  "ElectionMismatch",
   "EmlImportError",
   "EmlError",
   "EntryNotFound",

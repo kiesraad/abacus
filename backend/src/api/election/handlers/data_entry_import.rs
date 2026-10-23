@@ -310,11 +310,13 @@ async fn validate_import(
     let eml_election_id = election_identifier.id.value()?;
     let eml_election_date = election_identifier.election_date.copied_value()?.date;
 
-    if election.election_id != eml_election_id.value() {
-        return Err(EMLImportError::MismatchElection.into());
-    }
-    if election.election_date != eml_election_date {
-        return Err(EMLImportError::MismatchElectionDate.into());
+    if election.election_id != eml_election_id.value()
+        || election.election_date != eml_election_date
+    {
+        return Err(APIError::BadRequest(
+            "Election does not match".into(),
+            ErrorReference::ElectionMismatch,
+        ));
     }
 
     let committee_session =
@@ -889,13 +891,32 @@ mod tests {
         async fn test_other_election(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let user = User::test_user(Role::CoordinatorCSB, UserId::from(1));
+            let election_id = ElectionId::from(10);
+            let election = election_repo::get(&mut conn, election_id).await.unwrap();
             let eml = count_eml(&mut conn, ElectionId::from(5)).await;
-            let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+            let mut count = ElectionCount::parse_eml(&eml, EMLParsingMode::Strict).unwrap();
+            let identifier = &count.count.election.identifier;
 
-            assert_matches!(
-                validate_import(&mut conn, &user, ElectionId::from(10), zip, None).await,
-                Err(APIError::EmlImportError(EMLImportError::MismatchElection))
-            );
+            for (id, date) in [
+                (
+                    identifier.id.clone(),
+                    StringValue::from_raw(election.election_date.to_string()),
+                ),
+                (
+                    StringValue::from_raw(election.election_id),
+                    identifier.election_date.clone(),
+                ),
+            ] {
+                count.count.election.identifier.id = id;
+                count.count.election.identifier.election_date = date;
+                let eml = String::try_from(count.clone()).unwrap();
+                let zip = zip_with_files(&[("count.eml.xml", eml.as_bytes())]).await;
+
+                assert_matches!(
+                    validate_import(&mut conn, &user, election_id, zip, None).await,
+                    Err(APIError::BadRequest(_, ErrorReference::ElectionMismatch))
+                );
+            }
         }
 
         #[test(sqlx::test(fixtures(

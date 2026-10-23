@@ -15,7 +15,7 @@
   "check_eml": {
     "candidates_description": "Het bestand <file>filename</file> bevat de volgende kandidaten:",
     "candidates_title": "Controleer kandidatenlijsten",
-    "check_hash_instructions": "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
+    "check_hash_instructions": "Controleer de volledige digitale vingerafdruk met de code die je van het centraal stembureau hebt ontvangen. Vul ter controle de twee afgeschermde delen hieronder in. Ga alleen verder als alle delen overeenkomen.",
     "election_description": "Het bestand <file>filename</file> bevat de instellingen voor de volgende verkiezing:",
     "election_title": "Controleer verkiezingsdefinitie",
     "error": {

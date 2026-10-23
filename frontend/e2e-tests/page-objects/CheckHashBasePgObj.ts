@@ -19,4 +19,21 @@ export class CheckHashBasePgObj {
     await this.hashInput2.fill(hashInput2);
     await this.next.click();
   }
+
+  // The redacted chunk positions are random, so look up which chunks to fill in from the input names
+  async inputHashFrom(fullHash: string[]) {
+    const indexFor = async (input: Locator) => {
+      const name = await input.getAttribute("name");
+      if (name === null || !/^\d+$/.test(name) || Number(name) >= fullHash.length) {
+        throw new Error(`Hash input name "${name}" is not a valid chunk index`);
+      }
+      return Number(name);
+    };
+    const index1 = await indexFor(this.hashInput1);
+    const index2 = await indexFor(this.hashInput2);
+    if (index1 >= index2) {
+      throw new Error(`Hash input indexes ${index1} and ${index2} are not distinct or not sorted`);
+    }
+    await this.inputHash(fullHash[index1] ?? "", fullHash[index2] ?? "");
+  }
 }

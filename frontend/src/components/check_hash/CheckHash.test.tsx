@@ -24,7 +24,7 @@ const hashChunks = [
   "sdfr",
 ];
 
-function renderPage(error = false) {
+function renderPage(error = false, redactedIndexes = [4, 11], chunks = hashChunks) {
   render(
     <CheckHash
       date={"2022-03-16"}
@@ -35,8 +35,8 @@ function renderPage(error = false) {
       errorTitle={"Onjuiste vingerafdruk"}
       errorDescription={"De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw."}
       redactedHash={{
-        chunks: hashChunks,
-        redacted_indexes: [4, 11],
+        chunks,
+        redacted_indexes: redactedIndexes,
       }}
       error={error}
       onSubmit={onSubmit}
@@ -97,6 +97,30 @@ describe("CheckHash component", () => {
     expect(inputPart1).not.toBeInvalid();
     expect(inputPart2).not.toBeInvalid();
     expect(onSubmit).toHaveBeenCalled();
+  });
+
+  test("It reconstructs the hash for adjacent redacted chunks", async () => {
+    const chunks = ["asdf", "qwer", "zxcv", "tyui", "bnml", "1234", "5678", "", "", "gfsd"];
+    renderPage(false, [7, 8], chunks);
+
+    const user = userEvent.setup();
+
+    await user.type(screen.getByRole("textbox", { name: "Controle deel 1" }), "AB12");
+    await user.type(screen.getByRole("textbox", { name: "Controle deel 2" }), "cd34");
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+    expect(onSubmit).toHaveBeenCalledWith([
+      "asdf",
+      "qwer",
+      "zxcv",
+      "tyui",
+      "bnml",
+      "1234",
+      "5678",
+      "ab12",
+      "cd34",
+      "gfsd",
+    ]);
   });
 
   test("It shows an error for an invalid hash input", async () => {

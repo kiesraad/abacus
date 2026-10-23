@@ -17,6 +17,11 @@ import { StringFormData } from "@/utils/stringFormData";
 
 import { type UserValidationErrors, validateCreateUser } from "@/utils/validateUserAccount";
 
+interface FormError {
+  title: string;
+  message?: string;
+}
+
 interface CreateFirstAdminFormProps {
   next: () => void;
 }
@@ -26,6 +31,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
   const [validationErrors, setValidationErrors] = useState<UserValidationErrors | null>(null);
   const createPath: CREATE_FIRST_ADMIN_REQUEST_PATH = "/api/initialise/first-admin";
   const { create, isLoading } = useCrud<LoginResponse>({ createPath });
+  const [formError, setFormError] = useState<FormError | null>(null);
   const [apiError, setApiError] = useState<AnyApiError | null>(null);
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
@@ -43,24 +49,46 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
     const errors = validateCreateUser(account, passwordRepeat);
 
     if (Object.keys(errors).length > 0) {
+      setFormError({ title: t("account.not_saved"), message: t("account.check_fields") });
       setValidationErrors(errors);
       return;
     }
 
+    setFormError(null);
     setValidationErrors(null);
 
     void create(account).then((result) => {
       if (isSuccess(result)) {
         next();
-      } else if (
-        result instanceof ApiError &&
-        (result.reference === "PasswordRejectionSameAsOld" ||
-          result.reference === "PasswordRejectionSameAsUsername" ||
-          result.reference === "PasswordRejectionTooShort")
-      ) {
-        setValidationErrors({ password: t(`error.api_error.${result.reference}`) });
-      } else if (result instanceof ApiError) {
-        setApiError(result);
+        return;
+      }
+
+      if (result instanceof ApiError) {
+        switch (result.reference) {
+          case "InvalidFullname":
+            setFormError({
+              title: t("error.api_error.InvalidFullname"),
+              message: t("account.invalid_fullname"),
+            });
+            setValidationErrors({ fullname: t("account.invalid_fullname") });
+            return;
+          case "InvalidUsername":
+            setFormError({
+              title: t("error.api_error.InvalidUsername"),
+              message: t("account.invalid_username"),
+            });
+            setValidationErrors({ username: t("account.invalid_username") });
+            return;
+          case "PasswordRejectionSameAsOld":
+          case "PasswordRejectionSameAsUsername":
+          case "PasswordRejectionTooShort":
+            setFormError({ title: t("account.not_saved"), message: t("account.check_fields") });
+            setValidationErrors({ password: t(`error.api_error.${result.reference}`) });
+            return;
+          default:
+            setApiError(result);
+            return;
+        }
       }
     });
   }
@@ -74,11 +102,11 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
       </header>
       <main>
         <article className="no_footer">
-          {validationErrors && (
+          {formError && (
             <FormLayout.Alert>
               <Alert type="error">
-                <strong className="heading-md">{t("account.not_saved")}</strong>
-                <p>{t("account.check_fields")}</p>
+                <strong className="heading-md">{formError.title}</strong>
+                <p>{formError.message}</p>
               </Alert>
             </FormLayout.Alert>
           )}

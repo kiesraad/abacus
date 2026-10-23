@@ -5,7 +5,7 @@ import { AccountUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers
 import { loginResponseMockData } from "@/testing/api-mocks/UserMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler, within } from "@/testing/test-utils";
-import type { ACCOUNT_UPDATE_REQUEST_PATH, LoginResponse } from "@/types/generated/openapi";
+import type { ACCOUNT_UPDATE_REQUEST_PATH, ErrorResponse, LoginResponse } from "@/types/generated/openapi";
 
 import { AccountSetupForm } from "./AccountSetupForm";
 
@@ -148,14 +148,14 @@ describe("AccountSetupForm", () => {
         error: "PasswordRejectionTooShort",
         expectedErrorMessage: "Het wachtwoord moet minimaal 13 karakters lang zijn.",
       },
-    ])("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
+    ] as const)("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
       const { onSaved } = await renderForm();
       const user = userEvent.setup();
       overrideOnce("put", "/api/account" satisfies ACCOUNT_UPDATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
         reference: error,
-      });
+      } satisfies ErrorResponse);
 
       await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
       const password = screen.getByLabelText("Kies nieuw wachtwoord");
@@ -180,5 +180,30 @@ describe("AccountSetupForm", () => {
       });
       expect(onSaved).toHaveBeenCalledExactlyOnceWith(loginResponseMockData);
     });
+  });
+
+  test("Invalid fullname", async () => {
+    await renderForm();
+    const user = userEvent.setup();
+    overrideOnce("put", "/api/account" satisfies ACCOUNT_UPDATE_REQUEST_PATH, 400, {
+      error: "Invalid character",
+      fatal: false,
+      reference: "InvalidFullname",
+    } satisfies ErrorResponse);
+
+    const fullname = screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" });
+    await user.type(fullname, "First Last");
+    await user.type(screen.getByLabelText("Kies nieuw wachtwoord"), "password*password");
+    await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
+
+    const submitButton = screen.getByRole("button", { name: "Opslaan" });
+    await user.click(submitButton);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      ["Volledige naam bevat ongeldige tekens", "In de volledige naam mogen geen tabs of enter zitten."].join(""),
+    );
+
+    expect(fullname).toBeInvalid();
+    expect(fullname).toHaveAccessibleErrorMessage("In de volledige naam mogen geen tabs of enter zitten.");
   });
 });

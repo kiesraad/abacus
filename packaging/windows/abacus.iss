@@ -96,6 +96,13 @@ FinishedHeadingLabel=Abacus is geïnstalleerd en gestart.
 FinishedLabel=Abacus is klaar voor gebruik en start voortaan automatisch wanneer de computer wordt aangezet.%n%nDubbelklik op de snelkoppeling ‘Open Abacus in browser’ op het bureaublad om gebruikers aan te maken en verkiezingen in te richten.
 
 [Code]
+const
+  // Account IDs for icacls
+  // See: https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/81d92bba-d22b-4a8c-908a-554ab29148ab
+  Administrators = '*S-1-5-32-544';
+  LocalSystem = '*S-1-5-18';
+  LocalService = '*S-1-5-19';
+
 var
   // Indicates if installing or starting the service failed, so it can be used to report it on the last page
   ServiceFailed: Boolean;
@@ -203,6 +210,12 @@ procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then
     begin
+      // Set control for the data folder. Administrators/LocalSystem get full control, LocalService gets modify rights
+      ShowStatus('Datafolder beveiligen...');
+      RunStep('Het beveiligen van de datafolder', ExpandConstant('{sys}\icacls.exe'),
+        '"' + DataDir() + '" /inheritance:r /grant:r ' + Administrators + ':(OI)(CI)F ' +
+        LocalSystem + ':(OI)(CI)F ' + LocalService + ':(OI)(CI)M', '');
+
       // Generate the CA by running `--init-tls`
       ShowStatus('Beveiligingscertificaat aanmaken...');
       if RunStep('Het aanmaken van het beveiligingscertificaat', AppExe(),

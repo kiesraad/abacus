@@ -16,7 +16,9 @@
 #define MyAppURL "https://github.com/kiesraad/abacus"
 #define MyAppExeName "abacus.exe"
 #define MyAppIcon "abacus.ico"
-#define MyBackupDirName = "backups"
+#define MyDataDir "{commonappdata}\Abacus"
+#define MyFirewallRule "Abacus server"
+#define MyCAName "Abacus Local CA"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -28,7 +30,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={localappdata}\{#MyAppName}
+DefaultDirName={autopf}\{#MyAppName}
 ; Setup will not show the Select Destination Location wizard page.
 DisableDirPage=yes
 ; "ArchitecturesAllowed=x64compatible" specifies that Setup cannot run
@@ -40,7 +42,7 @@ ArchitecturesAllowed=x64compatible
 ; the 64-bit view of the registry.
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
-PrivilegesRequired=lowest
+PrivilegesRequired=admin
 OutputBaseFilename=abacussetup
 ; VC_redist can be eager to restart the system, but this breaks post-install run actions
 RestartIfNeededByRun=no
@@ -74,60 +76,105 @@ Source: ".\{#MyAppIcon}"; DestDir: "{app}"
 
 [Dirs]
 Name: "{app}"; Flags: uninsalwaysuninstall
-Name: "{app}\{#MyBackupDirName}"
+Name: "{#MyDataDir}\backups"; Flags: uninsneveruninstall
+Name: "{#MyDataDir}\logs"; Flags: uninsneveruninstall
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppIcon}"
-Name: "{autodesktop}\1. Start {#MyAppName} server"; Filename: "{sys}\cmd.exe"; Parameters: "/k ""{app}\{#MyAppExeName}"""; WorkingDir: "{app}"; IconFilename: "{app}\{#MyAppIcon}"
-Name: "{autodesktop}\2. Open {#MyAppName} in browser"; Filename: "https://localhost"; IconFilename: "{app}\{#MyAppIcon}"
-Name: "{autodesktop}\{#MyAppName} data"; Filename: "{app}"; IconFilename: "{sys}\shell32.dll"; IconIndex: 3
+Name: "{autoprograms}\{#MyAppName}"; Filename: "https://localhost"; IconFilename: "{app}\{#MyAppIcon}"
+Name: "{autodesktop}\Open {#MyAppName} in browser"; Filename: "https://localhost"; IconFilename: "{app}\{#MyAppIcon}"
+Name: "{autodesktop}\{#MyAppName} data"; Filename: "{#MyDataDir}"; IconFilename: "{sys}\shell32.dll"; IconIndex: 3
 
 [Run]
-Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /passive /norestart"; StatusMsg: "Visual C++ Redistributable installeren..."
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /quiet /norestart"; StatusMsg: "Visual C++ Redistributable installeren..."
 Filename: "https://localhost"; Description: "Open Abacus Interface"; Flags: shellexec postinstall skipifsilent
 
-[UninstallRun]
-Filename: "{sys}\certutil.exe"; Parameters: "-delstore root ""Abacus Local CA"""; Flags: runhidden; RunOnceId: "RemoveCaCert"
-Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Abacus server"" "; Flags: runhidden; RunOnceId: "RemoveFirewallExc"
-
 [Messages]
-WizardReady=Klaar om [name] te installeren
-ReadyLabel1=U gaat de [name] server installeren op deze computer.
-ReadyLabel2b=Het installatieprogramma vraagt een aantal keren om toestemming om hulpprogramma’s te kunnen installeren. Deze toestemming is nodig om Abacus goed te laten werken. Beantwoord deze vragen met ‘Ja’.
+WizardReady=Klaar om Abacus te installeren
+ReadyLabel2b=Abacus wordt op deze computer geïnstalleerd. Na de installatie start Abacus automatisch wanneer de computer wordt aangezet.%n%nLet op: Volgens de aansluitvoorschriften mag deze computer tijdens en na de installatie niet verbonden zijn met het internet.
 
-FinishedHeadingLabel=[name] is geïnstalleerd
-FinishedLabel=De installatie van [name] server is klaar.%n%nU kunt Abacus server starten via de snelkoppeling op het bureaublad. Doe dit pas nadat de internetverbinding van deze computer is verbroken.%n%nAls de server is gestart, kunt u Abacus inrichten via de snelkoppeling ‘Open [name]’.
+FinishedHeadingLabel=Abacus is geïnstalleerd en gestart.
+FinishedLabel=Abacus is klaar voor gebruik en start voortaan automatisch wanneer de computer wordt aangezet.%n%nDubbelklik op de snelkoppeling ‘Open Abacus in browser’ op het bureaublad om gebruikers aan te maken en verkiezingen in te richten.
 
 [Code]
-procedure RunElevatedCommandWithRetry(const CmdLine, ActionDescription: String);
+const
+  // Account IDs for icacls
+  // See: https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/81d92bba-d22b-4a8c-908a-554ab29148ab
+  Administrators = '*S-1-5-32-544';
+  LocalSystem = '*S-1-5-18';
+  LocalService = '*S-1-5-19';
+
+var
+  // Indicates if installing or starting the service failed, so it can be used to report it on the last page
+  ServiceFailed: Boolean;
+
+function AppExe(): String;
+begin
+  Result := ExpandConstant('{app}\{#MyAppExeName}');
+end;
+
+function DataDir(): String;
+begin
+  Result := ExpandConstant('{#MyDataDir}');
+end;
+
+// Run a command and shows an error if it fails
+function RunStep(const Description, Filename, Params, Hint: String): Boolean;
 var
   ResultCode: Integer;
-  Retry: Boolean;
-  MsgRes: Integer;
+  Message: String;
 begin
-  repeat
-    Retry := False;
+  Result := Exec(Filename, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
+  if not Result then
+  begin
+    Message := Description + ' is mislukt (foutcode: ' + IntToStr(ResultCode) + ').';
+    if Hint <> '' then
+      Message := Message + #13#10#13#10 + Hint;
+    MsgBox(Message, mbError, MB_OK);
+  end;
+end;
 
-    if not ShellExec('runas', ExpandConstant('{sys}\cmd.exe'),
-      '/c ' + CmdLine, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
-    begin
-      MsgRes := MsgBox(
-        ActionDescription + ' vereist administratorrechten.'#13#13 +
-        'Wilt u het opnieuw proberen?',
-        mbConfirmation, MB_YESNO or MB_DEFBUTTON2);
-      if MsgRes = IDYES then
-        Retry := True;
-    end
-    else
-    begin
-      if ResultCode = 0 then
-        MsgBox(ActionDescription + ' is succesvol uitgevoerd.', mbInformation, MB_OK)
-      else
-        MsgBox(ActionDescription + ' kon niet worden uitgevoerd (foutcode: ' + IntToStr(ResultCode) + ').',
-               mbError, MB_OK);
-    end;
-  until not Retry;
+// Runs a command and returns whether it has succeeded
+function Succeeds(const Filename, Params: String): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := Exec(Filename, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
+end;
+
+// Show what the installer is doing on the progress page
+procedure ShowStatus(const Text: String);
+begin
+  WizardForm.StatusLabel.Caption := Text;
+  WizardForm.FilenameLabel.Caption := '';
+end;
+
+// Check if the service keeps running. If PowerShell is unavailable, fall back to more simple sc.exe running check
+function ServiceKeepsRunning(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  if Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'),
+      '-NoProfile -NonInteractive -Command "$s = Get-Service Abacus; foreach ($i in 1..10) { Start-Sleep -Milliseconds 500; $s.Refresh(); if ($s.Status -eq ''Stopped'') { exit 1 } }"',
+      '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+    Result := (ResultCode = 0)
+  else
+  begin
+    Sleep(5000);
+    Result := Succeeds(ExpandConstant('{cmd}'), '/c sc.exe query Abacus | findstr /c:RUNNING');
+  end;
+end;
+
+// Gets the last x lines of the log, returns empty if there is no log
+function LogTail(const Count: Integer): String;
+var
+  Lines: TArrayOfString;
+  I: Integer;
+begin
+  Result := '';
+  if LoadStringsFromFile(DataDir() + '\logs\abacus.log', Lines) then
+    for I := GetArrayLength(Lines) - Count to GetArrayLength(Lines) - 1 do
+      if I >= 0 then
+        Result := Result + #13#10 + Lines[I];
 end;
 
 procedure InitializeWizard();
@@ -136,58 +183,122 @@ begin
   WizardForm.WizardSmallBitmapImage.Top := WizardForm.WizardSmallBitmapImage.Top + ScaleY(10);
   WizardForm.WizardSmallBitmapImage.Height := WizardForm.WizardSmallBitmapImage.Height - ScaleY(10);
   WizardForm.WizardSmallBitmapImage.Width := WizardForm.WizardSmallBitmapImage.Width - ScaleY(10);
+
+  // Adjust position of text on the first/install page
+  WizardForm.PageDescriptionLabel.Visible := False;
+  WizardForm.InnerNotebook.Left := WizardForm.PageNameLabel.Left;
+  WizardForm.InnerNotebook.Top := WizardForm.PageNameLabel.Top + 2 * WizardForm.PageNameLabel.Height;
+  WizardForm.InnerNotebook.Width := WizardForm.WizardSmallBitmapImage.Left - ScaleX(8) - WizardForm.InnerNotebook.Left;
+  WizardForm.InnerNotebook.BringToFront;
+end;
+
+function InitializeSetup(): Boolean;
+begin
+  // Check if an installation already exists
+  Result := not FileExists(ExpandConstant('{autopf}\{#MyAppName}\{#MyAppExeName}'));
+  if not Result then
+    MsgBox('Abacus is al geïnstalleerd op deze computer. Verwijder eerst de bestaande installatie en start daarna deze installatie opnieuw.', mbError, MB_OK)
+  // Check if a service named Abacus already exists
+  else if Succeeds(ExpandConstant('{sys}\sc.exe'), 'query Abacus') then
+  begin
+    Result := False;
+    MsgBox('Er bestaat al een Windows-service met de naam Abacus op deze computer. Verwijder deze service eerst en start daarna deze installatie opnieuw.', mbError, MB_OK);
+  end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
-var
-  CmdLine: String;
-  CaCertPath: String;
-  ResultCode: Integer;
 begin
   if CurStep = ssPostInstall then
     begin
-      // Generate the CA by running non-elevated with `--init-tls`
-      if (not Exec(ExpandConstant('{app}\{#MyAppExeName}'),
-          '--init-tls --tls-dir "' + ExpandConstant('{app}\tls') + '"',
-          ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, ResultCode))
-         or (ResultCode <> 0) then
-        MsgBox('Het aanmaken van het beveiligingscertificaat is mislukt (foutcode: '
-          + IntToStr(ResultCode) + ').'#13#10#13#10
-          + 'Installeer het beveiligingscertificaat handmatig volgens de gebruikershandleiding.',
-          mbError, MB_OK);
+      // Set control for the data folder. Administrators/LocalSystem get full control, LocalService gets modify rights
+      ShowStatus('Datafolder beveiligen...');
+      RunStep('Het beveiligen van de datafolder', ExpandConstant('{sys}\icacls.exe'),
+        '"' + DataDir() + '" /inheritance:r /grant:r ' + Administrators + ':(OI)(CI)F ' +
+        LocalSystem + ':(OI)(CI)F ' + LocalService + ':(OI)(CI)M', '');
 
-      // Create firewall rule and import CA into machine root store.
-      CaCertPath := ExpandConstant('{app}\tls\ca.cer');
-      CmdLine :=
-        'netsh advfirewall firewall delete rule name="Abacus server" >nul 2>&1 & ' +
-        'netsh advfirewall firewall add rule name="Abacus server" ' +
-        'program="' + ExpandConstant('{app}\{#MyAppExeName}') + '" ' +
-        'protocol=TCP dir=in localport=80,443 action=allow';
-      // Import the CA only if it was generated.
-      if FileExists(CaCertPath) then
-        CmdLine := CmdLine + ' && certutil -f -addstore root "' + CaCertPath + '"';
-      RunElevatedCommandWithRetry(CmdLine, 'Het instellen van de firewall en het beveiligingscertificaat');
+      // Generate the CA by running `--init-tls`
+      ShowStatus('Beveiligingscertificaat aanmaken...');
+      if RunStep('Het aanmaken van het beveiligingscertificaat', AppExe(),
+          '--init-tls --tls-dir "' + DataDir() + '\tls"',
+          '') then
+      begin
+        // Install the CA to the machine root store
+        ShowStatus('Beveiligingscertificaat installeren...');
+        RunStep('Het installeren van het beveiligingscertificaat', ExpandConstant('{sys}\certutil.exe'),
+          '-f -addstore root "' + DataDir() + '\tls\ca.cer"',
+          'Installeer het beveiligingscertificaat handmatig volgens de gebruikershandleiding.');
+      end;
+
+      ShowStatus('Firewall instellen...');
+      // Remove existing firewall rule if it exists
+      if Succeeds(ExpandConstant('{sys}\netsh.exe'), 'advfirewall firewall show rule name="{#MyFirewallRule}"') then
+        RunStep('Het verwijderen van de bestaande firewallregel', ExpandConstant('{sys}\netsh.exe'),
+          'advfirewall firewall delete rule name="{#MyFirewallRule}"', '');
+
+      // Create firewall rule
+      RunStep('Het instellen van de firewall', ExpandConstant('{sys}\netsh.exe'),
+        'advfirewall firewall add rule name="{#MyFirewallRule}" program="' + AppExe() + '" ' +
+        'protocol=TCP dir=in localport=80,443 action=allow', '');
+
+      // Install and start the service
+      ShowStatus('Abacus-service installeren...');
+      ServiceFailed := not RunStep('Het installeren van de Abacus-service', AppExe(), '--service --install',
+        'Bekijk de logbestanden via de snelkoppeling ‘Abacus data’ op het bureaublad voor meer informatie.');
+
+      if not ServiceFailed then
+      begin
+        ShowStatus('Abacus starten...');
+        ServiceFailed := not ServiceKeepsRunning();
+        if ServiceFailed then
+          MsgBox('Het starten van Abacus is mislukt.' + #13#10 + LogTail(5) + #13#10#13#10 +
+            'Bekijk de logbestanden via de snelkoppeling ‘Abacus data’ op het bureaublad voor meer informatie.', mbError, MB_OK);
+      end;
     end;
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+var
+  I: Integer;
+begin
+  if (CurPageID = wpFinished) and ServiceFailed then
+  begin
+    // On failure to install/start service, adjust text
+    WizardForm.FinishedHeadingLabel.Caption := 'Abacus is niet gestart.';
+    WizardForm.FinishedLabel.Caption := 'Abacus is geïnstalleerd, maar kon niet worden gestart. Bekijk de logbestanden via de snelkoppeling ‘Abacus data’ op het bureaublad voor meer informatie.';
+    
+    // Uncheck run list items
+    for I := 0 to WizardForm.RunList.Items.Count - 1 do
+      WizardForm.RunList.Checked[I] := False;
+  end;
 end;
 
 procedure CurUninstallStepChanged(CurStep: TUninstallStep);
 begin
   if CurStep = usUninstall then
     begin
-      // Confirm before deleting the Abacus data folder
-      case TaskDialogMsgBox('Database en backups verwijderen?',
-                   'De database bevat alle verkiezingsdetails, ingevoerde data en gemaakte processen-verbaal. Ook alle gemaakte backups worden verwijderd.' + #13#10#13#10 + 'Als u de database verwijdert, gaan deze gegevens definitief verloren.',
+      // Stop and uninstall the service first to remove any file locks
+      RunStep('Het verwijderen van de Abacus-service', AppExe(), '--service --uninstall', '');
+
+      case TaskDialogMsgBox('Database, back-ups en logbestanden verwijderen?',
+                   'De database bevat alle verkiezingsgegevens, ingevoerde gegevens en gemaakte processen-verbaal. Ook alle back-ups en logbestanden worden verwijderd.' + #13#10#13#10 + 'Let op: Verwijderde gegevens kunnen niet worden hersteld.',
                     mbConfirmation,
-                    MB_YESNO, ['Database en backups verwijderen', 'Bewaren'],
+                    MB_YESNO, ['Verwijder database, back-ups en logbestanden', 'Gegevens bewaren'],
                     0) of
         IDYES: begin
-          DelTree(ExpandConstant('{app}'), True, True, True);
-          MsgBox('Database en backups zijn verwijderd.', mbInformation, MB_OK);
+          if DelTree(DataDir(), True, True, True) then
+            MsgBox('Database, back-ups en logbestanden zijn verwijderd.', mbInformation, MB_OK)
+          else
+            MsgBox('De database, back-ups en logbestanden konden niet volledig worden verwijderd. Verwijder de map ' + DataDir() + ' handmatig.', mbError, MB_OK);
         end;
-        IDNO: MsgBox('Database en backups worden behouden.', mbInformation, MB_OK);
+        IDNO: MsgBox('Database, back-ups en logbestanden zijn niet verwijderd. Ze blijven beschikbaar in de map ' + DataDir(), mbInformation, MB_OK);
       end;
 
-      // delete Abacus CA from the machine root store by name and delete firewall rule
-      RunElevatedCommandWithRetry('certutil -delstore root "Abacus Local CA" >nul 2>&1 & netsh advfirewall firewall delete rule name="Abacus server"', 'Het verwijderen van de firewallregel en het beveiligingscertificaat');
+      // Delete the CA from the machine root store by name and delete firewall rule
+      if Succeeds(ExpandConstant('{sys}\certutil.exe'), '-store root "{#MyCAName}"') then
+        RunStep('Het verwijderen van het beveiligingscertificaat', ExpandConstant('{sys}\certutil.exe'),
+          '-delstore root "{#MyCAName}"', '');
+      if Succeeds(ExpandConstant('{sys}\netsh.exe'), 'advfirewall firewall show rule name="{#MyFirewallRule}"') then
+        RunStep('Het verwijderen van de firewallregel', ExpandConstant('{sys}\netsh.exe'),
+          'advfirewall firewall delete rule name="{#MyFirewallRule}"', '');
     end;
 end;

@@ -76,7 +76,10 @@ pub(crate) async fn hash_password(
     password: &ValidatedPassword<'_>,
 ) -> Result<HashedPassword, AuthenticationError> {
     let password = password.0.to_owned();
-    let permit = HASH_PERMITS.acquire().await?;
+    let permit = HASH_PERMITS
+        .acquire()
+        .await
+        .expect("HASH_PERMITS should not be closed");
 
     tokio::task::spawn_blocking(move || {
         // Hold the permit until hashing is done
@@ -107,7 +110,10 @@ pub(crate) async fn verify_password(
 ) -> Result<bool, AuthenticationError> {
     let password = password.to_owned();
     let password_hash = password_hash.clone();
-    let permit = HASH_PERMITS.acquire().await?;
+    let permit = HASH_PERMITS
+        .acquire()
+        .await
+        .expect("HASH_PERMITS should not be closed");
 
     Ok(tokio::task::spawn_blocking(move || {
         // Hold the permit until hashing is done

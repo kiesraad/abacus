@@ -7,7 +7,6 @@ use crate::error::{ApiErrorResponse, ErrorReference, ErrorResponse};
 #[derive(Debug)]
 pub enum AuthenticationError {
     AlreadyInitialised,
-    AcquireError(tokio::sync::AcquireError),
     Database(sqlx::Error),
     Forbidden,
     HashPassword(password_hash::Error),
@@ -143,8 +142,7 @@ impl ApiErrorResponse for AuthenticationError {
                     false,
                 ),
             ),
-            AuthenticationError::AcquireError(_)
-            | AuthenticationError::Database(_)
+            AuthenticationError::Database(_)
             | AuthenticationError::HashPassword(_)
             | AuthenticationError::InvalidSessionDuration
             | AuthenticationError::JoinError(_) => (
@@ -168,12 +166,6 @@ impl From<password_hash::Error> for AuthenticationError {
 impl From<sqlx::Error> for AuthenticationError {
     fn from(err: sqlx::Error) -> Self {
         AuthenticationError::Database(err)
-    }
-}
-
-impl From<tokio::sync::AcquireError> for AuthenticationError {
-    fn from(err: tokio::sync::AcquireError) -> Self {
-        Self::AcquireError(err)
     }
 }
 

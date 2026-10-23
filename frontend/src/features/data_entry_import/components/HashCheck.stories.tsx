@@ -58,7 +58,7 @@ export const Default: Story = {
     await expect(canvas.getByText("Telresultaten GSB Gemeenteraad Juinen 2026")).toBeVisible();
     await expect(
       canvas.getByText(
-        "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code staat op het proces-verbaal Na 31-2 van het GSB van de gemeente Juinen.",
+        "Controleer de volledige digitale vingerafdruk met de code op het proces-verbaal Na 31-2 van het GSB van de gemeente Juinen. Vul ter controle de twee afgeschermde delen hieronder in. Ga alleen verder als alle delen overeenkomen.",
       ),
     ).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Volgende" })).toBeVisible();

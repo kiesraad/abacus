@@ -107,7 +107,7 @@ test.describe(`data entry import GSB 510b into CSB election`, () => {
 
     // Correct hash.
     await hashCheckPage.hashInput1.click(); // Input needs focus again.
-    await hashCheckPage.inputHash(eml510b.hashInput1, eml510b.hashInput2);
+    await hashCheckPage.inputHashFrom(eml510b.fullHash);
 
     // Check and save.
     const dataEntryImportCheckAndSavePage = new DataEntryImportCheckAndSavePgObj(page);

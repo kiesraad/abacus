@@ -30,7 +30,7 @@ const meta = {
   args: {
     date: "2026-03-18",
     instructions:
-      "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
+      "Controleer de volledige digitale vingerafdruk met de code die je van het centraal stembureau hebt ontvangen. Vul ter controle de twee afgeschermde delen hieronder in. Ga alleen verder als alle delen overeenkomen.",
     errorTitle: "Onjuiste vingerafdruk",
     errorDescription: "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
     redactedHash,
@@ -59,7 +59,7 @@ export const Election: Story = {
     await expect(canvas.getByText("Gemeenteraad Juinen 2026")).toBeVisible();
     await expect(
       canvas.getByText(
-        "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
+        "Controleer de volledige digitale vingerafdruk met de code die je van het centraal stembureau hebt ontvangen. Vul ter controle de twee afgeschermde delen hieronder in. Ga alleen verder als alle delen overeenkomen.",
       ),
     ).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Volgende" })).toBeVisible();

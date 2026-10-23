@@ -67,6 +67,7 @@ pub enum ErrorReference {
     DataEntryGetNotAllowed,
     DataEntryNotAllowed,
     DataEntryValidationErrors,
+    ElectionMismatch,
     EmlImportError,
     EmlError,
     EntryNotFound,

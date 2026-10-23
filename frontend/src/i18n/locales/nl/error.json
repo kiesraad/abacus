@@ -24,6 +24,7 @@
     "DataEntryNotAllowed": "De invoer voor dit stembureau is niet toegestaan",
     "DataEntryValidationErrors": "Er zijn fouten opgetreden bij het valideren van het stembureau",
     "InvalidDataEntrySource": "De bron van de invoer is ongeldig",
+    "ElectionMismatch": "Het EML-bestand hoort niet bij deze verkiezing",
     "EmlImportError": "Het EML-bestand is niet geldig",
     "EmlError": "Er is een fout opgetreden bij het verwerken van het EML-bestand",
     "EntryNotFound": "Niet gevonden",

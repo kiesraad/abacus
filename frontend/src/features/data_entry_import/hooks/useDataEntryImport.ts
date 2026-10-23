@@ -94,7 +94,7 @@ function importError(error: AnyError, electionName: string): FileImportError {
     return fileError("invalid_510b");
   }
 
-  if (error.reference === "EmlImportError" || error.reference === "UnknownCommittee") {
+  if (error.reference === "ElectionMismatch" || error.reference === "UnknownCommittee") {
     return fileError("election_mismatch", { electionName });
   }
 
@@ -106,8 +106,12 @@ function importError(error: AnyError, electionName: string): FileImportError {
     return fileError("data_entry_already_started");
   }
 
-  // EmlError (e.g. unreadable EML).
-  if (error.reference === "DataEntryValidationErrors" || error.reference === "EmlError") {
+  // Invalid EML contents or results.
+  if (
+    error.reference === "EmlImportError" ||
+    error.reference === "EmlError" ||
+    error.reference === "DataEntryValidationErrors"
+  ) {
     return fileError("contains_errors");
   }
 

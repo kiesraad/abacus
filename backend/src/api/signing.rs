@@ -616,6 +616,7 @@ mod tests {
                 "not_after": certificate.not_after,
                 "public_key_fingerprint": certificate.public_key_fingerprint,
             }),
+            None,
         )
         .await;
     }
@@ -750,6 +751,7 @@ mod tests {
                 "not_after": removed.not_after,
                 "public_key_fingerprint": removed.public_key_fingerprint,
             }),
+            None,
         )
         .await;
     }

@@ -301,59 +301,18 @@ impl APIError {
                     ),
                 )
             }
-            APIError::EmlImportError(EMLImportError::InvalidCountType) => {
-                error!("Error importing EML file: Invalid count type");
-                (
-                    StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(
-                        "EML import error".to_string(),
-                        ErrorReference::InvalidCountType,
-                        false,
-                    ),
-                )
-            }
-            APIError::EmlImportError(EMLImportError::InvalidDistrict) => {
-                error!("Error importing EML file: Invalid district");
-                (
-                    StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(
-                        "EML import error".to_string(),
-                        ErrorReference::InvalidDistrict,
-                        false,
-                    ),
-                )
-            }
-            APIError::EmlImportError(EMLImportError::MismatchElection) => {
-                error!("Error importing EML file: Election does not match");
-                (
-                    StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(
-                        "EML import error".to_string(),
-                        ErrorReference::ElectionMismatch,
-                        false,
-                    ),
-                )
-            }
-            APIError::EmlImportError(EMLImportError::UnknownCommittee) => {
-                error!("Error importing EML file: Unknown sub committee");
-                (
-                    StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(
-                        "EML import error".to_string(),
-                        ErrorReference::UnknownCommittee,
-                        false,
-                    ),
-                )
-            }
             APIError::EmlImportError(err) => {
                 error!("Error importing EML file: {:?}", err);
+                let reference = match err {
+                    EMLImportError::InvalidCountType => ErrorReference::InvalidCountType,
+                    EMLImportError::InvalidDistrict => ErrorReference::InvalidDistrict,
+                    EMLImportError::MismatchElection => ErrorReference::ElectionMismatch,
+                    EMLImportError::UnknownCommittee => ErrorReference::UnknownCommittee,
+                    _ => ErrorReference::EmlImportError,
+                };
                 (
                     StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(
-                        "EML import error".to_string(),
-                        ErrorReference::EmlImportError,
-                        false,
-                    ),
+                    ErrorResponse::new("EML import error", reference, false),
                 )
             }
             APIError::EmlError(err) => {

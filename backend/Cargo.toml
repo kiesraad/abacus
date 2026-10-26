@@ -36,6 +36,7 @@ rand = "0.10.1"
 strum = { version = "0.28", features = ["derive"] }
 test-log = "0.2.19"
 tokio = { version = "1", features = ["full"] }
+tokio-util = { version = "0.7.18", features = ["compat"] }
 tracing = "0.1.44"
 rcgen = { version = "0.14", default-features = false, features = ["aws_lc_rs", "pem", "x509-parser", "zeroize"] }
 const-oid = { version = "0.10", features = ["db"] }
@@ -97,6 +98,7 @@ hyper = { version = "1", features = ["full"] }
 icu_collator = "2.2.0"
 icu_locale_core = "2.2.0"
 tokio.workspace = true
+tokio-util.workspace = true
 memory-serve = { version = "2.1.0", optional = true, features = ["force-embed"] }
 utoipa = { version = "6.0.0", features = ["axum_extras", "chrono"] }
 utoipa-axum = "0.3.0"

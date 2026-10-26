@@ -58,6 +58,16 @@ use crate::{
 
 const WATER_AUTHORITY_PREFIX: &str = "Algemeen bestuur van het ";
 
+/// Return exactly one contest.
+fn single_contest<T>(contests: &[T]) -> Result<&T, EMLImportError> {
+    match contests {
+        [contest] => Ok(contest),
+        _ => Err(EMLImportError::InvalidNumberOfContests {
+            found: contests.len(),
+        }),
+    }
+}
+
 fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
     match max_votes.copied_value() {
         // If max_votes is too large we fall back to zero
@@ -302,13 +312,10 @@ impl NewElection {
         }
 
         if self.election_date != election_date {
-            return Err(EMLImportError::MismatchElectionDate);
+            return Err(EMLImportError::MismatchElection);
         }
 
-        let contest = election
-            .contests
-            .first()
-            .ok_or(EMLImportError::CandidateListWithoutContest)?;
+        let contest = single_contest(&election.contests)?;
 
         // check that contest id is the same as the region number
         let contest_id = contest.identifier.id.cloned_value()?;
@@ -1343,17 +1350,11 @@ pub fn election_identifier_from_eml(
 pub fn polling_stations_from_eml(
     polling_stations: &PollingStations,
 ) -> Result<Vec<crate::domain::polling_station::PollingStationRequest>, EMLImportError> {
-    let contest = polling_stations
-        .election_event
-        .election
-        .contests
-        .first()
-        .ok_or(EMLImportError::PollingStationsWithoutContest)?;
+    let contest = single_contest(&polling_stations.election_event.election.contests)?;
 
     if contest.polling_places.is_empty() {
         return Err(EMLImportError::MissingPollingStations);
     }
-
     let mut result = vec![];
     for ps in &contest.polling_places {
         let physical_location = &ps.physical_location;
@@ -1436,12 +1437,7 @@ fn polling_station_location(ps: &crate::domain::polling_station::PollingStation)
 pub fn number_of_voters_from_polling_stations_eml(
     polling_stations: &PollingStations,
 ) -> Result<u32, EMLImportError> {
-    let contest = polling_stations
-        .election_event
-        .election
-        .contests
-        .first()
-        .ok_or(EMLImportError::PollingStationsWithoutContest)?;
+    let contest = single_contest(&polling_stations.election_event.election.contests)?;
 
     Ok(max_votes(&contest.max_votes))
 }
@@ -1504,6 +1500,56 @@ mod tests {
             tests::example_results,
         },
     };
+
+    #[test]
+    fn test_candidates_require_single_contest() {
+        let (mut election, _) =
+            NewElection::from_eml_str(include_str!("tests/eml110a_test.eml.xml"), None, false)
+                .unwrap();
+        let mut candidates = CandidateLists::parse_eml(
+            include_str!("tests/eml230b_test.eml.xml"),
+            EMLParsingMode::Strict,
+        )
+        .unwrap();
+        let contests = &mut candidates.candidate_list.election.contests;
+        contests.push(contests[0].clone());
+        assert_matches!(
+            election.add_candidates_from_eml(&candidates, &CommitteeDistrict::None),
+            Err(EMLImportError::InvalidNumberOfContests { found: 2 })
+        );
+
+        candidates.candidate_list.election.contests.clear();
+        assert_matches!(
+            election.add_candidates_from_eml(&candidates, &CommitteeDistrict::None),
+            Err(EMLImportError::InvalidNumberOfContests { found: 0 })
+        );
+    }
+
+    #[test]
+    fn test_polling_stations_require_single_contest() {
+        let mut polling_stations =
+            parse_polling_stations_eml_str(include_str!("tests/eml110b_test.eml.xml")).unwrap();
+        let contests = &mut polling_stations.election_event.election.contests;
+        contests.push(contests[0].clone());
+        assert_matches!(
+            polling_stations_from_eml(&polling_stations),
+            Err(EMLImportError::InvalidNumberOfContests { found: 2 })
+        );
+        assert_matches!(
+            number_of_voters_from_polling_stations_eml(&polling_stations),
+            Err(EMLImportError::InvalidNumberOfContests { found: 2 })
+        );
+
+        polling_stations.election_event.election.contests.clear();
+        assert_matches!(
+            polling_stations_from_eml(&polling_stations),
+            Err(EMLImportError::InvalidNumberOfContests { found: 0 })
+        );
+        assert_matches!(
+            number_of_voters_from_polling_stations_eml(&polling_stations),
+            Err(EMLImportError::InvalidNumberOfContests { found: 0 })
+        );
+    }
 
     fn source_and_results_gsb(voter_card_count: Option<Count>) -> (DataEntrySource, Results) {
         let mut results = example_results();

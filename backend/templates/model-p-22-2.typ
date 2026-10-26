@@ -81,7 +81,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #checkbox()[Nee]
 
-#checkbox()[Ja, *#sym.arrow.r Zie bijlage 2*]
+#checkbox()[Ja #sym.arrow.r *Zie bijlage 2*]
 
 == Verslag van controlewerkzaamheden
 
@@ -89,7 +89,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #checkbox()[Nee]
 
-#checkbox()[Ja, *#sym.arrow.r Zie bijlage 3*]
+#checkbox()[Ja #sym.arrow.r *Zie bijlage 3*]
 
 == Bezwaren
 

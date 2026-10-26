@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn } from "storybook/test";
 import type { RedactedEmlHash } from "@/types/generated/openapi";
+import { formatDateFull } from "@/utils/dateTime";
 import { CheckHash } from "./CheckHash";
 
 const redactedHash: RedactedEmlHash = {
@@ -28,7 +29,6 @@ const redactedHash: RedactedEmlHash = {
 const meta = {
   component: CheckHash,
   args: {
-    date: "2026-03-18",
     instructions:
       "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
     errorTitle: "Onjuiste vingerafdruk",
@@ -52,6 +52,7 @@ export const Election: Story = {
       </>
     ),
     title: "Gemeenteraad Juinen 2026",
+    subtitle: formatDateFull(new Date("2026-03-18")),
   },
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Controleer verkiezingsdefinitie")).toBeVisible();
@@ -76,6 +77,7 @@ export const ElectionWithError: Story = {
       </>
     ),
     title: "Gemeenteraad Juinen 2026",
+    subtitle: formatDateFull(new Date("2026-03-18")),
     error: "Invalid hash",
   },
   play: async ({ canvas }) => {
@@ -90,10 +92,48 @@ export const Candidates: Story = {
     header: "Controleer kandidatenlijsten",
     description: (
       <>
-        Het bestand <strong>kandidatenlijst_Fryslân_PS27.eml.xml</strong> bevat de volgende kandidaten:
+        Het bestand <strong>kandidatenlijst_Fryslân_PS27.eml.xml</strong> bevat de kandidaten voor onderstaand
+        kiesgebied:
       </>
     ),
-    title: "Fryslân, kandidatenlijsten PS2027",
+    title: "PS2027 Fryslân",
+  },
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("Controleer kandidatenlijsten")).toBeVisible();
+    await expect(canvas.getByText("kandidatenlijst_Fryslân_PS27.eml.xml")).toBeVisible();
+    await expect(canvas.getByText("PS2027 Fryslân")).toBeVisible();
+    await expect(
+      canvas.getByText(
+        "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
+      ),
+    ).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Volgende" })).toBeVisible();
+  },
+};
+
+export const CandidatesWithDistrict: Story = {
+  args: {
+    header: "Controleer kandidatenlijsten",
+    description: (
+      <>
+        Het bestand <strong>kandidatenlijst_Limburg_PS27.eml.xml</strong> bevat de kandidaten voor onderstaand
+        kiesgebied:
+      </>
+    ),
+    title: "PS2027 Limburg",
+    subtitle: "Kieskring I (Maastricht)",
+  },
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("Controleer kandidatenlijsten")).toBeVisible();
+    await expect(canvas.getByText("kandidatenlijst_Limburg_PS27.eml.xml")).toBeVisible();
+    await expect(canvas.getByText("PS2027 Limburg")).toBeVisible();
+    await expect(canvas.getByText("Kieskring I (Maastricht)")).toBeVisible();
+    await expect(
+      canvas.getByText(
+        "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
+      ),
+    ).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Volgende" })).toBeVisible();
   },
 };
 
@@ -102,10 +142,11 @@ export const CandidatesWithError: Story = {
     header: "Controleer kandidatenlijsten",
     description: (
       <>
-        Het bestand <strong>kandidatenlijst_Fryslân_PS27.eml.xml</strong> bevat de volgende kandidaten:
+        Het bestand <strong>kandidatenlijst_Fryslân_PS27.eml.xml</strong> bevat de kandidaten voor onderstaand
+        kiesgebied:
       </>
     ),
-    title: "Fryslân, kandidatenlijsten PS2027",
+    title: "PS2027 Fryslân",
     error: "Invalid hash",
   },
   play: async ({ canvas }) => {

@@ -1,6 +1,7 @@
 import { CheckHash } from "@/components/check_hash/CheckHash";
 import { t, tx } from "@/i18n/translate";
 import type { RedactedEmlHash, SubCommitteeFirstSession } from "@/types/generated/openapi";
+import { formatDateFull } from "@/utils/dateTime";
 
 export interface HashCheckProps {
   date: string;
@@ -15,8 +16,8 @@ export interface HashCheckProps {
 export function HashCheck({ date, title, fileName, subCommittee, hash, error, onSubmit }: HashCheckProps) {
   return (
     <CheckHash
-      date={date}
       title={title}
+      subtitle={formatDateFull(new Date(date))}
       header={t("data_entry_import.hash_check.title")}
       description={tx("data_entry_import.hash_check.description", {
         file: () => <strong>{fileName}</strong>,

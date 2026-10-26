@@ -240,6 +240,7 @@ mod tests {
     use test_log::test;
     use tokio::net::TcpListener;
     use tower::ServiceExt;
+    use utoipa::openapi::RefOr;
 
     use super::*;
     use crate::{
@@ -437,6 +438,9 @@ mod tests {
                     // replace path parameters with (dummy) values
                     if let Some(parameters) = operation.parameters.as_ref() {
                         for param in parameters {
+                            let RefOr::T(param) = param else {
+                                panic!("unexpected parameter reference in {path}");
+                            };
                             path = path.replace(&format!("{{{}}}", param.name), "1");
                         }
                     }

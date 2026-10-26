@@ -20,7 +20,6 @@ pub enum EMLImportError {
     InvalidVotingMethod,
     LimitedElectionsSupported,
     MismatchElection,
-    MismatchElectionDate,
     MismatchElectionDomain,
     MismatchNumberOfSeats,
     MismatchPreferenceThreshold,

@@ -313,10 +313,7 @@ async fn validate_import(
     if election.election_id != eml_election_id.value()
         || election.election_date != eml_election_date
     {
-        return Err(APIError::BadRequest(
-            "Election does not match".into(),
-            ErrorReference::ElectionMismatch,
-        ));
+        return Err(EMLImportError::MismatchElection.into());
     }
 
     let committee_session =
@@ -914,7 +911,7 @@ mod tests {
 
                 assert_matches!(
                     validate_import(&mut conn, &user, election_id, zip, None).await,
-                    Err(APIError::BadRequest(_, ErrorReference::ElectionMismatch))
+                    Err(APIError::EmlImportError(EMLImportError::MismatchElection))
                 );
             }
         }

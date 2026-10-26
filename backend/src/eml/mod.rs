@@ -58,7 +58,7 @@ use crate::{
 
 const WATER_AUTHORITY_PREFIX: &str = "Algemeen bestuur van het ";
 
-/// Return the exactly one contest.
+/// Return exactly one contest.
 fn single_contest<T>(contests: &[T]) -> Result<&T, EMLImportError> {
     match contests {
         [contest] => Ok(contest),
@@ -312,7 +312,7 @@ impl NewElection {
         }
 
         if self.election_date != election_date {
-            return Err(EMLImportError::MismatchElectionDate);
+            return Err(EMLImportError::MismatchElection);
         }
 
         let contest = single_contest(&election.contests)?;

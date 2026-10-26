@@ -323,6 +323,17 @@ impl APIError {
                     ),
                 )
             }
+            APIError::EmlImportError(EMLImportError::MismatchElection) => {
+                error!("Error importing EML file: Election does not match");
+                (
+                    StatusCode::BAD_REQUEST,
+                    ErrorResponse::new(
+                        "EML import error".to_string(),
+                        ErrorReference::ElectionMismatch,
+                        false,
+                    ),
+                )
+            }
             APIError::EmlImportError(EMLImportError::UnknownCommittee) => {
                 error!("Error importing EML file: Unknown sub committee");
                 (

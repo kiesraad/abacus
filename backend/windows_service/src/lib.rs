@@ -40,7 +40,7 @@ use windows_service::{
 
 const SERVICE_NAME: &str = "Abacus";
 const SERVICE_ACCOUNT: &str = r"NT AUTHORITY\LocalService";
-const SERVICE_DISPLAY_NAME: &str = "Abacus service";
+const SERVICE_DISPLAY_NAME: &str = "Abacus-service";
 const SERVICE_DESCRIPTION: &str = "Windows service running the Abacus server";
 const SERVICE_TYPE: ServiceType = ServiceType::OWN_PROCESS;
 

@@ -211,8 +211,8 @@ begin
   if CurStep = ssPostInstall then
     begin
       // Set control for the data folder. Administrators/LocalSystem get full control, LocalService gets modify rights
-      ShowStatus('Datafolder beveiligen...');
-      RunStep('Het beveiligen van de datafolder', ExpandConstant('{sys}\icacls.exe'),
+      ShowStatus('Gegevensmap beveiligen...');
+      RunStep('Het beveiligen van de gegevensmap', ExpandConstant('{sys}\icacls.exe'),
         '"' + DataDir() + '" /inheritance:r /grant:r ' + Administrators + ':(OI)(CI)F ' +
         LocalSystem + ':(OI)(CI)F ' + LocalService + ':(OI)(CI)M', '');
 

@@ -13,6 +13,7 @@ import type {
   ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
   ElectionDefinitionValidateResponse,
 } from "@/types/generated/openapi";
+import { formatDateFull } from "@/utils/dateTime";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
@@ -89,8 +90,8 @@ export function UploadElectionDefinition() {
 
     return (
       <CheckHash
-        date={state.election.election_date}
         title={state.election.name}
+        subtitle={formatDateFull(new Date(state.election.election_date))}
         header={t("election.check_eml.election_title")}
         description={tx("election.check_eml.election_description", {
           file: () => {

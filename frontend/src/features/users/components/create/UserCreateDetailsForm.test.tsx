@@ -182,7 +182,7 @@ describe("UserCreateDetailsForm", () => {
   test("Invalid username", async () => {
     const { onSubmitted } = renderForm("typist_gsb", false);
     const user = userEvent.setup();
-    overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 409, {
+    overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 422, {
       error: "Invalid character",
       fatal: false,
       reference: "InvalidUsername",
@@ -213,7 +213,7 @@ describe("UserCreateDetailsForm", () => {
   test("Invalid fullname", async () => {
     const { onSubmitted } = renderForm("typist_gsb", true);
     const user = userEvent.setup();
-    overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 409, {
+    overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 422, {
       error: "Invalid character",
       fatal: false,
       reference: "InvalidFullname",

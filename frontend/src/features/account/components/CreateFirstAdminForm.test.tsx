@@ -129,7 +129,7 @@ describe("CreateFirstAdminForm", () => {
         error: "Invalid password",
         fatal: false,
         reference: error,
-      } as ErrorResponse);
+      } satisfies ErrorResponse);
 
       await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
       await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "Administrator");
@@ -153,7 +153,7 @@ describe("CreateFirstAdminForm", () => {
     test("Invalid fullname", async () => {
       render(<CreateFirstAdminForm next={next} />);
       const user = userEvent.setup();
-      overrideOnce("post", "/api/initialise/first-admin" satisfies CREATE_FIRST_ADMIN_REQUEST_PATH, 400, {
+      overrideOnce("post", "/api/initialise/first-admin" satisfies CREATE_FIRST_ADMIN_REQUEST_PATH, 422, {
         error: "Invalid character",
         fatal: false,
         reference: "InvalidFullname",
@@ -178,7 +178,7 @@ describe("CreateFirstAdminForm", () => {
     test("Invalid username", async () => {
       render(<CreateFirstAdminForm next={next} />);
       const user = userEvent.setup();
-      overrideOnce("post", "/api/initialise/first-admin" satisfies CREATE_FIRST_ADMIN_REQUEST_PATH, 400, {
+      overrideOnce("post", "/api/initialise/first-admin" satisfies CREATE_FIRST_ADMIN_REQUEST_PATH, 422, {
         error: "Invalid character",
         fatal: false,
         reference: "InvalidUsername",

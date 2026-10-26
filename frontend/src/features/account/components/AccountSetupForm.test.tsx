@@ -185,7 +185,7 @@ describe("AccountSetupForm", () => {
   test("Invalid fullname", async () => {
     await renderForm();
     const user = userEvent.setup();
-    overrideOnce("put", "/api/account" satisfies ACCOUNT_UPDATE_REQUEST_PATH, 400, {
+    overrideOnce("put", "/api/account" satisfies ACCOUNT_UPDATE_REQUEST_PATH, 422, {
       error: "Invalid character",
       fatal: false,
       reference: "InvalidFullname",

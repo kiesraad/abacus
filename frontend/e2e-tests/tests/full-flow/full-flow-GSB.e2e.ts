@@ -270,12 +270,9 @@ for (const variant of variants) {
 
       electionId = election.id;
 
-      await expect(electionsOverviewPage.adminHeader).toBeVisible();
-      await expect(electionsOverviewPage.getAlertElectionCreated("GSB", variant.electionName)).toBeVisible();
-      await electionsOverviewPage.findElectionRowById(electionId).click();
-
       const electionHomePage = new ElectionHome(page);
       await expect(electionHomePage.header).toHaveText(variant.electionName);
+      await expect(electionHomePage.getAlertElectionCreated("GSB", variant.electionName)).toBeVisible();
       const sessionCard = electionHomePage.getCommitteeSessionCard(1);
       await expect(sessionCard).toContainText("Eerste zitting — Klaar voor invoer");
 

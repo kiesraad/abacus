@@ -491,10 +491,10 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 export interface AboutReport {
   /** Whether the extra page "controles en correcties" is inserted in the report
 ("Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?") */
-  checks_and_corrections_present: null | ChecksAndCorrectionsPresent;
+  checks_and_corrections_present: ChecksAndCorrectionsPresent | null;
   /** Whether a corrigendum accompanies the report
 ("Is er een corrigendum bij het papieren proces-verbaal aanwezig?") */
-  corrigendum_present: null | CorrigendumPresent;
+  corrigendum_present: CorrigendumPresent | null;
 }
 
 export interface AbsoluteMajorityDrawingLots {
@@ -960,8 +960,8 @@ export interface CountingDifferencesPollingStation {
   /** Whether there was a difference between the total votes per list as determined by the polling station and by the typist
 ("Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?") */
   difference_ballots_per_list: YesNo;
-  /** Whether the difference between the number of votes counted and the number of admitted voters was completely accounted for
-("Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?") */
+  /** Whether the total of admitted voters (D) and the total of votes counted (H) are equal, or the difference was completely accounted for
+("Is in de telresultaten van het stembureau het aantal toegelaten kiezers (D) en het totaal aantal getelde stemmen (H) gelijk OF is er een verschil en is dit verschil volledig verklaard?") */
   difference_ballots_voters_completely_accounted_for: YesNo;
 }
 

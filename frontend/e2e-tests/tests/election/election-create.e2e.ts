@@ -104,9 +104,12 @@ test.describe("Election creation", () => {
 
       // Back to the check and save page to test saving the election
       const election = await checkAndSavePage.saveElection();
-      await expect(overviewPage.adminHeader).toBeVisible();
-      await expect(overviewPage.getAlertElectionCreated("GSB", "Gemeenteraad Test 2022")).toBeVisible();
+      const electionHomePage = new ElectionHome(page);
+      await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
+      await expect(electionHomePage.getAlertElectionCreated("GSB", "Gemeenteraad Test 2022")).toBeVisible();
 
+      await new AdminNavBar(page).electionOverviewButton.click();
+      await expect(overviewPage.adminHeader).toBeVisible();
       const electionRow = overviewPage.findElectionRowById(election.id);
       await expect(electionRow).toBeVisible();
       await expect(electionRow).toContainText("Gemeenteraad Test 2022");
@@ -163,17 +166,12 @@ test.describe("Election creation", () => {
       await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
       await expect(checkAndSavePage.numberOfVoters).toContainText("1.234 kiesgerechtigden");
 
-      const election = await checkAndSavePage.saveElection();
-      await expect(overviewPage.adminHeader).toBeVisible();
-
-      const electionRow = overviewPage.findElectionRowById(election.id);
-      await expect(electionRow).toBeVisible();
-      await expect(electionRow).toContainText("Gemeenteraad Test 2022");
-      await expect(electionRow).toContainText("Zitting voorbereiden");
-      await electionRow.click();
+      await checkAndSavePage.saveElection();
 
       const electionHomePage = new ElectionHome(page);
+      const sessionCard = electionHomePage.getCommitteeSessionCard(1);
       await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
+      await expect(sessionCard).toContainText("Zitting voorbereiden");
       await electionHomePage.alertLinkToPollingStations.click();
 
       const pollingStationsPage = new PollingStationListEmptyPgObj(page);
@@ -190,8 +188,7 @@ test.describe("Election creation", () => {
       await navBar.getElectionBreadcrumb(eml110a.electionName).click();
 
       await expect(electionHomePage.header).toBeVisible();
-      const session = electionHomePage.getCommitteeSessionCard(1);
-      await expect(session).toContainText("Klaar voor invoer");
+      await expect(sessionCard).toContainText("Klaar voor invoer");
     });
   });
 
@@ -261,9 +258,12 @@ test.describe("Election creation", () => {
 
       // Back to the check and save page to test saving the election
       const election = await checkAndSavePage.saveElection();
-      await expect(overviewPage.adminHeader).toBeVisible();
-      await expect(overviewPage.getAlertElectionCreated("GSB", "Gemeenteraad Test 2022")).toBeVisible();
+      const electionHomePage = new ElectionHome(page);
+      await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
+      await expect(electionHomePage.getAlertElectionCreated("GSB", "Gemeenteraad Test 2022")).toBeVisible();
 
+      await new AdminNavBar(page).electionOverviewButton.click();
+      await expect(overviewPage.adminHeader).toBeVisible();
       const electionRow = overviewPage.findElectionRowById(election.id);
       await expect(electionRow).toBeVisible();
       await expect(electionRow).toContainText("Gemeenteraad Test 2022");
@@ -320,17 +320,12 @@ test.describe("Election creation", () => {
       await expect(checkAndSavePage.countingMethod).toContainText("Decentrale stemopneming");
       await expect(checkAndSavePage.numberOfVoters).toContainText("1.234 kiesgerechtigden");
 
-      const election = await checkAndSavePage.saveElection();
-      await expect(overviewPage.adminHeader).toBeVisible();
-
-      const electionRow = overviewPage.findElectionRowById(election.id);
-      await expect(electionRow).toBeVisible();
-      await expect(electionRow).toContainText("Gemeenteraad Test 2022");
-      await expect(electionRow).toContainText("Zitting voorbereiden");
-      await electionRow.click();
+      await checkAndSavePage.saveElection();
 
       const electionHomePage = new ElectionHome(page);
+      const sessionCard = electionHomePage.getCommitteeSessionCard(1);
       await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
+      await expect(sessionCard).toContainText("Zitting voorbereiden");
       await electionHomePage.alertLinkToPollingStations.click();
 
       const pollingStationsPage = new PollingStationListEmptyPgObj(page);
@@ -347,8 +342,7 @@ test.describe("Election creation", () => {
       await navBar.getElectionBreadcrumb(eml110a.electionName).click();
 
       await expect(electionHomePage.header).toBeVisible();
-      const session = electionHomePage.getCommitteeSessionCard(1);
-      await expect(session).toContainText("Klaar voor invoer");
+      await expect(sessionCard).toContainText("Klaar voor invoer");
     });
   });
 
@@ -415,12 +409,15 @@ test.describe("Election creation", () => {
 
         // Save the election.
         const election = await checkAndSavePage.saveElection();
-        await expect(overviewPage.adminHeader).toBeVisible();
+        const electionHomePage = new ElectionHome(page);
+        await expect(electionHomePage.header).toHaveText(variant.electionDefinition.electionName);
         await expect(
-          overviewPage.getAlertElectionCreated("CSB", variant.electionDefinition.electionName),
+          electionHomePage.getAlertElectionCreated("CSB", variant.electionDefinition.electionName),
         ).toBeVisible();
 
         // Check the election overview row.
+        await new AdminNavBar(page).electionOverviewButton.click();
+        await expect(overviewPage.adminHeader).toBeVisible();
         const electionRow = overviewPage.findElectionRowById(election.id);
         await expect(electionRow).toBeVisible();
         await expect(electionRow).toContainText(variant.electionDefinition.electionName);
@@ -686,8 +683,8 @@ test.describe("Election creation", () => {
       await expect(checkAndSavePage.header).toBeVisible();
       await checkAndSavePage.save.click();
 
-      // Redefine the Overview page, so we can locate the newly
-      await expect(overviewPage.adminHeader).toBeVisible();
+      const electionHomePage = new ElectionHome(page);
+      await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
 
       // Back button
       await page.goBack();
@@ -730,8 +727,10 @@ test.describe("Election creation", () => {
       await expect(checkAndSavePage.numberOfVoters).toContainText("45.678");
 
       await checkAndSavePage.saveElection();
-      await expect(overviewPage.adminHeader).toBeVisible();
-      await expect(overviewPage.getAlertElectionCreated("GSB", "Gemeenteraad Test 2022")).toBeVisible();
+
+      const electionHomePage = new ElectionHome(page);
+      await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
+      await expect(electionHomePage.getAlertElectionCreated("GSB", "Gemeenteraad Test 2022")).toBeVisible();
     });
 
     test("it fails on valid, but incorrect polling station file", async ({ page }) => {

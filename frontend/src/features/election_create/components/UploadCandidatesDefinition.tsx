@@ -12,9 +12,26 @@ import { t, tx } from "@/i18n/translate";
 import type {
   ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
   ElectionDefinitionValidateResponse,
+  NewElection,
 } from "@/types/generated/openapi";
+import { getDistrictNumber } from "@/utils/election";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
+
+function getSubtitle(election: NewElection) {
+  if (election.sub_category === "PS2") {
+    switch (election.committee_category) {
+      case "GSB":
+        if (election.district.district === "Specific") {
+          return `${t("election.district")} ${getDistrictNumber(election.district)} (${election.district.name})`;
+        }
+        break;
+      case "CSB":
+        return t("election.all_districts");
+    }
+  }
+  return undefined;
+}
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UploadCandidatesDefinition() {
@@ -116,11 +133,8 @@ export function UploadCandidatesDefinition() {
 
     return (
       <CheckHash
-        date={state.election.election_date}
-        title={t("election.check_eml.list_name", {
-          location: state.election.location,
-          name: state.election.election_id,
-        })}
+        title={`${state.election.election_id.split("_")[0]} ${state.election.domain?.name}`}
+        subtitle={getSubtitle(state.election)}
         header={t("election.check_eml.candidates_title")}
         description={tx("election.check_eml.candidates_description", {
           file: () => {

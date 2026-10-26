@@ -130,6 +130,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                   subtext={t("account.fullname_subtext")}
                   hint={t("initialise.fullname_hint")}
                   autoComplete="name"
+                  maxLength={255}
                   error={validationErrors?.fullname}
                 />
                 <InputField
@@ -138,6 +139,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                   label={t("initialise.username")}
                   hint={t("initialise.username_hint")}
                   autoComplete="username"
+                  maxLength={255}
                   error={validationErrors?.username}
                 />
                 <InputField

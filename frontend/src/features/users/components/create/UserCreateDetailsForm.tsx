@@ -136,6 +136,7 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
                 name="fullname"
                 label={t("users.fullname")}
                 hint={t("users.fullname_hint")}
+                maxLength={255}
                 error={validationErrors?.fullname}
               />
             )}
@@ -145,6 +146,7 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
               name="username"
               label={t("users.username")}
               hint={t("users.username_hint")}
+              maxLength={255}
               error={validationErrors?.username}
             />
 

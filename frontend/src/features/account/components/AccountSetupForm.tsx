@@ -124,6 +124,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
               subtext={t("account.fullname_subtext")}
               hint={t("account.fullname_hint")}
               autoComplete="name"
+              maxLength={255}
               error={validationErrors?.fullname}
               defaultValue={user.fullname}
             />

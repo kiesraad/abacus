@@ -118,6 +118,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
                 defaultValue={user.fullname}
                 label={t("users.fullname")}
                 hint={t("users.fullname_hint")}
+                maxLength={255}
                 error={validationErrors?.fullname}
               />
             )}
@@ -128,6 +129,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
               disabled={true}
               value={user.username}
               label={t("users.username")}
+              maxLength={255}
               hint={t("users.username_hint_disabled")}
             />
 

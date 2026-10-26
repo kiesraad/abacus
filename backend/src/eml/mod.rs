@@ -2149,6 +2149,19 @@ mod tests {
     }
 
     #[test]
+    fn test_polling_stations_from_eml_empty() {
+        let eml = include_str!("./tests/eml110b_test.eml.xml");
+        let mut polling_stations = parse_polling_stations_eml_str(eml).unwrap();
+
+        polling_stations.election_event.election.contests[0]
+            .polling_places
+            .clear();
+
+        let result = polling_stations_from_eml(&polling_stations);
+        assert_matches!(result, Err(EMLImportError::MissingPollingStations));
+    }
+
+    #[test]
     fn test_as_polling_stations_eml_location() {
         let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
         let mut polling_stations = polling_stations_fixture(&[1000, 2000, 3000]);

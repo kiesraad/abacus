@@ -117,7 +117,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     if (isSuccess(response)) {
       // Only push a message if there are no messages yet (e.g. from creating this investigation)
       if (!hasMessages()) {
-        pushMessage(getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status));
+        pushMessage(getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status, correctedResults));
       }
 
       await refetch();

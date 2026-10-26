@@ -196,6 +196,28 @@ describe("InvestigationFindingsPage", () => {
     });
   });
 
+  test("Adds the corrigendum instruction to the warning when data entry completed", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "completed" }));
+    overrideOnce("put", "/api/polling_stations/2/investigation", 200, {
+      findings: "Test findings 4",
+      corrected_results: true,
+    });
+
+    await renderPage(2);
+
+    (await screen.findByRole("radio", { name: /Ja/ })).click();
+    (await screen.findByRole("button", { name: "Opslaan" })).click();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(pushMessage).toHaveBeenCalledWith({
+      type: "warning",
+      title: "Maak een nieuw proces-verbaal voor deze zitting",
+      text: "Onderzoek voor stembureau 34 (Testplek) aangepast. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.\nLaat het corrigendum door 2 invoerders invoeren in Abacus.",
+    });
+  });
+
   test("Disables corrected results and forces corrected_results=true for new polling stations", async () => {
     server.use(PollingStationInvestigationUpdateHandler);
     const update = spyOnHandler(PollingStationInvestigationUpdateHandler);
@@ -239,6 +261,10 @@ describe("InvestigationFindingsPage", () => {
       reason: "Test investigation",
       // Always true for new polling stations
       corrected_results: true,
+    });
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Onderzoek voor stembureau 35 (Testschool) aangepast",
+      text: "Laat het corrigendum door 2 invoerders invoeren in Abacus.",
     });
   });
 

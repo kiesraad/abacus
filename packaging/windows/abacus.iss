@@ -210,11 +210,19 @@ procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then
     begin
-      // Set control for the data folder. Administrators/LocalSystem get full control, LocalService gets modify rights
       ShowStatus('Gegevensmap beveiligen...');
-      RunStep('Het beveiligen van de gegevensmap', ExpandConstant('{sys}\icacls.exe'),
-        '"' + DataDir() + '" /inheritance:r /grant:r ' + Administrators + ':(OI)(CI)F ' +
-        LocalSystem + ':(OI)(CI)F ' + LocalService + ':(OI)(CI)M', '');
+      // Securing the data folder
+      // See: https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/icacls
+      // 1. Replace existing ACLs with default inherited ACLs, traversing the data folder.
+      if RunStep('Het beveiligen van de gegevensmap', ExpandConstant('{sys}\icacls.exe'),
+          '"' + DataDir() + '" /reset /T', '') then
+        // 2. Set control for the data folder. Administrators/LocalSystem get full control, LocalService gets modify rights
+        if RunStep('Het beveiligen van de gegevensmap', ExpandConstant('{sys}\icacls.exe'),
+            '"' + DataDir() + '" /inheritance:r /grant:r ' + Administrators + ':(OI)(CI)F ' +
+            LocalSystem + ':(OI)(CI)F ' + LocalService + ':(OI)(CI)M', '') then
+          // 3. Set ownership to Administrators group, traversing the data folder.
+          RunStep('Het beveiligen van de gegevensmap', ExpandConstant('{sys}\icacls.exe'),
+            '"' + DataDir() + '" /setowner ' + Administrators + ' /T', '');
 
       // Generate the CA by running `--init-tls`
       ShowStatus('Beveiligingscertificaat aanmaken...');

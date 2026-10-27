@@ -113,9 +113,7 @@ export function ElectionStatusPage() {
           </div>
         </section>
       </header>
-
-      <Messages />
-
+      <Messages autoCloseTimeout={300000} /> {/* auto close success alerts after 5 minutes */}
       {showPauseModal && (
         <Modal title={t("election_status.pause_session")} onClose={togglePauseModal}>
           <p>{t("election_status.pause_are_you_sure")}</p>
@@ -136,7 +134,6 @@ export function ElectionStatusPage() {
           </nav>
         </Modal>
       )}
-
       {isCoordinator &&
       currentCommitteeSession.status !== "completed" &&
       statuses.length > 0 &&
@@ -165,7 +162,6 @@ export function ElectionStatusPage() {
           </Alert>
         )
       )}
-
       <main>
         <ElectionStatus
           committeeSession={currentCommitteeSession}

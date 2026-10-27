@@ -281,6 +281,8 @@ pub async fn user_update(
         return Err(AuthenticationError::Forbidden.into());
     }
 
+    update_user_req.validate()?;
+
     // Hash before transaction to prevent write lock
     let temp_password_hash = match &update_user_req.temp_password {
         Some(temp_password) => Some(
@@ -291,8 +293,6 @@ pub async fn user_update(
     };
 
     let mut tx = pool.begin_immediate().await?;
-
-    update_user_req.validate()?;
 
     if let Some(fullname) = update_user_req.fullname {
         user_repo::update_fullname(&mut tx, user_id, &fullname).await?

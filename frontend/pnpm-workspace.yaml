@@ -26,8 +26,6 @@ overrides:
   # @codecov/vite-plugin does not have official support for Vite 8, but works:
   # https://github.com/codecov/codecov-javascript-bundler-plugins/issues/264
   "vite": "catalog:"
-  # Fix GHSA-gv7w-rqvm-qjhr, GHSA-g7r4-m6w7-qqqr
-  esbuild@>=0.17.0 <0.28.1: ">=0.28.1"
   # Fix GHSA-mrhx-c7xc-m3w5
   "zod@<4.6.6": "4.6.6"
   # Fix GHSA-xjj6-f33q-929c, GHSA-4qv8-2p9j-2685

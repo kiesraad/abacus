@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useUser } from "@/hooks/user/useUser";
 import type { ElectionStatusResponseEntry } from "@/types/generated/openapi";
+import { sortList } from "@/utils/sorting";
 import { type DataEntryStatusWithUserStatus, DataEntryUserStatus, getDataEntryWithStatusList } from "../utils/util";
 
 const NOT_AVAILABLE_STATUSES: DataEntryUserStatus[] = [
@@ -28,11 +29,17 @@ export function useAvailableDataEntries(statuses: ElectionStatusResponseEntry[])
     const inProgressCurrentUser = availableCurrentUser.filter(
       (dataEntry) => dataEntry.userStatus === DataEntryUserStatus.InProgressCurrentUser,
     );
+    const sortedAvailableCurrentUser = sortList(availableCurrentUser, (item) => {
+      return item.statusEntry.source;
+    });
+    const sortedInProgressCurrentUser = sortList(inProgressCurrentUser, (item) => {
+      return item.statusEntry.source;
+    });
 
     return {
       dataEntryWithStatus,
-      availableCurrentUser: availableCurrentUser,
-      inProgressCurrentUser: inProgressCurrentUser,
+      availableCurrentUser: sortedAvailableCurrentUser,
+      inProgressCurrentUser: sortedInProgressCurrentUser,
     };
   }, [statuses, user]);
 }

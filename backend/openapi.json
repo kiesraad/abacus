@@ -84,6 +84,16 @@
               }
             }
           },
+          "422": {
+            "description": "Invalid fullname",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -5391,6 +5401,16 @@
               }
             }
           },
+          "422": {
+            "description": "Invalid username or fullname",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -6275,6 +6295,16 @@
               }
             }
           },
+          "422": {
+            "description": "Invalid username or fullname",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -6441,6 +6471,16 @@
           },
           "404": {
             "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fullname",
             "content": {
               "application/json": {
                 "schema": {
@@ -9056,6 +9096,7 @@
           "InvalidCountType",
           "InvalidData",
           "InvalidDistrict",
+          "InvalidFullname",
           "InvalidHash",
           "InvalidJson",
           "InvalidPassword",
@@ -9063,6 +9104,7 @@
           "InvalidDataEntrySource",
           "InvalidSession",
           "InvalidStateTransition",
+          "InvalidUsername",
           "InvalidUsernameOrPassword",
           "InvalidVoteCandidate",
           "InvalidVoteGroup",

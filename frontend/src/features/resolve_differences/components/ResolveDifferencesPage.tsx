@@ -9,6 +9,7 @@ import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
 import type { DataEntryGetDifferencesResponse, DataEntryStatusName } from "@/types/generated/openapi";
+import { cn } from "@/utils/classnames";
 import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { type ResolveOutcome, useDataEntryDifferences } from "../hooks/useDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
@@ -131,7 +132,7 @@ export function ResolveDifferencesPage() {
         </aside>
         <article>
           <h2>{t("resolve_differences.title")}</h2>
-          <p className="md">{t("resolve_differences.page_content")}</p>
+          <p className={cn(cls.description, "mb-xl")}>{t("resolve_differences.page_content")}</p>
           <ResolveDifferencesTables
             first={first_entry}
             second={second_entry}

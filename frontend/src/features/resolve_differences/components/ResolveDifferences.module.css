@@ -16,13 +16,7 @@
       align-items: flex-start;
     }
 
-    p {
-      max-width: 32rem;
-      color: var(--text-color-header);
-      margin-bottom: 0;
-    }
-
-    form p:global(.md) {
+    .description {
       width: 40rem;
       max-width: 40rem;
     }

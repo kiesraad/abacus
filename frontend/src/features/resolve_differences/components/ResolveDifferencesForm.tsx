@@ -55,7 +55,7 @@ export function ResolveDifferencesForm({
     >
       <FormLayout>
         <FormLayout.Section title={t("resolve_differences.form_question")}>
-          <p className="md">{t("resolve_differences.form_content")}</p>
+          <p>{t("resolve_differences.form_content")}</p>
           <ChoiceList>
             {correctEntryError && (
               <ChoiceList.Error id="resolve-differences-correct-entry-error">{correctEntryError}</ChoiceList.Error>

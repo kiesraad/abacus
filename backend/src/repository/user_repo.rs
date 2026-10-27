@@ -6,16 +6,12 @@ use utoipa::ToSchema;
 use crate::{
     api::middleware::authentication::{
         error::AuthenticationError,
-        password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
+        password::{DUMMY_PASSWORD_HASH, HashedPassword, verify_password},
     },
     domain::{identifier::id, role::Role},
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
-
-/// Pre-computed Argon2id hash of "TotallyValidP4ssW0rd". This hash is never verified, only used in a fixture.
-#[cfg(test)]
-const TEST_USER_PASSWORD_HASH: &str = "$argon2id$v=19$m=19456,t=2,p=1$ySkT+RWXZ+VGKh0wxfz9kA$aCyyi3a6ok9WaKiX5Jvacrxi9ifPxTOQ8wba40rVAbg";
 
 id!(UserId);
 
@@ -98,6 +94,10 @@ impl User {
         self.is_logged_in
     }
 
+    pub(crate) fn password_hash(&self) -> &HashedPassword {
+        &self.password_hash
+    }
+
     #[cfg(test)]
     pub fn test_user(role: Role, user_id: UserId) -> Self {
         Self {
@@ -106,7 +106,7 @@ impl User {
             fullname: Some("Full Name".to_string()),
             role,
             needs_password_change: false,
-            password_hash: HashedPassword::from(TEST_USER_PASSWORD_HASH.to_string()),
+            password_hash: HashedPassword::from(DUMMY_PASSWORD_HASH.to_string()),
             last_activity_at: None,
             is_logged_in: false,
             updated_at: Utc::now(),
@@ -130,30 +130,35 @@ pub async fn authenticate(
     // acquire a connection from the pool and drop it before verifying the password,
     // to ensure that the connection is not held open for too long
     let mut conn = pool.acquire().await?;
-    let Some(user) = get_by_username(&mut conn, username).await? else {
-        return Err(AuthenticationError::UserNotFound);
-    };
+    let user = get_by_username(&mut conn, username).await?;
     drop(conn);
 
-    if verify_password(password, &user.password_hash) {
+    let Some(user) = user else {
+        // User not found, perform dummy verification to mitigate timing attacks
+        verify_password(
+            password,
+            &HashedPassword::from(DUMMY_PASSWORD_HASH.to_string()),
+        )
+        .await?;
+        return Err(AuthenticationError::UserNotFound);
+    };
+
+    if verify_password(password, &user.password_hash).await? {
         Ok(user)
     } else {
         Err(AuthenticationError::InvalidPassword)
     }
 }
 
-/// Create a new user, save an Argon2id v19 hash of the password
-pub async fn create(
+/// Create a new user
+pub(crate) async fn create(
     conn: &mut SqliteConnection,
     username: &str,
     fullname: Option<&str>,
-    password: &str,
+    password_hash: &HashedPassword,
     needs_password_change: bool,
     role: Role,
 ) -> Result<User, AuthenticationError> {
-    let password_hash: HashedPassword =
-        hash_password(&ValidatedPassword::new(username, password, None)?)?;
-
     let user = sqlx::query_as!(
         User,
         r#"INSERT INTO users (username, fullname, password_hash, needs_password_change, role)
@@ -206,23 +211,11 @@ pub async fn delete(
 }
 
 /// Update a user's password
-pub async fn update_password(
+pub(crate) async fn update_password(
     conn: &mut SqliteConnection,
     user_id: UserId,
-    username: &str,
-    new_password: &str,
+    password_hash: &HashedPassword,
 ) -> Result<(), AuthenticationError> {
-    let old_password = sqlx::query!("SELECT password_hash FROM users WHERE id = ?", user_id)
-        .fetch_one(&mut *conn)
-        .await?
-        .password_hash;
-
-    let password_hash = hash_password(&ValidatedPassword::new(
-        username,
-        new_password,
-        Some(&old_password),
-    )?)?;
-
     sqlx::query!(
         r#"UPDATE users SET password_hash = ?, needs_password_change = FALSE WHERE id = ?"#,
         password_hash,
@@ -252,13 +245,11 @@ pub async fn update_fullname(
 }
 
 /// Set a temporary password for a user
-pub async fn set_temporary_password(
+pub(crate) async fn set_temporary_password(
     conn: &mut SqliteConnection,
     user_id: UserId,
-    temp_password: &str,
+    password_hash: &HashedPassword,
 ) -> Result<(), AuthenticationError> {
-    let username = username_by_id(conn, user_id).await?;
-    let password_hash = hash_password(&ValidatedPassword::new(&username, temp_password, None)?)?;
     sqlx::query!(
         r#"UPDATE users SET password_hash = ?, needs_password_change = TRUE WHERE id = ?"#,
         password_hash,
@@ -401,18 +392,6 @@ pub async fn admin_exists(conn: &mut SqliteConnection) -> Result<bool, Authentic
     Ok(result.is_some())
 }
 
-pub async fn username_by_id(
-    conn: &mut SqliteConnection,
-    user_id: UserId,
-) -> Result<String, sqlx::Error> {
-    Ok(
-        sqlx::query!("SELECT username FROM users WHERE id = ?", user_id)
-            .fetch_one(conn)
-            .await?
-            .username,
-    )
-}
-
 pub async fn update_last_activity_at(
     conn: &mut SqliteConnection,
     user_id: UserId,
@@ -446,7 +425,7 @@ mod tests {
             &mut conn,
             USERNAME,
             None,
-            "TotallyValidP4ssW0rd",
+            &password::hash_test_password("TotallyValidP4ssW0rd").await,
             true,
             Role::TypistGSB,
         )
@@ -465,21 +444,17 @@ mod tests {
             .unwrap();
 
         assert_eq!(user, fetched_user);
-
-        assert_eq!(
-            super::username_by_id(&mut conn, user.id).await.unwrap(),
-            USERNAME
-        );
     }
 
     #[test(sqlx::test)]
     async fn test_create_user_duplicate_username(pool: SqlitePool) {
+        let password_hash = password::hash_test_password("TotallyValidP4ssW0rd").await;
         let mut conn = pool.acquire().await.unwrap();
         let user = super::create(
             &mut conn,
             "test_user",
             None,
-            "TotallyValidP4ssW0rd",
+            &password_hash,
             true,
             Role::TypistGSB,
         )
@@ -493,7 +468,7 @@ mod tests {
             &mut conn,
             "test_User",
             None,
-            "TotallyValidP4ssW0rd",
+            &password_hash,
             true,
             Role::TypistGSB,
         )
@@ -512,7 +487,7 @@ mod tests {
             &mut conn,
             "test_user",
             Some("Full Name"),
-            "TotallyValidP4ssW0rd",
+            &password::hash_test_password("TotallyValidP4ssW0rd").await,
             true,
             Role::CoordinatorGSB,
         )
@@ -561,16 +536,20 @@ mod tests {
             &mut conn,
             "test_user",
             Some("Full Name"),
-            old_password,
+            &password::hash_test_password(old_password).await,
             true,
             Role::Administrator,
         )
         .await
         .unwrap();
 
-        super::update_password(&mut conn, user.id(), "test_user", new_password)
-            .await
-            .unwrap();
+        super::update_password(
+            &mut conn,
+            user.id(),
+            &password::hash_test_password(new_password).await,
+        )
+        .await
+        .unwrap();
 
         let authenticated_user = super::authenticate(&pool, "test_user", new_password)
             .await
@@ -596,7 +575,7 @@ mod tests {
             &mut conn,
             "test_user",
             Some("Full Name"),
-            "TotallyValidP4ssW0rd",
+            &password::hash_test_password("TotallyValidP4ssW0rd").await,
             true,
             Role::Administrator,
         )
@@ -606,7 +585,8 @@ mod tests {
         // User should need password change
         assert!(user.needs_password_change());
 
-        super::update_password(&mut conn, user.id(), "test_user", "temp_password")
+        let password_hash = password::hash_test_password("temp_password").await;
+        super::update_password(&mut conn, user.id(), &password_hash)
             .await
             .unwrap();
 
@@ -619,7 +599,7 @@ mod tests {
         assert!(!user.needs_password_change());
 
         // Set a temporary password via update
-        super::set_temporary_password(&mut conn, user.id(), "temp_password")
+        super::set_temporary_password(&mut conn, user.id(), &password_hash)
             .await
             .unwrap();
 
@@ -639,7 +619,7 @@ mod tests {
             &mut conn,
             "test_user",
             Some("Full Name"),
-            "TotallyValidP4ssW0rd",
+            &password::hash_test_password("TotallyValidP4ssW0rd").await,
             true,
             Role::Administrator,
         )
@@ -660,7 +640,7 @@ mod tests {
             role: Role::TypistGSB,
             needs_password_change: false,
             password_hash: password::HashedPassword::from(
-                super::TEST_USER_PASSWORD_HASH.to_string(),
+                password::DUMMY_PASSWORD_HASH.to_string(),
             ),
             last_activity_at: None,
             is_logged_in: false,

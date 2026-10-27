@@ -18,6 +18,7 @@ use crate::{
         middleware::authentication::{
             RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
             error::AuthenticationError,
+            password::{ValidatedPassword, hash_password},
         },
         user::ValidateUserRequest,
     },
@@ -323,16 +324,27 @@ async fn account_update(
     audit_service: AuditService,
     Json(account): Json<AccountUpdateRequest>,
 ) -> Result<impl IntoResponse, APIError> {
-    let mut tx = pool.begin_immediate().await?;
-
     if user.username() != account.username {
         return Err(AuthenticationError::UserNotFound.into());
     }
 
     account.validate()?;
 
+    // Hash before transaction to prevent write lock
+    let password_hash = hash_password(
+        &ValidatedPassword::new(
+            user.username(),
+            &account.password,
+            Some(user.password_hash()),
+        )
+        .await?,
+    )
+    .await?;
+
+    let mut tx = pool.begin_immediate().await?;
+
     // Update the password
-    user_repo::update_password(&mut tx, user.id(), &account.username, &account.password).await?;
+    user_repo::update_password(&mut tx, user.id(), &password_hash).await?;
 
     // Update the fullname
     if let Some(fullname) = account.fullname {
@@ -413,8 +425,23 @@ async fn create_first_admin(
     audit_service: AuditService,
     Json(admin_request): Json<CreateFirstAdminRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
+    let mut conn = pool.acquire().await?;
+    let initialised = user_repo::has_active_users(&mut conn).await?;
+    drop(conn);
+    if initialised {
+        return Err(AuthenticationError::AlreadyInitialised.into());
+    }
+
+    // Hash before transaction to prevent write lock
+    let password_hash = hash_password(
+        &ValidatedPassword::new(&admin_request.username, &admin_request.temp_password, None)
+            .await?,
+    )
+    .await?;
+
     let mut tx = pool.begin_immediate().await?;
 
+    // Check again, a user may have become active while hashing
     if user_repo::has_active_users(&mut tx).await? {
         return Err(AuthenticationError::AlreadyInitialised.into());
     }
@@ -438,7 +465,7 @@ async fn create_first_admin(
         &mut tx,
         &admin_request.username,
         Some(&admin_request.fullname),
-        &admin_request.temp_password,
+        &password_hash,
         false,
         Role::Administrator,
     )
@@ -549,7 +576,10 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::repository::user_repo::update_last_activity_at;
+    use crate::{
+        api::middleware::authentication::password::hash_test_password,
+        repository::user_repo::update_last_activity_at,
+    };
 
     #[test(tokio::test)]
     async fn test_set_default_cookie_properties() {
@@ -581,7 +611,7 @@ mod tests {
             &mut conn,
             "admin",
             Some("Admin User"),
-            "admin_password",
+            &hash_test_password("admin_password").await,
             false,
             Role::Administrator,
         )

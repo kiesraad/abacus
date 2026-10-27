@@ -12,7 +12,11 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         authentication::{UserCreatedAuditData, UserDeletedAuditData, UserUpdatedAuditData},
-        middleware::authentication::{RouteAuthorization, error::AuthenticationError},
+        middleware::authentication::{
+            RouteAuthorization,
+            error::AuthenticationError,
+            password::{ValidatedPassword, hash_password},
+        },
     },
     domain::role::Role,
     error::ErrorReference,
@@ -179,12 +183,23 @@ pub async fn user_create(
 
     create_user_req.validate()?;
 
+    // Hash before transaction to prevent write lock
+    let password_hash = hash_password(
+        &ValidatedPassword::new(
+            &create_user_req.username,
+            &create_user_req.temp_password,
+            None,
+        )
+        .await?,
+    )
+    .await?;
+
     let mut tx = pool.begin_immediate().await?;
     let user = user_repo::create(
         &mut tx,
         &create_user_req.username,
         create_user_req.fullname.as_deref(),
-        &create_user_req.temp_password,
+        &password_hash,
         true,
         create_user_req.role,
     )
@@ -255,28 +270,36 @@ pub async fn user_update(
     Path(user_id): Path<UserId>,
     Json(update_user_req): Json<UpdateUserRequest>,
 ) -> Result<Json<User>, APIError> {
-    let mut tx = pool.begin_immediate().await?;
+    let mut conn = pool.acquire().await?;
+    let user = user_repo::get_by_id(&mut conn, user_id)
+        .await?
+        .ok_or(sqlx::Error::RowNotFound)?;
+    drop(conn);
 
-    if logged_in_user.role().is_coordinator() {
-        // fetch the current user to determine role
-        let user = user_repo::get_by_id(&mut tx, user_id)
-            .await?
-            .ok_or(sqlx::Error::RowNotFound)?;
-
-        // Coordinators can only update Typists for the same committee category
-        if !logged_in_user.role().manages(&user.role()) {
-            return Err(AuthenticationError::Forbidden.into());
-        }
+    // Coordinators can only update Typists for the same committee category
+    if logged_in_user.role().is_coordinator() && !logged_in_user.role().manages(&user.role()) {
+        return Err(AuthenticationError::Forbidden.into());
     }
 
     update_user_req.validate()?;
+
+    // Hash before transaction to prevent write lock
+    let temp_password_hash = match &update_user_req.temp_password {
+        Some(temp_password) => Some(
+            hash_password(&ValidatedPassword::new(user.username(), temp_password, None).await?)
+                .await?,
+        ),
+        None => None,
+    };
+
+    let mut tx = pool.begin_immediate().await?;
 
     if let Some(fullname) = update_user_req.fullname {
         user_repo::update_fullname(&mut tx, user_id, &fullname).await?
     };
 
-    if let Some(temp_password) = update_user_req.temp_password {
-        user_repo::set_temporary_password(&mut tx, user_id, &temp_password).await?;
+    if let Some(password_hash) = temp_password_hash {
+        user_repo::set_temporary_password(&mut tx, user_id, &password_hash).await?;
 
         session_repo::delete_user_session(&mut tx, user_id).await?;
     };

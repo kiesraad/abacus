@@ -1,6 +1,6 @@
 //! Login rate limiting
 //!
-//! Allow one login attempt per source IP every five seconds. A succesful login
+//! Allow one login attempt per source IP every five seconds. A successful login
 //! resets the rate limit. A rate limited attempt doesn't cause the rate limit
 //! to be extended. The state is in-memory only, so restarting the server clears
 //! all rate limits. At most `MAX_SOURCES` sources are tracked, after that the

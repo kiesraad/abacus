@@ -38,8 +38,8 @@ impl PartialEq for AuthenticationError {
 
 impl ApiErrorResponse for AuthenticationError {
     fn log(&self) {
-        // note that we don't log the UserNotFound errors (triggered) for every
-        // unauthenciated account API call), nor do we log potentially verbose
+        // note that we don't log the UserNotFound errors (triggered for every
+        // unauthenticated account API call), nor do we log potentially verbose
         // login rate limited errors
         if !matches!(self, Self::UserNotFound | Self::LoginRateLimited) {
             error!("Authentication error: {:?}", self);

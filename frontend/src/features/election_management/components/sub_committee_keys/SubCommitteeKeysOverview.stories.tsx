@@ -25,7 +25,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   play: async ({ canvas }) => {
     await expect(
-      canvas.getByRole("heading", { level: 2, name: "Voeg de publieke sleutels van alle GSB's in de kieskring toe" }),
+      canvas.getByRole("heading", { level: 2, name: "Voeg de publieke sleutels van onderstaande GSB's toe" }),
     ).toBeVisible();
 
     await expect(canvas.getByRole("heading", { level: 3, name: "Nog toe te voegen publieke sleutels" })).toBeVisible();

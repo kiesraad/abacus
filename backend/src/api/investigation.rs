@@ -14,7 +14,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         committee_session::verify_committee_session_details_exist,
-        data_entry::delete_data_entry_for_polling_station,
+        data_entry::{delete_data_entry, delete_data_entry_for_polling_station},
         middleware::authentication::RouteAuthorization,
     },
     domain::{
@@ -117,29 +117,43 @@ async fn validate_and_get_committee_session(
     Ok(committee_session)
 }
 
+/// Delete the investigation and its linked data entry.
+/// Returns `false` if the polling station has no investigation.
 pub async fn delete_investigation_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     committee_session: &CommitteeSession,
     polling_station_id: PollingStationId,
-) -> Result<(), APIError> {
-    if let Some(old_status) = investigation_repo::delete(conn, polling_station_id).await? {
-        let investigation = PollingStationInvestigation::from((polling_station_id, &old_status));
-        audit_service
-            .log(conn, &InvestigationDeletedAuditData(investigation), None)
-            .await?;
+) -> Result<bool, APIError> {
+    let Some(old_status) = investigation_repo::get(conn, polling_station_id).await? else {
+        return Ok(false);
+    };
+    let investigation = PollingStationInvestigation::from((polling_station_id, &old_status));
+    audit_service
+        .log(conn, &InvestigationDeletedAuditData(investigation), None)
+        .await?;
 
-        if committee_session.status == CommitteeSessionStatus::Completed {
-            change_committee_session_status(
-                conn,
-                committee_session.id,
-                CommitteeSessionStatus::DataEntry,
-                audit_service.clone(),
-            )
-            .await?;
+    // Use the linked ID instead of the status, so this also removes a data entry
+    // that an earlier deleted investigation left behind
+    match polling_station_repo::get_data_entry_id(conn, polling_station_id).await {
+        Ok(data_entry_id) => {
+            delete_data_entry(conn, audit_service, polling_station_id, data_entry_id).await?
         }
+        Err(sqlx::Error::RowNotFound) => {}
+        Err(err) => return Err(err.into()),
     }
-    Ok(())
+    investigation_repo::delete(conn, polling_station_id).await?;
+
+    if committee_session.status == CommitteeSessionStatus::Completed {
+        change_committee_session_status(
+            conn,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntry,
+            audit_service.clone(),
+        )
+        .await?;
+    }
+    Ok(true)
 }
 
 impl From<InvestigationTransitionError> for APIError {
@@ -623,39 +637,19 @@ async fn polling_station_investigation_delete(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    // Delete investigation (returns old status, or None if none existed)
-    let old_status = investigation_repo::delete(&mut tx, polling_station_id)
-        .await?
-        .ok_or_else(|| {
-            APIError::NotFound(
-                "Investigation not found".into(),
-                ErrorReference::EntryNotFound,
-            )
-        })?;
-
-    let investigation = PollingStationInvestigation::from((polling_station_id, &old_status));
-    audit_service
-        .log(&mut tx, &InvestigationDeletedAuditData(investigation), None)
-        .await?;
-
-    if committee_session.status == CommitteeSessionStatus::Completed {
-        change_committee_session_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntry,
-            audit_service.clone(),
-        )
-        .await?;
-    }
-
-    // Delete potential data entry linked to the polling station
-    delete_data_entry_for_polling_station(
+    if !delete_investigation_for_polling_station(
         &mut tx,
         &audit_service,
         &committee_session,
         polling_station_id,
     )
-    .await?;
+    .await?
+    {
+        return Err(APIError::NotFound(
+            "Investigation not found".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
 
     // Change committee session status if last investigation is deleted
     if !investigation_repo::has_investigations_for_committee_session(&mut tx, committee_session.id)

@@ -226,6 +226,23 @@ async fn validate_and_get_data(
     Ok((context, data_entry_status))
 }
 
+/// Unlink and delete a data entry, without changing the committee session status
+pub async fn delete_data_entry(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    polling_station_id: PollingStationId,
+    data_entry_id: DataEntryId,
+) -> Result<(), APIError> {
+    polling_station_repo::unlink_data_entry(conn, polling_station_id).await?;
+    let data_entry = data_entry_repo::delete(conn, data_entry_id).await?;
+
+    audit_service
+        .log(conn, &DataEntryDeletedAuditData(data_entry.into()), None)
+        .await?;
+
+    Ok(())
+}
+
 pub async fn delete_data_entry_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
@@ -237,12 +254,7 @@ pub async fn delete_data_entry_for_polling_station(
         return Ok(());
     };
 
-    polling_station_repo::unlink_data_entry(conn, polling_station_id).await?;
-    let data_entry = data_entry_repo::delete(conn, data_entry_id).await?;
-
-    audit_service
-        .log(conn, &DataEntryDeletedAuditData(data_entry.into()), None)
-        .await?;
+    delete_data_entry(conn, audit_service, polling_station_id, data_entry_id).await?;
 
     if committee_session.status == CommitteeSessionStatus::Completed {
         change_committee_session_status(

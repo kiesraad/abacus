@@ -133,18 +133,26 @@ mod tests {
         }));
     }
 
+    /// Test that random chunk selection can select any pair of chunks
     #[test]
     fn test_random_chunk_indexes_covers_all_pairs() {
+        // All sorted pairs of two distinct chunk indexes: 16 * 15 / 2 = 120
+        let all_pairs: HashSet<[usize; 2]> = (0..CHUNK_COUNT)
+            .flat_map(|first| (first + 1..CHUNK_COUNT).map(move |second| [first, second]))
+            .collect();
+
+        // Select the indexes for 2000 different digests
         let salt = [1; 32];
-        let pairs: HashSet<[usize; 2]> = (0..2000u32)
+        let selected_pairs: HashSet<[usize; 2]> = (0..2000u32)
             .map(|i| {
                 let mut digest = [0; 32];
                 digest[..4].copy_from_slice(&i.to_le_bytes());
                 RedactedEmlHash::random_chunk_indexes(&salt, digest)
             })
             .collect();
-        assert_eq!(pairs.len(), CHUNK_COUNT * (CHUNK_COUNT - 1) / 2);
-        assert!(pairs.iter().all(|[first, second]| first < second));
+
+        // Check that every pair has been selected at least once
+        assert_eq!(selected_pairs, all_pairs);
     }
 
     #[test]
@@ -166,7 +174,7 @@ mod tests {
         }
 
         // Redacting the same input again should give the same result, because
-        // the salt changes per process
+        // the salt only changes between processes
         assert_eq!(
             RedactedEmlHash::from(input).redacted_indexes,
             redacted.redacted_indexes

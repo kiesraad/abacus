@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "abacus"
-version = "1.1.0"
+version = "1.3.0"
 dependencies = [
  "apportionment",
  "argon2",
@@ -48,7 +48,7 @@ dependencies = [
  "utoipa",
  "utoipa-axum",
  "utoipa-swagger-ui",
- "windows-service 1.1.0",
+ "windows-service 1.3.0",
  "windows_socket",
  "zeroize",
 ]
@@ -150,7 +150,7 @@ dependencies = [
 
 [[package]]
 name = "apportionment"
-version = "1.1.0"
+version = "1.3.0"
 dependencies = [
  "test-log",
  "tracing",
@@ -1194,7 +1194,7 @@ dependencies = [
 
 [[package]]
 name = "eml_signature"
-version = "1.1.0"
+version = "1.3.0"
 dependencies = [
  "aws-lc-rs",
  "chrono",
@@ -2893,7 +2893,7 @@ dependencies = [
 
 [[package]]
 name = "pdf_gen"
-version = "1.1.0"
+version = "1.3.0"
 dependencies = [
  "pdf_gen_impl",
  "pdf_gen_types",
@@ -2903,7 +2903,7 @@ dependencies = [
 
 [[package]]
 name = "pdf_gen_impl"
-version = "1.1.0"
+version = "1.3.0"
 dependencies = [
  "chrono",
  "pdf_gen_types",
@@ -2914,7 +2914,7 @@ dependencies = [
 
 [[package]]
 name = "pdf_gen_types"
-version = "1.1.0"
+version = "1.3.0"
 dependencies = [
  "async_zip",
  "axum",
@@ -5688,7 +5688,7 @@ dependencies = [
 
 [[package]]
 name = "windows-service"
-version = "1.1.0"
+version = "1.3.0"
 dependencies = [
  "tokio",
  "windows-service 0.8.1",
@@ -5769,7 +5769,7 @@ checksum = "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66"
 
 [[package]]
 name = "windows_socket"
-version = "1.1.0"
+version = "1.3.0"
 dependencies = [
  "socket2",
  "windows-sys 0.61.2",

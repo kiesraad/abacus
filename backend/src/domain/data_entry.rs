@@ -187,6 +187,7 @@ pub struct DataEntryStatusWithSource {
     pub data_entry_id: DataEntryId,
     pub source: DataEntrySource,
     pub status: DataEntryStatus,
+    pub updated_at: DateTime<Utc>,
 }
 
 impl From<SubCommitteeFirstSession> for DataEntrySource {

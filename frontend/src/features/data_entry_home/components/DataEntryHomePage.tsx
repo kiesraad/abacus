@@ -19,7 +19,7 @@ export function DataEntryHomePage() {
   const location = useLocation();
   const { currentCommitteeSession, election, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
-  const { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailableDataEntries();
+  const { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailableDataEntries(statuses);
 
   // live data polling (initial fetch + 30s interval + visibility change)
   useLiveData(refetchStatuses, true);

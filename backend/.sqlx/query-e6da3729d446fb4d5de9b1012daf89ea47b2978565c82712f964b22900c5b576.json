@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            de.id AS data_entry_id,\n            sc.id,\n            sc.number,\n            sc.name,\n            sc.category,\n            sc.authority_id,\n            sc.authority_name,\n            sc.certificates,\n            de.state AS \"state!: Json<DataEntryStatus>\"\n        FROM sub_committees AS sc\n        JOIN data_entries AS de ON de.id = sc.data_entry_id\n        WHERE sc.committee_session_id = $1\n        ",
+  "query": "\n        SELECT\n            de.id AS data_entry_id,\n            sc.id,\n            sc.number,\n            sc.name,\n            sc.category,\n            sc.authority_id,\n            sc.authority_name,\n            sc.certificates,\n            de.state AS \"state!: Json<DataEntryStatus>\",\n            de.updated_at\n        FROM sub_committees AS sc\n        JOIN data_entries AS de ON de.id = sc.data_entry_id\n        WHERE sc.committee_session_id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -101,6 +101,17 @@
             "name": "state"
           }
         }
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 9,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "data_entries",
+            "name": "updated_at"
+          }
+        }
       }
     ],
     "parameters": {
@@ -115,8 +126,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "778fd550671e6fb221d757f0b45a10ec44b7497a86c2080414109caf98cddcc1"
+  "hash": "e6da3729d446fb4d5de9b1012daf89ea47b2978565c82712f964b22900c5b576"
 }

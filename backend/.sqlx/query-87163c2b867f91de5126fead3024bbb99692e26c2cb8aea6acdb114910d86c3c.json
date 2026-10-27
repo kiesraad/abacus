@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            p.id,\n            p.committee_session_id,\n            c.number AS committee_session_number,\n            p.prev_data_entry_id,\n            de.id AS data_entry_id,\n            p.investigation_state,\n            p.name,\n            p.number,\n            p.number_of_voters,\n            p.polling_station_type,\n            p.address,\n            p.postal_code,\n            p.locality,\n            de.state\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        JOIN data_entries AS de ON de.id = p.data_entry_id\n        WHERE c.id = $1 AND c.number > 1 AND json_extract(p.investigation_state, '$.status') = 'ConcludedWithNewResults'\n        ",
+  "query": "\n        SELECT\n            p.id,\n            p.committee_session_id,\n            c.number AS committee_session_number,\n            p.prev_data_entry_id,\n            de.id AS data_entry_id,\n            p.investigation_state,\n            p.name,\n            p.number,\n            p.number_of_voters,\n            p.polling_station_type,\n            p.address,\n            p.postal_code,\n            p.locality,\n            de.state,\n            de.updated_at\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        JOIN data_entries AS de ON de.id = p.data_entry_id\n        WHERE c.id = $1 AND c.number > 1 AND json_extract(p.investigation_state, '$.status') = 'ConcludedWithNewResults'\n        ",
   "describe": {
     "columns": [
       {
@@ -156,6 +156,17 @@
             "name": "state"
           }
         }
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 14,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "data_entries",
+            "name": "updated_at"
+          }
+        }
       }
     ],
     "parameters": {
@@ -175,8 +186,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "cd8bf9265226a1ad05e3df019a289affa06cda71a96ffb4d767d3368fc716729"
+  "hash": "87163c2b867f91de5126fead3024bbb99692e26c2cb8aea6acdb114910d86c3c"
 }

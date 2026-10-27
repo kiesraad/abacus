@@ -67,25 +67,25 @@ describe("Messages component", () => {
 
     let alerts = screen.getAllByRole("alert");
     expect(alerts).toHaveLength(4);
-
-    const successAlert = alerts[0]!;
-    const infoAlert = alerts[1]!;
-    const warningAlert = alerts[2]!;
-    const errorAlert = alerts[3]!;
-
-    expect(within(successAlert).getByRole("strong")).toHaveTextContent("Welcome");
-    expect(within(successAlert).getByRole("paragraph")).toHaveTextContent("You are back");
-    expect(within(infoAlert).getByRole("strong")).toHaveTextContent("All your base are belong to us");
-    expect(within(warningAlert).getByRole("strong")).toHaveTextContent("Main screen turn on");
-    expect(within(warningAlert).getByRole("paragraph")).toHaveTextContent("Somebody set up us the bomb");
-    expect(within(errorAlert).getByRole("strong")).toHaveTextContent("Tik tok");
-    expect(within(errorAlert).getByRole("paragraph")).toHaveTextContent("The bomb goes off in 5 minutes");
+    expect(within(alerts[0]!).getByRole("strong")).toHaveTextContent("Welcome");
+    expect(within(alerts[0]!).getByRole("paragraph")).toHaveTextContent("You are back");
+    expect(within(alerts[1]!).getByRole("strong")).toHaveTextContent("All your base are belong to us");
+    expect(within(alerts[2]!).getByRole("strong")).toHaveTextContent("Main screen turn on");
+    expect(within(alerts[2]!).getByRole("paragraph")).toHaveTextContent("Somebody set up us the bomb");
+    expect(within(alerts[3]!).getByRole("strong")).toHaveTextContent("Tik tok");
+    expect(within(alerts[3]!).getByRole("paragraph")).toHaveTextContent("The bomb goes off in 5 minutes");
 
     vi.advanceTimersByTime(5_000);
 
     await vi.waitFor(() => {
       alerts = screen.getAllByRole("alert");
       expect(alerts).toHaveLength(3);
+      // The success alert is now closed
+      expect(within(alerts[0]!).getByRole("strong")).toHaveTextContent("All your base are belong to us");
+      expect(within(alerts[1]!).getByRole("strong")).toHaveTextContent("Main screen turn on");
+      expect(within(alerts[1]!).getByRole("paragraph")).toHaveTextContent("Somebody set up us the bomb");
+      expect(within(alerts[2]!).getByRole("strong")).toHaveTextContent("Tik tok");
+      expect(within(alerts[2]!).getByRole("paragraph")).toHaveTextContent("The bomb goes off in 5 minutes");
     });
 
     vi.useRealTimers();

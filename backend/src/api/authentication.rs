@@ -1,7 +1,7 @@
-use std::net::{IpAddr, Ipv4Addr};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use axum::{
-    extract::State,
+    extract::{ConnectInfo, State},
     response::{AppendHeaders, IntoResponse, Json},
 };
 use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
@@ -19,6 +19,7 @@ use crate::{
             RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
             error::AuthenticationError,
             password::{ValidatedPassword, hash_password},
+            ratelimit::LoginRateLimit,
         },
         user::ValidateUserRequest,
     },
@@ -186,11 +187,18 @@ pub(crate) fn set_default_cookie_properties(cookie: &mut Cookie) {
         (status = 200, description = "The logged in user id and user name", body = LoginResponse),
         (status = 401, description = "Invalid credentials", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
+        (
+            status = 429,
+            description = "Too many login attempts from this source IP, try again later",
+            body = ErrorResponse,
+        ),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 async fn login(
     State(pool): State<SqlitePool>,
+    State(login_ratelimit): State<LoginRateLimit>,
+    ConnectInfo(peer): ConnectInfo<SocketAddr>,
     jar: CookieJar,
     audit_service: AuditService,
     user_agent: Option<TypedHeader<UserAgent>>,
@@ -198,6 +206,12 @@ async fn login(
 ) -> Result<impl IntoResponse, APIError> {
     let Credentials { username, password } = credentials;
     let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
+
+    // Rate limit on the peer IP only, before looking up the account or verifying the password
+    let source = peer.ip().to_canonical();
+    if !login_ratelimit.admit(source) {
+        return Err(AuthenticationError::LoginRateLimited.into());
+    }
 
     // Check the username + password combination, do not leak information about usernames etc.
     // Log when the attempt fails
@@ -254,6 +268,8 @@ async fn login(
         .await?;
 
     tx.commit().await?;
+
+    login_ratelimit.clear(source);
 
     // Add the session cookie to the response
     let mut cookie = session.get_cookie();

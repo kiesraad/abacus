@@ -14,6 +14,7 @@ pub enum AuthenticationError {
     InvalidSessionDuration,
     InvalidUsernameOrPassword,
     JoinError(tokio::task::JoinError),
+    LoginRateLimited,
     NoSessionCookie,
     NotInitialised,
     OwnAccountCannotBeDeleted,
@@ -37,8 +38,10 @@ impl PartialEq for AuthenticationError {
 
 impl ApiErrorResponse for AuthenticationError {
     fn log(&self) {
-        // note that we don't log the UserNotFound error, as it is triggered for every account call
-        if !matches!(self, Self::UserNotFound) {
+        // note that we don't log the UserNotFound errors (triggered for every
+        // unauthenticated account API call), nor do we log potentially verbose
+        // login rate limited errors
+        if !matches!(self, Self::UserNotFound | Self::LoginRateLimited) {
             error!("Authentication error: {:?}", self);
         }
     }
@@ -51,6 +54,14 @@ impl ApiErrorResponse for AuthenticationError {
                 ErrorResponse::new(
                     "Invalid username and/or password",
                     ErrorReference::InvalidUsernameOrPassword,
+                    false,
+                ),
+            ),
+            AuthenticationError::LoginRateLimited => (
+                StatusCode::TOO_MANY_REQUESTS,
+                ErrorResponse::new(
+                    "Too many login attempts",
+                    ErrorReference::LoginRateLimited,
                     false,
                 ),
             ),

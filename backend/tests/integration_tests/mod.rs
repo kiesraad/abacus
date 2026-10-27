@@ -8,6 +8,7 @@ pub mod election_admin_integration_test;
 pub mod election_integration_test;
 pub mod init_tls_test;
 pub mod investigation_integration_test;
+pub mod login_ratelimit_integration_test;
 pub mod polling_station_integration_test;
 pub mod report_integration_test;
 pub mod signing_integration_test;

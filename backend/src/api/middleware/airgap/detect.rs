@@ -257,7 +257,9 @@ mod tests {
 
     use super::*;
     use crate::{
-        api::middleware::airgap::block_request_on_airgap_violation,
+        api::middleware::{
+            airgap::block_request_on_airgap_violation, authentication::ratelimit::LoginRateLimit,
+        },
         infra::{router, router::openapi_router},
         shutdown_signal,
     };
@@ -414,7 +416,13 @@ mod tests {
         let backup_config =
             crate::infra::backup::BackupConfig::new(backup_dir.path().to_path_buf());
         tokio::spawn(async move {
-            let app = router::create_router(pool, airgap_detection, backup_config).unwrap();
+            let app = router::create_router(
+                pool,
+                airgap_detection,
+                backup_config,
+                LoginRateLimit::default(),
+            )
+            .unwrap();
 
             axum::serve(
                 listener,

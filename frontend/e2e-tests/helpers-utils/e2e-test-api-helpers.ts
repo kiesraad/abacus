@@ -1,3 +1,4 @@
+import { setTimeout } from "node:timers/promises";
 import { type APIRequestContext, expect } from "@playwright/test";
 import { dataEntryRequest } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
@@ -29,12 +30,15 @@ export function getTestPassword(username: string, prefix = ""): string {
 
 export async function apiLoginAs(request: APIRequestContext, username: string, passwordPrefix = "") {
   const password = getTestPassword(username, passwordPrefix);
-  return await request.post("/api/login", {
-    data: {
-      username,
-      password,
-    },
-  });
+  // Parallel tests log in from the same IP; retry until another test's successful login releases the rate limit
+  const deadline = Date.now() + 60_000;
+  for (;;) {
+    const response = await request.post("/api/login", { data: { username, password } });
+    if (response.status() !== 429 || Date.now() >= deadline) {
+      return response;
+    }
+    await setTimeout(250);
+  }
 }
 
 export async function apiLogout(request: APIRequestContext) {

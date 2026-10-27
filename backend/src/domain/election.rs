@@ -795,6 +795,44 @@ pub mod tests {
         }
     }
 
+    pub fn new_election_fixture() -> NewElection {
+        NewElection {
+            name: "Gemeenteraad Test 2022".to_string(),
+            official_name: "Gemeenteraad Test 2022".to_string(),
+            committee_category: CommitteeCategory::GSB,
+            counting_method: None,
+            election_id: "GR2022_Test".to_string(),
+            location: "Test".to_string(),
+            authority_id: "CSB".to_string(),
+            authority_name: "Test".to_string(),
+            authority_region: "Test".to_string(),
+            district: CommitteeDistrict::None,
+            domain: Some(ElectionDomain {
+                id: Some("0000".to_string()),
+                name: "Test".to_string(),
+            }),
+            category: ElectionCategory::Municipal,
+            sub_category: ElectionSubCategory::GR2,
+            number_of_seats: 45,
+            number_of_voters: 1,
+            election_date: NaiveDate::from_ymd_opt(2022, 3, 16).unwrap(),
+            nomination_date: NaiveDate::from_ymd_opt(2022, 1, 31).unwrap(),
+            political_groups: Vec::new(),
+        }
+    }
+
+    impl NewElection {
+        pub fn with_election_id(mut self, election_id: &str) -> NewElection {
+            self.election_id = election_id.to_string();
+            self
+        }
+
+        pub fn with_election_date(mut self, election_date: &str) -> NewElection {
+            self.election_date = NaiveDate::parse_from_str(election_date, "%Y-%m-%d").unwrap();
+            self
+        }
+    }
+
     #[test]
     fn test_election_region_category() {
         use CommitteeCategory::*;

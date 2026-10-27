@@ -37,9 +37,8 @@ use crate::{
     eml::{
         EMLImportError, EmlHash, RedactedEmlHash,
         committees::{CommitteeDetails, ElectionTreeDetails},
-        number_of_voters_from_polling_stations_eml, parse_polling_stations_eml_str,
-        polling_stations_eml_matches_election, polling_stations_from_eml,
-        polling_stations_from_eml_str,
+        election_identifier_from_eml, number_of_voters_from_polling_stations_eml,
+        parse_polling_stations_eml_str, polling_stations_from_eml, polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{committee_session_repo, election_repo, signing_keypair_repo, user_repo::User},
@@ -470,10 +469,11 @@ fn validate_gsb_election(
         }
 
         let eml = parse_polling_stations_eml_str(data)?;
+        let election_identifier = election_identifier_from_eml(&eml)?;
         polling_stations = Some(polling_stations_from_eml(&eml)?);
         number_of_voters = number_of_voters_from_polling_stations_eml(&eml)?;
         polling_station_definition_matches_election =
-            Some(polling_stations_eml_matches_election(&eml, &election)?);
+            Some(election_identifier.matches_new_election(&election));
     } else {
         polling_stations = None;
     }
@@ -654,7 +654,7 @@ async fn import_gsb_election(
         create_imported_polling_stations(
             &mut tx,
             audit_service.clone(),
-            election.id,
+            &election,
             polling_stations_request,
         )
         .await?;
@@ -856,10 +856,10 @@ mod tests {
     };
 
     mod get_show_keypair_reminder {
-        use crate::repository::{election_repo::get, signing_keypair_repo::set_show_reminder};
+        use test_log::test;
 
         use super::*;
-        use test_log::test;
+        use crate::repository::{election_repo::get, signing_keypair_repo::set_show_reminder};
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
         async fn none_when_signing_not_supported(pool: SqlitePool) {

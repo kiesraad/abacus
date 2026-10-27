@@ -227,7 +227,7 @@ The following dependencies (crates) are used:
 - `windows_socket`: Local Windows-only helper for exclusive socket binding (`SO_EXCLUSIVEADDRUSE`), using `windows-sys`.
 - `sqlx`: async SQL library featuring compile-time checked queries.
 - `strum`: Converting enums from their string representation and back
-- `tokio-util`: used for download streaming.
+- `tokio-util`: used for download streaming and reading ZIP entries with a size limit.
 - `tokio`: runtime for writing asynchronous applications.
 - `tower-http`: Tower middleware and utilities for HTTP clients and servers.
 - `tower`: a library of modular and reusable components for building robust networking clients and servers.
@@ -345,4 +345,4 @@ abacus.exe --service --uninstall  Stop and uninstall the service
 
 Any other arguments given to `--service --install` are stored with the service and passed on to the server every time it starts, e.g. `abacus.exe --service --install --port 8443`.
 
-The service runs as `LocalSystem` and runs the server in the service process. The output is written to `abacus.log` next to the executable. If logs exist when the service starts, they will be renamed with a timestamp suffix. If there is a failure, it writes an `abacus.<timestamp>.crash.log` file. 
+The service runs as `LocalService` and starts automatically when Windows starts. It starts the server in the service process with `%ProgramData%\Abacus` as the current directory. The output is written to `abacus.log` inside the logs directory. If a log file exists when the service starts, it will be renamed with a timestamp suffix. If there is a failure, it writes an `abacus.<timestamp>.crash.log` file. 

@@ -29,6 +29,7 @@ dependencies = [
  "sqlx",
  "strum",
  "tokio",
+ "tokio-util",
  "tower",
  "tower-http",
  "tracing",

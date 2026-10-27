@@ -84,6 +84,16 @@
               }
             }
           },
+          "422": {
+            "description": "Invalid fullname",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -4510,7 +4520,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PollingStationRequestListResponse"
+                  "$ref": "#/components/schemas/PollingStationValidateImportResponse"
                 }
               }
             }
@@ -5383,6 +5393,16 @@
           },
           "409": {
             "description": "Conflict (username already exists)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid username or fullname",
             "content": {
               "application/json": {
                 "schema": {
@@ -6275,6 +6295,16 @@
               }
             }
           },
+          "422": {
+            "description": "Invalid username or fullname",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -6441,6 +6471,16 @@
           },
           "404": {
             "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fullname",
             "content": {
               "application/json": {
                 "schema": {
@@ -9043,6 +9083,7 @@
           "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
           "DataEntryValidationErrors",
+          "ElectionMismatch",
           "EmlImportError",
           "EmlError",
           "EntryNotFound",
@@ -9055,6 +9096,7 @@
           "InvalidCountType",
           "InvalidData",
           "InvalidDistrict",
+          "InvalidFullname",
           "InvalidHash",
           "InvalidJson",
           "InvalidPassword",
@@ -9062,6 +9104,7 @@
           "InvalidDataEntrySource",
           "InvalidSession",
           "InvalidStateTransition",
+          "InvalidUsername",
           "InvalidUsernameOrPassword",
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
@@ -10554,20 +10597,6 @@
         },
         "additionalProperties": false
       },
-      "PollingStationRequestListResponse": {
-        "type": "object",
-        "required": [
-          "polling_stations"
-        ],
-        "properties": {
-          "polling_stations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PollingStationRequest"
-            }
-          }
-        }
-      },
       "PollingStationType": {
         "type": "string",
         "description": "Type of Polling station",
@@ -10576,6 +10605,24 @@
           "Special",
           "Mobile"
         ]
+      },
+      "PollingStationValidateImportResponse": {
+        "type": "object",
+        "required": [
+          "polling_stations",
+          "polling_station_definition_matches_election"
+        ],
+        "properties": {
+          "polling_station_definition_matches_election": {
+            "type": "boolean"
+          },
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationRequest"
+            }
+          }
+        }
       },
       "PollingStationsRequest": {
         "type": "object",

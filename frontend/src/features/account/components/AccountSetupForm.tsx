@@ -13,6 +13,11 @@ import { StringFormData } from "@/utils/stringFormData";
 
 import { type UserValidationErrors, validateUpdateUser } from "@/utils/validateUserAccount";
 
+interface FormError {
+  title: string;
+  message?: string;
+}
+
 interface AccountSetupFormProps {
   user: LoginResponse;
   onSaved: (user: LoginResponse) => void;
@@ -25,6 +30,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
 
   const updatePath: ACCOUNT_UPDATE_REQUEST_PATH = "/api/account";
   const { update, isLoading } = useCrud<LoginResponse>({ updatePath });
+  const [formError, setFormError] = useState<FormError | null>(null);
   const [apiError, setApiError] = useState<AnyApiError | null>(null);
 
   function hideLoginSuccess() {
@@ -46,24 +52,39 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
     const errors = validateUpdateUser(account, passwordRepeat);
 
     if (Object.keys(errors).length > 0) {
+      setFormError({ title: t("account.not_saved"), message: t("account.check_fields") });
       setValidationErrors(errors);
       return;
     }
 
+    setFormError(null);
     setValidationErrors(null);
 
     void update(account).then((result) => {
       if (isSuccess(result)) {
         onSaved(result.data);
-      } else if (
-        result instanceof ApiError &&
-        (result.reference === "PasswordRejectionSameAsOld" ||
-          result.reference === "PasswordRejectionSameAsUsername" ||
-          result.reference === "PasswordRejectionTooShort")
-      ) {
-        setValidationErrors({ password: t(`error.api_error.${result.reference}`) });
-      } else {
-        setApiError(result);
+        return;
+      }
+
+      if (result instanceof ApiError) {
+        switch (result.reference) {
+          case "InvalidFullname":
+            setFormError({
+              title: t("error.api_error.InvalidFullname"),
+              message: t("account.invalid_fullname"),
+            });
+            setValidationErrors({ fullname: t("account.invalid_fullname") });
+            return;
+          case "PasswordRejectionSameAsOld":
+          case "PasswordRejectionSameAsUsername":
+          case "PasswordRejectionTooShort":
+            setFormError({ title: t("account.not_saved"), message: t("account.check_fields") });
+            setValidationErrors({ password: t(`error.api_error.${result.reference}`) });
+            return;
+          default:
+            setApiError(result);
+            return;
+        }
       }
     });
   }
@@ -78,11 +99,11 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
           </Alert>
         </FormLayout.Alert>
       )}
-      {validationErrors && (
+      {formError && (
         <FormLayout.Alert>
           <Alert type="error">
-            <strong className="heading-md">{t("account.not_saved")}</strong>
-            <p>{t("account.check_fields")}</p>
+            <strong className="heading-md">{formError.title}</strong>
+            <p>{formError.message}</p>
           </Alert>
         </FormLayout.Alert>
       )}
@@ -103,6 +124,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
               subtext={t("account.fullname_subtext")}
               hint={t("account.fullname_hint")}
               autoComplete="name"
+              maxLength={255}
               error={validationErrors?.fullname}
               defaultValue={user.fullname}
             />

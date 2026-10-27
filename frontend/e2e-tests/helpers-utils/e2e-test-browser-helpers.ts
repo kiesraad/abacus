@@ -128,7 +128,10 @@ export async function uploadCandidatesAndInputHash(page: Page, eml: Eml230b) {
   await expect(uploadCandidateDefinitionPage.header).toBeVisible();
   await uploadCandidateDefinitionPage.uploadFile(eml.path);
   await expect(uploadCandidateDefinitionPage.main).toContainText(eml.filename);
-  await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionDate);
+  await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionIdentifier);
+  if (eml.electionDistrict) {
+    await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionDistrict);
+  }
 
   const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
   await expect(checkCandidateDefinitionPage.header).toBeVisible();

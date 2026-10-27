@@ -17,25 +17,22 @@ use crate::domain::{
     },
 };
 
+use super::EMLImportError;
+
 impl GSBResults {
     /// Create GSB results from the `TotalVotes` element in an EML_NL 510b count document.
-    /// Uses the first contest.
+    /// Requires exactly one contest.
     pub fn from_eml_count(
         count: &ElectionCount,
         election_category: ElectionCategory,
-    ) -> Result<Self, EMLError> {
-        let contest = count
-            .count
-            .election
-            .contests
-            .first()
-            .ok_or_else(|| EMLError::custom("Missing a Contest element"))?;
+    ) -> Result<Self, EMLImportError> {
+        let contest = super::single_contest(&count.count.election.contests)?;
         let total_votes = contest
             .total_votes
             .as_ref()
             .ok_or_else(|| EMLError::custom("Missing the TotalVotes element"))?;
 
-        Self::from_eml_total_votes(total_votes, election_category)
+        Ok(Self::from_eml_total_votes(total_votes, election_category)?)
     }
 
     /// Create GSB results from the `TotalVotes` element of an EML_NL 510b count document.
@@ -329,6 +326,23 @@ mod tests {
             GSBResults::from_eml_count(&count, ElectionCategory::Municipal).unwrap(),
             results
         );
+    }
+
+    #[test]
+    fn test_from_eml_count_requires_single_contest() {
+        let mut count = count_document(gsb_results_fixture());
+        let contests = &mut count.count.election.contests;
+        contests.push(contests[0].clone());
+        assert!(matches!(
+            GSBResults::from_eml_count(&count, ElectionCategory::Municipal),
+            Err(EMLImportError::InvalidNumberOfContests { found: 2 })
+        ));
+
+        count.count.election.contests.clear();
+        assert!(matches!(
+            GSBResults::from_eml_count(&count, ElectionCategory::Municipal),
+            Err(EMLImportError::InvalidNumberOfContests { found: 0 })
+        ));
     }
 
     #[test]

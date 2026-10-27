@@ -2,8 +2,9 @@
 //! Provides functionality to run the Abacus server as a Windows service.
 //!
 //! This crate registers `abacus.exe --service` at the Windows service control manager (SCM).
+//! The service runs as the LocalService account, data will be stored in `%ProgramData%\Abacus`.
 //!
-//! The server logs to `abacus.log` next to the executable. If a previous log file exists,
+//! The server logs to `abacus.log` inside the `logs` folder. If a previous log file exists,
 //! it will be renamed with a timestamp before creating a new log file.
 //! If a crash occurs, it will be logged to a separate file with a timestamp.
 //!
@@ -17,6 +18,7 @@ use std::{
     fmt, fs,
     future::Future,
     io::{self, Write},
+    path::PathBuf,
     pin::Pin,
     sync::{Arc, OnceLock},
     thread,
@@ -37,14 +39,15 @@ use windows_service::{
 };
 
 const SERVICE_NAME: &str = "Abacus";
-const SERVICE_DISPLAY_NAME: &str = "Abacus service";
+const SERVICE_ACCOUNT: &str = r"NT AUTHORITY\LocalService";
+const SERVICE_DISPLAY_NAME: &str = "Abacus-service";
 const SERVICE_DESCRIPTION: &str = "Windows service running the Abacus server";
 const SERVICE_TYPE: ServiceType = ServiceType::OWN_PROCESS;
 
 /// How long the SCM should wait for the server to shut down gracefully after a stop request
 const STOP_WAIT_HINT: Duration = Duration::from_secs(15);
-/// How long [`uninstall`] waits for service removal
-const UNINSTALL_TIMEOUT: Duration = Duration::from_secs(5);
+/// How long [`uninstall`] waits for service removal, should be longer than the stop wait hint.
+const UNINSTALL_TIMEOUT: Duration = Duration::from_secs(20);
 
 /// If the service stops unexpectedly, it is restarted after this delay. After the last one, it stays stopped.
 const RESTART_DELAYS: [Duration; 3] = [
@@ -99,13 +102,10 @@ pub fn run(run_server: fn(ShutdownSignal) -> bool) -> Result<(), Error> {
     let _ = RUN_SERVER.set(run_server);
 
     // A service starts in the Windows system directory.
-    // Set current directory to the executable's directory.
-    let current_exe = std::env::current_exe()?;
-    std::env::set_current_dir(
-        current_exe
-            .parent()
-            .expect("path should have a parent directory"),
-    )?;
+    // Set current directory to the data directory.
+    let data_dir = data_dir()?;
+    fs::create_dir_all(&data_dir)?;
+    std::env::set_current_dir(&data_dir)?;
 
     // A service has no console to report panics on, so write them to a file instead
     std::panic::set_hook(Box::new(|info| log_crash(&info.to_string())));
@@ -209,26 +209,48 @@ fn report_status(
     Ok(())
 }
 
-/// Create the log file next to the executable. If the file exists,
+/// Create the log file in the logs directory. If the file exists,
 /// it will be renamed with a timestamp before creating a new log file.
 pub fn create_log_file() -> Result<fs::File, Error> {
-    let current_exe = std::env::current_exe()?;
-    let path = current_exe.with_extension("log");
+    let dir: PathBuf = logs_dir()?;
+    fs::create_dir_all(&dir)?;
+
+    let path = dir.join(format!("{}.log", SERVICE_NAME.to_lowercase()));
     if path.exists() {
         fs::rename(
             &path,
-            current_exe.with_extension(format!("{}.log", unix_timestamp())),
+            dir.join(format!(
+                "{}.{}.log",
+                SERVICE_NAME.to_lowercase(),
+                unix_timestamp()
+            )),
         )?;
     }
     Ok(fs::File::create(path)?)
 }
 
-/// Write a crash report to a new file next to the executable.
+/// Folder which contains the service data: `%ProgramData%\Abacus`
+/// The current dir for the service process is set to this folder.
+fn data_dir() -> Result<PathBuf, Error> {
+    let path = std::env::var_os("ProgramData").ok_or_else(|| {
+        io::Error::new(
+            io::ErrorKind::NotFound,
+            "the ProgramData environment variable is not set",
+        )
+    })?;
+    Ok(PathBuf::from(path).join(SERVICE_NAME))
+}
+
+fn logs_dir() -> Result<PathBuf, Error> {
+    Ok(data_dir()?.join("logs"))
+}
+
+/// Write a crash report to a new file in the logs directory.
 fn log_crash(text: &str) {
-    let Ok(current_exe) = std::env::current_exe() else {
+    let Ok(dir) = logs_dir() else {
         return;
     };
-    let path = current_exe.with_extension(format!("{}.crash.log", unix_timestamp()));
+    let path = dir.join(format!("{}.crash.log", unix_timestamp()));
 
     if let Ok(mut file) = fs::File::create(path) {
         let _ = writeln!(file, "{text}");
@@ -243,7 +265,7 @@ fn unix_timestamp() -> u64 {
 }
 
 /// Install and start the Windows service. Given `launch_arguments` will be used every time
-/// the service is started. The service runs under the LocalSystem account and starts automatically
+/// the service is started. The service runs under the LocalService account and starts automatically
 /// when Windows boots.
 pub fn install(launch_arguments: Vec<OsString>) -> Result<(), Error> {
     let service_manager = ServiceManager::local_computer(
@@ -260,8 +282,7 @@ pub fn install(launch_arguments: Vec<OsString>) -> Result<(), Error> {
         executable_path: std::env::current_exe()?,
         launch_arguments,
         dependencies: vec![],
-        // Run as LocalSystem
-        account_name: None,
+        account_name: Some(SERVICE_ACCOUNT.into()),
         account_password: None,
     };
 
@@ -299,7 +320,7 @@ pub fn install(launch_arguments: Vec<OsString>) -> Result<(), Error> {
     Ok(())
 }
 
-/// Stops and uninstalls the Windows service.
+/// Stop and uninstall the Windows service. Leave the data folder as-is.
 pub fn uninstall() -> Result<(), Error> {
     let service_manager =
         ServiceManager::local_computer(None::<&str>, ServiceManagerAccess::CONNECT)?;

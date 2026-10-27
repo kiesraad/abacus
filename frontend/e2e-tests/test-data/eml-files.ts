@@ -154,14 +154,15 @@ export const eml110b_zero_voters = {
 export type Eml230b = {
   filename: string;
   path: string;
-  electionDate: string;
+  electionIdentifier: string;
+  electionDistrict?: string;
   fullHash: string[];
 };
 
 export const eml230b: Eml230b = {
   filename: "eml230b_test.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test.eml.xml",
-  electionDate: "woensdag 16 maart 2022",
+  electionIdentifier: "GR2022 Test",
   fullHash: [
     "0e5b",
     "7360",
@@ -185,7 +186,7 @@ export const eml230b: Eml230b = {
 export const eml230b_with_gaps: Eml230b = {
   filename: "eml230b_test_with_gaps.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml230b_test_with_gaps.eml.xml",
-  electionDate: "woensdag 16 maart 2022",
+  electionIdentifier: "GR2022 Test",
   fullHash: [
     "0ae4",
     "2204",
@@ -209,7 +210,7 @@ export const eml230b_with_gaps: Eml230b = {
 export const eml230b_more_than_45_candidates: Eml230b = {
   filename: "eml230b_test_more_than_45_candidates.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml230b_test_more_than_45_candidates.eml.xml",
-  electionDate: "woensdag 16 maart 2022",
+  electionIdentifier: "GR2022 Test",
   fullHash: [
     "6155",
     "bd20",
@@ -233,7 +234,7 @@ export const eml230b_more_than_45_candidates: Eml230b = {
 export const eml230b_AB: Eml230b = {
   filename: "eml230b_test_AB.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_AB.eml.xml",
-  electionDate: "woensdag 15 maart 2023",
+  electionIdentifier: "AB2023 Rivier en Polder",
   fullHash: [
     "9526",
     "1053",
@@ -257,7 +258,7 @@ export const eml230b_AB: Eml230b = {
 export const eml230b_AB_more_than_45_candidates: Eml230b = {
   filename: "eml230b_test_AB_more_than_45_candidates.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml230b_test_AB_more_than_45_candidates.eml.xml",
-  electionDate: "woensdag 15 maart 2023",
+  electionIdentifier: "AB2023 Rivier en Polder",
   fullHash: [
     "b5ac",
     "8d5c",
@@ -281,7 +282,7 @@ export const eml230b_AB_more_than_45_candidates: Eml230b = {
 export const eml230b_PS1: Eml230b = {
   filename: "eml230b_test_PS1.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_PS1.eml.xml",
-  electionDate: "woensdag 15 maart 2023",
+  electionIdentifier: "PS2023 Oost-Holland",
   fullHash: [
     "d464",
     "56c3",
@@ -305,7 +306,8 @@ export const eml230b_PS1: Eml230b = {
 export const eml230b_PS2: Eml230b = {
   filename: "eml230b_test_PS2.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_PS2.eml.xml",
-  electionDate: "woensdag 15 maart 2023",
+  electionIdentifier: "PS2023 Zuid-Brabant",
+  electionDistrict: "Kieskring II ('s-Gravenveen)",
   fullHash: [
     "bce2",
     "c279",

@@ -1443,7 +1443,7 @@ async fn test_export_works(pool: SqlitePool) {
     .await;
     let xml = String::from_utf8(entry).unwrap();
 
-    let polling_stations = polling_stations_from_eml_str(&xml).unwrap();
+    let (_, polling_stations) = polling_stations_from_eml_str(&xml).unwrap();
     assert_eq!(polling_stations.len(), 2);
     assert!(polling_stations.iter().any(|ps| ps.name == "Op Rolletjes"));
     assert!(polling_stations.iter().any(|ps| ps.name == "Testplek"));

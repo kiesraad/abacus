@@ -6,6 +6,7 @@ import { pollingStationRequestMockData } from "@/testing/api-mocks/PollingStatio
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
+import type { PollingStationValidateImportResponse } from "@/types/generated/openapi";
 import * as uploadFileSize from "@/utils/uploadFileSize";
 import { PollingStationImportPage } from "./PollingStationImportPage";
 
@@ -99,7 +100,8 @@ describe("PollingStationImportPage", () => {
   test("Upload a file, show preview", async () => {
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 200, {
       polling_stations: pollingStationRequestMockData,
-    });
+      polling_station_definition_matches_election: true,
+    } satisfies PollingStationValidateImportResponse);
 
     await renderPage();
     await uploadFile(file);
@@ -107,5 +109,23 @@ describe("PollingStationImportPage", () => {
     // Check the overview table
     expect(await screen.findByRole("table")).toBeVisible();
     expect(await screen.findAllByRole("row")).toHaveLength(10);
+
+    // No warning
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  test("Upload a file, show warning election does not match", async () => {
+    overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 200, {
+      polling_stations: pollingStationRequestMockData,
+      polling_station_definition_matches_election: false,
+    } satisfies PollingStationValidateImportResponse);
+
+    await renderPage();
+    await uploadFile(file);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Afwijkende verkiezing" +
+        "Het bestand foo.txt bevat stembureaus voor een andere verkiezing. Controleer voor je verder gaat of de stembureaus juist zijn.",
+    );
   });
 });

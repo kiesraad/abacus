@@ -1898,15 +1898,16 @@ export interface PollingStationRequest {
   postal_code: string;
 }
 
-export interface PollingStationRequestListResponse {
-  polling_stations: PollingStationRequest[];
-}
-
 /**
  * Type of Polling station
  */
 export const pollingStationTypeValues = ["FixedLocation", "Special", "Mobile"] as const;
 export type PollingStationType = (typeof pollingStationTypeValues)[number];
+
+export interface PollingStationValidateImportResponse {
+  polling_station_definition_matches_election: boolean;
+  polling_stations: PollingStationRequest[];
+}
 
 export interface PollingStationsRequest {
   file_name: string;

@@ -1987,6 +1987,7 @@ mod tests {
             AuditEventType::DataEntryDiscarded,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+            None,
         )
         .await;
     }
@@ -2222,6 +2223,7 @@ mod tests {
             AuditEventType::DataEntryDiscarded,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+            None,
         )
         .await;
 
@@ -2265,6 +2267,7 @@ mod tests {
             AuditEventType::DataEntryDiscarded,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+            None,
         )
         .await;
 
@@ -2354,6 +2357,7 @@ mod tests {
             AuditEventType::DataEntryReset,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(in_progress.clone())).unwrap(),
+            None,
         )
         .await;
     }
@@ -2487,6 +2491,7 @@ mod tests {
             AuditEventType::DataEntryReset,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(correction.clone())).unwrap(),
+            None,
         )
         .await;
     }
@@ -2525,6 +2530,7 @@ mod tests {
             AuditEventType::DataEntryReset,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(correction.clone())).unwrap(),
+            None,
         )
         .await;
     }
@@ -2555,6 +2561,7 @@ mod tests {
                 AuditEventType::DataEntryKeptFirst,
                 AuditEventLevel::Info,
                 serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+                None,
             )
             .await;
 
@@ -2598,6 +2605,7 @@ mod tests {
                 AuditEventType::DataEntryKeptSecond,
                 AuditEventLevel::Info,
                 serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+                None,
             )
             .await;
 
@@ -2633,6 +2641,7 @@ mod tests {
                 AuditEventType::DataEntryKeptFirstReturnedSecond,
                 AuditEventLevel::Info,
                 serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+                None,
             )
             .await;
 
@@ -2681,6 +2690,7 @@ mod tests {
                 AuditEventType::DataEntryKeptSecondReturnedFirst,
                 AuditEventLevel::Info,
                 serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+                None,
             )
             .await;
 
@@ -2838,6 +2848,7 @@ mod tests {
                 AuditEventType::DataEntryDiscardedBoth,
                 AuditEventLevel::Info,
                 serde_json::to_value(DataEntryAuditData::from(data_entry)).unwrap(),
+                None,
             )
             .await;
         }

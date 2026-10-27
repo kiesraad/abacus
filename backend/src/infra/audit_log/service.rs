@@ -117,7 +117,7 @@ mod test {
         );
 
         assert_eq!(event.event_level(), &AuditEventLevel::Success);
-        assert_eq!(event.message(), Some(&"User logged in".to_string()));
+        assert_eq!(event.message(), Some("User logged in"));
         assert_eq!(event.user_id(), Some(UserId::from(1)));
         assert_eq!(event.username(), Some("admin1"));
         assert_eq!(event.ip(), Some(IpAddr::V4(TEST_IP_V4_ADDR)));

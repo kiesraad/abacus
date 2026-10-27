@@ -28,19 +28,15 @@ export function getInvestigationDeletedMessage(
 export function getInvestigationUpdatedMessage(
   pollingStation: PollingStation,
   currentCommitteeSessionStatus: CommitteeSessionStatus,
-  correctedResults = false,
 ) {
-  const enterCorrigendum = correctedResults ? t("investigations.message.enter_corrigendum") : undefined;
-
   if (currentCommitteeSessionStatus === "completed") {
-    const text = `${t("investigations.message.investigation_updated", {
-      number: pollingStation.number,
-      name: pollingStation.name,
-    })}. ${t("documents_are_invalidated")}`;
     return {
       type: "warning",
       title: t("generate_new_results"),
-      text: enterCorrigendum ? `${text}\n${enterCorrigendum}` : text,
+      text: `${t("investigations.message.investigation_updated", {
+        number: pollingStation.number,
+        name: pollingStation.name,
+      })}. ${t("documents_are_invalidated")}`,
     } as Message;
   } else {
     return {
@@ -48,7 +44,11 @@ export function getInvestigationUpdatedMessage(
         number: pollingStation.number,
         name: pollingStation.name,
       }),
-      text: enterCorrigendum,
     } as Message;
   }
+}
+
+export function withCorrigendumInstruction(message: Message): Message {
+  const instruction = t("investigations.message.enter_corrigendum");
+  return { ...message, text: typeof message.text === "string" ? `${message.text}\n${instruction}` : instruction };
 }

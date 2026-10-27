@@ -70,6 +70,47 @@ describe("InvestigationFindingsPage", () => {
     expect(await screen.findByRole("textbox", { name: "Bevindingen" })).toBeVisible();
   });
 
+  test("Adds the corrigendum instruction to the creation message", async () => {
+    server.use(PollingStationInvestigationConcludeHandler);
+    const popMessages = vi.fn(() => [{ title: "Onderzoek voor stembureau 35 (Testschool) toegevoegd" }]);
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages, hasMessages: vi.fn(() => true) });
+
+    await renderPage(3);
+
+    const user = userEvent.setup();
+    await user.type(await screen.findByRole("textbox", { name: "Bevindingen" }), "Bevindingen van het onderzoek");
+    await user.click(screen.getByRole("radio", { name: /Ja/ }));
+    await user.click(screen.getByRole("button", { name: "Opslaan" }));
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(pushMessage).toHaveBeenCalledExactlyOnceWith({
+      title: "Onderzoek voor stembureau 35 (Testschool) toegevoegd",
+      text: "Laat het corrigendum door 2 invoerders invoeren in Abacus.",
+    });
+  });
+
+  test("Keeps the creation message unchanged without corrected results", async () => {
+    server.use(PollingStationInvestigationConcludeHandler);
+    const popMessages = vi.fn(() => [{ title: "Onderzoek voor stembureau 35 (Testschool) toegevoegd" }]);
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages, hasMessages: vi.fn(() => true) });
+
+    await renderPage(3);
+
+    const user = userEvent.setup();
+    await user.type(await screen.findByRole("textbox", { name: "Bevindingen" }), "Bevindingen van het onderzoek");
+    await user.click(screen.getByRole("radio", { name: /Nee/ }));
+    await user.click(screen.getByRole("button", { name: "Opslaan" }));
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(pushMessage).toHaveBeenCalledExactlyOnceWith({
+      title: "Onderzoek voor stembureau 35 (Testschool) toegevoegd",
+    });
+  });
+
   test("Displays an error message when submitting an empty form", async () => {
     await renderPage(3);
 

@@ -21,7 +21,7 @@ import type {
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
-import { getInvestigationUpdatedMessage } from "../../utils/messages";
+import { getInvestigationUpdatedMessage, withCorrigendumInstruction } from "../../utils/messages";
 
 interface InvestigationFindingsProps {
   pollingStationId: number;
@@ -32,9 +32,8 @@ const ACCEPTED = "accepted";
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
-  const { hasMessages } = useMessages();
+  const { popMessages, pushMessage } = useMessages();
   const { currentCommitteeSession, election, investigation, pollingStation, refetch } = useElection(pollingStationId);
-  const { pushMessage } = useMessages();
   const updatePath = `/api/polling_stations/${pollingStationId}/investigation`;
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
   const { update, create: conclude } = useCrud<PollingStationInvestigation>({
@@ -115,10 +114,10 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     const response = await save();
 
     if (isSuccess(response)) {
-      // Only push a message if there are no messages yet (e.g. from creating this investigation)
-      if (!hasMessages()) {
-        pushMessage(getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status, correctedResults));
-      }
+      // Reuse the message from creating this investigation or editing its reason, if there is one
+      const message =
+        popMessages().pop() ?? getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status);
+      pushMessage(correctedResults ? withCorrigendumInstruction(message) : message);
 
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);

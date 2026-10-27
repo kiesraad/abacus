@@ -18,7 +18,6 @@ export interface AlertProps {
   margin?: "mb-0" | "mb-sm" | "mb-md" | "mb-md-lg" | "mb-lg";
   children: ReactNode;
   onClose?: () => void;
-  autoCloseTimeout?: number; // in ms
 }
 
 export function Alert({
@@ -30,15 +29,8 @@ export function Alert({
   title,
   inline,
   variant = "default",
-  autoCloseTimeout,
 }: AlertProps) {
   const id = useId();
-
-  if (onClose && autoCloseTimeout) {
-    setTimeout(() => {
-      onClose();
-    }, autoCloseTimeout);
-  }
 
   return (
     <div

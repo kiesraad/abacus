@@ -47,6 +47,50 @@ describe("Messages component", () => {
     expect(alerts).toHaveLength(4);
   });
 
+  test("should auto close only success message", async () => {
+    vi.useFakeTimers();
+    popMessages.mockReturnValue([
+      { title: "Welcome", text: "You are back" },
+      { type: "notify", title: "All your base are belong to us" },
+      {
+        type: "warning",
+        title: "Main screen turn on",
+        text: "Somebody set up us the bomb",
+      },
+      {
+        type: "error",
+        title: "Tik tok",
+        text: "The bomb goes off in 5 minutes",
+      },
+    ]);
+    render(<Messages autoCloseTimeout={5_000} />);
+
+    let alerts = screen.getAllByRole("alert");
+    expect(alerts).toHaveLength(4);
+
+    const successAlert = alerts[0]!;
+    const infoAlert = alerts[1]!;
+    const warningAlert = alerts[2]!;
+    const errorAlert = alerts[3]!;
+
+    expect(within(successAlert).getByRole("strong")).toHaveTextContent("Welcome");
+    expect(within(successAlert).getByRole("paragraph")).toHaveTextContent("You are back");
+    expect(within(infoAlert).getByRole("strong")).toHaveTextContent("All your base are belong to us");
+    expect(within(warningAlert).getByRole("strong")).toHaveTextContent("Main screen turn on");
+    expect(within(warningAlert).getByRole("paragraph")).toHaveTextContent("Somebody set up us the bomb");
+    expect(within(errorAlert).getByRole("strong")).toHaveTextContent("Tik tok");
+    expect(within(errorAlert).getByRole("paragraph")).toHaveTextContent("The bomb goes off in 5 minutes");
+
+    vi.advanceTimersByTime(5_000);
+
+    await vi.waitFor(() => {
+      alerts = screen.getAllByRole("alert");
+      expect(alerts).toHaveLength(3);
+    });
+
+    vi.useRealTimers();
+  });
+
   test("should get the messages only once", () => {
     expect(popMessages).not.toHaveBeenCalled();
 

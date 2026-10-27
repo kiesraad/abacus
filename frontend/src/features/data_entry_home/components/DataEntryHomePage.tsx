@@ -36,7 +36,7 @@ export function DataEntryHomePage() {
       {currentCommitteeSession.status === "paused" && (
         <CommitteeSessionPausedModal committeeCategory={election.committee_category} />
       )}
-      <Messages autoCloseTimeout={300000} /> {/* auto close success alerts after 5 minutes */}
+      <Messages autoCloseTimeout={300_000} /> {/* auto close success alerts after 5 minutes */}
       {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
           <strong className="heading-md">{t("data_entry.completed.all_entries_completed")}</strong>

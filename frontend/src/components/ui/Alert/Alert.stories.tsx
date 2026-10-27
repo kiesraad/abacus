@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { action } from "storybook/actions";
-import { expect, fn, userEvent, waitFor, within } from "storybook/test";
+import { expect, fn, userEvent, within } from "storybook/test";
+
 import { Alert } from "./Alert";
 
 const meta = {
@@ -74,37 +75,6 @@ export const ClosableAlert: Story = {
     await expect(closeButton).toBeVisible();
     await userEvent.click(closeButton);
     await expect(args.onClose).toHaveBeenCalled();
-  },
-};
-
-export const AutoClosingAlert: Story = {
-  args: {
-    type: "error",
-    children: (
-      <>
-        <h2>Error Title</h2>
-        <p>This is an error message that will auto close after 2 seconds.</p>
-      </>
-    ),
-    onClose: fn(),
-    autoCloseTimeout: 2000,
-  },
-
-  play: async ({ args, canvas }) => {
-    const alert = canvas.getByRole("alert");
-    await expect(within(alert).getByRole("heading", { level: 2, name: "Error Title" })).toBeVisible();
-    await expect(within(alert).getByRole("paragraph")).toHaveTextContent(
-      "This is an error message that will auto close after 2 seconds.",
-    );
-
-    const closeButton = within(alert).getByTitle("Melding sluiten");
-    await expect(closeButton).toBeVisible();
-    await waitFor(
-      async () => {
-        await expect(args.onClose).toHaveBeenCalled();
-      },
-      { timeout: args.autoCloseTimeout ? args.autoCloseTimeout + 1000 : 3000 },
-    );
   },
 };
 

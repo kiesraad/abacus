@@ -113,7 +113,7 @@ export function ElectionStatusPage() {
           </div>
         </section>
       </header>
-      <Messages autoCloseTimeout={300000} /> {/* auto close success alerts after 5 minutes */}
+      <Messages autoCloseTimeout={300_000} /> {/* auto close success alerts after 5 minutes */}
       {showPauseModal && (
         <Modal title={t("election_status.pause_session")} onClose={togglePauseModal}>
           <p>{t("election_status.pause_are_you_sure")}</p>

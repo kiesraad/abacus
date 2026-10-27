@@ -1,4 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
+import type { CommitteeCategory } from "@/types/generated/openapi";
 
 export class ElectionHome {
   readonly header: Locator;
@@ -47,5 +48,9 @@ export class ElectionHome {
 
   getCommitteeSessionCard(number: number) {
     return this.page.getByTestId(`session-${number}`);
+  }
+
+  getAlertElectionCreated(committeeCategory: CommitteeCategory, electionName: string) {
+    return this.alert.filter({ hasText: `Verkiezing ${committeeCategory} ${electionName} toegevoegd` });
   }
 }

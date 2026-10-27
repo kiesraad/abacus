@@ -4,10 +4,11 @@ import {
   csbElectionMockData,
   electionImportValidateMockResponse,
   electionMockData,
+  getNewElectionMockData,
 } from "@/testing/api-mocks/ElectionMockData";
 import { overrideOnce } from "@/testing/server";
 import { render, renderReturningRouter, screen, waitFor } from "@/testing/test-utils";
-import type { CommitteeCategory, ElectionCategory, NewElection } from "@/types/generated/openapi";
+import type { CommitteeCategory, ElectionCategory } from "@/types/generated/openapi";
 import * as uploadFileSize from "@/utils/uploadFileSize";
 import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
@@ -32,12 +33,7 @@ async function uploadFile(file: File) {
   await user.upload(input, file);
 }
 
-const election = {
-  name: "Naam",
-  location: "Plek",
-  election_date: "2022-03-16",
-} as NewElection;
-
+const election = getNewElectionMockData();
 const filename = "foo.txt";
 const file = new File(["foo"], filename, { type: "text/plain" });
 
@@ -131,6 +127,7 @@ describe("UploadCandidatesDefinition component", () => {
     async function submitHash() {
       const user = userEvent.setup();
       expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
+      expect(await screen.findByText("GR2026 Heemdamseburg")).toBeVisible();
       await user.type(screen.getByRole("textbox", { name: "Controle deel 1" }), "zxcv");
       await user.type(screen.getByRole("textbox", { name: "Controle deel 2" }), "gfsd");
       await user.click(screen.getByRole("button", { name: "Volgende" }));

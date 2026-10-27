@@ -157,12 +157,9 @@ for (const variant of variants) {
 
       electionId = election.id;
 
-      await expect(electionsOverviewPage.adminHeader).toBeVisible();
-      await expect(electionsOverviewPage.getAlertElectionCreated("CSB", variant.electionName)).toBeVisible();
-      await electionsOverviewPage.findElectionRowById(electionId).click();
-
       const electionHomePage = new ElectionHome(page);
       await expect(electionHomePage.header).toHaveText(variant.electionName);
+      await expect(electionHomePage.getAlertElectionCreated("CSB", variant.electionName)).toBeVisible();
       const sessionCard = electionHomePage.getCommitteeSessionCard(1);
       await expect(sessionCard).toContainText("Zitting CSB — Klaar voor invoer");
 

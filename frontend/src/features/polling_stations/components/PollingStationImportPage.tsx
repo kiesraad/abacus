@@ -17,9 +17,8 @@ import type {
   POLLING_STATION_IMPORT_REQUEST_PATH,
   POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH,
   PollingStationListResponse,
-  PollingStationRequest,
-  PollingStationRequestListResponse,
   PollingStationsRequest,
+  PollingStationValidateImportResponse,
 } from "@/types/generated/openapi";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 
@@ -33,13 +32,13 @@ export function PollingStationImportPage() {
 
   const [error, setError] = useState<ReactNode | undefined>();
   const [file, setFile] = useState<File | undefined>();
-  const [pollingStations, setPollingStations] = useState<PollingStationRequest[]>([]);
+  const [validationResponse, setValidationResponse] = useState<PollingStationValidateImportResponse>();
 
   const parentUrl = `/elections/${election.id}/polling-stations`;
   const validatePath: POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH = `/api/elections/${election.id}/polling_stations/validate-import`;
   const importPath: POLLING_STATION_IMPORT_REQUEST_PATH = `/api/elections/${election.id}/polling_stations/import`;
   const { create: postImport } = useCrud<PollingStationListResponse>({ createPath: importPath });
-  const { create: postValidate } = useCrud<PollingStationRequestListResponse>({ createPath: validatePath });
+  const { create: postValidate } = useCrud<PollingStationValidateImportResponse>({ createPath: validatePath });
 
   /**
    * Import the polling stations
@@ -79,10 +78,10 @@ export function PollingStationImportPage() {
       const response = await postValidate({ data });
 
       if (isSuccess(response)) {
-        setPollingStations(response.data.polling_stations);
+        setValidationResponse(response.data);
         setError(undefined);
       } else {
-        setPollingStations([]);
+        setValidationResponse(undefined);
 
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
@@ -124,7 +123,7 @@ export function PollingStationImportPage() {
   );
 
   // Show polling stations and import button
-  if (pollingStations.length > 0 && file) {
+  if (validationResponse && file) {
     content = (
       <Form title={t("election.polling_stations.check.title")}>
         <FormLayout>
@@ -135,13 +134,27 @@ export function PollingStationImportPage() {
               </Alert>
             )}
 
+            {!validationResponse.polling_station_definition_matches_election && (
+              <Alert
+                type="warning"
+                title={t("election.polling_station_definition_does_not_match_election.title")}
+                inline
+              >
+                <p>
+                  {tx("election.polling_station_definition_does_not_match_election.description", {
+                    file: () => <strong>{file.name}</strong>,
+                  })}
+                </p>
+              </Alert>
+            )}
+
             <p>
               {tx("election.polling_stations.check.description", {
                 file: () => <strong>{file.name}</strong>,
               })}
             </p>
 
-            <PollingStationsPreview pollingStations={pollingStations} />
+            <PollingStationsPreview pollingStations={validationResponse.polling_stations} />
           </FormLayout.Section>
           <FormLayout.Controls>
             <Button onClick={() => void importPollingStations(file)}>{t("polling_station.import")}</Button>
@@ -161,7 +174,9 @@ export function PollingStationImportPage() {
       </header>
       <PollingStationAlert />
       <main>
-        <article>{content}</article>
+        <article>
+          <section className="md">{content}</section>
+        </article>
       </main>
     </>
   );

@@ -14,10 +14,13 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::middleware::authentication::{
-        RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
-        error::AuthenticationError,
-        password::{ValidatedPassword, hash_password},
+    api::{
+        middleware::authentication::{
+            RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+            error::AuthenticationError,
+            password::{ValidatedPassword, hash_password},
+        },
+        user::ValidateUserRequest,
     },
     domain::role::Role,
     error::ErrorReference,
@@ -277,6 +280,16 @@ pub struct AccountUpdateRequest {
     pub fullname: Option<String>,
 }
 
+impl ValidateUserRequest for AccountUpdateRequest {
+    fn username(&self) -> Option<&str> {
+        None
+    }
+
+    fn fullname(&self) -> Option<&str> {
+        self.fullname.as_deref()
+    }
+}
+
 /// Get current logged-in user endpoint
 #[utoipa::path(
   get,
@@ -301,6 +314,7 @@ async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   responses(
       (status = 200, description = "The logged in user", body = LoginResponse),
       (status = 400, description = "Bad request", body = ErrorResponse),
+      (status = 422, description = "Invalid fullname", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
@@ -313,6 +327,8 @@ async fn account_update(
     if user.username() != account.username {
         return Err(AuthenticationError::UserNotFound.into());
     }
+
+    account.validate()?;
 
     // Hash before transaction to prevent write lock
     let password_hash = hash_password(
@@ -381,6 +397,16 @@ pub struct CreateFirstAdminRequest {
     pub temp_password: String,
 }
 
+impl ValidateUserRequest for CreateFirstAdminRequest {
+    fn username(&self) -> Option<&str> {
+        Some(&self.username)
+    }
+
+    fn fullname(&self) -> Option<&str> {
+        Some(&self.fullname)
+    }
+}
+
 /// Create the first admin user, only allowed if no users exist yet
 #[utoipa::path(
     post,
@@ -389,6 +415,7 @@ pub struct CreateFirstAdminRequest {
     responses(
         (status = 201, description = "First admin user created", body = User),
         (status = 403, description = "Forbidden, an active user already exists", body = ErrorResponse),
+        (status = 422, description = "Invalid username or fullname", body = ErrorResponse),
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -418,6 +445,8 @@ async fn create_first_admin(
     if user_repo::has_active_users(&mut tx).await? {
         return Err(AuthenticationError::AlreadyInitialised.into());
     }
+
+    admin_request.validate()?;
 
     // Delete any existing admin user
     let users = user_repo::list(&mut tx, None).await?;
@@ -543,6 +572,7 @@ async fn logout(
 
 #[cfg(test)]
 mod tests {
+    use http_body_util::BodyExt;
     use test_log::test;
 
     use super::*;
@@ -655,6 +685,30 @@ mod tests {
     }
 
     #[test(sqlx::test)]
+    async fn test_create_first_admin_fullname_invalid(pool: SqlitePool) {
+        let admin_request = CreateFirstAdminRequest {
+            username: "admin".to_string(),
+            fullname: "Admin\tUser".to_string(),
+            temp_password: "admin_password".to_string(),
+        };
+
+        let response = create_first_admin(
+            State(pool.clone()),
+            AuditService::new(None, None),
+            Json(admin_request),
+        )
+        .await
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::InvalidFullname);
+        assert_eq!(result.error, "Invalid character");
+    }
+
+    #[test(sqlx::test)]
     async fn test_admin_exists(pool: SqlitePool) {
         // No admin user exists yet
         let response = admin_exists(State(pool.clone())).await;
@@ -680,5 +734,36 @@ mod tests {
 
         let response = admin_exists(State(pool.clone())).await;
         assert_eq!(response.unwrap(), StatusCode::NO_CONTENT);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_account_update_fullname_invalid(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let user = user_repo::get_by_username(&mut conn, "typist1")
+            .await
+            .unwrap()
+            .unwrap();
+
+        let request = AccountUpdateRequest {
+            username: user.username().to_string(),
+            password: "".to_string(),
+            fullname: Some("Invalid\tFullname".to_string()),
+        };
+
+        let response = account_update(
+            user,
+            State(pool.clone()),
+            AuditService::new(None, None),
+            Json(request),
+        )
+        .await
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::InvalidFullname);
+        assert_eq!(result.error, "Invalid character");
     }
 }

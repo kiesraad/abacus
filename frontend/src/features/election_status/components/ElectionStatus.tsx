@@ -22,9 +22,16 @@ import cls from "./ElectionStatus.module.css";
 function sortTableRows(cat: StatusCategory, list: StatusEntryWithTypist[]) {
   switch (cat) {
     case "errors_and_warnings":
-    case "first_entry_finished":
       // Sort on updated_at ascending
       return list.sort((a, b) => a.entry.updated_at.localeCompare(b.entry.updated_at));
+    case "first_entry_finished":
+      // Sort on finished_at ascending
+      return list.sort((a, b) => {
+        if (!a.entry.finished_at) return 1;
+        if (!b.entry.finished_at) return -1;
+
+        return a.entry.finished_at.localeCompare(b.entry.finished_at);
+      });
     case "not_started":
     case "in_progress":
       // Sort on polling station number or subcommittee name ascending

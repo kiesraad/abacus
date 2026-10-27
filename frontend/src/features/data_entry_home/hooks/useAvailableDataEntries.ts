@@ -23,23 +23,16 @@ export function useAvailableDataEntries(statuses: ElectionStatusResponseEntry[])
     const dataEntryWithStatus = getDataEntryWithStatusList({ statuses, user });
 
     const available = dataEntryWithStatus.filter((dataEntry) => !NOT_AVAILABLE_STATUSES.includes(dataEntry.userStatus));
-    const availableCurrentUser = available.filter(
+    const sortedAvailable = sortList(available, (item) => {
+      return item.statusEntry.source;
+    });
+    const availableCurrentUser = sortedAvailable.filter(
       (dataEntry) => dataEntry.userStatus !== DataEntryUserStatus.InProgressOtherUser,
     );
     const inProgressCurrentUser = availableCurrentUser.filter(
       (dataEntry) => dataEntry.userStatus === DataEntryUserStatus.InProgressCurrentUser,
     );
-    const sortedAvailableCurrentUser = sortList(availableCurrentUser, (item) => {
-      return item.statusEntry.source;
-    });
-    const sortedInProgressCurrentUser = sortList(inProgressCurrentUser, (item) => {
-      return item.statusEntry.source;
-    });
 
-    return {
-      dataEntryWithStatus,
-      availableCurrentUser: sortedAvailableCurrentUser,
-      inProgressCurrentUser: sortedInProgressCurrentUser,
-    };
+    return { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser };
   }, [statuses, user]);
 }

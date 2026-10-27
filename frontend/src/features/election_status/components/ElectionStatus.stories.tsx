@@ -11,9 +11,6 @@ import {
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionStatus } from "./ElectionStatus";
 
-const mockStatuses = [...extendedElectionStatusesMock];
-mockStatuses[5]!.first_entry_origin = { type: "Typist", user_id: 1 };
-
 interface StoryProps {
   addLinks: boolean;
   buttonNavigate: (path: string) => void;
@@ -27,7 +24,7 @@ export const GSBElectionStatusNoLinks: StoryObj<StoryProps> = {
     return (
       <TestUserProvider userRole={"coordinator_gsb"}>
         <ElectionStatus
-          statuses={mockStatuses}
+          statuses={extendedElectionStatusesMock}
           committeeSession={committeeSessionMockData}
           election={electionMockData}
           addLinks={addLinks}
@@ -268,7 +265,7 @@ export const ElectionStatusWithLinks: StoryObj<StoryProps> = {
     return (
       <TestUserProvider userRole={"coordinator_gsb"}>
         <ElectionStatus
-          statuses={mockStatuses}
+          statuses={extendedElectionStatusesMock}
           committeeSession={committeeSessionMockData}
           election={electionMockData}
           addLinks={addLinks}
@@ -396,7 +393,7 @@ export const NextSession: StoryObj<StoryProps> = {
     return (
       <TestUserProvider userRole={"coordinator_gsb"}>
         <ElectionStatus
-          statuses={mockStatuses}
+          statuses={extendedElectionStatusesMock}
           committeeSession={{ ...committeeSessionMockData, number: 2 }}
           election={electionMockData}
           addLinks={addLinks}

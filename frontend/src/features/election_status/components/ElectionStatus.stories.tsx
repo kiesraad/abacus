@@ -9,7 +9,6 @@ import {
   extendedElectionStatusesMock,
 } from "@/testing/api-mocks/ElectionStatusMockData";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { sortList } from "@/utils/sorting";
 import { ElectionStatus } from "./ElectionStatus";
 
 const mockStatuses = [...extendedElectionStatusesMock];
@@ -28,7 +27,7 @@ export const GSBElectionStatusNoLinks: StoryObj<StoryProps> = {
     return (
       <TestUserProvider userRole={"coordinator_gsb"}>
         <ElectionStatus
-          statuses={sortList(mockStatuses, (item) => item.source)}
+          statuses={mockStatuses}
           committeeSession={committeeSessionMockData}
           election={electionMockData}
           addLinks={addLinks}
@@ -157,7 +156,7 @@ export const CSBElectionStatusNoLinks: StoryObj<StoryProps> = {
     return (
       <TestUserProvider userRole={"coordinator_csb"}>
         <ElectionStatus
-          statuses={sortList(extendedElectionStatusesCSBMock, (item) => item.source)}
+          statuses={extendedElectionStatusesCSBMock}
           committeeSession={csbCommitteeSessionMockData}
           election={csbElectionMockData}
           addLinks={addLinks}

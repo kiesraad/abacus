@@ -29,7 +29,6 @@ import {
   type ElectionDetailsResponse,
   type ElectionStatusResponse,
 } from "@/types/generated/openapi";
-import { sortList } from "@/utils/sorting";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
 async function renderDataEntryHomePage(
@@ -50,7 +49,7 @@ async function renderDataEntryHomePage(
 
   const refetch = vi.fn();
   vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({
-    statuses: sortList(statuses, (item) => item.source),
+    statuses: statuses,
     refetch,
   });
 

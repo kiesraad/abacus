@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useUser } from "@/hooks/user/useUser";
+import type { ElectionStatusResponseEntry } from "@/types/generated/openapi";
 import { type DataEntryStatusWithUserStatus, DataEntryUserStatus, getDataEntryWithStatusList } from "../utils/util";
 
 const NOT_AVAILABLE_STATUSES: DataEntryUserStatus[] = [
@@ -15,9 +15,8 @@ export interface UseAvailableDataEntries {
   inProgressCurrentUser: DataEntryStatusWithUserStatus[];
 }
 
-export function useAvailableDataEntries(): UseAvailableDataEntries {
+export function useAvailableDataEntries(statuses: ElectionStatusResponseEntry[]): UseAvailableDataEntries {
   const user = useUser();
-  const { statuses } = useElectionStatus();
 
   return useMemo(() => {
     const dataEntryWithStatus = getDataEntryWithStatusList({ statuses, user });
@@ -30,6 +29,10 @@ export function useAvailableDataEntries(): UseAvailableDataEntries {
       (dataEntry) => dataEntry.userStatus === DataEntryUserStatus.InProgressCurrentUser,
     );
 
-    return { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser };
+    return {
+      dataEntryWithStatus,
+      availableCurrentUser: availableCurrentUser,
+      inProgressCurrentUser: inProgressCurrentUser,
+    };
   }, [statuses, user]);
 }

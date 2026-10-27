@@ -133,6 +133,11 @@ Using a binary:
 abacus --airgap-detection
 ```
 
+When Abacus starts, it logs a warning if an internet connection attempt times out or fails in an unexpected way.
+These warnings alone do not prevent you from using Abacus. Abacus continues checking for internet access while it
+is running, but does not repeat these warnings. In a future version, air gap detection may prevent you from using
+Abacus when these unexpected connection problems occur.
+
 ### TLS (HTTPS)
 
 In production, Abacus must be built with TLS enabled, which makes Abacus serve

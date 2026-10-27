@@ -1,4 +1,5 @@
 use std::{
+    io::ErrorKind,
     net::{IpAddr, Ipv4Addr, Ipv6Addr},
     sync::{Arc, RwLock, atomic::AtomicBool},
     time::{Duration, Instant},
@@ -146,6 +147,7 @@ impl AirgapDetection {
 
     /// Detects if the system is in an airgap by attempting to connect to IPv4, IPv6 addresses and performing DNS lookups
     async fn is_connected(&self) -> bool {
+        let first_check = self.get_last_check().is_none();
         let mut set = JoinSet::new();
 
         let all_ip_adresses = IPV4
@@ -165,6 +167,17 @@ impl AirgapDetection {
                     Ok(Ok(_)) => {
                         warn!("TCP connection to IP address {ip} successful");
                         true
+                    }
+                    Ok(Err(error)) if first_check => {
+                        match error.kind() {
+                            ErrorKind::HostUnreachable | ErrorKind::NetworkUnreachable => {}
+                            _ => warn!("TCP connection to IP address {ip} failed: {error}"),
+                        }
+                        false
+                    }
+                    Err(_) if first_check => {
+                        warn!("TCP connection to IP address {ip} timed out");
+                        false
                     }
                     _ => false,
                 }

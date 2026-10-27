@@ -2,7 +2,7 @@
 
 use std::{future::Future, net::SocketAddr, pin::Pin, str::FromStr};
 
-use api::middleware::airgap::AirgapDetection;
+use api::middleware::{airgap::AirgapDetection, authentication::ratelimit::LoginRateLimit};
 use axum::{extract::FromRef, serve::ListenerExt};
 use serde::Serialize;
 use sqlx::{
@@ -60,6 +60,7 @@ pub struct AppState {
     pool: SqlitePool,
     airgap_detection: AirgapDetection,
     backup_config: BackupConfig,
+    login_ratelimit: LoginRateLimit,
 }
 
 /// Start airgap detection if enabled, logging which path was taken.
@@ -82,7 +83,12 @@ fn build_app(
 ) -> Result<axum::Router, AppError> {
     info!("Starting Abacus (version {})", env!("ABACUS_GIT_VERSION"));
     let airgap_detection = setup_airgap_detection(pool, enable_airgap_detection);
-    router::create_router(pool.clone(), airgap_detection, backup_config)
+    router::create_router(
+        pool.clone(),
+        airgap_detection,
+        backup_config,
+        LoginRateLimit::default(),
+    )
 }
 
 /// Close the database pool (flushing SQLite WAL/shm) and log a clean shutdown.

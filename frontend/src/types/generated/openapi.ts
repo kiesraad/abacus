@@ -1427,6 +1427,7 @@ export const errorReferenceValues = [
   "InvalidVoteGroup",
   "InvestigationHasDataEntryOrResult",
   "InvestigationRequiresCorrectedResults",
+  "LoginRateLimited",
   "NotInitialised",
   "OwnAccountCannotBeDeleted",
   "PasswordRejectionSameAsOld",

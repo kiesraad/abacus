@@ -457,6 +457,7 @@ mod tests {
             AuditEventType::SigningKeypairCreated,
             AuditEventLevel::Success,
             json!({"election_id": &election.id,"election_name": &election.name}),
+            None,
         )
         .await;
     }

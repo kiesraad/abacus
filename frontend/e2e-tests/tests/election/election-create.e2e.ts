@@ -465,7 +465,7 @@ test.describe("Election creation", () => {
       // Correct hash, incorrect case
       const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
       await expect(checkDefinitionPage.hashInput1).toBeFocused();
-      await checkDefinitionPage.inputHash(eml110a.hashInput1.toUpperCase(), eml110a.hashInput2.toUpperCase());
+      await checkDefinitionPage.inputHashFrom(eml110a.fullHash.map((chunk) => chunk.toUpperCase()));
 
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();

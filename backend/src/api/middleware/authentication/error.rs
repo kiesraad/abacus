@@ -13,6 +13,7 @@ pub enum AuthenticationError {
     InvalidPassword,
     InvalidSessionDuration,
     InvalidUsernameOrPassword,
+    JoinError(tokio::task::JoinError),
     NoSessionCookie,
     NotInitialised,
     OwnAccountCannotBeDeleted,
@@ -143,7 +144,8 @@ impl ApiErrorResponse for AuthenticationError {
             ),
             AuthenticationError::Database(_)
             | AuthenticationError::HashPassword(_)
-            | AuthenticationError::InvalidSessionDuration => (
+            | AuthenticationError::InvalidSessionDuration
+            | AuthenticationError::JoinError(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 ErrorResponse::new(
                     "Internal server error",
@@ -164,5 +166,11 @@ impl From<password_hash::Error> for AuthenticationError {
 impl From<sqlx::Error> for AuthenticationError {
     fn from(err: sqlx::Error) -> Self {
         AuthenticationError::Database(err)
+    }
+}
+
+impl From<tokio::task::JoinError> for AuthenticationError {
+    fn from(err: tokio::task::JoinError) -> Self {
+        Self::JoinError(err)
     }
 }

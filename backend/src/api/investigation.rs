@@ -129,9 +129,6 @@ pub async fn delete_investigation_for_polling_station(
         return Ok(false);
     };
     let investigation = PollingStationInvestigation::from((polling_station_id, &old_status));
-    audit_service
-        .log(conn, &InvestigationDeletedAuditData(investigation), None)
-        .await?;
 
     // Use the linked ID instead of the status, so this also removes a data entry
     // that an earlier deleted investigation left behind
@@ -143,6 +140,9 @@ pub async fn delete_investigation_for_polling_station(
         Err(err) => return Err(err.into()),
     }
     investigation_repo::delete(conn, polling_station_id).await?;
+    audit_service
+        .log(conn, &InvestigationDeletedAuditData(investigation), None)
+        .await?;
 
     if committee_session.status == CommitteeSessionStatus::Completed {
         change_committee_session_status(

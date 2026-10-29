@@ -818,8 +818,53 @@ mod tests {
 
     use super::*;
     use crate::{
-        domain::polling_station::PollingStationId, repository::polling_station_repo::exists,
+        domain::{data_entry::DataEntryId, polling_station::PollingStationId},
+        infra::audit_log::list_event_names,
+        repository::{polling_station_repo::exists, user_repo::UserId},
     };
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_delete_investigation_deletes_linked_data_entry(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let audit_service = AuditService::new(
+            Some(User::test_user(Role::CoordinatorGSB, UserId::from(1))),
+            None,
+        );
+        let polling_station_id = PollingStationId::from(5211);
+        let committee_session = validate_and_get_committee_session(&mut conn, polling_station_id)
+            .await
+            .unwrap();
+
+        assert!(
+            delete_investigation_for_polling_station(
+                &mut conn,
+                &audit_service,
+                &committee_session,
+                polling_station_id,
+            )
+            .await
+            .unwrap()
+        );
+
+        assert!(
+            investigation_repo::get(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+                .is_none()
+        );
+        assert!(matches!(
+            polling_station_repo::get_data_entry_id(&mut conn, polling_station_id).await,
+            Err(sqlx::Error::RowNotFound)
+        ));
+        assert!(matches!(
+            data_entry_repo::get(&mut conn, DataEntryId::from(502)).await,
+            Err(sqlx::Error::RowNotFound)
+        ));
+        assert_eq!(
+            list_event_names(&mut conn).await.unwrap(),
+            ["DataEntryDeleted", "InvestigationDeleted"]
+        );
+    }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_validation_ok(pool: SqlitePool) {

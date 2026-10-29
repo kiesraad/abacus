@@ -2,7 +2,6 @@
 
 use std::net::SocketAddr;
 
-use abacus::repository::{data_entry_repo, polling_station_repo};
 use axum::http::StatusCode;
 use reqwest::Response;
 use sqlx::SqlitePool;
@@ -182,14 +181,9 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
     scripts("election_5_with_results", "users")
 )))]
 async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
+    let addr = serve_api(pool).await;
     let election_id = 5;
     let polling_station_id = 5211;
-    let mut conn = pool.acquire().await.unwrap();
-    let data_entry_id =
-        polling_station_repo::get_data_entry_id(&mut conn, polling_station_id.into())
-            .await
-            .unwrap();
 
     let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses.len(), 1);
@@ -204,10 +198,6 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
 
     let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses.len(), 0);
-    assert!(matches!(
-        data_entry_repo::get(&mut conn, data_entry_id).await,
-        Err(sqlx::Error::RowNotFound)
-    ));
 }
 
 #[test(sqlx::test(fixtures(

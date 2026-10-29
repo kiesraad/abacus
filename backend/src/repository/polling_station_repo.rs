@@ -572,7 +572,8 @@ pub async fn list_first_session_with_status(
             p.address,
             p.postal_code,
             p.locality,
-            de.state
+            de.state,
+            de.updated_at
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
         JOIN data_entries AS de ON de.id = p.data_entry_id
@@ -599,6 +600,7 @@ pub async fn list_first_session_with_status(
         }
         .into_polling_station_data_source(),
         status: row.state.0,
+        updated_at: row.updated_at,
     })
     .fetch_all(conn)
     .await
@@ -626,7 +628,8 @@ pub async fn list_next_session_with_status(
             p.address,
             p.postal_code,
             p.locality,
-            de.state
+            de.state,
+            de.updated_at
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
         JOIN data_entries AS de ON de.id = p.data_entry_id
@@ -653,6 +656,7 @@ pub async fn list_next_session_with_status(
         }
         .into_polling_station_data_source(),
         status: row.state.0,
+        updated_at: row.updated_at,
     })
     .fetch_all(conn)
     .await

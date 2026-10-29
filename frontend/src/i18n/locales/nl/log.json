@@ -82,6 +82,7 @@
     "error_reference": "Referentie fout",
     "event_type": "Gebeurtenis",
     "file_created_at": "Aangemaakt op",
+    "file_hash": "Digitale vingerafdruk",
     "file_id": "Bestands-ID",
     "file_mime_type": "Bestandstype",
     "file_name": "Bestandsnaam",

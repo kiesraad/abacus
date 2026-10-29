@@ -19,7 +19,7 @@ export function DataEntryHomePage() {
   const location = useLocation();
   const { currentCommitteeSession, election, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
-  const { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailableDataEntries();
+  const { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailableDataEntries(statuses);
 
   // live data polling (initial fetch + 30s interval + visibility change)
   useLiveData(refetchStatuses, true);
@@ -33,13 +33,10 @@ export function DataEntryHomePage() {
           <h1>{election.name}</h1>
         </section>
       </header>
-
       {currentCommitteeSession.status === "paused" && (
         <CommitteeSessionPausedModal committeeCategory={election.committee_category} />
       )}
-
-      <Messages />
-
+      <Messages autoCloseTimeout={300_000} /> {/* auto close success alerts after 5 minutes */}
       {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
           <strong className="heading-md">{t("data_entry.completed.all_entries_completed")}</strong>

@@ -20,6 +20,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
+        data_entry::DataEntryStatus,
         election::{ElectionWithPoliticalGroups, VoteCountingMethod},
         investigation::{
             InvestigationStatus, InvestigationTransitionError, PollingStationInvestigation,
@@ -43,8 +44,10 @@ use crate::{
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
-        committee_session_repo, data_entry_repo::previous_results_for_polling_station,
-        election_repo, investigation_repo, polling_station_repo, user_repo::User,
+        committee_session_repo,
+        data_entry_repo::{self, previous_results_for_polling_station},
+        election_repo, investigation_repo, polling_station_repo,
+        user_repo::User,
     },
     service::change_committee_session_status,
 };
@@ -409,9 +412,38 @@ async fn apply_update(
     }
 }
 
+/// Delete the data entry linked to the polling station, if any.
+/// Requires `accept_data_entry_deletion` unless the data entry is still empty.
+async fn delete_linked_data_entry(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    committee_session: &CommitteeSession,
+    polling_station_id: PollingStationId,
+    accept_data_entry_deletion: Option<bool>,
+) -> Result<(), APIError> {
+    let ps = polling_station_repo::get(conn, polling_station_id).await?;
+    let Some(data_entry_id) = ps.data_entry_id() else {
+        return Ok(());
+    };
+    let status = data_entry_repo::get_status(conn, data_entry_id).await?;
+    if status != DataEntryStatus::Empty && accept_data_entry_deletion != Some(true) {
+        return Err(APIError::Conflict(
+            "Investigation has data entries or results".into(),
+            ErrorReference::InvestigationHasDataEntryOrResult,
+        ));
+    }
+    delete_data_entry_for_polling_station(
+        conn,
+        audit_service,
+        committee_session,
+        polling_station_id,
+    )
+    .await
+}
+
 /// Reopen a concluded investigation back to InProgress
 ///
-/// Deletes linked data entries if present (requires `accept_data_entry_deletion`).
+/// Deletes linked data entries if present (see [`delete_linked_data_entry`]).
 async fn reopen_investigation(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
@@ -420,23 +452,14 @@ async fn reopen_investigation(
     current: InvestigationStatus,
     request: &PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
-    let ps = polling_station_repo::get(conn, polling_station_id).await?;
-    if ps.data_entry_id().is_some() {
-        if request.accept_data_entry_deletion == Some(true) {
-            delete_data_entry_for_polling_station(
-                conn,
-                audit_service,
-                committee_session,
-                polling_station_id,
-            )
-            .await?;
-        } else {
-            return Err(APIError::Conflict(
-                "Investigation has data entries or results".into(),
-                ErrorReference::InvestigationHasDataEntryOrResult,
-            ));
-        }
-    }
+    delete_linked_data_entry(
+        conn,
+        audit_service,
+        committee_session,
+        polling_station_id,
+        request.accept_data_entry_deletion,
+    )
+    .await?;
     let mut status = current.reopen()?;
     status.update_in_progress(request.reason.clone())?;
     Ok(status)
@@ -451,23 +474,14 @@ async fn switch_to_without_new_results(
     current: InvestigationStatus,
     request: PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
-    let ps = polling_station_repo::get(conn, polling_station_id).await?;
-    if ps.data_entry_id().is_some() {
-        if request.accept_data_entry_deletion == Some(true) {
-            delete_data_entry_for_polling_station(
-                conn,
-                audit_service,
-                committee_session,
-                polling_station_id,
-            )
-            .await?;
-        } else {
-            return Err(APIError::Conflict(
-                "Investigation has data entries or results".into(),
-                ErrorReference::InvestigationHasDataEntryOrResult,
-            ));
-        }
-    }
+    delete_linked_data_entry(
+        conn,
+        audit_service,
+        committee_session,
+        polling_station_id,
+        request.accept_data_entry_deletion,
+    )
+    .await?;
 
     let ps = polling_station_repo::get_next_session(conn, polling_station_id).await?;
     let findings = request.findings.unwrap_or_default();

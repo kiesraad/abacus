@@ -6,7 +6,9 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
+import type { Message } from "@/hooks/messages/MessagesContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import * as useUser from "@/hooks/user/useUser";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
@@ -240,6 +242,29 @@ describe("ElectionStatusPage", () => {
     await user.click(finishButton);
 
     expect(navigate).toHaveBeenCalledWith("../report");
+  });
+
+  test("Success messages auto close", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      hasMessages: vi.fn(),
+      popMessages: vi.fn(() => [{ title: "Invoer stembureau 418 verwijderd" }] as Message[]),
+      pushMessage: vi.fn(),
+    });
+
+    await renderPage(1);
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Invoer stembureau 418 verwijderd");
+
+    vi.advanceTimersByTime(300_000);
+
+    await vi.waitFor(() => {
+      expect(screen.queryAllByRole("alert")).toHaveLength(0);
+    });
+
+    vi.useRealTimers();
   });
 
   test("Finish input alert not visible when data entry has completed for administrator", async () => {

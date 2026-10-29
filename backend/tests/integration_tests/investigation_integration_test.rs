@@ -688,7 +688,9 @@ async fn test_update_creates_data_entry_when_corrected_results_changed_to_true(p
     path = "../../fixtures",
     scripts("election_7_four_sessions", "users")
 )))]
-async fn test_update_deletes_data_entry_when_corrected_results_changed_to_false(pool: SqlitePool) {
+async fn test_update_deletes_empty_data_entry_without_confirmation_when_corrected_results_changed_to_false(
+    pool: SqlitePool,
+) {
     let addr = serve_api(pool).await;
     let election_id = 7;
     let polling_station_id = 741;
@@ -711,31 +713,16 @@ async fn test_update_deletes_data_entry_when_corrected_results_changed_to_false(
         StatusCode::OK
     );
 
-    // Verify data entry exists
+    // Verify empty data entry exists
     let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses[&polling_station_id]["status"], "empty");
 
-    // Update corrected_results to false without accepting deletion — should fail
-    let response = update_investigation(
-        &addr,
-        polling_station_id,
-        Some(serde_json::json!({"reason": "Test reason", "corrected_results": false})),
-    )
-    .await;
-    assert_eq!(response.status(), StatusCode::CONFLICT);
-    let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
-
-    // Data entry still exists
-    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
-    assert_eq!(statuses[&polling_station_id]["status"], "empty");
-
-    // Update corrected_results to false with accepted deletion
+    // Update corrected_results to false without accepting deletion, allowed because nothing was entered
     assert_eq!(
         update_investigation(
             &addr,
             polling_station_id,
-            Some(serde_json::json!({"reason": "Test reason", "corrected_results": false, "accept_data_entry_deletion": true})),
+            Some(serde_json::json!({"reason": "Test reason", "corrected_results": false})),
         )
         .await
         .status(),

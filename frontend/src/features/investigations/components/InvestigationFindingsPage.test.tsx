@@ -48,8 +48,8 @@ async function renderPage(pollingStationId: number) {
 
 // Election status where the data entry of the given polling station has not been started
 function emptyDataEntryStatus(pollingStationId: number): ElectionStatusResponse {
-  const { data_entry_id, source } = electionStatusesMock.find((entry) => entry.source.id === pollingStationId)!;
-  return { statuses: [{ data_entry_id, source, status: "empty" }] };
+  const entry = electionStatusesMock.find((entry) => entry.source.id === pollingStationId)!;
+  return { statuses: [{ ...entry, status: "empty" }] };
 }
 
 describe("InvestigationFindingsPage", () => {

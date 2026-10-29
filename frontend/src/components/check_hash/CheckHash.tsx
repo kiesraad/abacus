@@ -8,13 +8,12 @@ import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import type { RedactedEmlHash } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { formatDateFull } from "@/utils/dateTime";
 import cls from "./CheckHash.module.css";
 import { RedactedHash, type Stub } from "./RedactedHash";
 
 interface CheckHashProps {
-  date: string;
   title: string;
+  subtitle?: string;
   header: string;
   description: ReactNode;
   instructions: string;
@@ -28,8 +27,8 @@ interface CheckHashProps {
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function CheckHash({
-  date,
   title,
+  subtitle,
   header,
   description,
   instructions,
@@ -108,7 +107,7 @@ export function CheckHash({
                 <p>
                   <strong>{title}</strong>
                   <br />
-                  <span className="capitalize-first">{formatDateFull(new Date(date))}</span>
+                  {subtitle && <span className="capitalize-first">{subtitle}</span>}
                 </p>
                 {signatureDescription && (
                   <p>

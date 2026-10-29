@@ -133,6 +133,11 @@ Using a binary:
 abacus --airgap-detection
 ```
 
+When Abacus starts, it logs a warning if an internet connection attempt times out or fails in an unexpected way.
+These warnings alone do not prevent you from using Abacus. Abacus continues checking for internet access while it
+is running, but does not repeat these warnings. In a future version, air gap detection may prevent you from using
+Abacus when these unexpected connection problems occur.
+
 ### TLS (HTTPS)
 
 In production, Abacus must be built with TLS enabled, which makes Abacus serve
@@ -345,4 +350,4 @@ abacus.exe --service --uninstall  Stop and uninstall the service
 
 Any other arguments given to `--service --install` are stored with the service and passed on to the server every time it starts, e.g. `abacus.exe --service --install --port 8443`.
 
-The service runs as `LocalSystem` and runs the server in the service process. The output is written to `abacus.log` next to the executable. If logs exist when the service starts, they will be renamed with a timestamp suffix. If there is a failure, it writes an `abacus.<timestamp>.crash.log` file. 
+The service runs as `LocalService` and starts automatically when Windows starts. It starts the server in the service process with `%ProgramData%\Abacus` as the current directory. The output is written to `abacus.log` inside the logs directory. If a log file exists when the service starts, it will be renamed with a timestamp suffix. If there is a failure, it writes an `abacus.<timestamp>.crash.log` file. 

@@ -454,6 +454,7 @@ mod tests {
                 "election_id": ELECTION_ID,
                 "state": "RegisteringDeceasedCandidates",
             }),
+            None,
         )
         .await;
     }

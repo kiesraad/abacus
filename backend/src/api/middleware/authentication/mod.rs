@@ -5,6 +5,7 @@ pub use role::RouteAuthorization;
 pub mod error;
 mod middleware;
 pub mod password;
+pub mod ratelimit;
 mod role;
 mod session;
 mod session_identifier;
@@ -35,7 +36,7 @@ mod tests {
     use axum::{
         Router,
         body::Body,
-        extract::ConnectInfo,
+        extract::{ConnectInfo, connect_info::MockConnectInfo},
         http::{HeaderValue, Request, StatusCode},
         middleware,
     };
@@ -49,7 +50,7 @@ mod tests {
     use test_log::test;
     use tower::ServiceExt;
 
-    use super::*;
+    use super::{ratelimit::LoginRateLimit, *};
     use crate::{
         AppState, ErrorResponse,
         api::{authentication::*, middleware::airgap::AirgapDetection, user::*},
@@ -71,6 +72,7 @@ mod tests {
             pool: pool.clone(),
             airgap_detection: AirgapDetection::nop(),
             backup_config: BackupConfig::new(backup_dir.path().to_path_buf()),
+            login_ratelimit: LoginRateLimit::with_interval(std::time::Duration::ZERO),
         };
 
         Router::from(router())
@@ -84,6 +86,10 @@ mod tests {
                 inject_user,
             ))
             .with_state(state)
+            .layer(MockConnectInfo(SocketAddr::from((
+                [0, 0, 0, 0],
+                TEST_EPHEMERAL_PORT,
+            ))))
     }
 
     async fn login_as_admin(app: Router) -> HeaderValue {
@@ -550,9 +556,13 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user_repo::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
-            .await
-            .unwrap();
+        user_repo::set_temporary_password(
+            &mut conn,
+            UserId::from(1),
+            &password::hash_test_password("Admin1Password01").await,
+        )
+        .await
+        .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -613,9 +623,13 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user_repo::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
-            .await
-            .unwrap();
+        user_repo::set_temporary_password(
+            &mut conn,
+            UserId::from(1),
+            &password::hash_test_password("Admin1Password01").await,
+        )
+        .await
+        .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -651,9 +665,13 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user_repo::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
-            .await
-            .unwrap();
+        user_repo::set_temporary_password(
+            &mut conn,
+            UserId::from(1),
+            &password::hash_test_password("Admin1Password01").await,
+        )
+        .await
+        .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 

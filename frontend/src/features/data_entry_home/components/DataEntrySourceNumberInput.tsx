@@ -136,7 +136,7 @@ export function DataEntrySourceNumberInput({
         }}
         onKeyDown={(e) => {
           refetch();
-          if (e.shiftKey && e.key === "Enter") {
+          if (e.key === "Enter") {
             handleSubmit();
           }
         }}

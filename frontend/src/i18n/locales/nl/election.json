@@ -1,6 +1,4 @@
 {
-  "add": "Toevoegen: {name}",
-  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresultaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van het centraal stembureau)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente (voor GSB)</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
   "abort": {
     "action": "Afbreken",
     "description": "<p>De verkiezing wordt pas opgeslagen als je alle stappen doorlopen hebt. Weet je zeker dat je het aanmaken van de verkiezing wilt afbreken?</p>",
@@ -8,21 +6,23 @@
     "keep_input": "Annuleren",
     "title": "Niet opgeslagen wijzigingen"
   },
+  "add": "Toevoegen: {name}",
+  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresultaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van het centraal stembureau)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente (voor GSB)</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
+  "all_districts": "Alle kieskringen",
   "check_and_save": {
     "description": "Je gaat de volgende verkiezing toevoegen:",
     "title": "Controleren en opslaan"
   },
   "check_eml": {
-    "candidates_description": "Het bestand <file>filename</file> bevat de volgende kandidaten:",
+    "candidates_description": "Het bestand <file>filename</file> bevat de kandidaten voor onderstaand kiesgebied:",
     "candidates_title": "Controleer kandidatenlijsten",
-    "check_hash_instructions": "Vul ter controle de afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
+    "check_hash_instructions": "Controleer de volledige digitale vingerafdruk met de code die je van het centraal stembureau hebt ontvangen. Vul ter controle de twee afgeschermde delen hieronder in. Ga alleen verder als alle delen overeenkomen.",
     "election_description": "Het bestand <file>filename</file> bevat de instellingen voor de volgende verkiezing:",
     "election_title": "Controleer verkiezingsdefinitie",
     "error": {
       "description": "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
       "title": "Onjuiste vingerafdruk"
     },
-    "list_name": "{location}, kandidatenlijsten {name}",
     "polling_station_title": "Controleer stembureaus"
   },
   "committee_category": {
@@ -32,6 +32,7 @@
   },
   "configuration_not_finished": "De configuratie van Abacus is nog niet afgerond.",
   "create": "Verkiezing toevoegen",
+  "district": "Kieskring",
   "election_category": {
     "title": "Type verkiezing"
   },

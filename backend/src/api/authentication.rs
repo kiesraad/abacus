@@ -1,7 +1,7 @@
-use std::net::{IpAddr, Ipv4Addr};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use axum::{
-    extract::State,
+    extract::{ConnectInfo, State},
     response::{AppendHeaders, IntoResponse, Json},
 };
 use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
@@ -14,9 +14,14 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::middleware::authentication::{
-        RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
-        error::AuthenticationError,
+    api::{
+        middleware::authentication::{
+            RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+            error::AuthenticationError,
+            password::{ValidatedPassword, hash_password},
+            ratelimit::LoginRateLimit,
+        },
+        user::ValidateUserRequest,
     },
     domain::role::Role,
     error::ErrorReference,
@@ -182,11 +187,18 @@ pub(crate) fn set_default_cookie_properties(cookie: &mut Cookie) {
         (status = 200, description = "The logged in user id and user name", body = LoginResponse),
         (status = 401, description = "Invalid credentials", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
+        (
+            status = 429,
+            description = "Too many login attempts from this source IP, try again later",
+            body = ErrorResponse,
+        ),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 async fn login(
     State(pool): State<SqlitePool>,
+    State(login_ratelimit): State<LoginRateLimit>,
+    ConnectInfo(peer): ConnectInfo<SocketAddr>,
     jar: CookieJar,
     audit_service: AuditService,
     user_agent: Option<TypedHeader<UserAgent>>,
@@ -194,6 +206,12 @@ async fn login(
 ) -> Result<impl IntoResponse, APIError> {
     let Credentials { username, password } = credentials;
     let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
+
+    // Rate limit on the peer IP only, before looking up the account or verifying the password
+    let source = peer.ip().to_canonical();
+    if !login_ratelimit.admit(source) {
+        return Err(AuthenticationError::LoginRateLimited.into());
+    }
 
     // Check the username + password combination, do not leak information about usernames etc.
     // Log when the attempt fails
@@ -251,6 +269,8 @@ async fn login(
 
     tx.commit().await?;
 
+    login_ratelimit.clear(source);
+
     // Add the session cookie to the response
     let mut cookie = session.get_cookie();
     set_default_cookie_properties(&mut cookie);
@@ -274,6 +294,16 @@ pub struct AccountUpdateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub fullname: Option<String>,
+}
+
+impl ValidateUserRequest for AccountUpdateRequest {
+    fn username(&self) -> Option<&str> {
+        None
+    }
+
+    fn fullname(&self) -> Option<&str> {
+        self.fullname.as_deref()
+    }
 }
 
 /// Get current logged-in user endpoint
@@ -300,6 +330,7 @@ async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   responses(
       (status = 200, description = "The logged in user", body = LoginResponse),
       (status = 400, description = "Bad request", body = ErrorResponse),
+      (status = 422, description = "Invalid fullname", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
@@ -309,14 +340,27 @@ async fn account_update(
     audit_service: AuditService,
     Json(account): Json<AccountUpdateRequest>,
 ) -> Result<impl IntoResponse, APIError> {
-    let mut tx = pool.begin_immediate().await?;
-
     if user.username() != account.username {
         return Err(AuthenticationError::UserNotFound.into());
     }
 
+    account.validate()?;
+
+    // Hash before transaction to prevent write lock
+    let password_hash = hash_password(
+        &ValidatedPassword::new(
+            user.username(),
+            &account.password,
+            Some(user.password_hash()),
+        )
+        .await?,
+    )
+    .await?;
+
+    let mut tx = pool.begin_immediate().await?;
+
     // Update the password
-    user_repo::update_password(&mut tx, user.id(), &account.username, &account.password).await?;
+    user_repo::update_password(&mut tx, user.id(), &password_hash).await?;
 
     // Update the fullname
     if let Some(fullname) = account.fullname {
@@ -369,6 +413,16 @@ pub struct CreateFirstAdminRequest {
     pub temp_password: String,
 }
 
+impl ValidateUserRequest for CreateFirstAdminRequest {
+    fn username(&self) -> Option<&str> {
+        Some(&self.username)
+    }
+
+    fn fullname(&self) -> Option<&str> {
+        Some(&self.fullname)
+    }
+}
+
 /// Create the first admin user, only allowed if no users exist yet
 #[utoipa::path(
     post,
@@ -377,6 +431,7 @@ pub struct CreateFirstAdminRequest {
     responses(
         (status = 201, description = "First admin user created", body = User),
         (status = 403, description = "Forbidden, an active user already exists", body = ErrorResponse),
+        (status = 422, description = "Invalid username or fullname", body = ErrorResponse),
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -386,11 +441,28 @@ async fn create_first_admin(
     audit_service: AuditService,
     Json(admin_request): Json<CreateFirstAdminRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
+    let mut conn = pool.acquire().await?;
+    let initialised = user_repo::has_active_users(&mut conn).await?;
+    drop(conn);
+    if initialised {
+        return Err(AuthenticationError::AlreadyInitialised.into());
+    }
+
+    // Hash before transaction to prevent write lock
+    let password_hash = hash_password(
+        &ValidatedPassword::new(&admin_request.username, &admin_request.temp_password, None)
+            .await?,
+    )
+    .await?;
+
     let mut tx = pool.begin_immediate().await?;
 
+    // Check again, a user may have become active while hashing
     if user_repo::has_active_users(&mut tx).await? {
         return Err(AuthenticationError::AlreadyInitialised.into());
     }
+
+    admin_request.validate()?;
 
     // Delete any existing admin user
     let users = user_repo::list(&mut tx, None).await?;
@@ -409,7 +481,7 @@ async fn create_first_admin(
         &mut tx,
         &admin_request.username,
         Some(&admin_request.fullname),
-        &admin_request.temp_password,
+        &password_hash,
         false,
         Role::Administrator,
     )
@@ -516,10 +588,14 @@ async fn logout(
 
 #[cfg(test)]
 mod tests {
+    use http_body_util::BodyExt;
     use test_log::test;
 
     use super::*;
-    use crate::repository::user_repo::update_last_activity_at;
+    use crate::{
+        api::middleware::authentication::password::hash_test_password,
+        repository::user_repo::update_last_activity_at,
+    };
 
     #[test(tokio::test)]
     async fn test_set_default_cookie_properties() {
@@ -551,7 +627,7 @@ mod tests {
             &mut conn,
             "admin",
             Some("Admin User"),
-            "admin_password",
+            &hash_test_password("admin_password").await,
             false,
             Role::Administrator,
         )
@@ -625,6 +701,30 @@ mod tests {
     }
 
     #[test(sqlx::test)]
+    async fn test_create_first_admin_fullname_invalid(pool: SqlitePool) {
+        let admin_request = CreateFirstAdminRequest {
+            username: "admin".to_string(),
+            fullname: "Admin\tUser".to_string(),
+            temp_password: "admin_password".to_string(),
+        };
+
+        let response = create_first_admin(
+            State(pool.clone()),
+            AuditService::new(None, None),
+            Json(admin_request),
+        )
+        .await
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::InvalidFullname);
+        assert_eq!(result.error, "Invalid character");
+    }
+
+    #[test(sqlx::test)]
     async fn test_admin_exists(pool: SqlitePool) {
         // No admin user exists yet
         let response = admin_exists(State(pool.clone())).await;
@@ -650,5 +750,36 @@ mod tests {
 
         let response = admin_exists(State(pool.clone())).await;
         assert_eq!(response.unwrap(), StatusCode::NO_CONTENT);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_account_update_fullname_invalid(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let user = user_repo::get_by_username(&mut conn, "typist1")
+            .await
+            .unwrap()
+            .unwrap();
+
+        let request = AccountUpdateRequest {
+            username: user.username().to_string(),
+            password: "".to_string(),
+            fullname: Some("Invalid\tFullname".to_string()),
+        };
+
+        let response = account_update(
+            user,
+            State(pool.clone()),
+            AuditService::new(None, None),
+            Json(request),
+        )
+        .await
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::InvalidFullname);
+        assert_eq!(result.error, "Invalid character");
     }
 }

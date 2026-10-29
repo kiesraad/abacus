@@ -315,10 +315,11 @@ describe("InvestigationsOverviewPage", () => {
 
     const editLinks = await screen.findAllByRole("link", { name: "Bewerken" });
 
-    expect(editLinks[0]).toHaveAttribute("href", "/elections/1/investigations/1/findings");
-    expect(editLinks[1]).toHaveAttribute("href", "/elections/1/investigations/4/findings");
-    expect(editLinks[2]).toHaveAttribute("href", "/elections/1/investigations/2/findings");
-    expect(editLinks[3]).toHaveAttribute("href", "/elections/1/investigations/8/findings");
+    expect(editLinks[0]).toHaveAttribute("href", "/elections/1/investigations/3/reason");
+    expect(editLinks[1]).toHaveAttribute("href", "/elections/1/investigations/1/findings");
+    expect(editLinks[2]).toHaveAttribute("href", "/elections/1/investigations/4/findings");
+    expect(editLinks[3]).toHaveAttribute("href", "/elections/1/investigations/2/findings");
+    expect(editLinks[4]).toHaveAttribute("href", "/elections/1/investigations/8/findings");
   });
 
   test("Does not show add and edit links to administrator", async () => {

@@ -1280,6 +1280,8 @@ export interface ElectionStatusResponseEntry {
   source: DataEntrySource;
   /** Data entry status */
   status: DataEntryStatusName;
+  /** Time when the data entry was last updated */
+  updated_at: string;
 }
 
 /**
@@ -1400,6 +1402,7 @@ export const errorReferenceValues = [
   "DataEntryGetNotAllowed",
   "DataEntryNotAllowed",
   "DataEntryValidationErrors",
+  "ElectionMismatch",
   "EmlImportError",
   "EmlError",
   "EntryNotFound",
@@ -1412,6 +1415,7 @@ export const errorReferenceValues = [
   "InvalidCountType",
   "InvalidData",
   "InvalidDistrict",
+  "InvalidFullname",
   "InvalidHash",
   "InvalidJson",
   "InvalidPassword",
@@ -1419,11 +1423,13 @@ export const errorReferenceValues = [
   "InvalidDataEntrySource",
   "InvalidSession",
   "InvalidStateTransition",
+  "InvalidUsername",
   "InvalidUsernameOrPassword",
   "InvalidVoteCandidate",
   "InvalidVoteGroup",
   "InvestigationHasDataEntryOrResult",
   "InvestigationRequiresCorrectedResults",
+  "LoginRateLimited",
   "NotInitialised",
   "OwnAccountCannotBeDeleted",
   "PasswordRejectionSameAsOld",
@@ -1895,15 +1901,16 @@ export interface PollingStationRequest {
   postal_code: string;
 }
 
-export interface PollingStationRequestListResponse {
-  polling_stations: PollingStationRequest[];
-}
-
 /**
  * Type of Polling station
  */
 export const pollingStationTypeValues = ["FixedLocation", "Special", "Mobile"] as const;
 export type PollingStationType = (typeof pollingStationTypeValues)[number];
+
+export interface PollingStationValidateImportResponse {
+  polling_station_definition_matches_election: boolean;
+  polling_stations: PollingStationRequest[];
+}
 
 export interface PollingStationsRequest {
   file_name: string;

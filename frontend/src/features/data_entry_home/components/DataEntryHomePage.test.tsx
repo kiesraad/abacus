@@ -29,7 +29,6 @@ import {
   type ElectionDetailsResponse,
   type ElectionStatusResponse,
 } from "@/types/generated/openapi";
-import { sortList } from "@/utils/sorting";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
 async function renderDataEntryHomePage(
@@ -50,7 +49,7 @@ async function renderDataEntryHomePage(
 
   const refetch = vi.fn();
   vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({
-    statuses: sortList(statuses, (item) => item.source),
+    statuses: statuses,
     refetch,
   });
 
@@ -97,7 +96,7 @@ describe("DataEntryHomePage", () => {
   test.each(committeeCategoryValues)("Messages are shown (%s)", async (cat: CommitteeCategory) => {
     vi.spyOn(useMessages, "useMessages").mockReturnValue({
       hasMessages: vi.fn(),
-      popMessages: vi.fn(() => [{ title: "Let op: fouten in het proces-verbaal" }] as Message[]),
+      popMessages: vi.fn(() => [{ type: "notify", title: "Let op: fouten in het proces-verbaal" }] as Message[]),
       pushMessage: vi.fn(),
     });
 
@@ -105,6 +104,28 @@ describe("DataEntryHomePage", () => {
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Let op: fouten in het proces-verbaal");
+  });
+
+  test.each(committeeCategoryValues)("Success messages auto close (%s)", async (cat: CommitteeCategory) => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      hasMessages: vi.fn(),
+      popMessages: vi.fn(() => [{ title: "Eerste invoer is opgeslagen" }] as Message[]),
+      pushMessage: vi.fn(),
+    });
+
+    await renderDataEntryHomePage(cat);
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Eerste invoer is opgeslagen");
+
+    vi.advanceTimersByTime(300_000);
+
+    await vi.waitFor(() => {
+      expect(screen.queryAllByRole("alert")).toHaveLength(0);
+    });
+
+    vi.useRealTimers();
   });
 
   test.each(committeeCategoryValues)("Show different title for next entry (%s)", async (cat: CommitteeCategory) => {

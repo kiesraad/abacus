@@ -1,7 +1,7 @@
 {
   "add_all": {
-    "title": "Voeg de publieke sleutels van alle GSB's in de kieskring toe",
-    "description": "Voeg de publieke sleutels van onderstaande GSB's toe. Deze staan op het overdrachtsplatform van de Kiesraad. Met de publieke sleutel kan Abacus controleren dat telbestanden echt van de betreffende GSB's komen en niet zijn gewijzigd."
+    "title": "Voeg de publieke sleutels van onderstaande GSB's toe",
+    "description": "De publieke sleutels staan op het overdrachtsplatform van de Kiesraad. Met de publieke sleutel kan Abacus controleren dat telbestanden echt van de betreffende GSB's komen en niet zijn gewijzigd."
   },
   "delete_are_you_sure": "Weet je zeker dat je deze sleutel wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
   "delete_key": "Verwijder sleutel",

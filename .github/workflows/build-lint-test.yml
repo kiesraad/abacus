@@ -66,7 +66,7 @@ jobs:
           rustup toolchain install &&
           rustup target add x86_64-unknown-linux-musl
       - name: Cargo cache
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: "backend -> target"
       - name: Build
@@ -93,12 +93,12 @@ jobs:
       - name: Setup Rust
         run: rustup toolchain install
       - name: Cargo cache
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@8a2045612414e945291083f820cd50b4d8fc2218 # main
+        uses: cargo-bins/cargo-binstall@81df5c23b0dc775b009efdfc9895c5965b7a4e40 # main
       - name: Create empty frontend build dir for memory-serve
         run: mkdir -p dist dist-storybook
         working-directory: ./frontend
@@ -139,7 +139,7 @@ jobs:
       - name: Setup Rust
         run: rustup toolchain install
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@8a2045612414e945291083f820cd50b4d8fc2218 # main
+        uses: cargo-bins/cargo-binstall@81df5c23b0dc775b009efdfc9895c5965b7a4e40 # main
       - name: Install cargo-deny
         run: cargo binstall --no-confirm cargo-deny
       # Advisories are checked in the scheduled cargo-deny.yml workflow, so that
@@ -272,7 +272,7 @@ jobs:
         working-directory: ./backend/fuzz
         run: rustup toolchain install
       - name: Cargo cache
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: |
             backend/fuzz -> target

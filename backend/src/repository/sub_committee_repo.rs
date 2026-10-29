@@ -159,7 +159,8 @@ pub async fn list_first_session_with_status(
             sc.authority_id,
             sc.authority_name,
             sc.certificates,
-            de.state AS "state!: Json<DataEntryStatus>"
+            de.state AS "state!: Json<DataEntryStatus>",
+            de.updated_at
         FROM sub_committees AS sc
         JOIN data_entries AS de ON de.id = sc.data_entry_id
         WHERE sc.committee_session_id = $1
@@ -178,6 +179,7 @@ pub async fn list_first_session_with_status(
             authority_name: row.authority_name,
         }),
         status: row.state.0,
+        updated_at: row.updated_at,
     })
     .fetch_all(conn)
     .await

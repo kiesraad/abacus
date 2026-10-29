@@ -5,9 +5,11 @@ import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import type { CommitteeSession, Election, ElectionStatusResponseEntry } from "@/types/generated/openapi";
-
+import { sortList } from "@/utils/sorting";
 import {
   categoryColorClass,
+  type StatusCategory,
+  type StatusEntryWithTypist,
   statusCategories,
   statusesForCategory,
   useElectionStatus,
@@ -16,6 +18,34 @@ import { CategoryHeader } from "./CategoryHeader";
 import { CategoryRow } from "./CategoryRow";
 import { DataEntryImportButton } from "./DataEntryImportButton";
 import cls from "./ElectionStatus.module.css";
+
+function sortTableRows(cat: StatusCategory, list: StatusEntryWithTypist[]) {
+  switch (cat) {
+    case "errors_and_warnings":
+      // Sort on updated_at ascending
+      return list.sort((a, b) => a.entry.updated_at.localeCompare(b.entry.updated_at));
+    case "first_entry_finished":
+      // Sort on finished_at ascending
+      return list.sort((a, b) => {
+        if (!a.entry.finished_at) return 1;
+        if (!b.entry.finished_at) return -1;
+
+        return a.entry.finished_at.localeCompare(b.entry.finished_at);
+      });
+    case "not_started":
+    case "in_progress":
+      // Sort on polling station number or subcommittee name ascending
+      return sortList(list, (item) => item.entry.source);
+    case "definitive":
+      // Sort on finished_at descending
+      return list.sort((a, b) => {
+        if (!a.entry.finished_at) return 1;
+        if (!b.entry.finished_at) return -1;
+
+        return b.entry.finished_at.localeCompare(a.entry.finished_at);
+      });
+  }
+}
 
 export interface ElectionStatusProps {
   statuses: ElectionStatusResponseEntry[];
@@ -99,17 +129,18 @@ export function ElectionStatus({ statuses, election, committeeSession, addLinks,
                 <Table id={cat} key={cat} aria-label={t(`status.${cat}`)}>
                   <CategoryHeader category={cat} />
                   <Table.Body key={cat} className="fs-sm">
-                    {statusEntriesWithTypist
-                      .filter((se) => statusesForCategory[cat].includes(se.entry.status))
-                      .map((se) => (
-                        <CategoryRow
-                          key={`${cat}-${se.entry.source.type}-${se.entry.source.id}`}
-                          category={cat}
-                          statusEntryWithTypist={se}
-                          addLink={addLinks}
-                          warning={se.entry.finalised_with_warnings}
-                        />
-                      ))}
+                    {sortTableRows(
+                      cat,
+                      statusEntriesWithTypist.filter((se) => statusesForCategory[cat].includes(se.entry.status)),
+                    ).map((se) => (
+                      <CategoryRow
+                        key={`${cat}-${se.entry.source.type}-${se.entry.source.id}`}
+                        category={cat}
+                        statusEntryWithTypist={se}
+                        addLink={addLinks}
+                        warning={se.entry.finalised_with_warnings}
+                      />
+                    ))}
                   </Table.Body>
                 </Table>
               </div>

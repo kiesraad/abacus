@@ -1,7 +1,11 @@
 import type { ElectionStatusResponse, ElectionStatusResponseEntry } from "@/types/generated/openapi";
 
 const today = new Date();
-today.setHours(10, 20);
+today.setHours(9, 20);
+const earlier = new Date(today);
+earlier.setHours(today.getHours(), today.getMinutes() - 10);
+const later = new Date(today);
+later.setHours(today.getHours(), today.getMinutes() + 10);
 
 export const electionStatusesMock: ElectionStatusResponseEntry[] = [
   {
@@ -19,6 +23,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "empty",
+    updated_at: today.toISOString(),
   },
   {
     data_entry_id: 2,
@@ -35,6 +40,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "definitive",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Typist", user_id: 2 },
     second_entry_user_id: 1,
     finished_at: today.toISOString(),
@@ -55,6 +61,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "entries_different",
+    updated_at: later.toISOString(),
     first_entry_origin: { type: "Typist", user_id: 1 },
     second_entry_user_id: 2,
   },
@@ -73,6 +80,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "second_entry_in_progress",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Typist", user_id: 1 },
     second_entry_user_id: 2,
     data_entry_progress: 20,
@@ -92,6 +100,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "first_entry_has_errors",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Typist", user_id: 1 },
   },
   {
@@ -109,6 +118,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "first_entry_in_progress",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Typist", user_id: 2 },
     data_entry_progress: 60,
   },
@@ -127,8 +137,9 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "first_entry_finalised",
+    updated_at: later.toISOString(),
     first_entry_origin: { type: "Typist", user_id: 1 },
-    finished_at: today.toISOString(),
+    finished_at: later.toISOString(),
     finalised_with_warnings: false,
   },
   {
@@ -146,9 +157,168 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
       locality: "Teststad",
     },
     status: "first_entry_finalised",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Typist", user_id: 2 },
     finished_at: today.toISOString(),
     finalised_with_warnings: true,
+  },
+];
+
+export const extendedElectionStatusesMock: ElectionStatusResponseEntry[] = [
+  {
+    data_entry_id: 0,
+    source: {
+      type: "PollingStation",
+      id: 0,
+      number: 100,
+      name: "Het Stemgebouw",
+      session_type: "First",
+      committee_session_id: 1,
+      data_entry_id: 1,
+      address: "Kerkstraat 1",
+      postal_code: "1234 AB",
+      locality: "Teststad",
+    },
+    status: "empty",
+    updated_at: later.toISOString(),
+  },
+  ...electionStatusesMock,
+  {
+    data_entry_id: 9,
+    source: {
+      type: "PollingStation",
+      id: 9,
+      number: 41,
+      name: "Test hogeschool",
+      session_type: "First",
+      committee_session_id: 1,
+      data_entry_id: 1,
+      address: "Kerkstraat 1",
+      postal_code: "1234 AB",
+      locality: "Teststad",
+    },
+    status: "entries_different",
+    updated_at: earlier.toISOString(),
+    first_entry_origin: { type: "Import" },
+    second_entry_user_id: 1,
+  },
+  {
+    data_entry_id: 10,
+    source: {
+      type: "PollingStation",
+      id: 10,
+      number: 42,
+      name: "Test community center",
+      session_type: "First",
+      committee_session_id: 1,
+      data_entry_id: 1,
+      address: "Kerkstraat 1",
+      postal_code: "1234 AB",
+      locality: "Teststad",
+    },
+    status: "first_entry_finalised",
+    updated_at: earlier.toISOString(),
+    first_entry_origin: { type: "Import" },
+    finished_at: earlier.toISOString(),
+    finalised_with_warnings: true,
+  },
+  {
+    data_entry_id: 11,
+    source: {
+      type: "PollingStation",
+      id: 11,
+      number: 43,
+      name: "Het Stemhuis",
+      session_type: "First",
+      committee_session_id: 1,
+      data_entry_id: 1,
+      address: "Kerkstraat 1",
+      postal_code: "1234 AB",
+      locality: "Teststad",
+    },
+    status: "empty",
+    updated_at: earlier.toISOString(),
+  },
+  {
+    data_entry_id: 12,
+    source: {
+      type: "PollingStation",
+      id: 12,
+      number: 44,
+      name: "Testbioscoop",
+      session_type: "First",
+      committee_session_id: 1,
+      data_entry_id: 1,
+      address: "Kerkstraat 1",
+      postal_code: "1234 AB",
+      locality: "Teststad",
+    },
+    status: "definitive",
+    updated_at: later.toISOString(),
+    first_entry_origin: { type: "Import" },
+    second_entry_user_id: 1,
+    finished_at: later.toISOString(),
+    finalised_with_warnings: false,
+  },
+  {
+    data_entry_id: 13,
+    source: {
+      type: "PollingStation",
+      id: 13,
+      number: 20,
+      name: "Teststation",
+      session_type: "First",
+      committee_session_id: 1,
+      data_entry_id: 1,
+      address: "Kerkstraat 1",
+      postal_code: "1234 AB",
+      locality: "Teststad",
+    },
+    status: "first_entry_in_progress",
+    updated_at: earlier.toISOString(),
+    first_entry_origin: { type: "Typist", user_id: 1 },
+    data_entry_progress: 35,
+  },
+  {
+    data_entry_id: 14,
+    source: {
+      type: "PollingStation",
+      id: 14,
+      number: 5,
+      name: "Het Stemstation",
+      session_type: "First",
+      committee_session_id: 1,
+      data_entry_id: 1,
+      address: "Kerkstraat 1",
+      postal_code: "1234 AB",
+      locality: "Teststad",
+    },
+    status: "definitive",
+    updated_at: earlier.toISOString(),
+    first_entry_origin: { type: "Import" },
+    second_entry_user_id: 2,
+    finished_at: earlier.toISOString(),
+    finalised_with_warnings: false,
+  },
+  {
+    data_entry_id: 15,
+    source: {
+      type: "PollingStation",
+      id: 15,
+      number: 10,
+      name: "Buurthuis de Stem",
+      session_type: "First",
+      committee_session_id: 1,
+      data_entry_id: 1,
+      address: "Kerkstraat 1",
+      postal_code: "1234 AB",
+      locality: "Teststad",
+    },
+    status: "second_entry_in_progress",
+    updated_at: later.toISOString(),
+    first_entry_origin: { type: "Import" },
+    second_entry_user_id: 1,
+    data_entry_progress: 85,
   },
 ];
 
@@ -166,6 +336,7 @@ export const electionStatusesCSBMock: ElectionStatusResponseEntry[] = [
       authority_name: "Juinen",
     },
     status: "empty",
+    updated_at: today.toISOString(),
   },
   {
     data_entry_id: 1204,
@@ -180,6 +351,7 @@ export const electionStatusesCSBMock: ElectionStatusResponseEntry[] = [
       authority_name: "'s-Gravenveen",
     },
     status: "empty",
+    updated_at: earlier.toISOString(),
   },
   {
     data_entry_id: 1205,
@@ -194,6 +366,7 @@ export const electionStatusesCSBMock: ElectionStatusResponseEntry[] = [
       authority_name: "Eksterlo",
     },
     status: "empty",
+    updated_at: later.toISOString(),
   },
   {
     data_entry_id: 1206,
@@ -208,6 +381,7 @@ export const electionStatusesCSBMock: ElectionStatusResponseEntry[] = [
       authority_name: "Hovenerwoud",
     },
     status: "empty",
+    updated_at: today.toISOString(),
   },
   {
     data_entry_id: 1207,
@@ -222,6 +396,7 @@ export const electionStatusesCSBMock: ElectionStatusResponseEntry[] = [
       authority_name: "Bloemstede",
     },
     status: "empty",
+    updated_at: today.toISOString(),
   },
   {
     data_entry_id: 1208,
@@ -236,6 +411,7 @@ export const electionStatusesCSBMock: ElectionStatusResponseEntry[] = [
       authority_name: "Eemstricht",
     },
     status: "first_entry_finalised",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Import" },
     finished_at: today.toISOString(),
     finalised_with_warnings: false,
@@ -253,10 +429,69 @@ export const electionStatusesCSBMock: ElectionStatusResponseEntry[] = [
       authority_name: "Hoek van Zoom",
     },
     status: "second_entry_in_progress",
+    updated_at: today.toISOString(),
     first_entry_origin: { type: "Import" },
     second_entry_user_id: 2,
     data_entry_progress: 20,
   },
+];
+
+export const extendedElectionStatusesCSBMock: ElectionStatusResponseEntry[] = [
+  {
+    data_entry_id: 1200,
+    source: {
+      type: "SubCommittee",
+      committee_session_id: 802,
+      id: 809,
+      number: 8,
+      name: "Zaandorp",
+      data_entry_id: 1209,
+      authority_id: "0008",
+      authority_name: "Zaandorp",
+    },
+    status: "second_entry_in_progress",
+    updated_at: earlier.toISOString(),
+    first_entry_origin: { type: "Import" },
+    second_entry_user_id: 1,
+    data_entry_progress: 45,
+  },
+  {
+    data_entry_id: 1201,
+    source: {
+      type: "SubCommittee",
+      committee_session_id: 802,
+      id: 810,
+      number: 9,
+      name: "Bovendorp",
+      data_entry_id: 1209,
+      authority_id: "0009",
+      authority_name: "Bovendorp",
+    },
+    status: "first_entry_in_progress",
+    updated_at: earlier.toISOString(),
+    first_entry_origin: { type: "Import" },
+    second_entry_user_id: 2,
+    data_entry_progress: 65,
+  },
+  {
+    data_entry_id: 1202,
+    source: {
+      type: "SubCommittee",
+      committee_session_id: 802,
+      id: 811,
+      number: 10,
+      name: "Aardenveld",
+      data_entry_id: 1209,
+      authority_id: "0010",
+      authority_name: "Aardenveld",
+    },
+    status: "first_entry_in_progress",
+    updated_at: later.toISOString(),
+    first_entry_origin: { type: "Typist", user_id: 1 },
+    second_entry_user_id: 2,
+    data_entry_progress: 95,
+  },
+  ...electionStatusesCSBMock,
 ];
 
 /**
@@ -267,10 +502,11 @@ export const getElectionStatusMockData = (
   statuses: (Partial<ElectionStatusResponseEntry> & { status: ElectionStatusResponseEntry["status"] })[],
 ): ElectionStatusResponse => ({
   statuses: statuses.map((status, i) => {
-    const { data_entry_id, source } = electionStatusesMock[i]!;
+    const { data_entry_id, source, updated_at } = electionStatusesMock[i]!;
     return {
       data_entry_id,
       source,
+      updated_at,
       ...status,
     };
   }),

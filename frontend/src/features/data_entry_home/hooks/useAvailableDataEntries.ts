@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useUser } from "@/hooks/user/useUser";
+import type { ElectionStatusResponseEntry } from "@/types/generated/openapi";
+import { sortList } from "@/utils/sorting";
 import { type DataEntryStatusWithUserStatus, DataEntryUserStatus, getDataEntryWithStatusList } from "../utils/util";
 
 const NOT_AVAILABLE_STATUSES: DataEntryUserStatus[] = [
@@ -15,15 +16,17 @@ export interface UseAvailableDataEntries {
   inProgressCurrentUser: DataEntryStatusWithUserStatus[];
 }
 
-export function useAvailableDataEntries(): UseAvailableDataEntries {
+export function useAvailableDataEntries(statuses: ElectionStatusResponseEntry[]): UseAvailableDataEntries {
   const user = useUser();
-  const { statuses } = useElectionStatus();
 
   return useMemo(() => {
     const dataEntryWithStatus = getDataEntryWithStatusList({ statuses, user });
 
     const available = dataEntryWithStatus.filter((dataEntry) => !NOT_AVAILABLE_STATUSES.includes(dataEntry.userStatus));
-    const availableCurrentUser = available.filter(
+    const sortedAvailable = sortList(available, (item) => {
+      return item.statusEntry.source;
+    });
+    const availableCurrentUser = sortedAvailable.filter(
       (dataEntry) => dataEntry.userStatus !== DataEntryUserStatus.InProgressOtherUser,
     );
     const inProgressCurrentUser = availableCurrentUser.filter(

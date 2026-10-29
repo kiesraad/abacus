@@ -47,6 +47,7 @@ fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResp
         data_entry_id: entry.data_entry_id,
         source: entry.source,
         status: status.status_name(),
+        updated_at: entry.updated_at,
         first_entry_origin: status.get_first_entry_origin(),
         second_entry_user_id: status.get_second_entry_user_id(),
         data_entry_progress: status.get_data_entry_progress(),

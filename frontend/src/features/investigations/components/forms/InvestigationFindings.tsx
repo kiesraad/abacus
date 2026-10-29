@@ -12,6 +12,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
+import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import type {
@@ -34,6 +35,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
   const navigate = useNavigate();
   const { popMessages, pushMessage } = useMessages();
   const { currentCommitteeSession, election, investigation, pollingStation, refetch } = useElection(pollingStationId);
+  const { statuses } = useElectionStatus();
   const updatePath = `/api/polling_stations/${pollingStationId}/investigation`;
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
   const { update, create: conclude } = useCrud<PollingStationInvestigation>({
@@ -56,6 +58,10 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
   }
 
   const requiresCorrectedResults = !pollingStation.prev_data_entry_id;
+  const status = statuses.find(
+    (status) => status.source.type === "PollingStation" && status.source.id === pollingStationId,
+  );
+  const hasDataEntry = status !== undefined && status.status !== "empty";
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
@@ -117,7 +123,8 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
       // Reuse the message from creating this investigation or editing its reason, if there is one
       const message =
         popMessages().pop() ?? getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status);
-      pushMessage(correctedResults ? withCorrigendumInstruction(message) : message);
+      // Only instruct to enter the corrigendum when that hasn't been started yet
+      pushMessage(correctedResults && !hasDataEntry ? withCorrigendumInstruction(message) : message);
 
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);

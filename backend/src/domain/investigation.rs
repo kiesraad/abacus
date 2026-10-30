@@ -341,6 +341,47 @@ mod tests {
     }
 
     #[test]
+    fn test_from_state_and_data_entry_id() {
+        let de_id = DataEntryId::from(9901);
+        let cases = [
+            (
+                Some(concluded_with(DataEntryId::default())),
+                Some(de_id),
+                Some(concluded_with(de_id)),
+            ),
+            (Some(in_progress()), None, Some(in_progress())),
+            (Some(concluded_without()), None, Some(concluded_without())),
+            (None, None, None),
+        ];
+        for (state, data_entry_id, expected) in cases {
+            assert_eq!(
+                InvestigationStatus::from_state_and_data_entry_id(state, data_entry_id),
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn test_from_state_and_data_entry_id_invalid() {
+        let de_id = DataEntryId::from(9901);
+        let cases = [
+            (None, Some(de_id)),
+            (Some(in_progress()), Some(de_id)),
+            (Some(concluded_without()), Some(de_id)),
+            (Some(concluded_with(DataEntryId::default())), None),
+        ];
+        for (state, data_entry_id) in cases {
+            let result = std::panic::catch_unwind(|| {
+                InvestigationStatus::from_state_and_data_entry_id(state.clone(), data_entry_id)
+            });
+            assert!(
+                result.is_err(),
+                "expected panic for {state:?} with {data_entry_id:?}"
+            );
+        }
+    }
+
+    #[test]
     fn test_conclude_without_new_results_ok() {
         let s = in_progress()
             .conclude_without_new_results("findings".into(), false)

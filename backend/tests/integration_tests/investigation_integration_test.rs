@@ -202,6 +202,41 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(
     path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
+async fn test_readd_investigation_with_corrected_results_after_deletion(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let polling_station_id = 529;
+
+    // The second conclude fails if deleting the investigation left its data entry linked
+    for _ in 0..2 {
+        assert_eq!(
+            create_investigation(&addr, polling_station_id)
+                .await
+                .status(),
+            StatusCode::CREATED
+        );
+        assert_eq!(
+            conclude_investigation(
+                &addr,
+                polling_station_id,
+                Some(serde_json::json!({"findings": "Test findings", "corrected_results": true})),
+            )
+            .await
+            .status(),
+            StatusCode::OK
+        );
+        assert_eq!(
+            delete_investigation(&addr, polling_station_id)
+                .await
+                .status(),
+            StatusCode::NO_CONTENT
+        );
+    }
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
     scripts("election_7_four_sessions", "users")
 )))]
 async fn test_partials_update(pool: SqlitePool) {

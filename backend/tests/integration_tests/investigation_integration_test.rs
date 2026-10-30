@@ -820,6 +820,37 @@ async fn test_cannot_conclude_update_new_polling_station_corrected_results_false
 
 #[test(sqlx::test(fixtures(
     path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
+async fn test_update_new_polling_station_findings_with_undefined_corrected_results(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let ps_response = create_polling_station(&addr, &coordinator_cookie, 7, 123).await;
+    let ps_body: serde_json::Value = ps_response.json().await.unwrap();
+    let new_ps_id = u32::try_from(ps_body["id"].as_u64().unwrap()).unwrap();
+
+    let response = create_investigation(&addr, new_ps_id).await;
+    assert_eq!(response.status(), StatusCode::CREATED);
+
+    let update_response = update_investigation(
+        &addr,
+        new_ps_id,
+        Some(serde_json::json!({"reason": "Another reason"})),
+    )
+    .await;
+
+    assert_eq!(update_response.status(), StatusCode::OK);
+    let update_body: serde_json::Value = update_response.json().await.unwrap();
+    assert_eq!(
+        update_body,
+        serde_json::json!({"polling_station_id": new_ps_id, "reason": "Another reason"})
+    );
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
     scripts("election_5_with_results", "users")
 )))]
 async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {

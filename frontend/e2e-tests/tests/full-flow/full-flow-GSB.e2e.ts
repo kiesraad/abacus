@@ -155,13 +155,21 @@ const variants: TestVariant[] = [
 ];
 
 const investigations = [
-  { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
+  {
+    number: "1",
+    name: "Stadhuis",
+    reason: "Reden",
+    findings: "Probleem",
+    correctedResults: true,
+    alertDescription: "Laat het corrigendum door 2 invoerders invoeren in Abacus.",
+  },
   {
     number: "2",
     name: "Basisschool de Regenboog",
     reason: "Reden",
     findings: "Geen probleem",
     correctedResults: false,
+    alertDescription: "",
   },
   {
     number: "5",
@@ -169,6 +177,7 @@ const investigations = [
     reason: "Stembureau vergeten te importeren",
     findings: "Stembureau toegevoegd en ingevoerd",
     correctedResults: true,
+    alertDescription: "Laat het corrigendum door 2 invoerders invoeren in Abacus.",
   },
 ];
 
@@ -669,7 +678,7 @@ for (const variant of variants) {
         await investigationsFindingsPage.save.click();
 
         await expect(investigationsOverviewPage.alert).toHaveText(
-          `Onderzoek voor stembureau ${station.number} (${station.name}) aangepast`,
+          `Onderzoek voor stembureau ${station.number} (${station.name}) aangepast${station.alertDescription}`,
         );
 
         await logout(page);

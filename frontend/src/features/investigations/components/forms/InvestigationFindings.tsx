@@ -12,6 +12,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
+import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import type {
@@ -21,7 +22,7 @@ import type {
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
-import { getInvestigationUpdatedMessage } from "../../utils/messages";
+import { getInvestigationUpdatedMessage, withCorrigendumInstruction } from "../../utils/messages";
 
 interface InvestigationFindingsProps {
   pollingStationId: number;
@@ -32,9 +33,9 @@ const ACCEPTED = "accepted";
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
-  const { hasMessages } = useMessages();
+  const { popMessages, pushMessage } = useMessages();
   const { currentCommitteeSession, election, investigation, pollingStation, refetch } = useElection(pollingStationId);
-  const { pushMessage } = useMessages();
+  const { statuses } = useElectionStatus();
   const updatePath = `/api/polling_stations/${pollingStationId}/investigation`;
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
   const { update, create: conclude } = useCrud<PollingStationInvestigation>({
@@ -57,6 +58,10 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
   }
 
   const requiresCorrectedResults = !pollingStation.prev_data_entry_id;
+  const status = statuses.find(
+    (status) => status.source.type === "PollingStation" && status.source.id === pollingStationId,
+  );
+  const hasDataEntry = status !== undefined && status.status !== "empty";
 
   const handleChange = () => {
     setShowDataEntryWarning(false);
@@ -120,10 +125,11 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     const response = await save();
 
     if (isSuccess(response)) {
-      // Only push a message if there are no messages yet (e.g. from creating this investigation)
-      if (!hasMessages()) {
-        pushMessage(getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status));
-      }
+      // Reuse the message from creating this investigation or editing its reason, if there is one
+      const message =
+        popMessages().pop() ?? getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status);
+      // Only instruct to enter the corrigendum when that hasn't been started yet
+      pushMessage(correctedResults && !hasDataEntry ? withCorrigendumInstruction(message) : message);
 
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);

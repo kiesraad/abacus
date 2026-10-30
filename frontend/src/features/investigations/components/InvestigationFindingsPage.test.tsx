@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   ElectionRequestHandler,
@@ -17,7 +18,7 @@ import {
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
-import type { ErrorResponse, PollingStationInvestigation } from "@/types/generated/openapi";
+import type { ElectionStatusResponse, ErrorResponse, PollingStationInvestigation } from "@/types/generated/openapi";
 
 import { investigationRoutes } from "../routes";
 
@@ -45,6 +46,12 @@ async function renderPage(pollingStationId: number) {
   return router;
 }
 
+// Election status where the data entry of the given polling station has not been started
+function emptyDataEntryStatus(pollingStationId: number): ElectionStatusResponse {
+  const entry = electionStatusesMock.find((entry) => entry.source.id === pollingStationId)!;
+  return { statuses: [{ ...entry, status: "empty" }] };
+}
+
 describe("InvestigationFindingsPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
@@ -68,6 +75,48 @@ describe("InvestigationFindingsPage", () => {
       }),
     ).toBeVisible();
     expect(await screen.findByRole("textbox", { name: "Bevindingen" })).toBeVisible();
+  });
+
+  test("Adds the corrigendum instruction to the creation message", async () => {
+    server.use(PollingStationInvestigationConcludeHandler);
+    const popMessages = vi.fn(() => [{ title: "Onderzoek voor stembureau 35 (Testschool) toegevoegd" }]);
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages, hasMessages: vi.fn(() => true) });
+    overrideOnce("get", "/api/elections/1/status", 200, emptyDataEntryStatus(3));
+
+    await renderPage(3);
+
+    const user = userEvent.setup();
+    await user.type(await screen.findByRole("textbox", { name: "Bevindingen" }), "Bevindingen van het onderzoek");
+    await user.click(screen.getByRole("radio", { name: /Ja/ }));
+    await user.click(screen.getByRole("button", { name: "Opslaan" }));
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(pushMessage).toHaveBeenCalledExactlyOnceWith({
+      title: "Onderzoek voor stembureau 35 (Testschool) toegevoegd",
+      text: "Laat het corrigendum door 2 invoerders invoeren in Abacus.",
+    });
+  });
+
+  test("Keeps the creation message unchanged without corrected results", async () => {
+    server.use(PollingStationInvestigationConcludeHandler);
+    const popMessages = vi.fn(() => [{ title: "Onderzoek voor stembureau 35 (Testschool) toegevoegd" }]);
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages, hasMessages: vi.fn(() => true) });
+
+    await renderPage(3);
+
+    const user = userEvent.setup();
+    await user.type(await screen.findByRole("textbox", { name: "Bevindingen" }), "Bevindingen van het onderzoek");
+    await user.click(screen.getByRole("radio", { name: /Nee/ }));
+    await user.click(screen.getByRole("button", { name: "Opslaan" }));
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(pushMessage).toHaveBeenCalledExactlyOnceWith({
+      title: "Onderzoek voor stembureau 35 (Testschool) toegevoegd",
+    });
   });
 
   test("Displays an error message when submitting an empty form", async () => {
@@ -196,6 +245,49 @@ describe("InvestigationFindingsPage", () => {
     });
   });
 
+  test("Adds the corrigendum instruction to the warning when data entry completed", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "completed" }));
+    overrideOnce("get", "/api/elections/1/status", 200, emptyDataEntryStatus(2));
+    overrideOnce("put", "/api/polling_stations/2/investigation", 200, {
+      findings: "Test findings 4",
+      corrected_results: true,
+    });
+
+    await renderPage(2);
+
+    (await screen.findByRole("radio", { name: /Ja/ })).click();
+    (await screen.findByRole("button", { name: "Opslaan" })).click();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(pushMessage).toHaveBeenCalledWith({
+      type: "warning",
+      title: "Maak een nieuw proces-verbaal voor deze zitting",
+      text: "Onderzoek voor stembureau 34 (Testplek) aangepast. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.\nLaat het corrigendum door 2 invoerders invoeren in Abacus.",
+    });
+  });
+
+  test("Omits the corrigendum instruction when the corrigendum has already been entered", async () => {
+    overrideOnce("put", "/api/polling_stations/2/investigation", 200, {
+      findings: "Test findings 4",
+      corrected_results: true,
+    });
+
+    // Polling station 2 has a definitive data entry in the default election status
+    await renderPage(2);
+
+    (await screen.findByRole("radio", { name: /Ja/ })).click();
+    (await screen.findByRole("button", { name: "Opslaan" })).click();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(pushMessage).toHaveBeenCalledExactlyOnceWith({
+      title: "Onderzoek voor stembureau 34 (Testplek) aangepast",
+    });
+  });
+
   test("Disables corrected results and forces corrected_results=true for new polling stations", async () => {
     server.use(PollingStationInvestigationUpdateHandler);
     const update = spyOnHandler(PollingStationInvestigationUpdateHandler);
@@ -215,6 +307,7 @@ describe("InvestigationFindingsPage", () => {
         },
       ],
     });
+    overrideOnce("get", "/api/elections/1/status", 200, emptyDataEntryStatus(3));
     await renderPage(3);
 
     const correctedResults = await screen.findByRole("group", { name: "Is er een gecorrigeerde uitkomst?" });
@@ -239,6 +332,10 @@ describe("InvestigationFindingsPage", () => {
       reason: "Test investigation",
       // Always true for new polling stations
       corrected_results: true,
+    });
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Onderzoek voor stembureau 35 (Testschool) aangepast",
+      text: "Laat het corrigendum door 2 invoerders invoeren in Abacus.",
     });
   });
 

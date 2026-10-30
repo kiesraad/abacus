@@ -488,6 +488,8 @@ async fn switch_to_without_new_results(
     current: InvestigationStatus,
     request: PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
+    let ps = polling_station_repo::get_next_session(conn, polling_station_id).await?;
+
     delete_linked_data_entry(
         conn,
         audit_service,
@@ -497,7 +499,6 @@ async fn switch_to_without_new_results(
     )
     .await?;
 
-    let ps = polling_station_repo::get_next_session(conn, polling_station_id).await?;
     let findings = request.findings.unwrap_or_default();
     let status = current.switch_to_without_new_results(
         request.reason,

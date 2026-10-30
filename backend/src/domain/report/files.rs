@@ -277,7 +277,7 @@ mod tests {
         infra::audit_log::list_event_names,
         repository::{
             committee_session_repo::{self, change_status},
-            investigation_repo, signing_keypair_repo,
+            investigation_repo, polling_station_repo, signing_keypair_repo,
         },
         service::update_apportionment_state,
     };
@@ -492,7 +492,13 @@ mod tests {
                 findings: "findings".into(),
             },
         );
+        polling_station_repo::unlink_data_entry(&mut conn, PollingStationId::from(721))
+            .await
+            .unwrap();
         investigation_repo::save(&mut conn, PollingStationId::from(721), &status)
+            .await
+            .unwrap();
+        polling_station_repo::unlink_data_entry(&mut conn, PollingStationId::from(732))
             .await
             .unwrap();
         investigation_repo::save(&mut conn, PollingStationId::from(732), &status)

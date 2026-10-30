@@ -66,15 +66,10 @@ pub async fn get(
     .fetch_one(conn)
     .await?;
 
-    Ok(row.investigation_state.map(|json| {
-        let status = json.0;
-        match (&status, row.data_entry_id) {
-            (InvestigationStatus::ConcludedWithNewResults(_), Some(id)) => {
-                status.with_data_entry_id(id)
-            }
-            _ => status,
-        }
-    }))
+    Ok(InvestigationStatus::from_state_and_data_entry_id(
+        row.investigation_state.clone().map(Json::into_inner),
+        row.data_entry_id,
+    ))
 }
 
 /// Delete the investigation for a given polling station.

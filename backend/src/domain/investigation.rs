@@ -56,6 +56,24 @@ impl InvestigationStatus {
         Self::InProgress(InvestigationInProgress { reason })
     }
 
+    pub fn from_state_and_data_entry_id(
+        state: Option<Self>,
+        data_entry_id: Option<DataEntryId>,
+    ) -> Option<Self> {
+        match (&state, data_entry_id) {
+            // An investigation with new results must have a data entry ID
+            (Some(Self::ConcludedWithNewResults(_)), Some(id)) => {
+                state.map(|status| status.with_data_entry_id(id))
+            }
+            // An investigation **without** new results must not have a data entry ID
+            (Some(Self::InProgress(_) | Self::ConcludedWithoutNewResults(_)), None) => state,
+            // No investigation, there must not be a data entry ID
+            (None, None) => None,
+            // All other situations, panic
+            _ => panic!("Unexpected data entry ID for investigation status"),
+        }
+    }
+
     /// InProgress -> ConcludedWithoutNewResults
     ///
     /// `new_polling_station` must be false: for a new polling station, corrected results are required (there are no previous results).

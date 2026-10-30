@@ -404,39 +404,20 @@ pub async fn create_data_entry(
     Ok(data_entry.id)
 }
 
-/// Set `data_entry_id` on a polling station and return the updated row.
+/// Set `data_entry_id` on a polling station.
 pub async fn link_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
     data_entry_id: DataEntryId,
-) -> Result<PollingStationForSession, sqlx::Error> {
-    query_as!(
-        PollingStationRow,
-        r#"
-            UPDATE polling_stations
-            SET data_entry_id = ?
-            WHERE id = ?
-            RETURNING
-                id,
-                committee_session_id,
-                (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
-                prev_data_entry_id,
-                data_entry_id,
-                investigation_state,
-                name,
-                number,
-                number_of_voters,
-                polling_station_type,
-                address,
-                postal_code,
-                locality
-        "#,
+) -> Result<(), sqlx::Error> {
+    query!(
+        "UPDATE polling_stations SET data_entry_id = ? WHERE id = ?",
         data_entry_id,
         polling_station_id,
     )
-    .fetch_one(conn)
-    .await
-    .map(PollingStationRow::into_polling_station_for_session)
+    .execute(conn)
+    .await?;
+    Ok(())
 }
 
 /// Clear `data_entry_id` on a polling station (counterpart to `link_data_entry`).

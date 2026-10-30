@@ -94,14 +94,10 @@ impl PollingStationRowLike for PollingStationRow {
         PollingStationNextSession {
             committee_session_id: self.committee_session_id,
             prev_data_entry_id: self.prev_data_entry_id,
-            investigation_status: self.investigation_state.clone().map(|Json(status)| {
-                match (&status, self.data_entry_id) {
-                    (InvestigationStatus::ConcludedWithNewResults(_), Some(id)) => {
-                        status.with_data_entry_id(id)
-                    }
-                    _ => status,
-                }
-            }),
+            investigation_status: InvestigationStatus::from_state_and_data_entry_id(
+                self.investigation_state.clone().map(Json::into_inner),
+                self.data_entry_id,
+            ),
             polling_station: self.as_polling_station(),
         }
     }

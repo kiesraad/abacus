@@ -24,7 +24,10 @@ test.describe("election certificate", () => {
 
     const certificatePage = new ElectionCertificate(page);
     await expect(certificatePage.header).toBeVisible();
-    await expect(certificatePage.downloadCertificate).toHaveAccessibleDescription(/Organisatie: GR2022_Test/);
+    // Longer timeout on first assert of downloadCertificate because it takes time to generate the certificate
+    await expect(certificatePage.downloadCertificate).toHaveAccessibleDescription(/Organisatie: GR2022_Test/, {
+      timeout: 10000,
+    });
     await expect(certificatePage.downloadCertificate).toHaveAccessibleDescription(/Algemene naam: Gemeente Test/);
     await expect(certificatePage.downloadCertificate).toHaveAccessibleDescription(
       /Handtekeningalgoritme: RSA 4096-bit/,

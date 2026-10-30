@@ -1,7 +1,5 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { IconPlus } from "@/components/generated/icons";
@@ -12,6 +10,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import useInvestigations from "@/hooks/election/useInvestigations";
+import { useLiveData } from "@/hooks/useLiveData";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t, tx } from "@/i18n/translate";
 import type {
@@ -20,7 +19,6 @@ import type {
 } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatList } from "@/utils/strings";
-
 import { InvestigationCard } from "./InvestigationCard";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
@@ -48,16 +46,7 @@ export function InvestigationsOverviewPage() {
     throw new NotFoundError();
   }
 
-  // re-fetch statuses when component mounts
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    void refetchStatuses(abortController);
-
-    return () => {
-      abortController.abort(DEFAULT_CANCEL_REASON);
-    };
-  }, [refetchStatuses]);
+  useLiveData(refetchStatuses, true);
 
   return (
     <>

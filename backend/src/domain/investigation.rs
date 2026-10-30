@@ -56,6 +56,24 @@ impl InvestigationStatus {
         Self::InProgress(InvestigationInProgress { reason })
     }
 
+    pub fn from_state_and_data_entry_id(
+        state: Option<Self>,
+        data_entry_id: Option<DataEntryId>,
+    ) -> Option<Self> {
+        match (&state, data_entry_id) {
+            // An investigation with new results must have a data entry ID
+            (Some(Self::ConcludedWithNewResults(_)), Some(id)) => {
+                state.map(|status| status.with_data_entry_id(id))
+            }
+            // An investigation **without** new results must not have a data entry ID
+            (Some(Self::InProgress(_) | Self::ConcludedWithoutNewResults(_)), None) => state,
+            // No investigation, there must not be a data entry ID
+            (None, None) => None,
+            // All other situations, panic
+            _ => panic!("Unexpected data entry ID for investigation status"),
+        }
+    }
+
     /// InProgress -> ConcludedWithoutNewResults
     ///
     /// `new_polling_station` must be false: for a new polling station, corrected results are required (there are no previous results).
@@ -320,6 +338,47 @@ mod tests {
         assert_eq!(s.findings(), None);
         assert_eq!(s.data_entry_id(), None);
         assert_eq!(s.corrected_results(), None);
+    }
+
+    #[test]
+    fn test_from_state_and_data_entry_id() {
+        let de_id = DataEntryId::from(9901);
+        let cases = [
+            (
+                Some(concluded_with(DataEntryId::default())),
+                Some(de_id),
+                Some(concluded_with(de_id)),
+            ),
+            (Some(in_progress()), None, Some(in_progress())),
+            (Some(concluded_without()), None, Some(concluded_without())),
+            (None, None, None),
+        ];
+        for (state, data_entry_id, expected) in cases {
+            assert_eq!(
+                InvestigationStatus::from_state_and_data_entry_id(state, data_entry_id),
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn test_from_state_and_data_entry_id_invalid() {
+        let de_id = DataEntryId::from(9901);
+        let cases = [
+            (None, Some(de_id)),
+            (Some(in_progress()), Some(de_id)),
+            (Some(concluded_without()), Some(de_id)),
+            (Some(concluded_with(DataEntryId::default())), None),
+        ];
+        for (state, data_entry_id) in cases {
+            let result = std::panic::catch_unwind(|| {
+                InvestigationStatus::from_state_and_data_entry_id(state.clone(), data_entry_id)
+            });
+            assert!(
+                result.is_err(),
+                "expected panic for {state:?} with {data_entry_id:?}"
+            );
+        }
     }
 
     #[test]

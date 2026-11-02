@@ -18,6 +18,8 @@ env:
 jobs:
   backend-coverage:
     name: Backend coverage
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,6 +28,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
       BINSTALL_DISABLE_TELEMETRY: "true"
+      BINSTALL_NO_CONFIRM: "true"
       # Branch coverage requires Rust nightly: https://github.com/taiki-e/cargo-llvm-cov/issues/8
       RUSTUP_TOOLCHAIN: nightly-2026-07-10
     steps:
@@ -44,9 +47,13 @@ jobs:
       - name: Install Binstall
         uses: cargo-bins/cargo-binstall@81df5c23b0dc775b009efdfc9895c5965b7a4e40 # main
       - name: Install cargo-llvm-cov
-        run: cargo binstall cargo-llvm-cov
+        run: cargo binstall --locked cargo-llvm-cov
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Install Nextest
-        run: cargo binstall cargo-nextest
+        run: cargo binstall --locked cargo-nextest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Symlink sqlx test directory to /dev/shm
         run: mkdir -p target /dev/shm/sqlx && rm -rf target/sqlx && ln -s /dev/shm/sqlx target/sqlx
       - name: Run tests with coverage

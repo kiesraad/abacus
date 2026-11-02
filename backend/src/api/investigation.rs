@@ -542,7 +542,7 @@ async fn polling_station_investigation_update(
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let ps = polling_station_repo::get_next_session(&mut tx, polling_station_id).await?;
-    if ps.is_new_polling_station() && request.corrected_results != Some(true) {
+    if ps.is_new_polling_station() && request.corrected_results == Some(false) {
         return Err(APIError::Conflict(
             "Investigation requires corrected results, because it is not part of a previous session".into(),
             ErrorReference::InvestigationRequiresCorrectedResults,

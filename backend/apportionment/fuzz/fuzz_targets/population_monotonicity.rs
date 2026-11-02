@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use apportionment::{ApportionmentOutput, CandidateVotes, process};
+use apportionment::{ApportionmentOutput, ApportionmentWarning, CandidateVotes, process};
 use apportionment_fuzz::{
     FuzzedApportionmentInput, SimpleCandidateVotes, SimpleListVotes, init_tracing, run_with_log,
 };
@@ -23,10 +23,18 @@ fuzz_target!(
     // Reason is that Abacus does not include the P 9-seat for the max. one seat requirement when
     // re-assigning residual seats that were freed up after list exhaustion.
     //
+    // The same check is done below for the second assignment
+    //
     // related issue: #3219
     if data.seats < 19
-        && log1.contains("in accordance with Article P 9 Kieswet")
-        && log1.contains("assigned to another list in accordance with Article P 10 Kieswet") {
+            && matches!(
+                alloc,
+                Ok(ApportionmentOutput::Completed(ref alloc))
+                    if alloc
+                        .seat_assignment
+                        .warnings()
+                        .contains(&ApportionmentWarning::AbsoluteMajorityAndListExhaustion))
+    {
         return;
     }
 
@@ -58,6 +66,19 @@ fuzz_target!(
         }
 
     let (new_alloc, log2) = run_with_log(|| process(&new_data));
+
+    // Skip when P 9 and P 10 are applied (see comment above)
+    if data.seats < 19
+            && matches!(
+                new_alloc,
+                Ok(ApportionmentOutput::Completed(ref new_alloc))
+                    if new_alloc
+                        .seat_assignment
+                        .warnings()
+                        .contains(&ApportionmentWarning::AbsoluteMajorityAndListExhaustion))
+    {
+        return;
+    }
 
     if let (Ok(ApportionmentOutput::Completed(alloc)), Ok(ApportionmentOutput::Completed(new_alloc))) = (alloc, new_alloc) {
         let seats_per_party: Vec<u32> = alloc

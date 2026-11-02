@@ -36,6 +36,7 @@
   "investigate_which_polling_station": "Voor welk stembureau wordt het onderzoek gedaan?",
   "investigations_in_committee_session": "Onderzoeken in {sessionLabel}",
   "message": {
+    "enter_corrigendum": "Laat het corrigendum door 2 invoerders invoeren in Abacus.",
     "investigation_created": "Onderzoek voor stembureau {number} ({name}) toegevoegd",
     "investigation_deleted": "Onderzoek voor stembureau {number} ({name}) verwijderd",
     "investigation_updated": "Onderzoek voor stembureau {number} ({name}) aangepast"

@@ -30,10 +30,7 @@ use crate::{
     eml::EMLImportError,
     infra::backup::BackupError,
     repository::common as common_repo,
-    service::{
-        DataEntryServiceError, PollingStationServiceError, SigningServiceError,
-        SubCommitteeCertificateError, SubCommitteeServiceError,
-    },
+    service::{SigningServiceError, SubCommitteeCertificateError, SubCommitteeServiceError},
 };
 
 /// Trait for error types that can be converted to HTTP response parts
@@ -489,17 +486,6 @@ impl From<DataEntryImportError> for APIError {
     }
 }
 
-impl From<DataEntryServiceError> for APIError {
-    fn from(err: DataEntryServiceError) -> Self {
-        match err {
-            DataEntryServiceError::DatabaseError(e) => e.into(),
-            DataEntryServiceError::DataEntryAlreadyLinked => {
-                APIError::DataIntegrityError(String::from("Data entry is already linked"))
-            }
-        }
-    }
-}
-
 impl From<InvalidElectionError> for APIError {
     fn from(err: InvalidElectionError) -> Self {
         APIError::DataIntegrityError(err.0)
@@ -509,14 +495,6 @@ impl From<InvalidElectionError> for APIError {
 impl From<ModelsError> for APIError {
     fn from(err: ModelsError) -> Self {
         APIError::Delegated(Box::new(err))
-    }
-}
-
-impl From<PollingStationServiceError> for APIError {
-    fn from(err: PollingStationServiceError) -> Self {
-        match err {
-            PollingStationServiceError::DatabaseError(e) => e.into(),
-        }
     }
 }
 

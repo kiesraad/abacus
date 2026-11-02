@@ -7,29 +7,8 @@ use crate::{
         data_entry::{DataEntryStatus, DataEntryStatusWithSource},
         election::{CommitteeCategory, Election},
     },
-    repository::{common as common_repo, polling_station_repo, sub_committee_repo},
+    repository::{common::DatabaseError, polling_station_repo, sub_committee_repo},
 };
-
-#[derive(Debug)]
-pub enum DataEntryServiceError {
-    DatabaseError(sqlx::Error),
-    DataEntryAlreadyLinked,
-}
-
-impl From<sqlx::Error> for DataEntryServiceError {
-    fn from(err: sqlx::Error) -> Self {
-        Self::DatabaseError(err)
-    }
-}
-
-impl From<common_repo::DatabaseError> for DataEntryServiceError {
-    fn from(err: common_repo::DatabaseError) -> Self {
-        match err {
-            common_repo::DatabaseError::Sqlx(e) => Self::DatabaseError(e),
-            common_repo::DatabaseError::DataEntryAlreadyLinked => Self::DataEntryAlreadyLinked,
-        }
-    }
-}
 
 fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResponseEntry {
     let status = &entry.status;
@@ -60,7 +39,7 @@ pub async fn election_statuses(
     conn: &mut SqliteConnection,
     election: &Election,
     committee_session: &CommitteeSession,
-) -> Result<Vec<ElectionStatusResponseEntry>, DataEntryServiceError> {
+) -> Result<Vec<ElectionStatusResponseEntry>, DatabaseError> {
     let is_next_session = committee_session.is_next_session();
     let entries = match (election.committee_category, is_next_session) {
         (CommitteeCategory::GSB, false) => {
@@ -86,7 +65,7 @@ pub async fn create_definitive_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: crate::domain::polling_station::PollingStationId,
     results: &crate::domain::results::Results,
-) -> Result<(), DataEntryServiceError> {
+) -> Result<(), DatabaseError> {
     use crate::{
         domain::data_entry::{DataEntryStatus, Definitive},
         repository::{data_entry_repo, user_repo::UserId},

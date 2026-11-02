@@ -570,9 +570,7 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(704);
 
-            create_test_investigation(&mut conn, PollingStationId::from(741), Some(false))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, PollingStationId::from(741), Some(false)).await;
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id)
                 .await
@@ -602,9 +600,7 @@ mod tests {
             let committee_session_id = CommitteeSessionId::from(704);
             let polling_station_id = PollingStationId::from(741);
 
-            create_test_investigation(&mut conn, polling_station_id, Some(true))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, polling_station_id, Some(true)).await;
 
             create_definitive_data_entry(&mut conn, polling_station_id, &create_test_results(10))
                 .await
@@ -637,9 +633,7 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(704);
 
-            create_test_investigation(&mut conn, PollingStationId::from(741), Some(true))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, PollingStationId::from(741), Some(true)).await;
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
@@ -693,9 +687,7 @@ mod tests {
             .await
             .unwrap();
 
-            create_test_investigation(&mut conn, new_polling_station_id, Some(false))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, new_polling_station_id, Some(false)).await;
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
@@ -724,9 +716,7 @@ mod tests {
             .await
             .unwrap();
 
-            create_test_investigation(&mut conn, new_polling_station_id, Some(true))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, new_polling_station_id, Some(true)).await;
 
             create_definitive_data_entry(
                 &mut conn,
@@ -782,9 +772,7 @@ mod tests {
             .await
             .unwrap();
 
-            create_test_investigation(&mut conn, new_polling_station_id, Some(true))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, new_polling_station_id, Some(true)).await;
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());

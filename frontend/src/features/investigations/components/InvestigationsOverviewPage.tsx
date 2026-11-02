@@ -23,7 +23,7 @@ import { InvestigationCard } from "./InvestigationCard";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function InvestigationsOverviewPage() {
-  const { currentCommitteeSession, election } = useElection();
+  const { currentCommitteeSession, election, refetch: refetchElection } = useElection();
   const { investigations, currentInvestigations, handledInvestigations, missingInvestigations } = useInvestigations();
   const { refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
@@ -47,6 +47,7 @@ export function InvestigationsOverviewPage() {
   }
 
   useLiveData(refetchStatuses, true);
+  useLiveData(refetchElection, true);
 
   return (
     <>

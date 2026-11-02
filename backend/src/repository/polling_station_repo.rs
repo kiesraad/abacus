@@ -91,7 +91,7 @@ async fn list(
 pub async fn get(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<PollingStationForSession, sqlx::Error> {
+) -> Result<PollingStationForSession, DatabaseError> {
     query_as!(
         PollingStationRow,
         r#"
@@ -121,7 +121,7 @@ pub async fn get(
     )
     .fetch_one(conn)
     .await
-    .map(PollingStationRow::into_polling_station_for_session)
+    .map(PollingStationRow::into_polling_station_for_session)?
 }
 
 /// Get a single polling station for an election
@@ -129,7 +129,7 @@ pub async fn get_for_election(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     polling_station_id: PollingStationId,
-) -> Result<PollingStationForSession, sqlx::Error> {
+) -> Result<PollingStationForSession, DatabaseError> {
     let committee_session_id =
         committee_session_repo::get_current_id_for_election(conn, election_id)
             .await?
@@ -161,7 +161,7 @@ pub async fn get_for_election(
     )
     .fetch_one(&mut *conn)
     .await
-    .map(PollingStationRow::into_polling_station_for_session)
+    .map(PollingStationRow::into_polling_station_for_session)?
 }
 
 /// Create a single polling station for an election, returning its id.
@@ -275,7 +275,7 @@ pub async fn update(
     election_id: ElectionId,
     polling_station_id: PollingStationId,
     polling_station_update: PollingStationRequest,
-) -> Result<PollingStationForSession, sqlx::Error> {
+) -> Result<PollingStationForSession, DatabaseError> {
     let mut tx = conn.begin().await?;
     let committee_session_id =
         committee_session_repo::get_current_id_for_election(&mut tx, election_id)
@@ -287,7 +287,8 @@ pub async fn update(
         return Err(sqlx::Error::InvalidArgument(
             "number cannot be updated for polling stations linked to a previous session"
                 .to_string(),
-        ));
+        )
+        .into());
     }
 
     let res = query_as!(
@@ -332,7 +333,7 @@ pub async fn update(
     .fetch_one(&mut *tx)
     .await?;
     tx.commit().await?;
-    Ok(res.into_polling_station_for_session())
+    Ok(res.into_polling_station_for_session()?)
 }
 
 /// Delete a single polling station for an election
@@ -450,34 +451,34 @@ pub async fn list_first_session(
 pub async fn list_next_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<Vec<PollingStationNextSession>, sqlx::Error> {
-    Ok(list(conn, committee_session_id)
+) -> Result<Vec<PollingStationNextSession>, DatabaseError> {
+    list(conn, committee_session_id)
         .await?
         .into_iter()
         .map(PollingStationRow::into_polling_station_next_session)
-        .collect())
+        .collect()
 }
 
 /// List all polling stations for a committee session (including session metadata)
 pub async fn list_for_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<Vec<PollingStationForSession>, sqlx::Error> {
-    Ok(list(conn, committee_session_id)
+) -> Result<Vec<PollingStationForSession>, DatabaseError> {
+    list(conn, committee_session_id)
         .await?
         .into_iter()
         .map(PollingStationRow::into_polling_station_for_session)
-        .collect())
+        .collect()
 }
 
 /// Get a single polling station typed for a next committee session
 pub async fn get_next_session(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<PollingStationNextSession, sqlx::Error> {
+) -> Result<PollingStationNextSession, DatabaseError> {
     match get(conn, polling_station_id).await? {
         PollingStationForSession::Next(ps) => Ok(ps),
-        PollingStationForSession::First(_) => Err(sqlx::Error::RowNotFound),
+        PollingStationForSession::First(_) => Err(sqlx::Error::RowNotFound.into()),
     }
 }
 
@@ -524,7 +525,7 @@ pub async fn duplicate_for_committee_session(
 pub async fn list_first_session_with_status(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<Vec<DataEntryStatusWithSource>, sqlx::Error> {
+) -> Result<Vec<DataEntryStatusWithSource>, DatabaseError> {
     query!(
         r#"
         SELECT
@@ -550,29 +551,33 @@ pub async fn list_first_session_with_status(
         "#,
         committee_session_id
     )
-    .map(|row| DataEntryStatusWithSource {
-        data_entry_id: row.data_entry_id,
-        source: PollingStationRow {
-            id: row.id,
-            committee_session_id: row.committee_session_id,
-            committee_session_number: row.committee_session_number,
-            prev_data_entry_id: row.prev_data_entry_id,
-            data_entry_id: Some(row.data_entry_id),
-            investigation_state: row.investigation_state,
-            name: row.name,
-            number: row.number,
-            number_of_voters: row.number_of_voters,
-            polling_station_type: row.polling_station_type,
-            address: row.address,
-            postal_code: row.postal_code,
-            locality: row.locality,
-        }
-        .into_polling_station_data_source(),
-        status: row.state.0,
-        updated_at: row.updated_at,
-    })
     .fetch_all(conn)
-    .await
+    .await?
+    .into_iter()
+    .map(|row| {
+        Ok(DataEntryStatusWithSource {
+            data_entry_id: row.data_entry_id,
+            source: PollingStationRow {
+                id: row.id,
+                committee_session_id: row.committee_session_id,
+                committee_session_number: row.committee_session_number,
+                prev_data_entry_id: row.prev_data_entry_id,
+                data_entry_id: Some(row.data_entry_id),
+                investigation_state: row.investigation_state,
+                name: row.name,
+                number: row.number,
+                number_of_voters: row.number_of_voters,
+                polling_station_type: row.polling_station_type,
+                address: row.address,
+                postal_code: row.postal_code,
+                locality: row.locality,
+            }
+            .into_polling_station_data_source()?,
+            status: row.state.0,
+            updated_at: row.updated_at,
+        })
+    })
+    .collect()
 }
 
 /// List polling stations for a next committee session with their data entry status,
@@ -580,7 +585,7 @@ pub async fn list_first_session_with_status(
 pub async fn list_next_session_with_status(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<Vec<DataEntryStatusWithSource>, sqlx::Error> {
+) -> Result<Vec<DataEntryStatusWithSource>, DatabaseError> {
     query!(
         r#"
         SELECT
@@ -606,29 +611,31 @@ pub async fn list_next_session_with_status(
         "#,
         committee_session_id
     )
-    .map(|row| DataEntryStatusWithSource {
-        data_entry_id: row.data_entry_id,
-        source: PollingStationRow {
-            id: row.id,
-            committee_session_id: row.committee_session_id,
-            committee_session_number: row.committee_session_number,
-            prev_data_entry_id: row.prev_data_entry_id,
-            data_entry_id: Some(row.data_entry_id),
-            investigation_state: row.investigation_state,
-            name: row.name,
-            number: row.number,
-            number_of_voters: row.number_of_voters,
-            polling_station_type: row.polling_station_type,
-            address: row.address,
-            postal_code: row.postal_code,
-            locality: row.locality,
-        }
-        .into_polling_station_data_source(),
-        status: row.state.0,
-        updated_at: row.updated_at,
-    })
     .fetch_all(conn)
-    .await
+    .await?
+    .into_iter()
+    .map(|row| Ok(DataEntryStatusWithSource {
+            data_entry_id: row.data_entry_id,
+            source: PollingStationRow {
+                id: row.id,
+                committee_session_id: row.committee_session_id,
+                committee_session_number: row.committee_session_number,
+                prev_data_entry_id: row.prev_data_entry_id,
+                data_entry_id: Some(row.data_entry_id),
+                investigation_state: row.investigation_state,
+                name: row.name,
+                number: row.number,
+                number_of_voters: row.number_of_voters,
+                polling_station_type: row.polling_station_type,
+                address: row.address,
+                postal_code: row.postal_code,
+                locality: row.locality,
+            }
+        .into_polling_station_data_source()?,
+            status: row.state.0,
+            updated_at: row.updated_at,
+        }))
+    .collect()
 }
 
 #[cfg(test)]

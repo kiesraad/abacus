@@ -6,11 +6,15 @@ use axum::{
 };
 use tracing::error;
 
-use crate::{AppError, ErrorResponse, error::ErrorReference, service::SubCommitteeServiceError};
+use crate::{
+    AppError, ErrorResponse, error::ErrorReference, repository::common::DatabaseError,
+    service::SubCommitteeServiceError,
+};
 
 #[derive(Debug)]
 pub enum GenerateError {
     DatabaseError(sqlx::Error),
+    DataIntegrityError(String),
     UnsupportedError(String),
 }
 
@@ -20,6 +24,7 @@ impl Display for GenerateError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             GenerateError::DatabaseError(e) => write!(f, "{}", e),
+            GenerateError::DataIntegrityError(e) => write!(f, "{}", e),
             GenerateError::UnsupportedError(e) => write!(f, "{}", e),
         }
     }
@@ -37,6 +42,20 @@ impl From<sqlx::Error> for GenerateError {
     }
 }
 
+impl From<DatabaseError> for GenerateError {
+    fn from(err: DatabaseError) -> Self {
+        match err {
+            DatabaseError::Sqlx(e) => GenerateError::DatabaseError(e),
+            DatabaseError::DataEntryAlreadyLinked => {
+                GenerateError::DataIntegrityError(String::from("Data entry already linked"))
+            }
+            DatabaseError::InvestigationIntegrityError => {
+                GenerateError::DataIntegrityError(String::from("Investigation integrity error"))
+            }
+        }
+    }
+}
+
 impl From<SubCommitteeServiceError> for GenerateError {
     fn from(err: SubCommitteeServiceError) -> Self {
         match err {
@@ -50,6 +69,7 @@ impl From<GenerateError> for AppError {
     fn from(err: GenerateError) -> Self {
         match err {
             GenerateError::DatabaseError(e) => AppError::Database(e),
+            GenerateError::DataIntegrityError(msg) => AppError::DataIntegrity(msg),
             GenerateError::UnsupportedError(msg) => AppError::StdError(msg),
         }
     }

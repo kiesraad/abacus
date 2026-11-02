@@ -4,7 +4,7 @@ use crate::domain::{
     committee_session::CommitteeSessionId,
     data_entry::{DataEntryId, DataEntrySource},
     election::CommitteeCategory,
-    investigation::InvestigationStatus,
+    investigation::{InvestigationError, InvestigationStatus},
     polling_station::{
         PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
         PollingStationNextSession, PollingStationNumber, PollingStationType,
@@ -21,11 +21,21 @@ pub enum DatabaseError {
     Sqlx(sqlx::Error),
     /// Polling station is already linked to a data entry
     DataEntryAlreadyLinked,
+    /// Integrity error with investigation state
+    InvestigationIntegrityError,
 }
 
 impl From<sqlx::Error> for DatabaseError {
     fn from(err: sqlx::Error) -> Self {
         Self::Sqlx(err)
+    }
+}
+
+impl From<InvestigationError> for DatabaseError {
+    fn from(err: InvestigationError) -> Self {
+        match err {
+            InvestigationError::IntegrityError => DatabaseError::InvestigationIntegrityError,
+        }
     }
 }
 
@@ -42,23 +52,25 @@ pub trait PollingStationRowLike: Sized {
         self.as_polling_station_first_session()
     }
 
-    fn as_polling_station_next_session(&self) -> PollingStationNextSession;
+    fn as_polling_station_next_session(&self) -> Result<PollingStationNextSession, DatabaseError>;
 
-    fn into_polling_station_next_session(self) -> PollingStationNextSession {
+    fn into_polling_station_next_session(self) -> Result<PollingStationNextSession, DatabaseError> {
         self.as_polling_station_next_session()
     }
 
-    fn as_polling_station_for_session(&self) -> PollingStationForSession;
+    fn as_polling_station_for_session(&self) -> Result<PollingStationForSession, DatabaseError>;
 
-    fn into_polling_station_for_session(self) -> PollingStationForSession {
+    fn into_polling_station_for_session(self) -> Result<PollingStationForSession, DatabaseError> {
         self.as_polling_station_for_session()
     }
 
-    fn as_polling_station_data_source(&self) -> DataEntrySource {
-        DataEntrySource::PollingStation(self.as_polling_station_for_session())
+    fn as_polling_station_data_source(&self) -> Result<DataEntrySource, DatabaseError> {
+        Ok(DataEntrySource::PollingStation(
+            self.as_polling_station_for_session()?,
+        ))
     }
 
-    fn into_polling_station_data_source(self) -> DataEntrySource {
+    fn into_polling_station_data_source(self) -> Result<DataEntrySource, DatabaseError> {
         self.as_polling_station_data_source()
     }
 }
@@ -105,23 +117,27 @@ impl PollingStationRowLike for PollingStationRow {
         }
     }
 
-    fn as_polling_station_next_session(&self) -> PollingStationNextSession {
-        PollingStationNextSession {
+    fn as_polling_station_next_session(&self) -> Result<PollingStationNextSession, DatabaseError> {
+        Ok(PollingStationNextSession {
             committee_session_id: self.committee_session_id,
             prev_data_entry_id: self.prev_data_entry_id,
             investigation_status: InvestigationStatus::from_state_and_data_entry_id(
                 self.investigation_state.clone().map(Json::into_inner),
                 self.data_entry_id,
-            ),
+            )?,
             polling_station: self.as_polling_station(),
-        }
+        })
     }
 
-    fn as_polling_station_for_session(&self) -> PollingStationForSession {
+    fn as_polling_station_for_session(&self) -> Result<PollingStationForSession, DatabaseError> {
         if self.committee_session_number > 1 {
-            PollingStationForSession::Next(self.as_polling_station_next_session())
+            Ok(PollingStationForSession::Next(
+                self.as_polling_station_next_session()?,
+            ))
         } else {
-            PollingStationForSession::First(self.as_polling_station_first_session())
+            Ok(PollingStationForSession::First(
+                self.as_polling_station_first_session(),
+            ))
         }
     }
 }

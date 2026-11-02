@@ -55,7 +55,7 @@ pub async fn create(
 pub async fn get(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<Option<InvestigationStatus>, sqlx::Error> {
+) -> Result<Option<InvestigationStatus>, DatabaseError> {
     let row = query!(
         r#"SELECT
             investigation_state,
@@ -69,7 +69,7 @@ pub async fn get(
     Ok(InvestigationStatus::from_state_and_data_entry_id(
         row.investigation_state.clone().map(Json::into_inner),
         row.data_entry_id,
-    ))
+    )?)
 }
 
 /// Delete the investigation for a given polling station.

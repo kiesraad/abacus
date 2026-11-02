@@ -525,6 +525,9 @@ impl From<common_repo::DatabaseError> for APIError {
             common_repo::DatabaseError::DataEntryAlreadyLinked => {
                 APIError::DataIntegrityError(String::from("Data entry is already linked"))
             }
+            common_repo::DatabaseError::InvestigationIntegrityError => {
+                APIError::DataIntegrityError(String::from("Investigation integrity error"))
+            }
         }
     }
 }

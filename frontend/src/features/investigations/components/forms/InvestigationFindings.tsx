@@ -58,6 +58,11 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
 
   const requiresCorrectedResults = !pollingStation.prev_data_entry_id;
 
+  const handleChange = () => {
+    setShowDataEntryWarning(false);
+    setWarningNotAcceptedError(false);
+  };
+
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -149,7 +154,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
             hint={t("investigations.findings.hint")}
             defaultValue={investigation.findings || ""}
           />
-          <ChoiceList>
+          <ChoiceList onChange={handleChange}>
             <ChoiceList.Legend>{t("investigations.findings.corrected_result")}</ChoiceList.Legend>
             {radioError && (
               <ChoiceList.Error id="corrected_results_error">

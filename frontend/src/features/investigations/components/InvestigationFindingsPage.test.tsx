@@ -341,6 +341,37 @@ describe("InvestigationFindingsPage", () => {
     });
   });
 
+  test("Remove warning when changing corrected results back to yes", async () => {
+    spyOnHandler(
+      overrideOnce("put", "/api/polling_stations/2/investigation", 409, {
+        error: "Investigation has data entries or results",
+        fatal: false,
+        reference: "InvestigationHasDataEntryOrResult",
+      } satisfies ErrorResponse),
+    );
+
+    await renderPage(2);
+    const title = await screen.findByRole("heading", { name: /Bevindingen van het onderzoek/ });
+    expect(title).toBeVisible();
+
+    screen.getByRole("radio", { name: /Nee/ }).click();
+    screen.getByRole("button", { name: "Opslaan" }).click();
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent(
+      "Er zijn al gecorrigeerde telresultaten ingevoerd. Als je verder gaat worden deze verwijderd.",
+    );
+
+    const acceptWarning = await screen.findByRole("checkbox", {
+      name: "Ga verder en verwijder de gecorrigeerde telresultaten",
+    });
+    expect(acceptWarning).toBeVisible();
+
+    screen.getByRole("radio", { name: /Ja/ }).click();
+    expect(alert).not.toBeInTheDocument();
+    expect(acceptWarning).not.toBeInTheDocument();
+  });
+
   test("Returns to list page with a success message when clicking delete investigation", async () => {
     server.use(PollingStationInvestigationDeleteHandler);
     const user = userEvent.setup();

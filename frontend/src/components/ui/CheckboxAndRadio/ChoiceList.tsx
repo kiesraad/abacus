@@ -1,4 +1,4 @@
-import type { ReactNode, RefObject } from "react";
+import type { ChangeEvent, ReactNode, RefObject } from "react";
 
 import { Checkbox, type CheckboxAndRadioProps, Radio } from "./CheckboxAndRadio";
 import cls from "./CheckboxAndRadio.module.css";
@@ -6,11 +6,12 @@ import cls from "./CheckboxAndRadio.module.css";
 export interface ChoiceListProps {
   children: ReactNode;
   disabled?: boolean;
+  onChange?: (e: ChangeEvent<HTMLFieldSetElement>) => void;
 }
 
-export function ChoiceList({ children, disabled }: ChoiceListProps) {
+export function ChoiceList({ children, disabled, onChange }: ChoiceListProps) {
   return (
-    <fieldset className="choiceList" disabled={disabled}>
+    <fieldset className="choiceList" disabled={disabled} onChange={onChange}>
       {children}
     </fieldset>
   );

@@ -12,22 +12,10 @@ use crate::{
     },
     repository::{
         committee_session_repo,
-        common::{PollingStationRow, PollingStationRowLike},
+        common::{DatabaseError, PollingStationRow, PollingStationRowLike},
         data_entry_repo,
     },
 };
-
-#[derive(Debug)]
-pub enum CreateDataEntryError {
-    Sqlx(sqlx::Error),
-    DataEntryAlreadyLinked,
-}
-
-impl From<sqlx::Error> for CreateDataEntryError {
-    fn from(err: sqlx::Error) -> Self {
-        Self::Sqlx(err)
-    }
-}
 
 /// Returns the committee category for the related election
 pub async fn get_committee_category(
@@ -393,10 +381,10 @@ pub async fn get_data_entry_id(
 pub async fn create_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<DataEntryId, CreateDataEntryError> {
+) -> Result<DataEntryId, DatabaseError> {
     let mut tx = conn.begin().await?;
     if get_data_entry_id(&mut tx, polling_station_id).await.is_ok() {
-        return Err(CreateDataEntryError::DataEntryAlreadyLinked);
+        return Err(DatabaseError::DataEntryAlreadyLinked);
     }
     let data_entry = data_entry_repo::create_empty(&mut tx).await?;
     link_data_entry(&mut tx, polling_station_id, data_entry.id).await?;

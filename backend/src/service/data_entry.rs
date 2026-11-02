@@ -7,7 +7,7 @@ use crate::{
         data_entry::{DataEntryStatus, DataEntryStatusWithSource},
         election::{CommitteeCategory, Election},
     },
-    repository::{polling_station_repo, sub_committee_repo},
+    repository::{common as common_repo, polling_station_repo, sub_committee_repo},
 };
 
 #[derive(Debug)]
@@ -22,13 +22,11 @@ impl From<sqlx::Error> for DataEntryServiceError {
     }
 }
 
-impl From<polling_station_repo::CreateDataEntryError> for DataEntryServiceError {
-    fn from(err: polling_station_repo::CreateDataEntryError) -> Self {
+impl From<common_repo::DatabaseError> for DataEntryServiceError {
+    fn from(err: common_repo::DatabaseError) -> Self {
         match err {
-            polling_station_repo::CreateDataEntryError::Sqlx(e) => Self::DatabaseError(e),
-            polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
-                Self::DataEntryAlreadyLinked
-            }
+            common_repo::DatabaseError::Sqlx(e) => Self::DatabaseError(e),
+            common_repo::DatabaseError::DataEntryAlreadyLinked => Self::DataEntryAlreadyLinked,
         }
     }
 }

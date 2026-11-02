@@ -29,7 +29,7 @@ use crate::{
     },
     eml::EMLImportError,
     infra::backup::BackupError,
-    repository::polling_station_repo,
+    repository::common as common_repo,
     service::{
         DataEntryServiceError, PollingStationServiceError, SigningServiceError,
         SubCommitteeCertificateError, SubCommitteeServiceError,
@@ -540,11 +540,11 @@ impl From<IncorrectResultsModel> for APIError {
     }
 }
 
-impl From<polling_station_repo::CreateDataEntryError> for APIError {
-    fn from(err: polling_station_repo::CreateDataEntryError) -> Self {
+impl From<common_repo::DatabaseError> for APIError {
+    fn from(err: common_repo::DatabaseError) -> Self {
         match err {
-            polling_station_repo::CreateDataEntryError::Sqlx(e) => e.into(),
-            polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
+            common_repo::DatabaseError::Sqlx(e) => e.into(),
+            common_repo::DatabaseError::DataEntryAlreadyLinked => {
                 APIError::DataIntegrityError(String::from("Data entry is already linked"))
             }
         }

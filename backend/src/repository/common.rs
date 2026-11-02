@@ -14,6 +14,21 @@ use crate::domain::{
     },
 };
 
+/// Generic error type for Sqlx and data integrity errors
+#[derive(Debug)]
+pub enum DatabaseError {
+    /// Sqlx database error
+    Sqlx(sqlx::Error),
+    /// Polling station is already linked to a data entry
+    DataEntryAlreadyLinked,
+}
+
+impl From<sqlx::Error> for DatabaseError {
+    fn from(err: sqlx::Error) -> Self {
+        Self::Sqlx(err)
+    }
+}
+
 pub trait PollingStationRowLike: Sized {
     fn as_polling_station(&self) -> PollingStation;
 

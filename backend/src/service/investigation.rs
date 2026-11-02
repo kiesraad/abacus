@@ -1,5 +1,5 @@
 #[cfg(test)]
-use crate::repository::polling_station_repo;
+use crate::repository::common as common_repo;
 
 #[cfg(test)]
 #[derive(Debug)]
@@ -16,13 +16,11 @@ impl From<sqlx::Error> for InvestigationServiceError {
 }
 
 #[cfg(test)]
-impl From<polling_station_repo::CreateDataEntryError> for InvestigationServiceError {
-    fn from(err: polling_station_repo::CreateDataEntryError) -> Self {
+impl From<common_repo::DatabaseError> for InvestigationServiceError {
+    fn from(err: common_repo::DatabaseError) -> Self {
         match err {
-            polling_station_repo::CreateDataEntryError::Sqlx(e) => Self::DatabaseError(e),
-            polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
-                Self::DataEntryAlreadyLinked
-            }
+            common_repo::DatabaseError::Sqlx(e) => Self::DatabaseError(e),
+            common_repo::DatabaseError::DataEntryAlreadyLinked => Self::DataEntryAlreadyLinked,
         }
     }
 }

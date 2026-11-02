@@ -5,7 +5,7 @@ use crate::{
         committee_session::CommitteeSessionId, investigation::InvestigationStatus,
         polling_station::PollingStationId,
     },
-    repository::polling_station_repo::CreateDataEntryError,
+    repository::common::DatabaseError,
 };
 
 pub async fn save(
@@ -77,7 +77,7 @@ pub async fn get(
 pub async fn delete(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<(), CreateDataEntryError> {
+) -> Result<(), DatabaseError> {
     let row = query!(
         "SELECT data_entry_id FROM polling_stations WHERE id = ?",
         polling_station_id,
@@ -86,7 +86,7 @@ pub async fn delete(
     .await?;
 
     if row.data_entry_id.is_some() {
-        return Err(CreateDataEntryError::DataEntryAlreadyLinked);
+        return Err(DatabaseError::DataEntryAlreadyLinked);
     }
 
     query!(
@@ -162,7 +162,7 @@ mod tests {
 
         assert!(matches!(
             delete(&mut conn, polling_station_id).await,
-            Err(CreateDataEntryError::DataEntryAlreadyLinked)
+            Err(DatabaseError::DataEntryAlreadyLinked)
         ));
     }
 
@@ -172,7 +172,7 @@ mod tests {
 
         assert!(matches!(
             delete(&mut conn, PollingStationId::from(999_999)).await,
-            Err(CreateDataEntryError::Sqlx(sqlx::Error::RowNotFound))
+            Err(DatabaseError::Sqlx(sqlx::Error::RowNotFound))
         ));
     }
 }

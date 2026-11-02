@@ -11,7 +11,7 @@
   doc,
   header-left: [
     Bijlage 1 - verslag telling stembureau \
-    #input.election.name
+    #input.election.official_name
   ],
   header-right: [
     #location_name \

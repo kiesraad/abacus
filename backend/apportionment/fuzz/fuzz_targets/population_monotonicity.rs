@@ -17,6 +17,19 @@ fuzz_target!(
 
     let (alloc, log1) = run_with_log(|| process(&data));
 
+    // Skip cases where there are fewer than 19 seats and both art. P 9 (absolute majority) and
+    // art. P 10 (list exhaustion) are applied.
+    //
+    // Reason is that Abacus does not include the P 9-seat for the max. one seat requirement when
+    // re-assigning residual seats that were freed up after list exhaustion.
+    //
+    // related issue: #3219
+    if data.seats < 19
+        && log1.contains("in accordance with Article P 9 Kieswet")
+        && log1.contains("assigned to another list in accordance with Article P 10 Kieswet") {
+        return;
+    }
+
     // Add some votes to the first candidate of the first party
     let mut new_data = FuzzedApportionmentInput {
         seats: data.seats,

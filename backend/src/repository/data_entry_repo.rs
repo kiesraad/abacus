@@ -100,10 +100,10 @@ pub async fn update(
     .await
 }
 
-async fn try_fetch_polling_station_for_source(
+async fn try_fetch_polling_station_row(
     tx: &mut SqliteConnection,
     data_entry_id: DataEntryId,
-) -> Result<Option<DataEntrySource>, DatabaseError> {
+) -> Result<Option<PollingStationRow>, sqlx::Error> {
     query_as!(
         PollingStationRow,
         r#"
@@ -128,9 +128,7 @@ async fn try_fetch_polling_station_for_source(
         data_entry_id
     )
     .fetch_optional(&mut *tx)
-    .await?
-    .map(PollingStationRow::into_polling_station_data_source)
-    .transpose()
+    .await
 }
 
 async fn try_fetch_sub_committee_for_source(
@@ -168,12 +166,9 @@ pub async fn resolve_source(
 ) -> Result<DataEntrySourceContext, DatabaseError> {
     let mut tx = conn.begin().await?;
 
-    let ps = try_fetch_polling_station_for_source(&mut tx, data_entry_id).await?;
-
-    let source = if let Some(ps) = ps {
-        ps
-    } else {
-        try_fetch_sub_committee_for_source(&mut tx, data_entry_id).await?
+    let source = match try_fetch_polling_station_row(&mut tx, data_entry_id).await? {
+        Some(row) => row.into_polling_station_data_source()?,
+        None => try_fetch_sub_committee_for_source(&mut tx, data_entry_id).await?,
     };
     let committee_session =
         committee_session_repo::get(&mut tx, source.committee_session_id()).await?;

@@ -333,7 +333,7 @@ pub async fn update(
     .fetch_one(&mut *tx)
     .await?;
     tx.commit().await?;
-    Ok(res.into_polling_station_for_session()?)
+    res.into_polling_station_for_session()
 }
 
 /// Delete a single polling station for an election

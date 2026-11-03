@@ -434,7 +434,7 @@ mod test {
             #[cfg(feature = "memory-serve")]
             {
                 let response = reqwest::get(format!("{base_url}/")).await.unwrap();
-                assert_eq!(response.headers()["cache-control"], "max-age:300, private");
+                assert_eq!(response.headers()["cache-control"], "max-age=300, private");
             }
         })
         .await;

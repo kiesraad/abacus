@@ -180,7 +180,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_status).authorize(ALL_ROLES))
 }
 
-async fn validate_and_get_data(
+async fn get_authorized_data(
     conn: &mut SqliteConnection,
     data_entry_id: DataEntryId,
     user: &User,
@@ -205,6 +205,16 @@ async fn validate_and_get_data(
             ErrorReference::DataEntryNotAllowed,
         ));
     }
+
+    Ok((context, data_entry_status))
+}
+
+async fn validate_and_get_data(
+    conn: &mut SqliteConnection,
+    data_entry_id: DataEntryId,
+    user: &User,
+) -> Result<(DataEntrySourceContext, DataEntryStatus), APIError> {
+    let (context, data_entry_status) = get_authorized_data(conn, data_entry_id, user).await?;
 
     // Validate state based on user role
     if user.role().is_typist() {
@@ -717,7 +727,17 @@ async fn data_entry_get(
     use DataEntryStatus::*;
 
     let mut conn = pool.acquire().await?;
-    let (context, state) = validate_and_get_data(&mut conn, data_entry_id, &user).await?;
+    let (context, state) = get_authorized_data(&mut conn, data_entry_id, &user).await?;
+
+    // Read-only view should stay available in completed state, unlike other handlers
+    if !matches!(
+        context.committee_session.status,
+        CommitteeSessionStatus::DataEntry
+            | CommitteeSessionStatus::Paused
+            | CommitteeSessionStatus::Completed
+    ) {
+        return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
+    }
 
     Ok(Json(match state.clone() {
         FirstEntryInProgress(first_entry_in_progress_state) => DataEntryGetResponse {
@@ -3352,6 +3372,55 @@ mod tests {
             assert_eq!(result.user_id, None);
             assert!(!result.validation_results.has_errors());
             assert!(result.validation_results.has_warnings());
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_committee_session_status(pool: SqlitePool) {
+            let data_entry_id = DataEntryId::from(201);
+
+            // Complete first entry
+            claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+            save(
+                pool.clone(),
+                example_data_entry(),
+                data_entry_id,
+                EntryNumber::FirstEntry,
+            )
+            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+
+            // Complete second entry
+            claim(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
+            save(
+                pool.clone(),
+                example_data_entry(),
+                data_entry_id,
+                EntryNumber::SecondEntry,
+            )
+            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
+
+            for (status, allowed) in [
+                (CommitteeSessionStatus::Created, false),
+                (CommitteeSessionStatus::InPreparation, false),
+                (CommitteeSessionStatus::DataEntry, true),
+                (CommitteeSessionStatus::Paused, true),
+                (CommitteeSessionStatus::Completed, true),
+            ] {
+                change_status_committee_session(pool.clone(), CommitteeSessionId::from(2), status)
+                    .await;
+
+                let result = call_data_entry_get(pool.clone(), data_entry_id).await;
+
+                if allowed {
+                    assert_eq!(result.unwrap().status, DataEntryStatusName::Definitive);
+                } else {
+                    assert_eq!(
+                        result.err().unwrap().reference,
+                        ErrorReference::InvalidCommitteeSessionStatus
+                    );
+                }
+            }
         }
     }
 

@@ -410,21 +410,24 @@ async fn polling_station_delete(
 
     let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
 
-    delete_data_entry_for_polling_station(
-        &mut tx,
-        &audit_service,
-        &committee_session,
-        polling_station.id(),
-    )
-    .await?;
-
-    delete_investigation_for_polling_station(
-        &mut tx,
-        &audit_service,
-        &committee_session,
-        polling_station.id(),
-    )
-    .await?;
+    if committee_session.is_next_session() {
+        // Also deletes the data entry, which belongs to the investigation
+        delete_investigation_for_polling_station(
+            &mut tx,
+            &audit_service,
+            &committee_session,
+            polling_station.id(),
+        )
+        .await?;
+    } else {
+        delete_data_entry_for_polling_station(
+            &mut tx,
+            &audit_service,
+            &committee_session,
+            polling_station.id(),
+        )
+        .await?;
+    }
 
     delete(&mut tx, election_id, polling_station_id).await?;
 

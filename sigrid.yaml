@@ -61,6 +61,7 @@ dependencychecker:
     - "pdf_gen"
     - "pdf_gen_impl"
     - "pdf_gen_types"
+    - "windows_socket"
   transitive: true
   exclude:
     # Marvin Attack on RSA crate, which we do not use (Cargo weak dependency, https://github.com/rust-lang/cargo/issues/10801)

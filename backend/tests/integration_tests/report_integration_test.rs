@@ -178,7 +178,7 @@ async fn test_gsb_cso_election_first_session_zip_download_works(pool: SqlitePool
             "Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.zip",
             "Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.zip/Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.eml.xml",
             "Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.zip/Telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.eml.xml.signature",
-            "abacus_telling_gr2024_heemdamseburg.csv",
+            "abacus_telling_GR2024_Heemdamseburg_gemeente_Heemdamseburg.csv",
         ]
     );
 
@@ -234,7 +234,7 @@ async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool
             "Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.zip",
             "Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.zip/Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.eml.xml",
             "Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.zip/Telling_AB2026_sLansbregen_gemeente_Heemdamseburg.eml.xml.signature",
-            "abacus_telling_ab2026_slansbregen.csv",
+            "abacus_telling_AB2026_sLansbregen_gemeente_Heemdamseburg.csv",
         ]
     );
 
@@ -279,7 +279,7 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
             "Telling_GR2026_Juinen_gemeente_Juinen.zip",
             "Telling_GR2026_Juinen_gemeente_Juinen.zip/Telling_GR2026_Juinen_gemeente_Juinen.eml.xml",
             "Telling_GR2026_Juinen_gemeente_Juinen.zip/Telling_GR2026_Juinen_gemeente_Juinen.eml.xml.signature",
-            "abacus_telling_gr2026_juinen.csv",
+            "abacus_telling_GR2026_Juinen_gemeente_Juinen.csv",
             "Leeg_Model_P2a.pdf",
         ]
     );

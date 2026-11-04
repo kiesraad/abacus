@@ -351,7 +351,7 @@ mod tests {
                 "Telling_GR2026_Juinen_gemeente_Juinen.eml.xml.signature"
             );
             assert_eq!(signature.id, FileId::from(2));
-            assert_eq!(csv.name, "abacus_telling_gr2026_juinen.csv");
+            assert_eq!(csv.name, "abacus_telling_GR2026_Juinen_gemeente_Juinen.csv");
             assert_eq!(csv.id, FileId::from(3));
             assert_eq!(pdf.name, "Model_Na31-2.pdf");
             assert_eq!(pdf.id, FileId::from(4));
@@ -411,7 +411,7 @@ mod tests {
                 "Telling_AB2026_Juinen_gemeente_Juinen.eml.xml.signature"
             );
             assert_eq!(signature.id, FileId::from(2));
-            assert_eq!(csv.name, "abacus_telling_ab2026_juinen.csv");
+            assert_eq!(csv.name, "abacus_telling_AB2026_Juinen_gemeente_Juinen.csv");
             assert_eq!(csv.id, FileId::from(3));
             assert_eq!(pdf.name, "Model_Na31-1.pdf");
             assert_eq!(pdf.id, FileId::from(4));
@@ -457,7 +457,10 @@ mod tests {
                 "Telling_GR2026_GroteStad_gemeente_Grote_Stad.eml.xml.signature"
             );
             assert_eq!(signature.id, FileId::from(2));
-            assert_eq!(csv.name, "abacus_telling_gr2026_grotestad.csv");
+            assert_eq!(
+                csv.name,
+                "abacus_telling_GR2026_GroteStad_gemeente_Grote_Stad.csv"
+            );
             assert_eq!(csv.id, FileId::from(3));
             assert_eq!(pdf.name, "Model_Na14-2.pdf");
             assert_eq!(pdf.id, FileId::from(4));

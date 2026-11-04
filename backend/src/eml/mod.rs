@@ -994,6 +994,8 @@ pub fn polling_stations_eml_matches_election(
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use apportionment::Fraction;
     use eml_nl::{documents::election_result::ElectionResultSelectionType, utils::StringValue};
 
@@ -1008,7 +1010,7 @@ mod tests {
         let data =
             include_str!("../eml/tests/eml110a_invalid_election_missing_election_domain.eml.xml");
         let res = NewElection::from_eml_str(data).unwrap_err();
-        assert!(matches!(res, EMLImportError::MissingElectionDomain))
+        assert_matches!(res, EMLImportError::MissingElectionDomain)
     }
 
     #[test]
@@ -1018,7 +1020,7 @@ mod tests {
         );
         let res = NewElection::from_eml_str(data).unwrap_err();
         dbg!(&res);
-        assert!(matches!(res, EMLImportError::LimitedElectionsSupported));
+        assert_matches!(res, EMLImportError::LimitedElectionsSupported);
     }
 
     #[test]
@@ -1028,10 +1030,7 @@ mod tests {
         );
         let res = NewElection::from_eml_str(data).unwrap_err();
         dbg!(&res);
-        assert!(matches!(
-            res,
-            EMLImportError::MismatchElectionCategoryAndSubCategory
-        ));
+        assert_matches!(res, EMLImportError::MismatchElectionCategoryAndSubCategory);
     }
 
     #[test]

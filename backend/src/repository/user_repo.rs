@@ -427,6 +427,8 @@ pub async fn update_last_activity_at(
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use sqlx::SqlitePool;
     use test_log::test;
 
@@ -498,10 +500,7 @@ mod tests {
         )
         .await;
 
-        assert!(matches!(
-            error,
-            Err(AuthenticationError::UsernameAlreadyExists)
-        ));
+        assert_matches!(error, Err(AuthenticationError::UsernameAlreadyExists));
     }
 
     #[test(sqlx::test)]
@@ -535,19 +534,13 @@ mod tests {
             .await
             .unwrap_err();
 
-        assert!(matches!(
-            authenticated_user,
-            AuthenticationError::InvalidPassword
-        ));
+        assert_matches!(authenticated_user, AuthenticationError::InvalidPassword);
 
         let authenticated_user = super::authenticate(&pool, "other_user", "TotallyValidP4ssW0rd")
             .await
             .unwrap_err();
 
-        assert!(matches!(
-            authenticated_user,
-            AuthenticationError::UserNotFound
-        ));
+        assert_matches!(authenticated_user, AuthenticationError::UserNotFound);
     }
 
     #[test(sqlx::test)]
@@ -581,10 +574,7 @@ mod tests {
             .await
             .unwrap_err();
 
-        assert!(matches!(
-            authenticated_user,
-            AuthenticationError::InvalidPassword
-        ));
+        assert_matches!(authenticated_user, AuthenticationError::InvalidPassword);
     }
 
     #[test(sqlx::test)]

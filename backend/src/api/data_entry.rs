@@ -995,6 +995,8 @@ async fn election_status(
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use axum::http::StatusCode;
     use http_body_util::BodyExt;
     use sqlx::SqlitePool;
@@ -1314,10 +1316,7 @@ mod tests {
             &CommitteeSession::next_session(),
             Some(&previous_results),
         );
-        assert!(matches!(
-            current_data_entry.entry,
-            Results::CSONextSession(_)
-        ));
+        assert_matches!(current_data_entry.entry, Results::CSONextSession(_));
         assert_eq!(
             current_data_entry.entry.voters_counts().voter_card_count,
             Some(5)
@@ -1337,8 +1336,8 @@ mod tests {
             status,
             ..
         } = serde_json::from_slice(&body).unwrap();
-        assert!(matches!(data, Results::CSOFirstSession(_)));
-        assert!(matches!(source, DataEntrySource::PollingStation(_)));
+        assert_matches!(data, Results::CSOFirstSession(_));
+        assert_matches!(source, DataEntrySource::PollingStation(_));
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
     }
 
@@ -1363,8 +1362,8 @@ mod tests {
             status,
             ..
         } = serde_json::from_slice(&body).unwrap();
-        assert!(matches!(data, Results::GSB(_)));
-        assert!(matches!(source, DataEntrySource::SubCommittee(_)));
+        assert_matches!(data, Results::GSB(_));
+        assert_matches!(source, DataEntrySource::SubCommittee(_));
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
     }
 
@@ -1775,7 +1774,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
+        assert_matches!(status, DataEntryStatus::SecondEntryInProgress(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1813,7 +1812,7 @@ mod tests {
 
         // Check that the status is 'Definitive'
         let status = get_data_entry_status(pool.clone(), data_entry_id).await;
-        assert!(matches!(status, DataEntryStatus::Definitive(_)));
+        assert_matches!(status, DataEntryStatus::Definitive(_));
 
         // Check that we can't save a new data entry after finalising
         let response = save(
@@ -1844,7 +1843,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
+        assert_matches!(status, DataEntryStatus::EntriesDifferent(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1934,7 +1933,7 @@ mod tests {
         // Check that the data entry is in SecondEntryInProgress state
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
+        assert_matches!(status, DataEntryStatus::SecondEntryInProgress(_));
 
         // delete second data entry
         let response = delete(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
@@ -1943,7 +1942,7 @@ mod tests {
         // Check that the second data entry is deleted
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::FirstEntryFinalised(_)));
+        assert_matches!(status, DataEntryStatus::FirstEntryFinalised(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1982,7 +1981,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
+        assert_matches!(status, DataEntryStatus::FirstEntryInProgress(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2026,7 +2025,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
+        assert_matches!(status, DataEntryStatus::FirstEntryInProgress(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2324,7 +2323,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
+        assert_matches!(status, DataEntryStatus::EntriesDifferent(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2344,7 +2343,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
+        assert_matches!(status, DataEntryStatus::FirstEntryInProgress(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2400,7 +2399,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::FirstEntryHasErrors(_)));
+        assert_matches!(status, DataEntryStatus::FirstEntryHasErrors(_));
     }
 
     async fn claim_previous_results(

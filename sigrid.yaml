@@ -54,6 +54,7 @@ dependencychecker:
   blocklist:
     - "abacus"
     - "abacus-fuzz"
+    - "abacus_windows_service"
     - "apportionment"
     - "apportionment-fuzz"
     - "eml_signature"

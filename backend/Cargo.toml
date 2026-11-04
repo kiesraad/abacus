@@ -128,7 +128,7 @@ zeroize.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows_socket = { path = "./windows_socket" }
-windows-service = { path = "./windows_service" }
+abacus_windows_service = { path = "./windows_service" }
 
 [dev-dependencies]
 http-body-util.workspace = true

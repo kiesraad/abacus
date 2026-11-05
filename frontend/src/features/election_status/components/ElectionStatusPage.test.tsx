@@ -250,6 +250,33 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
   });
 
+  test("Data entry started alert not visible in next committee session for coordinator", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(getElectionMockData({}, { number: 2 }) satisfies ElectionDetailsResponse, {
+          status: 200,
+        }),
+      ),
+    );
+    server.use(
+      http.get("/api/elections/1/status", () =>
+        HttpResponse.json(getElectionStatusMockData([{ status: "empty" }, { status: "empty" }]), {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage(1);
+
+    // Test that the data entry started and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
+    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
+  });
+
   test("Finish input alert visible when data entry has completed for coordinator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();

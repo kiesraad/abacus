@@ -96,6 +96,8 @@ pub struct UpdateUserRequest {
     pub temp_password: Option<String>,
 }
 
+pub const MAX_NAME_LENGTH: usize = 255;
+
 /// Validates username and fullname length and allowed characters
 pub trait ValidateUserRequest {
     fn username(&self) -> Option<&str>;
@@ -122,7 +124,7 @@ pub trait ValidateUserRequest {
                 return Err("Empty".to_string());
             };
 
-            if input.chars().nth(255).is_some() {
+            if input.chars().nth(MAX_NAME_LENGTH).is_some() {
                 return Err("Too long".to_string());
             };
 

@@ -102,7 +102,15 @@ impl FileType {
             }
             CsbResultsPdf => "Model_P22-2.pdf".to_string(),
             CsbAttachmentPdf => "Model_P22-2_bijlage.pdf".to_string(),
-            CsbCsvCounts | GsbCsvCounts => {
+            GsbCsvCounts => {
+                format!(
+                    "abacus_telling_{}_{}_{}.csv",
+                    election.election_id,
+                    election.region_category(),
+                    slugify(&election.authority_region)
+                )
+            }
+            CsbCsvCounts => {
                 format!("abacus_telling_{}.csv", election.election_id.to_lowercase())
             }
         };

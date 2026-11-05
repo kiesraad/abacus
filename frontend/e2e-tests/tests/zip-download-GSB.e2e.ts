@@ -44,7 +44,7 @@ test.describe("GSB election results zip", () => {
     expect(Object.keys(zip)).toStrictEqual([
       "Model_Na31-2.pdf",
       "Telling_GR2022_Test_gemeente_Test.zip",
-      "abacus_telling_gr2022_test.csv",
+      "abacus_telling_GR2022_Test_gemeente_Test.csv",
     ]);
 
     // The EML and signature are in a nested ZIP file

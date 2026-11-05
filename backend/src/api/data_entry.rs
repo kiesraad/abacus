@@ -41,7 +41,9 @@ use crate::{
         election_repo, investigation_repo, polling_station_repo,
         user_repo::{User, UserId},
     },
-    service::change_committee_session_status,
+    service::{
+        change_committee_session_status, validate_committee_session_is_current_committee_session,
+    },
 };
 
 impl From<DataError> for APIError {
@@ -655,6 +657,12 @@ async fn data_entry_reset(
     let context = data_entry_repo::resolve_source(&mut tx, data_entry_id).await?;
     user.role()
         .is_authorized(context.election.committee_category)?;
+    validate_committee_session_is_current_committee_session(
+        &mut tx,
+        context.committee_session.election_id,
+        context.committee_session.id,
+    )
+    .await?;
 
     let data_entry = data_entry_repo::get(&mut tx, data_entry_id).await?;
 
@@ -728,6 +736,12 @@ async fn data_entry_get(
 
     let mut conn = pool.acquire().await?;
     let (context, state) = get_authorized_data(&mut conn, data_entry_id, &user).await?;
+    validate_committee_session_is_current_committee_session(
+        &mut conn,
+        context.committee_session.election_id,
+        context.committee_session.id,
+    )
+    .await?;
 
     // Read-only view should stay available in completed state, unlike other handlers
     if !matches!(
@@ -2454,6 +2468,28 @@ mod tests {
         assert_eq!(committee_session.status, CommitteeSessionStatus::DataEntry);
     }
 
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_data_entry_reset_fails_previous_committee_session(pool: SqlitePool) {
+        let data_entry_id = DataEntryId::from(701);
+
+        let response = reset(pool.clone(), data_entry_id).await;
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::EntryNotFound);
+
+        // Check that the data entry and committee session are not changed
+        let status = get_data_entry_status(pool.clone(), data_entry_id).await;
+        assert!(matches!(status, DataEntryStatus::Definitive(_)));
+
+        let mut conn = pool.acquire().await.unwrap();
+        let committee_session =
+            committee_session_repo::get(&mut conn, CommitteeSessionId::from(701))
+                .await
+                .unwrap();
+        assert_eq!(committee_session.status, CommitteeSessionStatus::Completed);
+    }
+
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_reset_fails_entries_different(pool: SqlitePool) {
         let polling_station_id = PollingStationId::from(211);
@@ -3421,6 +3457,19 @@ mod tests {
                     );
                 }
             }
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_7_four_sessions")
+        )))]
+        async fn test_previous_committee_session_fails(pool: SqlitePool) {
+            let result = call_data_entry_get(pool.clone(), DataEntryId::from(701))
+                .await
+                .err()
+                .unwrap();
+
+            assert_eq!(result.reference, ErrorReference::EntryNotFound);
         }
     }
 

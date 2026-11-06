@@ -412,6 +412,70 @@ describe("ElectionHomePage", () => {
         ]);
       });
 
+      test.each([
+        { model: "N 10-2", rowIndex: 1, role: "coordinator_gsb" },
+        {
+          model: "Na 31-2 Bijlage 1",
+          rowIndex: 2,
+          role: "coordinator_gsb",
+        },
+        { model: "N 10-2", rowIndex: 1, role: "administrator" },
+        {
+          model: "Na 31-2 Bijlage 1",
+          rowIndex: 2,
+          role: "administrator",
+        },
+      ] satisfies {
+        model: string;
+        rowIndex: number;
+        role: Role;
+      }[])("Shows modal on clicking download $model when polling stations missing for $role", async ({
+        model,
+        rowIndex,
+        role,
+      }) => {
+        const user = userEvent.setup();
+        const electionDataSecondSession = getElectionMockData();
+        electionDataSecondSession.polling_stations = [];
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage(role);
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("CSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        const row = rows[rowIndex]!;
+        expect(row).toHaveTextContent(model);
+        await user.click(row);
+
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        const title = within(modal).getByText("Voeg eerst stembureaus toe");
+        expect(title).toBeVisible();
+        const instruction = within(modal).getByText(
+          "In deze download zit voor elk onderliggend stembureau een proces-verbaal met de gegevens van dat stembureau al ingevuld. Voeg daarom eerst de onderliggende stembureaus toe.",
+        );
+        expect(instruction).toBeVisible();
+
+        const add_polling_stations_button = await within(modal).findByRole("button", { name: "Stembureaus toevoegen" });
+        expect(add_polling_stations_button).toBeVisible();
+        await user.click(add_polling_stations_button);
+
+        expect(navigate).toHaveBeenCalledExactlyOnceWith("polling-stations");
+      });
+
       test("Shows empty document section for second committee session", async () => {
         const electionDataSecondSession = getElectionMockData({}, { id: 2, number: 2 });
         electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(2, 3);
@@ -495,6 +559,72 @@ describe("ElectionHomePage", () => {
           ["N 10-1", "Inlegvellen controles en correcties per stembureau"],
           ["Na 14-1, versie 1", "Corrigenda eerste zitting per stembureau"],
         ]);
+      });
+
+      test.each([
+        { model: ["N 10-1", "Processen-verbaal per stembureau"].join(""), rowIndex: 1, role: "coordinator_gsb" },
+        {
+          model: ["N 10-1", "Inlegvellen controles en correcties per stembureau"].join(""),
+          rowIndex: 2,
+          role: "coordinator_gsb",
+        },
+        { model: "Na 14-1, versie 1", rowIndex: 3, role: "coordinator_gsb" },
+        { model: ["N 10-1", "Processen-verbaal per stembureau"].join(""), rowIndex: 1, role: "administrator" },
+        {
+          model: ["N 10-1", "Inlegvellen controles en correcties per stembureau"].join(""),
+          rowIndex: 2,
+          role: "administrator",
+        },
+        { model: "Na 14-1, versie 1", rowIndex: 3, role: "administrator" },
+      ] satisfies {
+        model: string;
+        rowIndex: number;
+        role: Role;
+      }[])("Shows modal on clicking download $model when polling stations missing for $role", async ({
+        model,
+        rowIndex,
+        role,
+      }) => {
+        const user = userEvent.setup();
+        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" });
+        electionDataSecondSession.polling_stations = [];
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage(role);
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        const row = rows[rowIndex]!;
+        expect(row).toHaveTextContent(model);
+        await user.click(row);
+
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        const title = within(modal).getByText("Voeg eerst stembureaus toe");
+        expect(title).toBeVisible();
+        const instruction = within(modal).getByText(
+          "In deze download zit voor elk onderliggend stembureau een proces-verbaal met de gegevens van dat stembureau al ingevuld. Voeg daarom eerst de onderliggende stembureaus toe.",
+        );
+        expect(instruction).toBeVisible();
+
+        const add_polling_stations_button = await within(modal).findByRole("button", { name: "Stembureaus toevoegen" });
+        expect(add_polling_stations_button).toBeVisible();
+        await user.click(add_polling_stations_button);
+
+        expect(navigate).toHaveBeenCalledExactlyOnceWith("polling-stations");
       });
 
       test("Shows modal on clicking download Na 14-1 versie 1 when committee session details missing", async () => {

@@ -60,16 +60,26 @@ describe("routes", () => {
   });
 
   test("EntryNotFound API response results in not found page", async () => {
-    overrideOnce("post", "/api/data_entries/9876/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, 404, {
+    overrideOnce("post", "/api/data_entries/1/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, 404, {
       error: "Item not found",
       fatal: true,
       reference: "EntryNotFound",
     } satisfies ErrorResponse);
     // Navigate to a non-existing page
     const router = renderWithRouter("typist_gsb");
-    await router.navigate("/elections/1/data-entry/9876/1");
-    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/9876/1");
+    await router.navigate("/elections/1/data-entry/1/1");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/1");
     await expectNotFound("Niet gevonden");
+  });
+
+  test("Not found if data entry does not belong to current committee session", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch");
+
+    // Data entry 9876 is not in the status list of election 1
+    const router = renderWithRouter("typist_gsb");
+    await router.navigate("/elections/1/data-entry/9876/1");
+    await expectNotFound();
+    expect(fetchSpy).not.toHaveBeenCalledWith(expect.stringContaining("/claim"), expect.anything());
   });
 
   test("Non existing entry number results in not found page", async () => {

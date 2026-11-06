@@ -21,7 +21,7 @@ export function MissingPollingStationsModal({ onClose, to }: MissingPollingStati
             void navigate(to);
           }}
         >
-          {t("election_management.missing_polling_stations_modal.enter_details_button")}
+          {t("election_management.missing_polling_stations_modal.add_polling_stations_button")}
         </Button>
         <Button variant="secondary" size="lg" onClick={onClose}>
           {t("cancel")}

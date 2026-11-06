@@ -38,46 +38,12 @@ interface DownloadSectionProps {
   numberOfPollingStations: number;
 }
 
-function EmptyModelsSection({ election, session, numberOfPollingStations }: DownloadSectionProps) {
-  if (session.number === 1) {
-    // Sections for first session
-    if (election.counting_method === "CSO") {
-      return (
-        <CSOFirstSessionDownloadSection
-          election={election}
-          session={session}
-          numberOfPollingStations={numberOfPollingStations}
-        />
-      );
-    } else {
-      return (
-        <DSOFirstSessionDownloadSection
-          election={election}
-          session={session}
-          numberOfPollingStations={numberOfPollingStations}
-        />
-      );
-    }
-  } else {
-    // Sections for next session
-    if (election.counting_method === "CSO") {
-      return (
-        <CSONextSessionDownloadSection
-          election={election}
-          session={session}
-          numberOfPollingStations={numberOfPollingStations}
-        />
-      );
-    } else {
-      return (
-        <DSONextSessionDownloadSection
-          election={election}
-          session={session}
-          numberOfPollingStations={numberOfPollingStations}
-        />
-      );
-    }
+function EmptyModelsSection(props: DownloadSectionProps) {
+  const isCSO = props.election.counting_method === "CSO";
+  if (props.session.number === 1) {
+    return isCSO ? <CSOFirstSessionDownloadSection {...props} /> : <DSOFirstSessionDownloadSection {...props} />;
   }
+  return isCSO ? <CSONextSessionDownloadSection {...props} /> : <DSONextSessionDownloadSection {...props} />;
 }
 
 function CSOFirstSessionDownloadSection({ election, numberOfPollingStations }: DownloadSectionProps) {

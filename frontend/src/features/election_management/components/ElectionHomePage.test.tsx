@@ -26,7 +26,18 @@ import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
-import type { CommitteeSession, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
+import type {
+  CommitteeSession,
+  ELECTION_DOWNLOAD_N_10_1_INLEGVEL_REQUEST_PATH,
+  ELECTION_DOWNLOAD_N_10_1_REQUEST_PATH,
+  ELECTION_DOWNLOAD_N_10_2_REQUEST_PATH,
+  ELECTION_DOWNLOAD_NA_14_1_VERSIE1_REQUEST_PATH,
+  ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH,
+  ElectionDetailsResponse,
+  ErrorResponse,
+  Role,
+} from "@/types/generated/openapi";
+import * as download from "@/utils/download";
 import { ElectionHomePage } from "./ElectionHomePage";
 
 const navigate = vi.fn();
@@ -413,6 +424,62 @@ describe("ElectionHomePage", () => {
       });
 
       test.each([
+        { model: "N 10-2", rowIndex: 1, role: "coordinator_gsb", endpoint: "/api/elections/1/download_n_10_2" },
+        {
+          model: "Na 31-2 Bijlage 1",
+          rowIndex: 2,
+          role: "coordinator_gsb",
+          endpoint: "/api/elections/1/download_na_31_2_bijlage1",
+        },
+        { model: "N 10-2", rowIndex: 1, role: "administrator", endpoint: "/api/elections/1/download_n_10_2" },
+        {
+          model: "Na 31-2 Bijlage 1",
+          rowIndex: 2,
+          role: "administrator",
+          endpoint: "/api/elections/1/download_na_31_2_bijlage1",
+        },
+      ] satisfies {
+        model: string;
+        rowIndex: number;
+        role: Role;
+        endpoint: ELECTION_DOWNLOAD_N_10_2_REQUEST_PATH | ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH;
+      }[])("Does not show modal on clicking download $model when polling stations exist for $role", async ({
+        model,
+        rowIndex,
+        role,
+        endpoint,
+      }) => {
+        const user = userEvent.setup();
+        const electionDataFirstSession = getElectionMockData();
+        const directDownload = vi.spyOn(download, "directDownload").mockImplementation(() => {});
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage(role);
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("CSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        const row = rows[rowIndex]!;
+        expect(row).toHaveTextContent(model);
+        await user.click(row);
+
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(directDownload).toHaveBeenCalledExactlyOnceWith(endpoint);
+      });
+
+      test.each([
         { model: "N 10-2", rowIndex: 1, role: "coordinator_gsb" },
         {
           model: "Na 31-2 Bijlage 1",
@@ -435,12 +502,12 @@ describe("ElectionHomePage", () => {
         role,
       }) => {
         const user = userEvent.setup();
-        const electionDataSecondSession = getElectionMockData();
-        electionDataSecondSession.polling_stations = [];
+        const electionDataFirstSession = getElectionMockData();
+        electionDataFirstSession.polling_stations = [];
         vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
         server.use(
           http.get("/api/elections/1", () =>
-            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
           ),
         );
 
@@ -504,11 +571,11 @@ describe("ElectionHomePage", () => {
       });
 
       test("Shows empty document section for third committee session", async () => {
-        const electionDataSecondSession = getElectionMockData({}, { id: 2, number: 3 });
-        electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(1, 3);
+        const electionDataThirdSession = getElectionMockData({}, { id: 2, number: 3 });
+        electionDataThirdSession.committee_sessions = getCommitteeSessionListMockData().slice(1, 3);
         server.use(
           http.get("/api/elections/1", () =>
-            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+            HttpResponse.json(electionDataThirdSession satisfies ElectionDetailsResponse, { status: 200 }),
           ),
         );
 
@@ -533,11 +600,11 @@ describe("ElectionHomePage", () => {
 
     describe("DSO", () => {
       test("Shows empty documents section for first committee session", async () => {
-        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" });
+        const electionDataFirstSession = getElectionMockData({ counting_method: "DSO" });
         vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
         server.use(
           http.get("/api/elections/1", () =>
-            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
           ),
         );
 
@@ -559,6 +626,90 @@ describe("ElectionHomePage", () => {
           ["N 10-1", "Inlegvellen controles en correcties per stembureau"],
           ["Na 14-1, versie 1", "Corrigenda eerste zitting per stembureau"],
         ]);
+      });
+
+      test.each([
+        {
+          model: ["N 10-1", "Processen-verbaal per stembureau"].join(""),
+          rowIndex: 1,
+          role: "coordinator_gsb",
+          endpoint: "/api/elections/1/download_n_10_1",
+        },
+        {
+          model: ["N 10-1", "Inlegvellen controles en correcties per stembureau"].join(""),
+          rowIndex: 2,
+          role: "coordinator_gsb",
+          endpoint: "/api/elections/1/download_n_10_1_inlegvel",
+        },
+        {
+          model: "Na 14-1, versie 1",
+          rowIndex: 3,
+          role: "coordinator_gsb",
+          endpoint: "/api/elections/1/download_na_14_1_versie1",
+        },
+        {
+          model: ["N 10-1", "Processen-verbaal per stembureau"].join(""),
+          rowIndex: 1,
+          role: "administrator",
+          endpoint: "/api/elections/1/download_n_10_1",
+        },
+        {
+          model: ["N 10-1", "Inlegvellen controles en correcties per stembureau"].join(""),
+          rowIndex: 2,
+          role: "administrator",
+          endpoint: "/api/elections/1/download_n_10_1_inlegvel",
+        },
+        {
+          model: "Na 14-1, versie 1",
+          rowIndex: 3,
+          role: "administrator",
+          endpoint: "/api/elections/1/download_na_14_1_versie1",
+        },
+      ] satisfies {
+        model: string;
+        rowIndex: number;
+        role: Role;
+        endpoint:
+          | ELECTION_DOWNLOAD_N_10_1_REQUEST_PATH
+          | ELECTION_DOWNLOAD_N_10_1_INLEGVEL_REQUEST_PATH
+          | ELECTION_DOWNLOAD_NA_14_1_VERSIE1_REQUEST_PATH;
+      }[])("Does not show modal on clicking download $model when polling stations exist for $role", async ({
+        model,
+        rowIndex,
+        role,
+        endpoint,
+      }) => {
+        const user = userEvent.setup();
+        const directDownload = vi.spyOn(download, "directDownload").mockImplementation(() => {});
+        const electionDataFirstSessionWithDetails = getElectionMockData(
+          { counting_method: "DSO" },
+          { location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+        );
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataFirstSessionWithDetails satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage(role);
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        const row = rows[rowIndex]!;
+        expect(row).toHaveTextContent(model);
+        await user.click(row);
+
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(directDownload).toHaveBeenCalledExactlyOnceWith(endpoint);
       });
 
       test.each([
@@ -586,12 +737,12 @@ describe("ElectionHomePage", () => {
         role,
       }) => {
         const user = userEvent.setup();
-        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" });
-        electionDataSecondSession.polling_stations = [];
+        const electionDataFirstSession = getElectionMockData({ counting_method: "DSO" });
+        electionDataFirstSession.polling_stations = [];
         vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
         server.use(
           http.get("/api/elections/1", () =>
-            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
           ),
         );
 
@@ -629,11 +780,11 @@ describe("ElectionHomePage", () => {
 
       test("Shows modal on clicking download Na 14-1 versie 1 when committee session details missing", async () => {
         const user = userEvent.setup();
-        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" });
+        const electionDataFirstSession = getElectionMockData({ counting_method: "DSO" });
         vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
         server.use(
           http.get("/api/elections/1", () =>
-            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
           ),
         );
 
@@ -665,13 +816,14 @@ describe("ElectionHomePage", () => {
 
       test("Does not show modal on clicking download Na 14-1 versie 1 when committee session details present", async () => {
         const user = userEvent.setup();
-        const electionDataSecondSession = getElectionMockData(
+        const directDownload = vi.spyOn(download, "directDownload").mockImplementation(() => {});
+        const electionDataFirstSessionWithDetails = getElectionMockData(
           { counting_method: "DSO" },
           { location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
         );
         server.use(
           http.get("/api/elections/1", () =>
-            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+            HttpResponse.json(electionDataFirstSessionWithDetails satisfies ElectionDetailsResponse, { status: 200 }),
           ),
         );
 
@@ -690,15 +842,16 @@ describe("ElectionHomePage", () => {
         await user.click(rows[3]!);
 
         expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(directDownload).toHaveBeenCalledExactlyOnceWith("/api/elections/1/download_na_14_1_versie1");
       });
 
       test("Shows modal on clicking download Na 14-1 versie 1 when committee session details missing for administrator", async () => {
         const user = userEvent.setup();
-        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" });
+        const electionDataFirstSession = getElectionMockData({ counting_method: "DSO" });
         vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
         server.use(
           http.get("/api/elections/1", () =>
-            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
           ),
         );
 
@@ -756,11 +909,11 @@ describe("ElectionHomePage", () => {
       });
 
       test("Shows empty document section for third committee session", async () => {
-        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" }, { id: 2, number: 3 });
-        electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(1, 3);
+        const electionDataThirdSession = getElectionMockData({ counting_method: "DSO" }, { id: 2, number: 3 });
+        electionDataThirdSession.committee_sessions = getCommitteeSessionListMockData().slice(1, 3);
         server.use(
           http.get("/api/elections/1", () =>
-            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+            HttpResponse.json(electionDataThirdSession satisfies ElectionDetailsResponse, { status: 200 }),
           ),
         );
 

@@ -29,11 +29,8 @@ use crate::{
     },
     eml::EMLImportError,
     infra::backup::BackupError,
-    repository::polling_station_repo,
-    service::{
-        DataEntryServiceError, PollingStationServiceError, SigningServiceError,
-        SubCommitteeCertificateError, SubCommitteeServiceError,
-    },
+    repository::common as common_repo,
+    service::{SigningServiceError, SubCommitteeCertificateError, SubCommitteeServiceError},
 };
 
 /// Trait for error types that can be converted to HTTP response parts
@@ -489,17 +486,6 @@ impl From<DataEntryImportError> for APIError {
     }
 }
 
-impl From<DataEntryServiceError> for APIError {
-    fn from(err: DataEntryServiceError) -> Self {
-        match err {
-            DataEntryServiceError::DatabaseError(e) => e.into(),
-            DataEntryServiceError::DataEntryAlreadyLinked => {
-                APIError::DataIntegrityError(String::from("Data entry is already linked"))
-            }
-        }
-    }
-}
-
 impl From<InvalidElectionError> for APIError {
     fn from(err: InvalidElectionError) -> Self {
         APIError::DataIntegrityError(err.0)
@@ -509,14 +495,6 @@ impl From<InvalidElectionError> for APIError {
 impl From<ModelsError> for APIError {
     fn from(err: ModelsError) -> Self {
         APIError::Delegated(Box::new(err))
-    }
-}
-
-impl From<PollingStationServiceError> for APIError {
-    fn from(err: PollingStationServiceError) -> Self {
-        match err {
-            PollingStationServiceError::DatabaseError(e) => e.into(),
-        }
     }
 }
 
@@ -540,12 +518,15 @@ impl From<IncorrectResultsModel> for APIError {
     }
 }
 
-impl From<polling_station_repo::CreateDataEntryError> for APIError {
-    fn from(err: polling_station_repo::CreateDataEntryError) -> Self {
+impl From<common_repo::DatabaseError> for APIError {
+    fn from(err: common_repo::DatabaseError) -> Self {
         match err {
-            polling_station_repo::CreateDataEntryError::Sqlx(e) => e.into(),
-            polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
+            common_repo::DatabaseError::Sqlx(e) => e.into(),
+            common_repo::DatabaseError::DataEntryAlreadyLinked => {
                 APIError::DataIntegrityError(String::from("Data entry is already linked"))
+            }
+            common_repo::DatabaseError::InvestigationIntegrityError => {
+                APIError::DataIntegrityError(String::from("Investigation integrity error"))
             }
         }
     }

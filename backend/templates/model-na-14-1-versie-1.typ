@@ -26,7 +26,7 @@
 #title_page(
   is_municipality[#input.election.authority_id #input.election.authority_region][#input.election.authority_region],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
-  [#input.election.name - #format_date(input.election.election_date)],
+  [#get_election_title(input.election), #format_date(input.election.election_date)],
   [
     Verslag van telling van een door het #location_type herteld stembureau -
     Model Na 14-1 (eerste zitting)
@@ -67,10 +67,12 @@ Het #location_type heeft de telresultaten van dit stembureau onderzocht en is to
 == Aantallen kiezers en stemmen
 
 #emph_block[
-  Is in de telresultaten van het #underline[*stembureau*] (rubriek 2.3 van het proces-verbaal van het stembureau) het verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers volledig verklaard? Controleer daarbij ook of rubriek 2.3 van het proces-verbaal van het stembureau correct is ingevuld en de verklaringen het verschil daadwerkelijk verklaren.
+  Is in de telresultaten van het #underline[*stembureau*] (rubriek 2.3 van het proces-verbaal van het stembureau) het aantal toegelaten kiezers (D) en het totaal aantal getelde stemmen (H) gelijk *OF* is er een verschil en is dit verschil *volledig* verklaard?
 ]
 
-#checkbox[Ja]
+Controleer bij verklaarde verschillen ook of rubriek 2.3 van het proces-verbaal van het stembureau correct is ingevuld en de verklaringen het verschil daadwerkelijk verklaren.
+
+#checkbox[Ja, D en H zijn gelijk *OF* het verschil is volledig verklaard]
 
 #checkbox[Nee #sym.arrow.r *Hertel het aantal toegelaten kiezers en de stembiljetten. Tot het verschil is opgelost of beide één keer
 zijn herteld.*]

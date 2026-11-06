@@ -7,7 +7,8 @@
 //!
 //! [`Certificate::from_der`]/[`Certificate::from_pem`] read a certificate back,
 //! and [`Certificate::to_pem`] encodes the `.crt` in the same PEM format as
-//! OSV2020-U.
+//! OSV2020-U. [`PublicKey::to_pem`]/[`PublicKey::from_pem`] encode and decode
+//! the bare public key as PEM.
 //!
 //! [`SigningKeyPair::sign`] signs an EML document, producing a
 //! [`Signature`] (the `.signature` file). [`Signature::from_der`] reads one

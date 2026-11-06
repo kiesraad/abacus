@@ -1,9 +1,14 @@
 import type { Locator, Page } from "@playwright/test";
+import type { CommitteeCategory } from "@/types/generated/openapi";
 
 export class ElectionHome {
   readonly header: Locator;
   readonly alert: Locator;
   readonly alertLinkToPollingStations: Locator;
+  readonly alertRegisterPublicKey: Locator;
+  readonly alertRegisterPublicKeyButton: Locator;
+  readonly alertPublicKeyRegistered: Locator;
+  readonly importKeysButton: Locator;
   readonly detailsButton: Locator;
   readonly startButton: Locator;
   readonly statusButton: Locator;
@@ -21,6 +26,12 @@ export class ElectionHome {
     this.header = page.getByRole("heading", { level: 1 });
     this.alert = page.getByRole("alert");
     this.alertLinkToPollingStations = this.alert.getByRole("link", { name: "Stembureaus beheren" });
+    this.alertRegisterPublicKey = this.alert.filter({ hasText: "Publieke sleutel registreren" });
+    this.alertRegisterPublicKeyButton = this.alertRegisterPublicKey.getByRole("link", {
+      name: "Publieke sleutel registreren",
+    });
+    this.alertPublicKeyRegistered = this.alert.filter({ hasText: "Publieke sleutel geregistreerd" });
+    this.importKeysButton = page.getByRole("button", { name: "Publieke sleutels GSB's importeren" });
     this.detailsButton = page.getByRole("button", { name: "Details van de zitting" });
     this.startButton = page.getByRole("button", { name: "Start invoer" });
     this.statusButton = page.getByRole("link", { name: "Bekijk voortgang" });
@@ -37,5 +48,9 @@ export class ElectionHome {
 
   getCommitteeSessionCard(number: number) {
     return this.page.getByTestId(`session-${number}`);
+  }
+
+  getAlertElectionCreated(committeeCategory: CommitteeCategory, electionName: string) {
+    return this.alert.filter({ hasText: `Verkiezing ${committeeCategory} ${electionName} toegevoegd` });
   }
 }

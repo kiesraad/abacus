@@ -13,6 +13,14 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     fields: ["data.extra_investigation"],
     code: "F102",
   },
+  F103: {
+    fields: ["data.extra_investigation"],
+    code: "F103",
+  },
+  F104: {
+    fields: ["data.extra_investigation"],
+    code: "F104",
+  },
   F111: {
     fields: ["data.counting_differences_polling_station"],
     code: "F111",
@@ -118,6 +126,10 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
   F312: {
     fields: ["data.differences_counts.more_ballots_count", "data.differences_counts.fewer_ballots_count"],
     code: "F312",
+  },
+  F313: {
+    fields: ["data.differences_counts.difference_completely_accounted_for"],
+    code: "F313",
   },
   F401: {
     fields: ["data.political_group_votes.0.total"],

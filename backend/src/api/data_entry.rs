@@ -18,8 +18,8 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            ClientState, DataEntryId, DataEntryRow, DataEntrySource, DataEntrySourceContext,
-            DataEntryStatus, DataEntryStatusName, DataEntryStatusResponse,
+            ClientState, DataEntryId, DataEntryOrigin, DataEntryRow, DataEntrySource,
+            DataEntrySourceContext, DataEntryStatus, DataEntryStatusName, DataEntryStatusResponse,
             DataEntryTransitionError, DataEntryUpdate, EntriesDifferent,
         },
         election::ElectionId,
@@ -41,7 +41,9 @@ use crate::{
         election_repo, investigation_repo, polling_station_repo,
         user_repo::{User, UserId},
     },
-    service::change_committee_session_status,
+    service::{
+        change_committee_session_status, validate_committee_session_is_current_committee_session,
+    },
 };
 
 impl From<DataError> for APIError {
@@ -73,7 +75,7 @@ pub struct DataEntryAuditData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data_entry_progress: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub first_entry_user_id: Option<UserId>,
+    pub first_entry_origin: Option<DataEntryOrigin>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub second_entry_user_id: Option<UserId>,
 }
@@ -86,7 +88,7 @@ impl From<DataEntryRow> for DataEntryAuditData {
             data_entry_id: value.id,
             data_entry_status: state.status_name().to_string(),
             data_entry_progress: state.get_data_entry_progress().map(|p| format!("{p}%")),
-            first_entry_user_id: state.get_first_entry_user_id(),
+            first_entry_origin: state.get_first_entry_origin(),
             second_entry_user_id: state.get_second_entry_user_id(),
         }
     }
@@ -180,7 +182,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_status).authorize(ALL_ROLES))
 }
 
-async fn validate_and_get_data(
+async fn get_authorized_data(
     conn: &mut SqliteConnection,
     data_entry_id: DataEntryId,
     user: &User,
@@ -206,6 +208,16 @@ async fn validate_and_get_data(
         ));
     }
 
+    Ok((context, data_entry_status))
+}
+
+async fn validate_and_get_data(
+    conn: &mut SqliteConnection,
+    data_entry_id: DataEntryId,
+    user: &User,
+) -> Result<(DataEntrySourceContext, DataEntryStatus), APIError> {
+    let (context, data_entry_status) = get_authorized_data(conn, data_entry_id, user).await?;
+
     // Validate state based on user role
     if user.role().is_typist() {
         if context.committee_session.status == CommitteeSessionStatus::Paused {
@@ -226,6 +238,23 @@ async fn validate_and_get_data(
     Ok((context, data_entry_status))
 }
 
+/// Unlink and delete a data entry, without changing the committee session status
+pub async fn delete_data_entry(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    polling_station_id: PollingStationId,
+    data_entry_id: DataEntryId,
+) -> Result<(), APIError> {
+    polling_station_repo::unlink_data_entry(conn, polling_station_id).await?;
+    let data_entry = data_entry_repo::delete(conn, data_entry_id).await?;
+
+    audit_service
+        .log(conn, &DataEntryDeletedAuditData(data_entry.into()), None)
+        .await?;
+
+    Ok(())
+}
+
 pub async fn delete_data_entry_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
@@ -237,12 +266,7 @@ pub async fn delete_data_entry_for_polling_station(
         return Ok(());
     };
 
-    polling_station_repo::unlink_data_entry(conn, polling_station_id).await?;
-    let data_entry = data_entry_repo::delete(conn, data_entry_id).await?;
-
-    audit_service
-        .log(conn, &DataEntryDeletedAuditData(data_entry.into()), None)
-        .await?;
+    delete_data_entry(conn, audit_service, polling_station_id, data_entry_id).await?;
 
     if committee_session.status == CommitteeSessionStatus::Completed {
         change_committee_session_status(
@@ -633,6 +657,12 @@ async fn data_entry_reset(
     let context = data_entry_repo::resolve_source(&mut tx, data_entry_id).await?;
     user.role()
         .is_authorized(context.election.committee_category)?;
+    validate_committee_session_is_current_committee_session(
+        &mut tx,
+        context.committee_session.election_id,
+        context.committee_session.id,
+    )
+    .await?;
 
     let data_entry = data_entry_repo::get(&mut tx, data_entry_id).await?;
 
@@ -696,6 +726,7 @@ pub struct DataEntryGetResponse {
         ("data_entry_id" = DataEntryId, description = "Data entry database id"),
     ),
 )]
+#[expect(clippy::too_many_lines, reason = "Written out cases take many lines")]
 async fn data_entry_get(
     user: User,
     State(pool): State<SqlitePool>,
@@ -704,7 +735,23 @@ async fn data_entry_get(
     use DataEntryStatus::*;
 
     let mut conn = pool.acquire().await?;
-    let (context, state) = validate_and_get_data(&mut conn, data_entry_id, &user).await?;
+    let (context, state) = get_authorized_data(&mut conn, data_entry_id, &user).await?;
+    validate_committee_session_is_current_committee_session(
+        &mut conn,
+        context.committee_session.election_id,
+        context.committee_session.id,
+    )
+    .await?;
+
+    // Read-only view should stay available in completed state, unlike other handlers
+    if !matches!(
+        context.committee_session.status,
+        CommitteeSessionStatus::DataEntry
+            | CommitteeSessionStatus::Paused
+            | CommitteeSessionStatus::Completed
+    ) {
+        return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
+    }
 
     Ok(Json(match state.clone() {
         FirstEntryInProgress(first_entry_in_progress_state) => DataEntryGetResponse {
@@ -729,21 +776,24 @@ async fn data_entry_get(
             source: context.source,
         },
         FirstEntryFinalised(first_entry_finalised_state) => DataEntryGetResponse {
-            user_id: Some(first_entry_finalised_state.first_entry_user_id),
+            user_id: match first_entry_finalised_state.first_entry_origin {
+                DataEntryOrigin::Import => None,
+                DataEntryOrigin::Typist(user_id) => Some(user_id),
+            },
             data: first_entry_finalised_state.finalised_first_entry,
             status: state.status_name(),
             validation_results: state.start_validate(&context.election)?,
             source: context.source,
         },
         SecondEntryInProgress(second_entry_in_progress_state) => DataEntryGetResponse {
-            user_id: Some(second_entry_in_progress_state.second_entry_user_id),
+            user_id: state.get_second_entry_user_id(),
             data: second_entry_in_progress_state.second_entry,
             status: state.status_name(),
             validation_results: ValidationResults::default(),
             source: context.source,
         },
         SecondEntryCorrection(second_entry_correction_state) => DataEntryGetResponse {
-            user_id: Some(second_entry_correction_state.second_entry_user_id),
+            user_id: state.get_second_entry_user_id(),
             data: second_entry_correction_state.second_entry,
             status: state.status_name(),
             validation_results: ValidationResults::default(),
@@ -756,7 +806,7 @@ async fn data_entry_get(
             validation_results: state.start_validate(&context.election)?,
             source: context.source,
         },
-        _ => Err(APIError::Conflict(
+        Empty | EntriesDifferent(_) => Err(APIError::Conflict(
             "Data entry is in the wrong state".to_string(),
             ErrorReference::DataEntryGetNotAllowed,
         ))?,
@@ -820,7 +870,7 @@ async fn data_entry_resolve_errors(
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct DataEntryGetDifferencesResponse {
-    pub first_entry_user_id: UserId,
+    pub first_entry_origin: DataEntryOrigin,
     pub first_entry: Results,
     pub first_entry_has_errors: bool,
     pub second_entry_user_id: UserId,
@@ -856,7 +906,7 @@ async fn data_entry_get_differences(
 
     match state {
         DataEntryStatus::EntriesDifferent(EntriesDifferent {
-            first_entry_user_id,
+            first_entry_origin,
             first_entry,
             second_entry_user_id,
             second_entry,
@@ -868,7 +918,7 @@ async fn data_entry_get_differences(
                 second_entry.start_validate(&context.election)?.has_errors();
 
             Ok(Json(DataEntryGetDifferencesResponse {
-                first_entry_user_id,
+                first_entry_origin,
                 first_entry,
                 first_entry_has_errors,
                 second_entry_user_id,
@@ -962,14 +1012,16 @@ pub struct ElectionStatusResponse {
 pub struct ElectionStatusResponseEntry {
     /// Data entry id
     pub data_entry_id: DataEntryId,
-    /// Data entry source (polling station or sub committee)
+    /// Data entry source (polling station or subcommittee)
     pub source: DataEntrySource,
     /// Data entry status
     pub status: DataEntryStatusName,
-    /// First entry user id
+    /// Time when the data entry was last updated
+    pub updated_at: DateTime<Utc>,
+    /// First entry origin (import or typist user id)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = u8)]
-    pub first_entry_user_id: Option<UserId>,
+    #[schema(value_type = DataEntryOrigin)]
+    pub first_entry_origin: Option<DataEntryOrigin>,
     /// Second entry user id
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = u8)]
@@ -1036,6 +1088,7 @@ mod tests {
         domain::{
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
+            data_entry::DataEntryOrigin,
             results::tests::example_results,
             role::Role,
             validate::{ValidationResult, ValidationResultCode},
@@ -1485,9 +1538,7 @@ mod tests {
         let polling_station_id = PollingStationId::from(742);
         // Insert investigation with corrected_results and create empty data entry
         // (simulates what the investigation conclude flow does)
-        create_test_investigation(&mut conn, polling_station_id, Some(true))
-            .await
-            .unwrap();
+        create_test_investigation(&mut conn, polling_station_id, Some(true)).await;
         let ps = polling_station_repo::get(&mut conn, polling_station_id)
             .await
             .unwrap();
@@ -1675,9 +1726,7 @@ mod tests {
         let polling_station_id = PollingStationId::from(529);
 
         // Add investigation with corrected_results and create empty data entry
-        create_test_investigation(&mut conn, polling_station_id, Some(true))
-            .await
-            .unwrap();
+        create_test_investigation(&mut conn, polling_station_id, Some(true)).await;
         let ps = polling_station_repo::get(&mut conn, polling_station_id)
             .await
             .unwrap();
@@ -1835,7 +1884,7 @@ mod tests {
             serde_json::json!({
                 "data_entry_id": 201,
                 "data_entry_status": "first_entry_has_errors",
-                "first_entry_user_id": 1,
+                "first_entry_origin": {"type": "Typist", "user_id": 1},
             })
         );
     }
@@ -1982,6 +2031,7 @@ mod tests {
             AuditEventType::DataEntryDiscarded,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+            None,
         )
         .await;
     }
@@ -2217,6 +2267,7 @@ mod tests {
             AuditEventType::DataEntryDiscarded,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+            None,
         )
         .await;
 
@@ -2224,7 +2275,10 @@ mod tests {
         let DataEntryStatus::FirstEntryFinalised(state) = data_entry.state.0 else {
             panic!("Expected entry to be in FirstEntryFinalised state");
         };
-        assert_eq!(state.first_entry_user_id, UserId::from(2));
+        assert_eq!(
+            state.first_entry_origin,
+            DataEntryOrigin::Typist(UserId::from(2))
+        );
         let Results::CSOFirstSession(first_entry) = state.finalised_first_entry else {
             panic!("Expected entry to be CSOFirstSession model");
         };
@@ -2257,6 +2311,7 @@ mod tests {
             AuditEventType::DataEntryDiscarded,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+            None,
         )
         .await;
 
@@ -2264,7 +2319,10 @@ mod tests {
         let DataEntryStatus::FirstEntryFinalised(state) = data_entry.state.0 else {
             panic!("Expected entry to be in FirstEntryFinalised state");
         };
-        assert_eq!(state.first_entry_user_id, UserId::from(1));
+        assert_eq!(
+            state.first_entry_origin,
+            DataEntryOrigin::Typist(UserId::from(1))
+        );
         let Results::CSOFirstSession(first_entry) = state.finalised_first_entry else {
             panic!("Expected entry to be CSOFirstSession model");
         };
@@ -2343,6 +2401,7 @@ mod tests {
             AuditEventType::DataEntryReset,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(in_progress.clone())).unwrap(),
+            None,
         )
         .await;
     }
@@ -2403,6 +2462,28 @@ mod tests {
             .unwrap();
 
         assert_eq!(committee_session.status, CommitteeSessionStatus::DataEntry);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_data_entry_reset_fails_previous_committee_session(pool: SqlitePool) {
+        let data_entry_id = DataEntryId::from(701);
+
+        let response = reset(pool.clone(), data_entry_id).await;
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::EntryNotFound);
+
+        // Check that the data entry and committee session are not changed
+        let status = get_data_entry_status(pool.clone(), data_entry_id).await;
+        assert!(matches!(status, DataEntryStatus::Definitive(_)));
+
+        let mut conn = pool.acquire().await.unwrap();
+        let committee_session =
+            committee_session_repo::get(&mut conn, CommitteeSessionId::from(701))
+                .await
+                .unwrap();
+        assert_eq!(committee_session.status, CommitteeSessionStatus::Completed);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2476,6 +2557,7 @@ mod tests {
             AuditEventType::DataEntryReset,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(correction.clone())).unwrap(),
+            None,
         )
         .await;
     }
@@ -2514,6 +2596,7 @@ mod tests {
             AuditEventType::DataEntryReset,
             AuditEventLevel::Info,
             serde_json::to_value(DataEntryAuditData::from(correction.clone())).unwrap(),
+            None,
         )
         .await;
     }
@@ -2544,6 +2627,7 @@ mod tests {
                 AuditEventType::DataEntryKeptFirst,
                 AuditEventLevel::Info,
                 serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+                None,
             )
             .await;
 
@@ -2587,6 +2671,7 @@ mod tests {
                 AuditEventType::DataEntryKeptSecond,
                 AuditEventLevel::Info,
                 serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+                None,
             )
             .await;
 
@@ -2622,6 +2707,7 @@ mod tests {
                 AuditEventType::DataEntryKeptFirstReturnedSecond,
                 AuditEventLevel::Info,
                 serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+                None,
             )
             .await;
 
@@ -2670,6 +2756,7 @@ mod tests {
                 AuditEventType::DataEntryKeptSecondReturnedFirst,
                 AuditEventLevel::Info,
                 serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+                None,
             )
             .await;
 
@@ -2827,6 +2914,7 @@ mod tests {
                 AuditEventType::DataEntryDiscardedBoth,
                 AuditEventLevel::Info,
                 serde_json::to_value(DataEntryAuditData::from(data_entry)).unwrap(),
+                None,
             )
             .await;
         }
@@ -2997,9 +3085,7 @@ mod tests {
         .unwrap();
 
         // Add investigation with corrected_results and create empty data entry
-        create_test_investigation(&mut conn, polling_station_id, Some(true))
-            .await
-            .unwrap();
+        create_test_investigation(&mut conn, polling_station_id, Some(true)).await;
         let ps = polling_station_repo::get(&mut conn, polling_station_id)
             .await
             .unwrap();
@@ -3027,9 +3113,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = PollingStationId::from(742);
         // Add investigation with corrected_results and create empty data entry
-        create_test_investigation(&mut conn, polling_station_id, Some(true))
-            .await
-            .unwrap();
+        create_test_investigation(&mut conn, polling_station_id, Some(true)).await;
         let ps = polling_station_repo::get(&mut conn, polling_station_id)
             .await
             .unwrap();
@@ -3316,6 +3400,68 @@ mod tests {
             assert_eq!(result.user_id, None);
             assert!(!result.validation_results.has_errors());
             assert!(result.validation_results.has_warnings());
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_committee_session_status(pool: SqlitePool) {
+            let data_entry_id = DataEntryId::from(201);
+
+            // Complete first entry
+            claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+            save(
+                pool.clone(),
+                example_data_entry(),
+                data_entry_id,
+                EntryNumber::FirstEntry,
+            )
+            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+
+            // Complete second entry
+            claim(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
+            save(
+                pool.clone(),
+                example_data_entry(),
+                data_entry_id,
+                EntryNumber::SecondEntry,
+            )
+            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
+
+            for (status, allowed) in [
+                (CommitteeSessionStatus::Created, false),
+                (CommitteeSessionStatus::InPreparation, false),
+                (CommitteeSessionStatus::DataEntry, true),
+                (CommitteeSessionStatus::Paused, true),
+                (CommitteeSessionStatus::Completed, true),
+            ] {
+                change_status_committee_session(pool.clone(), CommitteeSessionId::from(2), status)
+                    .await;
+
+                let result = call_data_entry_get(pool.clone(), data_entry_id).await;
+
+                if allowed {
+                    assert_eq!(result.unwrap().status, DataEntryStatusName::Definitive);
+                } else {
+                    assert_eq!(
+                        result.err().unwrap().reference,
+                        ErrorReference::InvalidCommitteeSessionStatus
+                    );
+                }
+            }
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_7_four_sessions")
+        )))]
+        async fn test_previous_committee_session_fails(pool: SqlitePool) {
+            let result = call_data_entry_get(pool.clone(), DataEntryId::from(701))
+                .await
+                .err()
+                .unwrap();
+
+            assert_eq!(result.reference, ErrorReference::EntryNotFound);
         }
     }
 

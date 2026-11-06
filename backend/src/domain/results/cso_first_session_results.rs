@@ -18,7 +18,7 @@ use crate::domain::{compare::Compare, field_path::FieldPath};
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CSOFirstSessionResults {
-    /// Extra investigation ("B1-1 Alleen bij extra onderzoek")
+    /// Extra investigation ("B1-1 Extra onderzoek")
     pub extra_investigation: ExtraInvestigation,
     /// Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau")
     pub counting_differences_polling_station: CountingDifferencesPollingStation,

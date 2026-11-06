@@ -1,5 +1,4 @@
 import type { Locator, Page } from "@playwright/test";
-import type { CommitteeCategory } from "@/types/generated/openapi";
 
 export class ElectionsOverviewPgObj {
   readonly main: Locator;
@@ -17,12 +16,6 @@ export class ElectionsOverviewPgObj {
     this.elections = page.getByTestId("overview").locator("tbody").getByRole("row");
 
     this.alertAccountSetup = page.getByRole("alert").filter({ hasText: "Je account is ingesteld" });
-  }
-
-  getAlertElectionCreated(committeeCategory: CommitteeCategory, electionName: string) {
-    return this.page
-      .getByRole("alert")
-      .filter({ hasText: `Verkiezing ${committeeCategory} ${electionName} toegevoegd` });
   }
 
   findElectionRowById(electionId: number) {

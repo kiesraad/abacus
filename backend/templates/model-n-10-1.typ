@@ -27,7 +27,7 @@
 #title_page(
   [#input.election.authority_region #header-right #input.polling_station.name],
   "",
-  [#input.election.name - #format_date(input.election.election_date)],
+  [#get_election_title(input.election), #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst en kandidaat \
     Model N 10-1

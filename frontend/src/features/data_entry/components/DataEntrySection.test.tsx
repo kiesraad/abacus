@@ -108,7 +108,7 @@ describe("DataEntrySection", () => {
       const router = renderComponent("extra_investigation");
 
       // Wait for the page to be loaded
-      const title = await screen.findByText("Alleen bij extra onderzoek");
+      const title = await screen.findByText("Extra onderzoek");
       expect(title).toBeInTheDocument();
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });

@@ -18,6 +18,8 @@ env:
 jobs:
   backend-coverage:
     name: Backend coverage
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,6 +28,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
       BINSTALL_DISABLE_TELEMETRY: "true"
+      BINSTALL_NO_CONFIRM: "true"
       # Branch coverage requires Rust nightly: https://github.com/taiki-e/cargo-llvm-cov/issues/8
       RUSTUP_TOOLCHAIN: nightly-2026-07-10
     steps:
@@ -37,22 +40,26 @@ jobs:
         shell: bash
         run: rustup toolchain install "$RUSTUP_TOOLCHAIN"
       - name: Cargo cache
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@b874e25ea559687bec77e281e9b271aa1367b624 # main
+        uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # main
       - name: Install cargo-llvm-cov
-        run: cargo binstall cargo-llvm-cov
+        run: cargo binstall --locked cargo-llvm-cov
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Install Nextest
-        run: cargo binstall cargo-nextest
+        run: cargo binstall --locked cargo-nextest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Symlink sqlx test directory to /dev/shm
         run: mkdir -p target /dev/shm/sqlx && rm -rf target/sqlx && ln -s /dev/shm/sqlx target/sqlx
       - name: Run tests with coverage
         run: cargo llvm-cov nextest --workspace --branch --profile ci --features embed-typst,airgap-detection --cobertura --output-path ./target/llvm-cov-target/codecov.json
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Backend Nextest Coverage
@@ -74,7 +81,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup Node
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           package-manager-cache: false
@@ -94,7 +101,7 @@ jobs:
         env:
           CHROMIUM_CHANNEL: chrome
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Frontend Vitest Coverage

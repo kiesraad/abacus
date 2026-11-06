@@ -202,6 +202,41 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(
     path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
+async fn test_readd_investigation_with_corrected_results_after_deletion(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let polling_station_id = 529;
+
+    // The second conclude fails if deleting the investigation left its data entry linked
+    for _ in 0..2 {
+        assert_eq!(
+            create_investigation(&addr, polling_station_id)
+                .await
+                .status(),
+            StatusCode::CREATED
+        );
+        assert_eq!(
+            conclude_investigation(
+                &addr,
+                polling_station_id,
+                Some(serde_json::json!({"findings": "Test findings", "corrected_results": true})),
+            )
+            .await
+            .status(),
+            StatusCode::OK
+        );
+        assert_eq!(
+            delete_investigation(&addr, polling_station_id)
+                .await
+                .status(),
+            StatusCode::NO_CONTENT
+        );
+    }
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
     scripts("election_7_four_sessions", "users")
 )))]
 async fn test_partials_update(pool: SqlitePool) {
@@ -688,7 +723,9 @@ async fn test_update_creates_data_entry_when_corrected_results_changed_to_true(p
     path = "../../fixtures",
     scripts("election_7_four_sessions", "users")
 )))]
-async fn test_update_deletes_data_entry_when_corrected_results_changed_to_false(pool: SqlitePool) {
+async fn test_update_deletes_empty_data_entry_without_confirmation_when_corrected_results_changed_to_false(
+    pool: SqlitePool,
+) {
     let addr = serve_api(pool).await;
     let election_id = 7;
     let polling_station_id = 741;
@@ -711,31 +748,16 @@ async fn test_update_deletes_data_entry_when_corrected_results_changed_to_false(
         StatusCode::OK
     );
 
-    // Verify data entry exists
+    // Verify empty data entry exists
     let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses[&polling_station_id]["status"], "empty");
 
-    // Update corrected_results to false without accepting deletion — should fail
-    let response = update_investigation(
-        &addr,
-        polling_station_id,
-        Some(serde_json::json!({"reason": "Test reason", "corrected_results": false})),
-    )
-    .await;
-    assert_eq!(response.status(), StatusCode::CONFLICT);
-    let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
-
-    // Data entry still exists
-    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
-    assert_eq!(statuses[&polling_station_id]["status"], "empty");
-
-    // Update corrected_results to false with accepted deletion
+    // Update corrected_results to false without accepting deletion, allowed because nothing was entered
     assert_eq!(
         update_investigation(
             &addr,
             polling_station_id,
-            Some(serde_json::json!({"reason": "Test reason", "corrected_results": false, "accept_data_entry_deletion": true})),
+            Some(serde_json::json!({"reason": "Test reason", "corrected_results": false})),
         )
         .await
         .status(),
@@ -828,6 +850,37 @@ async fn test_cannot_conclude_update_new_polling_station_corrected_results_false
     assert_eq!(
         update_body["reference"],
         "InvestigationRequiresCorrectedResults"
+    );
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
+async fn test_update_new_polling_station_findings_with_undefined_corrected_results(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let ps_response = create_polling_station(&addr, &coordinator_cookie, 7, 123).await;
+    let ps_body: serde_json::Value = ps_response.json().await.unwrap();
+    let new_ps_id = u32::try_from(ps_body["id"].as_u64().unwrap()).unwrap();
+
+    let response = create_investigation(&addr, new_ps_id).await;
+    assert_eq!(response.status(), StatusCode::CREATED);
+
+    let update_response = update_investigation(
+        &addr,
+        new_ps_id,
+        Some(serde_json::json!({"reason": "Another reason"})),
+    )
+    .await;
+
+    assert_eq!(update_response.status(), StatusCode::OK);
+    let update_body: serde_json::Value = update_response.json().await.unwrap();
+    assert_eq!(
+        update_body,
+        serde_json::json!({"polling_station_id": new_ps_id, "reason": "Another reason"})
     );
 }
 

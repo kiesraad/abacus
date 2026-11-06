@@ -2,7 +2,10 @@ use std::{any::Any, error::Error, fmt::Debug};
 
 use axum::{
     Json,
-    extract::rejection::JsonRejection,
+    extract::{
+        multipart::{MultipartError, MultipartRejection},
+        rejection::JsonRejection,
+    },
     http::StatusCode,
     response::{IntoResponse, Response},
 };
@@ -15,7 +18,10 @@ use utoipa::ToSchema;
 
 use crate::{
     MAX_BODY_SIZE_MB,
-    api::middleware::authentication::error::AuthenticationError,
+    api::{
+        election::handlers::data_entry_import::DataEntryImportError,
+        middleware::authentication::error::AuthenticationError,
+    },
     domain::{
         committee_session::CommitteeSessionError, election::InvalidElectionError,
         models::error::ModelsError, results::IncorrectResultsModel, role::RoleNotAuthorizedError,
@@ -23,11 +29,8 @@ use crate::{
     },
     eml::EMLImportError,
     infra::backup::BackupError,
-    repository::polling_station_repo,
-    service::{
-        DataEntryServiceError, PollingStationServiceError, SigningServiceError,
-        SubCommitteeServiceError,
-    },
+    repository::common as common_repo,
+    service::{SigningServiceError, SubCommitteeCertificateError, SubCommitteeServiceError},
 };
 
 /// Trait for error types that can be converted to HTTP response parts
@@ -49,13 +52,19 @@ pub enum ErrorReference {
     ApportionmentNotCompleted,
     ApportionmentCommitteeSessionNotCompleted,
     ApportionmentInvalidLotDrawing,
+    CertificateAlreadyAdded,
+    CertificateUnknownSubCommittee,
+    CertificateWrongElection,
     CommitteeSessionPaused,
     DatabaseError,
     DataEntryAlreadyClaimed,
+    DataEntryAlreadyImported,
     DataEntryAlreadyFinalised,
     DataEntryCannotBeReset,
     DataEntryGetNotAllowed,
     DataEntryNotAllowed,
+    DataEntryValidationErrors,
+    ElectionMismatch,
     EmlImportError,
     EmlError,
     EntryNotFound,
@@ -63,9 +72,12 @@ pub enum ErrorReference {
     Forbidden,
     InternalServerError,
     InvalidApportionmentState,
+    InvalidCertificate,
     InvalidCommitteeSessionStatus,
+    InvalidCountType,
     InvalidData,
     InvalidDistrict,
+    InvalidFullname,
     InvalidHash,
     InvalidJson,
     InvalidPassword,
@@ -73,11 +85,13 @@ pub enum ErrorReference {
     InvalidDataEntrySource,
     InvalidSession,
     InvalidStateTransition,
+    InvalidUsername,
     InvalidUsernameOrPassword,
     InvalidVoteCandidate,
     InvalidVoteGroup,
     InvestigationHasDataEntryOrResult,
     InvestigationRequiresCorrectedResults,
+    LoginRateLimited,
     NotInitialised,
     OwnAccountCannotBeDeleted,
     PasswordRejectionSameAsOld,
@@ -85,11 +99,15 @@ pub enum ErrorReference {
     PasswordRejectionTooShort,
     PdfGenerationError,
     PollingStationRepeated,
-    PollingStationValidationErrors,
     RequestPayloadTooLarge,
+    SignatureMissing,
+    SignatureUnknown,
+    SubCommitteeHasNoCertificates,
     Unauthorized,
+    UnknownCommittee,
     UsernameNotUnique,
     UserNotFound,
+    ZipError,
 }
 
 /// Response structure for errors
@@ -140,6 +158,7 @@ pub enum APIError {
     SigningError(String),
     SqlxError(sqlx::Error),
     StdError(Box<dyn Error>),
+    Unprocessable(String, ErrorReference),
     ZipError(ZipResponseError),
 }
 
@@ -170,6 +189,10 @@ impl APIError {
             ),
             APIError::Conflict(message, reference) => (
                 StatusCode::CONFLICT,
+                ErrorResponse::new(message, reference, false),
+            ),
+            APIError::Unprocessable(message, reference) => (
+                StatusCode::UNPROCESSABLE_ENTITY,
                 ErrorResponse::new(message, reference, false),
             ),
             APIError::DataIntegrityError(message) => {
@@ -278,26 +301,18 @@ impl APIError {
                     ),
                 )
             }
-            APIError::EmlImportError(EMLImportError::InvalidDistrict) => {
-                error!("Error importing EML file: Invalid district");
-                (
-                    StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(
-                        "EML import error".to_string(),
-                        ErrorReference::InvalidDistrict,
-                        false,
-                    ),
-                )
-            }
             APIError::EmlImportError(err) => {
                 error!("Error importing EML file: {:?}", err);
+                let reference = match err {
+                    EMLImportError::InvalidCountType => ErrorReference::InvalidCountType,
+                    EMLImportError::InvalidDistrict => ErrorReference::InvalidDistrict,
+                    EMLImportError::MismatchElection => ErrorReference::ElectionMismatch,
+                    EMLImportError::UnknownCommittee => ErrorReference::UnknownCommittee,
+                    _ => ErrorReference::EmlImportError,
+                };
                 (
                     StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(
-                        "EML import error".to_string(),
-                        ErrorReference::EmlImportError,
-                        false,
-                    ),
+                    ErrorResponse::new("EML import error", reference, false),
                 )
             }
             APIError::EmlError(err) => {
@@ -323,6 +338,28 @@ impl IntoResponse for APIError {
 impl From<JsonRejection> for APIError {
     fn from(rejection: JsonRejection) -> Self {
         APIError::JsonRejection(rejection)
+    }
+}
+
+impl From<MultipartRejection> for APIError {
+    fn from(rejection: MultipartRejection) -> Self {
+        APIError::BadRequest(rejection.body_text(), ErrorReference::InvalidData)
+    }
+}
+
+impl From<MultipartError> for APIError {
+    fn from(err: MultipartError) -> Self {
+        if err.status() == StatusCode::PAYLOAD_TOO_LARGE {
+            APIError::ContentTooLarge(
+                MAX_BODY_SIZE_MB.to_string(),
+                ErrorReference::RequestPayloadTooLarge,
+            )
+        } else {
+            APIError::BadRequest(
+                format!("Invalid form data: {}", err.body_text()),
+                ErrorReference::InvalidData,
+            )
+        }
     }
 }
 
@@ -405,13 +442,46 @@ impl From<CommitteeSessionError> for APIError {
     }
 }
 
-impl From<DataEntryServiceError> for APIError {
-    fn from(err: DataEntryServiceError) -> Self {
+impl From<SubCommitteeCertificateError> for APIError {
+    fn from(err: SubCommitteeCertificateError) -> Self {
+        APIError::Delegated(Box::new(err))
+    }
+}
+
+impl From<DataEntryImportError> for APIError {
+    fn from(err: DataEntryImportError) -> Self {
         match err {
-            DataEntryServiceError::DatabaseError(e) => e.into(),
-            DataEntryServiceError::DataEntryAlreadyLinked => {
-                APIError::DataIntegrityError(String::from("Data entry is already linked"))
+            DataEntryImportError::EmlZipError(message) => {
+                APIError::Unprocessable(message, ErrorReference::ZipError)
             }
+            DataEntryImportError::InvalidCommitteeSessionStatus => APIError::Unprocessable(
+                "Invalid committee session status".into(),
+                ErrorReference::InvalidCommitteeSessionStatus,
+            ),
+            DataEntryImportError::SubCommitteeDataEntryAlreadyImported => APIError::Unprocessable(
+                "Sub committee data entry already imported".into(),
+                ErrorReference::DataEntryAlreadyImported,
+            ),
+            DataEntryImportError::SubCommitteeDataEntryNotEmpty => APIError::Unprocessable(
+                "Sub committee data entry not empty".into(),
+                ErrorReference::DataEntryNotAllowed,
+            ),
+            DataEntryImportError::ResultsHaveValidationErrors => APIError::Unprocessable(
+                "Results have validation errors".into(),
+                ErrorReference::DataEntryValidationErrors,
+            ),
+            DataEntryImportError::SignatureMissing => APIError::Unprocessable(
+                "Signature matching EML missing".into(),
+                ErrorReference::SignatureMissing,
+            ),
+            DataEntryImportError::SignatureUnknown => APIError::Unprocessable(
+                "Signature does not match public key of subcommittee".into(),
+                ErrorReference::SignatureUnknown,
+            ),
+            DataEntryImportError::SubCommitteeHasNoCertificates => APIError::Unprocessable(
+                "Subcommittee does not have any certificates".into(),
+                ErrorReference::SubCommitteeHasNoCertificates,
+            ),
         }
     }
 }
@@ -425,14 +495,6 @@ impl From<InvalidElectionError> for APIError {
 impl From<ModelsError> for APIError {
     fn from(err: ModelsError) -> Self {
         APIError::Delegated(Box::new(err))
-    }
-}
-
-impl From<PollingStationServiceError> for APIError {
-    fn from(err: PollingStationServiceError) -> Self {
-        match err {
-            PollingStationServiceError::DatabaseError(e) => e.into(),
-        }
     }
 }
 
@@ -456,12 +518,15 @@ impl From<IncorrectResultsModel> for APIError {
     }
 }
 
-impl From<polling_station_repo::CreateDataEntryError> for APIError {
-    fn from(err: polling_station_repo::CreateDataEntryError) -> Self {
+impl From<common_repo::DatabaseError> for APIError {
+    fn from(err: common_repo::DatabaseError) -> Self {
         match err {
-            polling_station_repo::CreateDataEntryError::Sqlx(e) => e.into(),
-            polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
+            common_repo::DatabaseError::Sqlx(e) => e.into(),
+            common_repo::DatabaseError::DataEntryAlreadyLinked => {
                 APIError::DataIntegrityError(String::from("Data entry is already linked"))
+            }
+            common_repo::DatabaseError::InvestigationIntegrityError => {
+                APIError::DataIntegrityError(String::from("Investigation integrity error"))
             }
         }
     }

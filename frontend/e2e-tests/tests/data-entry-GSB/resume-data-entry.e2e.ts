@@ -119,7 +119,6 @@ test.describe("resume data entry flow", () => {
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-      await differencesPage.differenceCompletelyAccountedForYes.check();
       await expect(differencesPage.fieldset).toBeVisible();
       await differencesPage.next.click();
 
@@ -367,7 +366,6 @@ test.describe("resume data entry flow", () => {
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-      await differencesPage.differenceCompletelyAccountedForYes.check();
       await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, 0, "Partijdige Partij");
@@ -419,11 +417,11 @@ test.describe("resume data entry flow", () => {
       // extra investigation section should be empty
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await expect(extraInvestigationPage.fieldset).toBeVisible();
-      await expect(extraInvestigationPage.extraInvestigationOtherReasonYes).not.toBeChecked();
-      await expect(extraInvestigationPage.extraInvestigationOtherReasonNo).not.toBeChecked();
+      await expect(extraInvestigationPage.extraInvestigationDoneYes).not.toBeChecked();
+      await expect(extraInvestigationPage.extraInvestigationDoneNo).not.toBeChecked();
       await expect(extraInvestigationPage.ballotsRecountedYes).not.toBeChecked();
       await expect(extraInvestigationPage.ballotsRecountedNo).not.toBeChecked();
-      await extraInvestigationPage.next.click();
+      await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
       // counting differences polling station section should be empty
       const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
@@ -556,7 +554,6 @@ test.describe("resume data entry flow", () => {
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-      await differencesPage.differenceCompletelyAccountedForYes.check();
       await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, 0, "Partijdige Partij");

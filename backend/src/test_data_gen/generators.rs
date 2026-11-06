@@ -9,7 +9,8 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            DataEntryId, DataEntrySource, DataEntryStatus, Definitive, FirstEntryFinalised,
+            DataEntryId, DataEntryOrigin, DataEntrySource, DataEntryStatus, Definitive,
+            FirstEntryFinalised,
         },
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
@@ -407,6 +408,7 @@ fn generate_election(
     let cleaned_up_locality = domain.name.replace(" ", "_").replace("'", "");
     let election_id = format!("{category}{year}_{cleaned_up_locality}");
     let mut official_name = format_election_name(rng, args.election_category, &domain.name, year);
+    let mut seats_range = args.seats.clone();
     if args.election_category == ElectionCategory::WaterAuthority {
         let mut chars = official_name.chars();
         let lowercased_name = match chars.next() {
@@ -414,11 +416,15 @@ fn generate_election(
             None => String::new(),
         };
         official_name = format!("Algemeen bestuur van het {}", lowercased_name);
+        // Water Authority number of seats should be >= 19 and <= 30
+        let start = seats_range.0.start.clamp(19, 30);
+        let end = seats_range.0.end.clamp(start + 1, 31);
+        seats_range = RandomRange(start..end);
     }
 
     info!("Election has name '{name}'");
 
-    let number_of_seats = rng.random_range(args.seats.clone());
+    let number_of_seats = rng.random_range(seats_range);
 
     let counting_method = match args.committee_category {
         CommitteeCategory::GSB => Some(args.counting_method.unwrap_or(VoteCountingMethod::CSO)),
@@ -663,7 +669,7 @@ async fn generate_gsb_data_entry(
             if rng.random_ratio(second_entry_chance, 100) {
                 // generate a definitive data entry
                 let state = DataEntryStatus::Definitive(Definitive {
-                    first_entry_user_id: UserId::from(5), // first typist from users in fixtures
+                    first_entry_origin: DataEntryOrigin::Typist(UserId::from(5)), // first typist from users in fixtures
                     second_entry_user_id: UserId::from(6), // second typist from users in fixtures
                     finished_at: ts,
                     finalised_with_warnings,
@@ -677,7 +683,7 @@ async fn generate_gsb_data_entry(
             } else {
                 // generate only a first data entry
                 let state = DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
-                    first_entry_user_id: UserId::from(5), // first typist from users in fixtures
+                    first_entry_origin: DataEntryOrigin::Typist(UserId::from(5)), // first typist from users in fixtures
                     finalised_first_entry: results.clone(),
                     first_entry_finished_at: ts,
                     finalised_with_warnings,
@@ -756,7 +762,7 @@ async fn generate_csb_data_entry(
                     if vr.has_errors() {
                         panic!(
                             "Generated invalid results for sub committee number {}: {:?}",
-                            sub_committee_first_session.sub_committee.number, vr.errors
+                            sub_committee_first_session.number, vr.errors
                         );
                     }
                     vr.has_warnings()
@@ -764,7 +770,7 @@ async fn generate_csb_data_entry(
                 Err(e) => {
                     panic!(
                         "Failed to validate generated results for sub committee number {}: {}",
-                        sub_committee_first_session.sub_committee.number, e
+                        sub_committee_first_session.number, e
                     );
                 }
             };
@@ -772,7 +778,7 @@ async fn generate_csb_data_entry(
         if rng.random_ratio(second_entry_chance, 100) {
             // generate a definitive data entry
             let state = DataEntryStatus::Definitive(Definitive {
-                first_entry_user_id: UserId::from(9), // first typist from users in fixtures
+                first_entry_origin: DataEntryOrigin::Typist(UserId::from(9)), // first typist from users in fixtures
                 second_entry_user_id: UserId::from(10), // second typist from users in fixtures
                 finished_at: ts,
                 finalised_with_warnings,
@@ -786,7 +792,7 @@ async fn generate_csb_data_entry(
         } else {
             // generate only a first data entry
             let state = DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
-                first_entry_user_id: UserId::from(9), // first typist from users in fixtures
+                first_entry_origin: DataEntryOrigin::Typist(UserId::from(9)), // first typist from users in fixtures
                 finalised_first_entry: results.clone(),
                 first_entry_finished_at: ts,
                 finalised_with_warnings,
@@ -945,19 +951,18 @@ fn generate_common_results(
 
 fn generate_extra_investigation(rng: &mut impl rand::RngExt) -> ExtraInvestigation {
     let extra_investigation_options = [
-        (85, YesNo::default(), YesNo::default()),
-        (10, YesNo::no(), YesNo::no()),
-        (3, YesNo::yes(), YesNo::no()),
-        (2, YesNo::yes(), YesNo::yes()),
+        (85, YesNo::no(), YesNo::default()),
+        (8, YesNo::yes(), YesNo::no()),
+        (7, YesNo::yes(), YesNo::yes()),
     ];
 
-    let (_, extra_investigation_other_reason, ballots_recounted_extra_investigation) =
+    let (_, extra_investigation_done, ballots_recounted_extra_investigation) =
         *extra_investigation_options
             .choose_weighted(rng, |(weight, ..)| *weight)
             .expect("Weighted random selection for extra_investigation should never fail");
 
     ExtraInvestigation {
-        extra_investigation_other_reason,
+        extra_investigation_done,
         ballots_recounted_extra_investigation,
     }
 }

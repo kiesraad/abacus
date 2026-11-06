@@ -7,31 +7,8 @@ use crate::{
         data_entry::{DataEntryStatus, DataEntryStatusWithSource},
         election::{CommitteeCategory, Election},
     },
-    repository::{polling_station_repo, sub_committee_repo},
+    repository::{common::DatabaseError, polling_station_repo, sub_committee_repo},
 };
-
-#[derive(Debug)]
-pub enum DataEntryServiceError {
-    DatabaseError(sqlx::Error),
-    DataEntryAlreadyLinked,
-}
-
-impl From<sqlx::Error> for DataEntryServiceError {
-    fn from(err: sqlx::Error) -> Self {
-        Self::DatabaseError(err)
-    }
-}
-
-impl From<polling_station_repo::CreateDataEntryError> for DataEntryServiceError {
-    fn from(err: polling_station_repo::CreateDataEntryError) -> Self {
-        match err {
-            polling_station_repo::CreateDataEntryError::Sqlx(e) => Self::DatabaseError(e),
-            polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
-                Self::DataEntryAlreadyLinked
-            }
-        }
-    }
-}
 
 fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResponseEntry {
     let status = &entry.status;
@@ -47,7 +24,8 @@ fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResp
         data_entry_id: entry.data_entry_id,
         source: entry.source,
         status: status.status_name(),
-        first_entry_user_id: status.get_first_entry_user_id(),
+        updated_at: entry.updated_at,
+        first_entry_origin: status.get_first_entry_origin(),
         second_entry_user_id: status.get_second_entry_user_id(),
         data_entry_progress: status.get_data_entry_progress(),
         finished_at,
@@ -61,7 +39,7 @@ pub async fn election_statuses(
     conn: &mut SqliteConnection,
     election: &Election,
     committee_session: &CommitteeSession,
-) -> Result<Vec<ElectionStatusResponseEntry>, DataEntryServiceError> {
+) -> Result<Vec<ElectionStatusResponseEntry>, DatabaseError> {
     let is_next_session = committee_session.is_next_session();
     let entries = match (election.committee_category, is_next_session) {
         (CommitteeCategory::GSB, false) => {
@@ -87,14 +65,14 @@ pub async fn create_definitive_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: crate::domain::polling_station::PollingStationId,
     results: &crate::domain::results::Results,
-) -> Result<(), DataEntryServiceError> {
+) -> Result<(), DatabaseError> {
     use crate::{
         domain::data_entry::{DataEntryStatus, Definitive},
         repository::{data_entry_repo, user_repo::UserId},
     };
 
     let state = DataEntryStatus::Definitive(Definitive {
-        first_entry_user_id: UserId::from(5),
+        first_entry_origin: crate::domain::data_entry::DataEntryOrigin::Typist(UserId::from(5)),
         second_entry_user_id: UserId::from(6),
         finished_at: chrono::Utc::now(),
         finalised_with_warnings: false,

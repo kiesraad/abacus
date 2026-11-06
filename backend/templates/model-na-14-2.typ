@@ -25,7 +25,7 @@
 #title_page(
   is_municipality[#input.election.authority_id #input.election.authority_region][#input.election.authority_region],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
-  [#input.election.name - #format_date(input.election.election_date)],
+  [#get_election_title(input.election), #format_date(input.election.election_date)],
   [
     Gecorrigeerde telresultaten per lijst en kandidaat –
     Model Na 14-2

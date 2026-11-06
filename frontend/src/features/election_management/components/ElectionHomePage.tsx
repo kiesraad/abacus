@@ -221,7 +221,7 @@ function Alerts() {
             <Button
               variant="secondary"
               size="md"
-              disabled={isUpdatingReminder}
+              disabled={showKeypairReminder === "NonDismissable" || isUpdatingReminder}
               onClick={() => {
                 void dismissReminder({}).then((result) => {
                   if (isSuccess(result)) {

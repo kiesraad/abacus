@@ -23,13 +23,21 @@ function determineUserStatus(
       return DataEntryUserStatus.Available;
     case "first_entry_in_progress":
     case "first_entry_correction":
-      if (statusEntry.first_entry_user_id === userId) {
+      if (
+        statusEntry.first_entry_origin &&
+        statusEntry.first_entry_origin.type === "Typist" &&
+        statusEntry.first_entry_origin.user_id === userId
+      ) {
         return DataEntryUserStatus.InProgressCurrentUser;
       } else {
         return DataEntryUserStatus.InProgressOtherUser;
       }
     case "first_entry_finalised":
-      if (statusEntry.first_entry_user_id === userId) {
+      if (
+        statusEntry.first_entry_origin &&
+        statusEntry.first_entry_origin.type === "Typist" &&
+        statusEntry.first_entry_origin.user_id === userId
+      ) {
         return DataEntryUserStatus.SecondEntryNotAllowed;
       } else {
         return DataEntryUserStatus.Available;

@@ -64,10 +64,14 @@ pub struct ValidationResultContext {
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum ValidationResultCode {
-    /// GSB CSO: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+    /// GSB CSO: 'Extra onderzoek B1-1': de eerste vraag is niet beantwoord
     F101,
-    /// GSB CSO: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    /// GSB CSO: 'Extra onderzoek B1-1': 'extra onderzoek gedaan' = 'ja' en de tweede vraag is niet beantwoord
     F102,
+    /// GSB CSO: 'Extra onderzoek B1-1': 'extra onderzoek gedaan' = 'nee' en de tweede vraag is beantwoord
+    F103,
+    /// GSB CSO: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    F104,
     /// GSB CSO: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
     F111,
     /// GSB CSO: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
@@ -121,6 +125,8 @@ pub enum ValidationResultCode {
     F311,
     /// CSB: totaal aantal kiezers <> totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
     F312,
+    /// GSB CSO, GSB DSO: (Als D = H) Verklaring voor verschil 'ja' en/of 'nee' aangevinkt
+    F313,
 
     /// GSB CSO, GSB DSO, CSB: 'Kandidaten en lijsttotalen': Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0
     F401,

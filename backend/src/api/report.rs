@@ -3,8 +3,8 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
-use chrono::{DateTime, Datelike, Local};
-use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
+use chrono::{DateTime, Local};
+use pdf_gen::zip::{ZipResponse, ZipResponseError, zip_files, zip_single_file};
 use sqlx::{SqliteConnection, SqlitePool};
 use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -15,6 +15,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         election::{ElectionId, ElectionWithPoliticalGroups},
+        filename::{format_datetime, hyphenate},
         report::files::{get_files_csb_election, get_files_gsb_election},
         role::Role,
     },
@@ -72,18 +73,14 @@ pub fn download_zip_filename(
     election: &ElectionWithPoliticalGroups,
     created_at: DateTime<Local>,
 ) -> String {
-    let location = election.location.to_lowercase();
-    let location_without_whitespace: String = location.split_whitespace().collect();
-    slugify_filename(&format!(
-        "{} {}{} {} gemeente {}-{}-{}.zip",
+    format!(
+        "{}_{}_{}_{}-{}.zip",
         base,
-        election.category.to_eml_code().to_lowercase(),
-        election.election_date.year(),
-        location_without_whitespace,
-        location.replace(" ", "-"),
-        created_at.date_naive().format("%Y%m%d"),
-        created_at.time().format("%H%M%S"),
-    ))
+        election.election_id.to_lowercase(),
+        election.region_category(),
+        hyphenate(&election.authority_region),
+        format_datetime(created_at),
+    )
 }
 
 /// Replaces the extension of the given filename with .zip
@@ -159,6 +156,17 @@ pub async fn election_download_zip_results_gsb(
     let created_at = files.created_at().with_timezone(&Local);
     let download_zip_filename = download_zip_filename(base_name, &election, created_at);
 
+    // The EML is always generated and stored together with its signature
+    let results_eml = match (files.results_eml, files.results_eml_signature) {
+        (Some(eml), Some(signature)) => Some((eml, signature)),
+        (None, None) => None,
+        _ => {
+            return Err(APIError::DataIntegrityError(
+                "GSB results EML and its signature should both be present".to_string(),
+            ));
+        }
+    };
+
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
     tokio::spawn(async move {
@@ -166,9 +174,10 @@ pub async fn election_download_zip_results_gsb(
             zip_writer.add_file(&pdf_file.name, &pdf_file.data).await?;
         }
 
-        if let Some(eml_file) = files.results_eml {
-            let xml_zip_filename = with_zip_extension(&eml_file.name);
-            let xml_zip = zip_single_file(&eml_file.name, &eml_file.data).await?;
+        if let Some((eml, signature)) = results_eml {
+            let xml_zip_filename = with_zip_extension(&eml.name);
+            let xml_zip =
+                zip_files(&[(&eml.name, &eml.data), (&signature.name, &signature.data)]).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
 
@@ -469,7 +478,10 @@ mod tests {
         assert_committee_category_authorization_err(results).await;
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_5_with_results", "signing_keypair")
+    )))]
     async fn test_gsb_election_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers_gsb(pool, Role::CoordinatorGSB, ElectionId::from(5)).await;
         assert_committee_category_authorization_ok(results);

@@ -4,13 +4,40 @@ use crate::domain::{
     committee_session::CommitteeSessionId,
     data_entry::{DataEntryId, DataEntrySource},
     election::CommitteeCategory,
-    investigation::InvestigationStatus,
+    investigation::{InvestigationError, InvestigationStatus},
     polling_station::{
         PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
         PollingStationNextSession, PollingStationNumber, PollingStationType,
     },
-    sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber},
+    sub_committee::{
+        Certificate, SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber,
+    },
 };
+
+/// Generic error type for Sqlx and data integrity errors
+#[derive(Debug)]
+pub enum DatabaseError {
+    /// Sqlx database error
+    Sqlx(sqlx::Error),
+    /// Polling station is already linked to a data entry
+    DataEntryAlreadyLinked,
+    /// Integrity error with investigation state
+    InvestigationIntegrityError,
+}
+
+impl From<sqlx::Error> for DatabaseError {
+    fn from(err: sqlx::Error) -> Self {
+        Self::Sqlx(err)
+    }
+}
+
+impl From<InvestigationError> for DatabaseError {
+    fn from(err: InvestigationError) -> Self {
+        match err {
+            InvestigationError::IntegrityError => DatabaseError::InvestigationIntegrityError,
+        }
+    }
+}
 
 pub trait PollingStationRowLike: Sized {
     fn as_polling_station(&self) -> PollingStation;
@@ -25,23 +52,25 @@ pub trait PollingStationRowLike: Sized {
         self.as_polling_station_first_session()
     }
 
-    fn as_polling_station_next_session(&self) -> PollingStationNextSession;
+    fn as_polling_station_next_session(&self) -> Result<PollingStationNextSession, DatabaseError>;
 
-    fn into_polling_station_next_session(self) -> PollingStationNextSession {
+    fn into_polling_station_next_session(self) -> Result<PollingStationNextSession, DatabaseError> {
         self.as_polling_station_next_session()
     }
 
-    fn as_polling_station_for_session(&self) -> PollingStationForSession;
+    fn as_polling_station_for_session(&self) -> Result<PollingStationForSession, DatabaseError>;
 
-    fn into_polling_station_for_session(self) -> PollingStationForSession {
+    fn into_polling_station_for_session(self) -> Result<PollingStationForSession, DatabaseError> {
         self.as_polling_station_for_session()
     }
 
-    fn as_polling_station_data_source(&self) -> DataEntrySource {
-        DataEntrySource::PollingStation(self.as_polling_station_for_session())
+    fn as_polling_station_data_source(&self) -> Result<DataEntrySource, DatabaseError> {
+        Ok(DataEntrySource::PollingStation(
+            self.as_polling_station_for_session()?,
+        ))
     }
 
-    fn into_polling_station_data_source(self) -> DataEntrySource {
+    fn into_polling_station_data_source(self) -> Result<DataEntrySource, DatabaseError> {
         self.as_polling_station_data_source()
     }
 }
@@ -88,27 +117,27 @@ impl PollingStationRowLike for PollingStationRow {
         }
     }
 
-    fn as_polling_station_next_session(&self) -> PollingStationNextSession {
-        PollingStationNextSession {
+    fn as_polling_station_next_session(&self) -> Result<PollingStationNextSession, DatabaseError> {
+        Ok(PollingStationNextSession {
             committee_session_id: self.committee_session_id,
             prev_data_entry_id: self.prev_data_entry_id,
-            investigation_status: self.investigation_state.clone().map(|Json(status)| {
-                match (&status, self.data_entry_id) {
-                    (InvestigationStatus::ConcludedWithNewResults(_), Some(id)) => {
-                        status.with_data_entry_id(id)
-                    }
-                    _ => status,
-                }
-            }),
+            investigation_status: InvestigationStatus::from_state_and_data_entry_id(
+                self.investigation_state.clone().map(Json::into_inner),
+                self.data_entry_id,
+            )?,
             polling_station: self.as_polling_station(),
-        }
+        })
     }
 
-    fn as_polling_station_for_session(&self) -> PollingStationForSession {
+    fn as_polling_station_for_session(&self) -> Result<PollingStationForSession, DatabaseError> {
         if self.committee_session_number > 1 {
-            PollingStationForSession::Next(self.as_polling_station_next_session())
+            Ok(PollingStationForSession::Next(
+                self.as_polling_station_next_session()?,
+            ))
         } else {
-            PollingStationForSession::First(self.as_polling_station_first_session())
+            Ok(PollingStationForSession::First(
+                self.as_polling_station_first_session(),
+            ))
         }
     }
 }
@@ -124,10 +153,15 @@ pub struct SubCommitteeRow {
     pub category: CommitteeCategory,
     pub authority_id: String,
     pub authority_name: String,
+    pub certificates: Json<Vec<Certificate>>,
 }
 
 pub trait SubCommitteeRowLike: Sized {
     fn as_sub_committee(&self) -> SubCommittee;
+
+    fn into_sub_committee(self) -> SubCommittee {
+        self.as_sub_committee()
+    }
 
     fn as_sub_committee_first_session(&self) -> SubCommitteeFirstSession;
 
@@ -153,6 +187,7 @@ impl SubCommitteeRowLike for SubCommitteeRow {
             category: self.category,
             authority_id: self.authority_id.clone(),
             authority_name: self.authority_name.clone(),
+            certificates: self.certificates.0.clone(),
         }
     }
 
@@ -160,7 +195,11 @@ impl SubCommitteeRowLike for SubCommitteeRow {
         SubCommitteeFirstSession {
             committee_session_id: self.committee_session_id,
             data_entry_id: self.data_entry_id,
-            sub_committee: self.as_sub_committee(),
+            id: self.id,
+            number: self.number,
+            name: self.name.clone(),
+            authority_id: self.authority_id.clone(),
+            authority_name: self.authority_name.clone(),
         }
     }
 }

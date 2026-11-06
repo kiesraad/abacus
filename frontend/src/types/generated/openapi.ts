@@ -240,6 +240,19 @@ export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/status`;
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
 
+// /api/elections/{election_id}/data_entry/import
+export interface ELECTION_DATA_ENTRY_IMPORT_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DATA_ENTRY_IMPORT_REQUEST_PATH = `/api/elections/${ElectionId}/data_entry/import`;
+
+// /api/elections/{election_id}/data_entry/import/validate
+export interface ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_PATH =
+  `/api/elections/${ElectionId}/data_entry/import/validate`;
+
 // /api/elections/{election_id}/dismiss_public_key_upload_reminder
 export interface DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -344,6 +357,26 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: ElectionId;
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${ElectionId}/status`;
+
+// /api/elections/{election_id}/sub_committee_certificates
+export interface SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH = `/api/elections/${ElectionId}/sub_committee_certificates`;
+export interface SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH = `/api/elections/${ElectionId}/sub_committee_certificates`;
+export type SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY = AddSubCommitteeCertificateRequest;
+
+// /api/elections/{election_id}/sub_committees/{sub_committee_id}/certificates/{public_key_fingerprint}
+export interface SUB_COMMITTEE_CERTIFICATE_DELETE_REQUEST_PARAMS {
+  election_id: ElectionId;
+  sub_committee_id: SubCommitteeId;
+  public_key_fingerprint: string;
+}
+export type SUB_COMMITTEE_CERTIFICATE_DELETE_REQUEST_PATH =
+  `/api/elections/${ElectionId}/sub_committees/${SubCommitteeId}/certificates/${string}`;
 
 // /api/elections/{election_id}/voters
 export interface ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
@@ -458,10 +491,10 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 export interface AboutReport {
   /** Whether the extra page "controles en correcties" is inserted in the report
 ("Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?") */
-  checks_and_corrections_present: null | ChecksAndCorrectionsPresent;
+  checks_and_corrections_present: ChecksAndCorrectionsPresent | null;
   /** Whether a corrigendum accompanies the report
 ("Is er een corrigendum bij het papieren proces-verbaal aanwezig?") */
-  corrigendum_present: null | CorrigendumPresent;
+  corrigendum_present: CorrigendumPresent | null;
 }
 
 export interface AbsoluteMajorityDrawingLots {
@@ -481,6 +514,23 @@ export interface AccountUpdateRequest {
   fullname?: string;
   password: string;
   username: string;
+}
+
+/**
+ * Request to add a sub committee certificate
+ */
+export interface AddSubCommitteeCertificateRequest {
+  data: string;
+}
+
+/**
+ * The certificate that was added, with the sub committee it was added to
+ */
+export interface AddSubCommitteeCertificateResponse {
+  authority_name: string;
+  certificate: Certificate;
+  expired: boolean;
+  sub_committee_id: SubCommitteeId;
 }
 
 export type ApportionmentState =
@@ -536,6 +586,7 @@ export const auditEventTypeValues = [
   "PollingStationsExported",
   "DataEntryStarted",
   "DataEntrySaved",
+  "DataEntryImported",
   "DataEntryResumed",
   "DataEntryDeleted",
   "DataEntryDiscarded",
@@ -553,6 +604,8 @@ export const auditEventTypeValues = [
   "ApplicationStarted",
   "DatabaseBackupCreated",
   "SigningKeypairCreated",
+  "SubCommitteeCertificateAdded",
+  "SubCommitteeCertificateDeleted",
   "ApiError",
   "ApiWarning",
   "UnknownEvent",
@@ -609,6 +662,29 @@ export interface BasePollingStation {
   postal_code: string;
 }
 
+export interface CSBDataEntryImportRequest {
+  data: string;
+  hash: string[];
+}
+
+export interface CSBDataEntryImportResponse {
+  election_date: string;
+  election_name: string;
+  sub_committee: SubCommitteeFirstSession;
+}
+
+export interface CSBDataEntryImportValidateRequest {
+  data: string;
+  hash?: string[];
+}
+
+export interface CSBDataEntryImportValidateResponse {
+  election_date: string;
+  election_name: string;
+  hash: RedactedEmlHash;
+  sub_committee: SubCommitteeFirstSession;
+}
+
 export interface CSBElectionCreationRequest {
   candidate_data: string;
   candidate_hash: string[];
@@ -641,7 +717,7 @@ export interface CSOFirstSessionResults {
   counting_differences_polling_station: CountingDifferencesPollingStation;
   /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
   differences_counts: DifferencesCounts;
-  /** Extra investigation ("B1-1 Alleen bij extra onderzoek") */
+  /** Extra investigation ("B1-1 Extra onderzoek") */
   extra_investigation: ExtraInvestigation;
   /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
   political_group_votes: PoliticalGroupCandidateVotes[];
@@ -721,6 +797,17 @@ export type CandidateNumber = number;
 export interface CandidateVotes {
   number: number;
   votes: number;
+}
+
+export interface Certificate {
+  common_name: string;
+  election_identifier: string;
+  not_after: string;
+  not_before: string;
+  organizational_unit: string;
+  public_key: string;
+  public_key_fingerprint: string;
+  signature_algorithm: string;
 }
 
 export interface CertificateDetailsResponse {
@@ -873,8 +960,8 @@ export interface CountingDifferencesPollingStation {
   /** Whether there was a difference between the total votes per list as determined by the polling station and by the typist
 ("Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?") */
   difference_ballots_per_list: YesNo;
-  /** Whether the difference between the number of votes counted and the number of admitted voters was completely accounted for
-("Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?") */
+  /** Whether the total of admitted voters (D) and the total of votes counted (H) are equal, or the difference was completely accounted for
+("Is in de telresultaten van het stembureau het aantal toegelaten kiezers (D) en het totaal aantal getelde stemmen (H) gelijk OF is er een verschil en is dit verschil volledig verklaard?") */
   difference_ballots_voters_completely_accounted_for: YesNo;
 }
 
@@ -948,7 +1035,7 @@ export interface DataEntry {
 export interface DataEntryGetDifferencesResponse {
   first_entry: Results;
   first_entry_has_errors: boolean;
-  first_entry_user_id: UserId;
+  first_entry_origin: DataEntryOrigin;
   second_entry: Results;
   second_entry_has_errors: boolean;
   second_entry_user_id: UserId;
@@ -964,6 +1051,8 @@ export interface DataEntryGetResponse {
 }
 
 export type DataEntryId = number;
+
+export type DataEntryOrigin = { type: "Import" } | { type: "Typist"; user_id: UserId };
 
 export type DataEntrySource =
   | (PollingStationForSession & { type: "PollingStation" })
@@ -1131,7 +1220,7 @@ export interface ElectionDetailsResponse {
   election: ElectionWithPoliticalGroups;
   investigations: PollingStationInvestigation[];
   polling_stations: PollingStation[];
-  show_keypair_reminder?: boolean;
+  show_keypair_reminder?: KeypairReminder;
 }
 
 /**
@@ -1183,14 +1272,16 @@ export interface ElectionStatusResponseEntry {
   finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
   finished_at?: string;
-  /** First entry user id */
-  first_entry_user_id?: number;
+  /** First entry origin (import or typist user id) */
+  first_entry_origin?: DataEntryOrigin;
   /** Second entry user id */
   second_entry_user_id?: number;
-  /** Data entry source (polling station or sub committee) */
+  /** Data entry source (polling station or subcommittee) */
   source: DataEntrySource;
   /** Data entry status */
   status: DataEntryStatusName;
+  /** Time when the data entry was last updated */
+  updated_at: string;
 }
 
 /**
@@ -1299,13 +1390,19 @@ export const errorReferenceValues = [
   "ApportionmentNotCompleted",
   "ApportionmentCommitteeSessionNotCompleted",
   "ApportionmentInvalidLotDrawing",
+  "CertificateAlreadyAdded",
+  "CertificateUnknownSubCommittee",
+  "CertificateWrongElection",
   "CommitteeSessionPaused",
   "DatabaseError",
   "DataEntryAlreadyClaimed",
+  "DataEntryAlreadyImported",
   "DataEntryAlreadyFinalised",
   "DataEntryCannotBeReset",
   "DataEntryGetNotAllowed",
   "DataEntryNotAllowed",
+  "DataEntryValidationErrors",
+  "ElectionMismatch",
   "EmlImportError",
   "EmlError",
   "EntryNotFound",
@@ -1313,9 +1410,12 @@ export const errorReferenceValues = [
   "Forbidden",
   "InternalServerError",
   "InvalidApportionmentState",
+  "InvalidCertificate",
   "InvalidCommitteeSessionStatus",
+  "InvalidCountType",
   "InvalidData",
   "InvalidDistrict",
+  "InvalidFullname",
   "InvalidHash",
   "InvalidJson",
   "InvalidPassword",
@@ -1323,11 +1423,13 @@ export const errorReferenceValues = [
   "InvalidDataEntrySource",
   "InvalidSession",
   "InvalidStateTransition",
+  "InvalidUsername",
   "InvalidUsernameOrPassword",
   "InvalidVoteCandidate",
   "InvalidVoteGroup",
   "InvestigationHasDataEntryOrResult",
   "InvestigationRequiresCorrectedResults",
+  "LoginRateLimited",
   "NotInitialised",
   "OwnAccountCannotBeDeleted",
   "PasswordRejectionSameAsOld",
@@ -1335,11 +1437,15 @@ export const errorReferenceValues = [
   "PasswordRejectionTooShort",
   "PdfGenerationError",
   "PollingStationRepeated",
-  "PollingStationValidationErrors",
   "RequestPayloadTooLarge",
+  "SignatureMissing",
+  "SignatureUnknown",
+  "SubCommitteeHasNoCertificates",
   "Unauthorized",
+  "UnknownCommittee",
   "UsernameNotUnique",
   "UserNotFound",
+  "ZipError",
 ] as const;
 export type ErrorReference = (typeof errorReferenceValues)[number];
 
@@ -1353,15 +1459,15 @@ export interface ErrorResponse {
 }
 
 /**
- * Extra investigation, part of the results ("B1-1 Alleen bij extra onderzoek")
+ * Extra investigation, part of the results ("B1-1 Extra onderzoek")
  */
 export interface ExtraInvestigation {
   /** Whether ballots were (partially) recounted following the extra investigation
 ("Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?") */
   ballots_recounted_extra_investigation: YesNo;
-  /** Whether extra investigation was done for another reason than an unexplained difference
-("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?") */
-  extra_investigation_other_reason: YesNo;
+  /** Whether extra investigation was done
+("Heeft het gemeentelijk stembureau extra onderzoek gedaan?") */
+  extra_investigation_done: YesNo;
 }
 
 /**
@@ -1516,6 +1622,9 @@ export type InvestigationStatus =
   | { state: InvestigationInProgress; status: "InProgress" }
   | { state: InvestigationConcludedWithoutNewResults; status: "ConcludedWithoutNewResults" }
   | { state: InvestigationConcludedWithNewResults; status: "ConcludedWithNewResults" };
+
+export const keypairReminderValues = ["Dismissable", "NonDismissable"] as const;
+export type KeypairReminder = (typeof keypairReminderValues)[number];
 
 export interface LargestRemainderAssignedSeat {
   drawing_lots?: ListDrawingLotsVariant;
@@ -1792,15 +1901,16 @@ export interface PollingStationRequest {
   postal_code: string;
 }
 
-export interface PollingStationRequestListResponse {
-  polling_stations: PollingStationRequest[];
-}
-
 /**
  * Type of Polling station
  */
 export const pollingStationTypeValues = ["FixedLocation", "Special", "Mobile"] as const;
 export type PollingStationType = (typeof pollingStationTypeValues)[number];
+
+export interface PollingStationValidateImportResponse {
+  polling_station_definition_matches_election: boolean;
+  polling_stations: PollingStationRequest[];
+}
 
 export interface PollingStationsRequest {
   file_name: string;
@@ -1951,6 +2061,7 @@ export interface SubCommittee {
   authority_id: string;
   authority_name: string;
   category: CommitteeCategory;
+  certificates: Certificate[];
   id: SubCommitteeId;
   name: string;
   number: number;
@@ -1959,10 +2070,15 @@ export interface SubCommittee {
 /**
  * Sub electoral committee in a first committee session.
  */
-export type SubCommitteeFirstSession = SubCommittee & {
+export interface SubCommitteeFirstSession {
+  authority_id: string;
+  authority_name: string;
   committee_session_id: CommitteeSessionId;
   data_entry_id: DataEntryId;
-};
+  id: SubCommitteeId;
+  name: string;
+  number: number;
+}
 
 export type SubCommitteeId = number;
 
@@ -2009,6 +2125,8 @@ export interface ValidationResult {
 export const validationResultCodeValues = [
   "F101",
   "F102",
+  "F103",
+  "F104",
   "F111",
   "F112",
   "F121",
@@ -2034,6 +2152,7 @@ export const validationResultCodeValues = [
   "F310",
   "F311",
   "F312",
+  "F313",
   "F401",
   "F402",
   "F403",

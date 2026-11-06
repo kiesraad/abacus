@@ -1,38 +1,40 @@
-use std::{num::NonZeroU64, str::FromStr as _};
+use std::{collections::HashMap, num::NonZeroU64, str::FromStr as _};
 
 pub mod committees;
+mod count;
 mod error;
 pub mod hash;
 
 use apportionment::CandidateNominationDetails;
 use chrono::{DateTime, Local};
 use eml_nl::{
-    EMLError,
+    EMLError, EMLVersion,
     common::{
         AuthorityIdentifier, ContestIdentifier, ElectionTree, ManagingAuthority, PersonName,
-        ReportingUnitIdentifier,
+        QualifyingAddress, ReportingUnitIdentifier,
     },
     documents::{
         candidate_lists::{
             CandidateLists, CandidateListsAffiliation, CandidateListsCandidate,
-            CandidateListsContest, QualifyingAddress,
+            CandidateListsContest,
         },
         election_count::{
             AffiliationSelection, CountType, ElectionCount, ElectionCountContest,
-            ElectionCountSelection, InvestigationReason, RejectedVotesReason, ReportingUnitVotes,
-            ReportingUnitVotesBuilder, UncountedVotesReason,
+            ElectionCountContestBuilder, ElectionCountSelection, InvestigationReason,
+            RejectedVotesReason, ReportingUnitVotes, ReportingUnitVotesBuilder,
+            UncountedVotesReason,
         },
         election_definition::{ElectionDefinition, ElectionDefinitionRegisteredParty},
         election_result::{
             ElectionResult, ElectionResultContest, ElectionResultSelection, RankingType, YesNoType,
         },
-        polling_stations::{PollingPlace, PollingStations, PollingStationsContest},
+        polling_stations::{Location, PollingPlace, PollingStations, PollingStationsContest},
     },
     io::{EMLParsingMode, EMLRead as _},
     utils::{
         AffiliationId, AffiliationType, AuthorityId, CandidateId, ElectionDomainId, ElectionId,
-        Gender, ReportingUnitIdentifierId, StringValue, StringValueData, VotingChannelType,
-        VotingMethod,
+        Gender, GenderAnnex, ReportingUnitIdentifierId, StringValue, StringValueData,
+        VotingChannelType, VotingMethod,
     },
 };
 pub use error::EMLImportError;
@@ -41,19 +43,30 @@ pub use hash::{EmlHash, RedactedEmlHash};
 use crate::{
     domain::{
         committee_session::CommitteeSession,
-        data_entry::DataEntrySourceNumber,
+        data_entry::{DataEntrySource, DataEntrySourceNumber},
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
-            ElectionCategory, ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber,
-            RegionKey, RegisteredPoliticalGroup,
+            ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
+            RegisteredPoliticalGroup, VoteCountingMethod,
         },
+        report::structs::ResultsInputData,
         results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
-        tabulation::{CommitteeSpecificTotals, ElectionTotals, GSBTotals},
+        tabulation::{CommitteeSpecificTotals, ElectionTotals},
     },
     eml::committees::ElectionTreeDetails,
 };
 
 const WATER_AUTHORITY_PREFIX: &str = "Algemeen bestuur van het ";
+
+/// Return exactly one contest.
+fn single_contest<T>(contests: &[T]) -> Result<&T, EMLImportError> {
+    match contests {
+        [contest] => Ok(contest),
+        _ => Err(EMLImportError::InvalidNumberOfContests {
+            found: contests.len(),
+        }),
+    }
+}
 
 fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
     match max_votes.copied_value() {
@@ -67,10 +80,10 @@ fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
 /// Format the EML election name for Abacus
 ///
 /// For water authority, the prefix is removed and the first letter capitalized
-fn format_election_name(name: &str, category: ElectionCategory) -> String {
+fn format_election_name(name: &str, category: crate::domain::election::ElectionCategory) -> String {
     let name = name.trim();
 
-    if category != ElectionCategory::WaterAuthority {
+    if category != crate::domain::election::ElectionCategory::WaterAuthority {
         return name.to_string();
     }
 
@@ -88,12 +101,56 @@ fn format_election_name(name: &str, category: ElectionCategory) -> String {
     }
 }
 
+impl From<CandidateGender> for GenderAnnex {
+    fn from(candidate_gender: CandidateGender) -> Self {
+        match candidate_gender {
+            CandidateGender::Male => Self::Male,
+            CandidateGender::Female => Self::Female,
+            CandidateGender::X => Self::Other,
+        }
+    }
+}
+
+/// Maps Gender or GenderAnnex to a CandidateGender
+/// Uses `gender_annex` when available, falls back to gender otherwise
+fn candidate_gender(
+    gender: &Option<StringValue<Gender>>,
+    gender_annex: &Option<StringValue<GenderAnnex>>,
+) -> Result<Option<CandidateGender>, EMLImportError> {
+    // First try to find a `GenderAnnex`
+    Ok(match &gender_annex {
+        Some(gender_annex) => {
+            let gender_annex = gender_annex.copied_value()?;
+            match gender_annex {
+                GenderAnnex::Male => Some(CandidateGender::Male),
+                GenderAnnex::Female => Some(CandidateGender::Female),
+                GenderAnnex::Other => Some(CandidateGender::X),
+            }
+        }
+        None => {
+            // If `GenderAnnex` is not found, fall back to `Gender`
+            match &gender {
+                None => None,
+                Some(gender) => {
+                    let gender = gender.copied_value()?;
+                    match gender {
+                        Gender::Male => Some(CandidateGender::Male),
+                        Gender::Female => Some(CandidateGender::Female),
+                        Gender::Unknown => None,
+                    }
+                }
+            }
+        }
+    })
+}
+
 impl NewElection {
     fn get_category_or_err(
         category: eml_nl::utils::ElectionCategory,
     ) -> Result<crate::domain::election::ElectionCategory, EMLImportError> {
-        use crate::domain::election::ElectionCategory as Domain;
         use eml_nl::utils::ElectionCategory as Eml;
+
+        use crate::domain::election::ElectionCategory as Domain;
         let category = match category {
             Eml::AB => Domain::WaterAuthority,
             Eml::GR => Domain::Municipal,
@@ -106,10 +163,10 @@ impl NewElection {
     fn get_sub_category_or_err(
         sub_category: eml_nl::utils::ElectionSubcategory,
     ) -> Result<crate::domain::election::ElectionSubCategory, EMLImportError> {
-        use crate::domain::election::ElectionSubCategory as Domain;
         use eml_nl::utils::ElectionSubcategory as Eml;
+
+        use crate::domain::election::ElectionSubCategory as Domain;
         let sub_category = match sub_category {
-            Eml::AB1 => Domain::AB1,
             Eml::AB2 => Domain::AB2,
             Eml::GR1 => Domain::GR1,
             Eml::GR2 => Domain::GR2,
@@ -118,25 +175,6 @@ impl NewElection {
             _ => return Err(EMLImportError::LimitedElectionsSupported),
         };
         Ok(sub_category)
-    }
-
-    fn category_and_sub_category_match(
-        category: crate::domain::election::ElectionCategory,
-        sub_category: crate::domain::election::ElectionSubCategory,
-    ) -> bool {
-        use crate::domain::election::ElectionCategory;
-        use crate::domain::election::ElectionSubCategory;
-        match category {
-            ElectionCategory::WaterAuthority => {
-                sub_category == ElectionSubCategory::AB1 || sub_category == ElectionSubCategory::AB2
-            }
-            ElectionCategory::Municipal => {
-                sub_category == ElectionSubCategory::GR1 || sub_category == ElectionSubCategory::GR2
-            }
-            ElectionCategory::Provincial => {
-                sub_category == ElectionSubCategory::PS1 || sub_category == ElectionSubCategory::PS2
-            }
-        }
     }
 
     pub fn from_eml_str(
@@ -164,10 +202,6 @@ impl NewElection {
         let election_date = identifier.election_date.copied_value()?.date;
         let nomination_date = identifier.nomination_date.copied_value()?.date;
         let election_tree_details = ElectionTreeDetails::from_definition(definition)?;
-
-        if !Self::category_and_sub_category_match(category, sub_category) {
-            return Err(EMLImportError::MismatchElectionCategoryAndSubCategory);
-        }
 
         // we need the number of seats and it must be a valid u32
         let number_of_seats = election
@@ -278,13 +312,10 @@ impl NewElection {
         }
 
         if self.election_date != election_date {
-            return Err(EMLImportError::MismatchElectionDate);
+            return Err(EMLImportError::MismatchElection);
         }
 
-        let contest = election
-            .contests
-            .first()
-            .ok_or(EMLImportError::CandidateListWithoutContest)?;
+        let contest = single_contest(&election.contests)?;
 
         // check that contest id is the same as the region number
         let contest_id = contest.identifier.id.cloned_value()?;
@@ -381,21 +412,25 @@ impl Candidate {
                 .or(Err(EMLImportError::InvalidCandidate))?,
             initials: can
                 .full_name
-                .person_name
-                .get_initials()
+                .as_ref()
+                .and_then(|n| n.person_name.get_initials())
                 .unwrap_or_default()
                 .to_string(),
             first_name: can
                 .full_name
-                .person_name
-                .get_first_name()
+                .as_ref()
+                .and_then(|n| n.person_name.get_first_name())
                 .map(str::to_string),
             last_name_prefix: can
                 .full_name
-                .person_name
-                .get_name_prefix()
+                .as_ref()
+                .and_then(|n| n.person_name.get_name_prefix())
                 .map(str::to_string),
-            last_name: can.full_name.person_name.get_last_name().to_string(),
+            last_name: can
+                .full_name
+                .as_ref()
+                .map(|n| n.person_name.get_last_name().to_string())
+                .ok_or(EMLImportError::MissingLastName)?,
             locality: can
                 .qualifying_address
                 .as_ref()
@@ -406,22 +441,12 @@ impl Candidate {
                 .as_ref()
                 .and_then(|qa| qa.country_name_code())
                 .map(|code| code.value.to_string()),
-            gender: match &can.gender {
-                None => None,
-                Some(gender) => {
-                    let gender = gender.copied_value()?;
-                    match gender {
-                        Gender::Male => Some(CandidateGender::Male),
-                        Gender::Female => Some(CandidateGender::Female),
-                        Gender::Unknown => None,
-                    }
-                }
-            },
+            gender: candidate_gender(&can.gender, &can.gender_annex)?,
         })
     }
 
     fn as_candidate_lists_candidate(&self) -> Result<CandidateListsCandidate, EMLError> {
-        CandidateListsCandidate::builder()
+        let mut candidate_list_candidate = CandidateListsCandidate::builder()
             .identifier(CandidateId::from_str(
                 &self.number.as_internal_u32().to_string(),
             )?)
@@ -438,8 +463,13 @@ impl Candidate {
             .qualifying_address(QualifyingAddress::new(
                 &self.locality[..],
                 self.country_code.as_deref(),
-            ))
-            .build()
+            ));
+
+        if let Some(candidate_gender) = self.gender {
+            candidate_list_candidate = candidate_list_candidate.gender_annex(candidate_gender);
+        };
+
+        candidate_list_candidate.build()
     }
 }
 
@@ -466,11 +496,50 @@ impl ElectionDomain {
     }
 }
 
+pub struct CountResultsData<'a> {
+    pub results: &'a [(DataEntrySource, crate::domain::results::Results)],
+    pub previous_results:
+        &'a HashMap<DataEntrySourceNumber, (DataEntrySource, crate::domain::results::Results)>,
+    pub totals: &'a ElectionTotals,
+    pub previous_totals: Option<&'a ElectionTotals>,
+}
+
+impl<'a> CountResultsData<'a> {
+    /// Create a `CountResultsData` from each of the components.
+    pub fn new(
+        results: &'a [(DataEntrySource, crate::domain::results::Results)],
+        previous_results: &'a HashMap<
+            DataEntrySourceNumber,
+            (DataEntrySource, crate::domain::results::Results),
+        >,
+        totals: &'a ElectionTotals,
+        previous_totals: Option<&'a ElectionTotals>,
+    ) -> Self {
+        Self {
+            results,
+            previous_results,
+            totals,
+            previous_totals,
+        }
+    }
+
+    /// Create a `CountResultsData` from a `ResultsInputData` reference.
+    pub fn from_results_input_data(results_input: &'a ResultsInputData) -> Self {
+        Self::new(
+            &results_input.results,
+            &results_input.previous_results,
+            &results_input.totals,
+            results_input.previous_totals.as_ref(),
+        )
+    }
+}
+
 impl ElectionWithPoliticalGroups {
     /// Get the EML election category for this election.
     pub fn get_eml_category(&self) -> eml_nl::utils::ElectionCategory {
-        use crate::domain::election::ElectionCategory as Domain;
         use eml_nl::utils::ElectionCategory as Eml;
+
+        use crate::domain::election::ElectionCategory as Domain;
         match self.category {
             Domain::Municipal => Eml::GR,
             Domain::Provincial => Eml::PS,
@@ -480,8 +549,9 @@ impl ElectionWithPoliticalGroups {
 
     /// Get the EML election sub category for this election.
     pub fn get_eml_sub_category(&self) -> eml_nl::utils::ElectionSubcategory {
-        use crate::domain::election::ElectionSubCategory as Domain;
         use eml_nl::utils::ElectionSubcategory as Eml;
+
+        use crate::domain::election::ElectionSubCategory as Domain;
         match self.sub_category {
             Domain::AB1 => Eml::AB1,
             Domain::AB2 => Eml::AB2,
@@ -528,6 +598,7 @@ impl ElectionWithPoliticalGroups {
         let timestamp = timestamp.unwrap_or_else(Local::now);
 
         CandidateLists::builder()
+            .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
@@ -574,6 +645,7 @@ impl ElectionWithPoliticalGroups {
         let timestamp = timestamp.unwrap_or_else(Local::now);
 
         ElectionDefinition::builder()
+            .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.authority_id)?)
@@ -616,6 +688,7 @@ impl ElectionWithPoliticalGroups {
         let timestamp = timestamp.unwrap_or_else(Local::now);
 
         PollingStations::builder()
+            .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.authority_id)?)
@@ -641,7 +714,7 @@ impl ElectionWithPoliticalGroups {
                     polling_stations
                         .iter()
                         .map(|ps| {
-                            PollingPlace::builder()
+                            let mut polling_place = PollingPlace::builder()
                                 .channel(VotingChannelType::Polling)
                                 // Use polling station name (not ps.locality which contains the physical location).
                                 .locality_name(&ps.name[..])
@@ -654,7 +727,17 @@ impl ElectionWithPoliticalGroups {
                                         .map(|n| n.to_string())
                                         .unwrap_or_else(|| "0".to_string()),
                                 )
-                                .build()
+                                .reporting_unit_type_option(
+                                    ps.polling_station_type
+                                        .map(|t| t.as_eml_reporting_unit_type()),
+                                )
+                                .build()?;
+                            polling_place
+                                .physical_location
+                                .address
+                                .locations
+                                .push(polling_station_location(ps));
+                            Ok(polling_place)
                         })
                         .collect::<Result<Vec<_>, EMLError>>()?,
                 )
@@ -666,14 +749,11 @@ impl ElectionWithPoliticalGroups {
         &self,
         transaction_id: Option<u64>,
         committee_session: &CommitteeSession,
-        results: &[(
-            crate::domain::data_entry::DataEntrySource,
-            crate::domain::results::Results,
-        )],
-        totals: &ElectionTotals,
+        data: &CountResultsData,
         timestamp: DateTime<Local>,
     ) -> Result<ElectionCount, EMLError> {
-        ElectionCount::builder()
+        let mut builder = ElectionCount::builder()
+            .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
@@ -688,84 +768,160 @@ impl ElectionWithPoliticalGroups {
                 CommitteeCategory::GSB => CountType::Municipal,
                 CommitteeCategory::CSB => CountType::Central,
             })
-            .contests([self.as_eml_count_contest(committee_session, results, totals)?])
-            .build()
+            .phase(if committee_session.is_next_session() {
+                eml_nl::common::PhaseCode::Corrigendum
+            } else {
+                eml_nl::common::PhaseCode::FirstSession
+            })
+            .contests([self.as_eml_count_contest(committee_session, data)?]);
+        match self.counting_method {
+            Some(VoteCountingMethod::CSO) => {
+                builder = builder.counting_method(eml_nl::common::CountingMethodCode::CSO)
+            }
+            Some(VoteCountingMethod::DSO) => {
+                builder = builder.counting_method(eml_nl::common::CountingMethodCode::DSO)
+            }
+            _ => {}
+        }
+        builder.build()
     }
 
     fn as_eml_count_contest(
         &self,
         committee_session: &CommitteeSession,
-        results: &[(
-            crate::domain::data_entry::DataEntrySource,
-            crate::domain::results::Results,
-        )],
-        totals: &ElectionTotals,
+        data: &CountResultsData,
     ) -> Result<ElectionCountContest, EMLError> {
         let mut builder = ElectionCountContest::builder()
-            .identifier(ContestIdentifier::geen())
-            .total_eligible_voter_count(self.get_eligible_voter_count(totals))
-            .total_candidate_votes_count(totals.votes_counts.total_votes_candidates_count)
+            .identifier(self.district.as_contest_identifier()?)
+            .total_votes_selections(self.as_eml_count_selections(
+                &data.totals.political_group_votes,
+                data.previous_totals.map(|pt| &pt.political_group_votes[..]),
+            )?);
+
+        builder = self.add_totals(builder, data);
+        builder = self.add_previous_totals(builder, data);
+
+        // Do not include reporting unit votes if this is the CSB for a Municipal election
+        if !(self.committee_category == CommitteeCategory::CSB
+            && self.category == crate::domain::election::ElectionCategory::Municipal)
+        {
+            builder = builder.reporting_unit_votes(
+                data.results
+                    .iter()
+                    .map(|(data_source, source_results)| {
+                        let source_previous_results = data
+                            .previous_results
+                            .get(&data_source.number())
+                            .map(|(source, results)| (source, results));
+                        self.as_eml_reporting_unit_votes(
+                            committee_session,
+                            data_source,
+                            source_results,
+                            source_previous_results,
+                            &data.totals.committee_specific,
+                        )
+                    })
+                    .collect::<Result<Vec<_>, EMLError>>()?,
+            );
+        }
+
+        builder.build()
+    }
+
+    fn add_totals(
+        &self,
+        mut builder: ElectionCountContestBuilder,
+        data: &CountResultsData,
+    ) -> ElectionCountContestBuilder {
+        builder = builder
+            .total_eligible_voter_count(self.get_eligible_voter_count(data.totals))
+            .total_candidate_votes_count(data.totals.votes_counts.total_votes_candidates_count)
             .total_rejected_votes(
                 RejectedVotesReason::Blank,
-                totals.votes_counts.blank_votes_count,
+                data.totals.votes_counts.blank_votes_count,
             )
             .total_rejected_votes(
                 RejectedVotesReason::Invalid,
-                totals.votes_counts.invalid_votes_count,
+                data.totals.votes_counts.invalid_votes_count,
             )
             .total_uncounted_votes(
                 UncountedVotesReason::ValidPollCards,
-                totals.voters_counts.poll_card_count,
+                data.totals.voters_counts.poll_card_count,
             )
             .total_uncounted_votes(
                 UncountedVotesReason::ValidProxyCertificates,
-                totals.voters_counts.proxy_certificate_count,
+                data.totals.voters_counts.proxy_certificate_count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::AdmittedVoters,
+                data.totals.voters_counts.total_admitted_voters_count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::MoreBallotsCounted,
+                data.totals.differences_counts.more_ballots_count.count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::FewerBallotsCounted,
+                data.totals.differences_counts.fewer_ballots_count.count,
             );
 
-        if let Some(voter_card_count) = totals.voters_counts.voter_card_count {
+        if let Some(voter_card_count) = data.totals.voters_counts.voter_card_count {
             builder = builder
                 .total_uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count);
         }
 
-        let builder = builder
-            .total_uncounted_votes(
-                UncountedVotesReason::AdmittedVoters,
-                totals.voters_counts.total_admitted_voters_count,
-            )
-            .total_uncounted_votes(
-                UncountedVotesReason::MoreBallotsCounted,
-                totals.differences_counts.more_ballots_count.count,
-            )
-            .total_uncounted_votes(
-                UncountedVotesReason::FewerBallotsCounted,
-                totals.differences_counts.fewer_ballots_count.count,
-            )
-            .total_votes_selections(self.as_eml_count_selections(&totals.political_group_votes)?);
+        builder
+    }
 
-        // GSB elections include reporting unit votes in the count
-        let builder = if self.committee_category == CommitteeCategory::GSB {
-            let CommitteeSpecificTotals::GSB(ref gsb_totals) = totals.committee_specific else {
-                unreachable!();
-            };
+    fn add_previous_totals(
+        &self,
+        mut builder: ElectionCountContestBuilder,
+        data: &CountResultsData,
+    ) -> ElectionCountContestBuilder {
+        if let Some(previous_totals) = data.previous_totals {
+            if let Some(voter_card_count) = previous_totals.voters_counts.voter_card_count {
+                builder = builder.previous_total_uncounted_votes(
+                    UncountedVotesReason::ValidVoterCards,
+                    voter_card_count,
+                );
+            }
 
-            builder.reporting_unit_votes(
-                results
-                    .iter()
-                    .map(|(data_source, ps_res)| {
-                        self.as_eml_reporting_unit_votes(
-                            committee_session,
-                            data_source,
-                            ps_res,
-                            gsb_totals,
-                        )
-                    })
-                    .collect::<Result<Vec<_>, EMLError>>()?,
-            )
-        } else {
-            builder
-        };
+            builder = builder
+                .previous_total_eligible_voter_count(self.get_eligible_voter_count(previous_totals))
+                .previous_total_candidate_votes_count(
+                    previous_totals.votes_counts.total_votes_candidates_count,
+                )
+                .previous_total_rejected_votes(
+                    RejectedVotesReason::Blank,
+                    previous_totals.votes_counts.blank_votes_count,
+                )
+                .previous_total_rejected_votes(
+                    RejectedVotesReason::Invalid,
+                    previous_totals.votes_counts.invalid_votes_count,
+                )
+                .previous_total_uncounted_votes(
+                    UncountedVotesReason::ValidPollCards,
+                    previous_totals.voters_counts.poll_card_count,
+                )
+                .previous_total_uncounted_votes(
+                    UncountedVotesReason::ValidProxyCertificates,
+                    previous_totals.voters_counts.proxy_certificate_count,
+                )
+                .previous_total_uncounted_votes(
+                    UncountedVotesReason::AdmittedVoters,
+                    previous_totals.voters_counts.total_admitted_voters_count,
+                )
+                .previous_total_uncounted_votes(
+                    UncountedVotesReason::MoreBallotsCounted,
+                    previous_totals.differences_counts.more_ballots_count.count,
+                )
+                .previous_total_uncounted_votes(
+                    UncountedVotesReason::FewerBallotsCounted,
+                    previous_totals.differences_counts.fewer_ballots_count.count,
+                );
+        }
 
-        builder.build()
+        builder
     }
 
     /// Depending on the context of the totals coming from GSB or from CSB, the number of voters source is different.
@@ -779,11 +935,17 @@ impl ElectionWithPoliticalGroups {
     fn as_eml_count_selections(
         &self,
         votes: &[PoliticalGroupCandidateVotes],
+        previous_votes: Option<&[PoliticalGroupCandidateVotes]>,
     ) -> Result<Vec<ElectionCountSelection>, EMLError> {
         let mut selections = vec![];
 
         for pg in votes {
             let epg = self.political_groups.iter().find(|p| p.number == pg.number);
+            let previous_pg = previous_votes.and_then(|pv| {
+                pv.iter()
+                    .find(|previous_pg| previous_pg.number == pg.number)
+            });
+
             selections.push(
                 ElectionCountSelection::builder()
                     .affiliation(AffiliationSelection::new(
@@ -791,16 +953,23 @@ impl ElectionWithPoliticalGroups {
                         epg.map(|p| p.registered_name.as_str()).unwrap_or(""),
                     ))
                     .valid_votes(pg.total)
+                    .previous_valid_votes_option(previous_pg.map(|pg| pg.total))
                     .build()?,
             );
 
             for can in &pg.candidate_votes {
+                let previous_can = previous_pg.and_then(|p| {
+                    p.candidate_votes
+                        .iter()
+                        .find(|prev_can| prev_can.number == can.number)
+                });
                 selections.push(
                     ElectionCountSelection::builder()
                         .candidate(CandidateId::from_str(
                             &can.number.as_internal_u32().to_string(),
                         )?)
                         .valid_votes(can.votes)
+                        .previous_valid_votes_option(previous_can.map(|pc| pc.votes))
                         .build()?,
                 );
             }
@@ -812,9 +981,10 @@ impl ElectionWithPoliticalGroups {
     fn as_eml_reporting_unit_votes(
         &self,
         committee_session: &CommitteeSession,
-        data_source: &crate::domain::data_entry::DataEntrySource,
+        data_source: &DataEntrySource,
         results: &crate::domain::results::Results,
-        gsb_totals: &crate::domain::tabulation::GSBTotals,
+        previous_results: Option<(&DataEntrySource, &crate::domain::results::Results)>,
+        committee_specific_totals: &crate::domain::tabulation::CommitteeSpecificTotals,
     ) -> Result<ReportingUnitVotes, EMLError> {
         let mut builder = ReportingUnitVotes::builder()
             .identifier(ReportingUnitIdentifier::new(
@@ -823,7 +993,37 @@ impl ElectionWithPoliticalGroups {
                 )?,
                 data_source.eml_reporting_unit_identifier_name(),
             ))
-            .selections(self.as_eml_count_selections(results.political_group_votes())?)
+            .reporting_unit_type_option(match data_source {
+                crate::domain::data_entry::DataEntrySource::PollingStation(ps) => ps
+                    .polling_station()
+                    .polling_station_type
+                    .map(|t| t.as_eml_reporting_unit_type()),
+                _ => None,
+            })
+            .selections(self.as_eml_count_selections(
+                results.political_group_votes(),
+                previous_results.map(|pr| pr.1.political_group_votes()),
+            )?);
+
+        builder = self.add_unit_votes(builder, data_source, results);
+        builder = self.add_unit_previous(builder, previous_results);
+
+        builder = add_reporting_unit_investigations(
+            builder,
+            committee_session,
+            data_source,
+            committee_specific_totals,
+        );
+        builder.build()
+    }
+
+    fn add_unit_votes(
+        &self,
+        mut builder: ReportingUnitVotesBuilder,
+        data_source: &DataEntrySource,
+        results: &crate::domain::results::Results,
+    ) -> ReportingUnitVotesBuilder {
+        builder = builder
             .eligible_voter_count(match results {
                 crate::domain::results::Results::DSOFirstSession(_)
                 | crate::domain::results::Results::DSONextSession(_)
@@ -849,14 +1049,7 @@ impl ElectionWithPoliticalGroups {
             .uncounted_votes(
                 UncountedVotesReason::ValidProxyCertificates,
                 results.voters_counts().proxy_certificate_count,
-            );
-
-        if let Some(voter_card_count) = results.voters_counts().voter_card_count {
-            builder =
-                builder.uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count);
-        }
-
-        builder = builder
+            )
             .uncounted_votes(
                 UncountedVotesReason::AdmittedVoters,
                 results.voters_counts().total_admitted_voters_count,
@@ -870,9 +1063,72 @@ impl ElectionWithPoliticalGroups {
                 *results.differences_counts().fewer_ballots_count,
             );
 
-        builder =
-            add_reporting_unit_investigations(builder, committee_session, data_source, gsb_totals);
-        builder.build()
+        if let Some(voter_card_count) = results.voters_counts().voter_card_count {
+            builder =
+                builder.uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count);
+        }
+
+        builder
+    }
+
+    fn add_unit_previous(
+        &self,
+        mut builder: ReportingUnitVotesBuilder,
+        results: Option<(&DataEntrySource, &crate::domain::results::Results)>,
+    ) -> ReportingUnitVotesBuilder {
+        if let Some((previous_data_source, previous_results)) = results {
+            builder = builder
+                .previous_eligible_voter_count(match previous_results {
+                    crate::domain::results::Results::DSOFirstSession(_)
+                    | crate::domain::results::Results::DSONextSession(_)
+                    | crate::domain::results::Results::CSOFirstSession(_)
+                    | crate::domain::results::Results::CSONextSession(_) => {
+                        previous_data_source.eml_eligible_voter_count().unwrap_or(0)
+                    }
+                    crate::domain::results::Results::GSB(gsb_results) => {
+                        gsb_results.number_of_voters
+                    }
+                })
+                .previous_candidate_votes_count(
+                    previous_results.votes_counts().total_votes_candidates_count,
+                )
+                .previous_rejected_votes(
+                    RejectedVotesReason::Blank,
+                    previous_results.votes_counts().blank_votes_count,
+                )
+                .previous_rejected_votes(
+                    RejectedVotesReason::Invalid,
+                    previous_results.votes_counts().invalid_votes_count,
+                )
+                .previous_uncounted_votes(
+                    UncountedVotesReason::ValidPollCards,
+                    previous_results.voters_counts().poll_card_count,
+                )
+                .previous_uncounted_votes(
+                    UncountedVotesReason::ValidProxyCertificates,
+                    previous_results.voters_counts().proxy_certificate_count,
+                )
+                .previous_uncounted_votes(
+                    UncountedVotesReason::AdmittedVoters,
+                    previous_results.voters_counts().total_admitted_voters_count,
+                )
+                .previous_uncounted_votes(
+                    UncountedVotesReason::MoreBallotsCounted,
+                    *previous_results.differences_counts().more_ballots_count,
+                )
+                .previous_uncounted_votes(
+                    UncountedVotesReason::FewerBallotsCounted,
+                    *previous_results.differences_counts().fewer_ballots_count,
+                );
+
+            if let Some(voter_card_count) = previous_results.voters_counts().voter_card_count {
+                builder = builder.previous_uncounted_votes(
+                    UncountedVotesReason::ValidVoterCards,
+                    voter_card_count,
+                );
+            }
+        }
+        builder
     }
 
     pub fn as_result_eml(
@@ -887,6 +1143,7 @@ impl ElectionWithPoliticalGroups {
             ));
         }
         ElectionResult::builder()
+            .version(EMLVersion::V1_3_1)
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
@@ -982,11 +1239,7 @@ fn build_candidate_result(
                 );
 
             if let Some(gender) = can.gender {
-                builder = builder.gender(match gender {
-                    CandidateGender::Female => Gender::Female,
-                    CandidateGender::Male => Gender::Male,
-                    CandidateGender::X => Gender::Unknown,
-                });
+                builder = builder.gender_annex(gender);
             }
 
             builder = builder.locality_name(can.locality.clone());
@@ -1009,14 +1262,16 @@ fn add_reporting_unit_investigations(
     mut builder: ReportingUnitVotesBuilder,
     committee_session: &CommitteeSession,
     data_source: &crate::domain::data_entry::DataEntrySource,
-    gsb_totals: &crate::domain::tabulation::GSBTotals,
+    committee_specific_totals: &crate::domain::tabulation::CommitteeSpecificTotals,
 ) -> ReportingUnitVotesBuilder {
+    use crate::domain::tabulation::{CommitteeSpecificTotals, GSBTotals};
+
     if !committee_session.is_next_session() {
-        let DataEntrySourceNumber::PollingStation(ref number) = data_source.number() else {
-            unreachable!()
-        };
-        match gsb_totals {
-            GSBTotals::DSO(investigations) => {
+        match committee_specific_totals {
+            CommitteeSpecificTotals::GSB(GSBTotals::DSO(investigations)) => {
+                let DataEntrySourceNumber::PollingStation(ref number) = data_source.number() else {
+                    unreachable!()
+                };
                 builder = builder
                     .investigation(
                         InvestigationReason::UnexplainedDifference,
@@ -1031,7 +1286,10 @@ fn add_reporting_unit_investigations(
                         investigations.corrected_results.contains(number),
                     )
             }
-            GSBTotals::CSO(investigations) => {
+            CommitteeSpecificTotals::GSB(GSBTotals::CSO(investigations)) => {
+                let DataEntrySourceNumber::PollingStation(ref number) = data_source.number() else {
+                    unreachable!()
+                };
                 builder = builder
                     .investigation(
                         InvestigationReason::OtherReason,
@@ -1045,6 +1303,9 @@ fn add_reporting_unit_investigations(
                         InvestigationReason::AdmittedVotersReestablished,
                         investigations.admitted_voters_recounted.contains(number),
                     )
+            }
+            _ => {
+                // other committee specific totals have no investigations
             }
         }
     };
@@ -1060,25 +1321,47 @@ pub fn parse_polling_stations_eml_str(
 
 pub fn polling_stations_from_eml_str(
     polling_stations_data: &str,
-) -> Result<Vec<crate::domain::polling_station::PollingStationRequest>, EMLImportError> {
+) -> Result<
+    (
+        crate::domain::polling_station::PollingStationsElectionIdentifier,
+        Vec<crate::domain::polling_station::PollingStationRequest>,
+    ),
+    EMLImportError,
+> {
     let polling_stations = parse_polling_stations_eml_str(polling_stations_data)?;
-    polling_stations_from_eml(&polling_stations)
+    Ok((
+        election_identifier_from_eml(&polling_stations)?,
+        polling_stations_from_eml(&polling_stations)?,
+    ))
+}
+
+pub fn election_identifier_from_eml(
+    polling_stations: &PollingStations,
+) -> Result<crate::domain::polling_station::PollingStationsElectionIdentifier, EMLImportError> {
+    let identifier = &polling_stations.election_event.election.identifier;
+    Ok(
+        crate::domain::polling_station::PollingStationsElectionIdentifier {
+            election_id: identifier.id.cloned_value()?.value().to_owned(),
+            election_date: identifier.election_date.copied_value()?.date,
+        },
+    )
 }
 
 pub fn polling_stations_from_eml(
     polling_stations: &PollingStations,
 ) -> Result<Vec<crate::domain::polling_station::PollingStationRequest>, EMLImportError> {
-    let contest = polling_stations
-        .election_event
-        .election
-        .contests
-        .first()
-        .ok_or(EMLImportError::PollingStationsWithoutContest)?;
+    let contest = single_contest(&polling_stations.election_event.election.contests)?;
+
+    if contest.polling_places.is_empty() {
+        return Err(EMLImportError::MissingPollingStations);
+    }
     let mut result = vec![];
     for ps in &contest.polling_places {
         let physical_location = &ps.physical_location;
         let pspl = &physical_location.polling_station;
         let locality = &physical_location.address.locality;
+        // Only the first EML 1.3 location is used
+        let location = physical_location.address.locations.first();
         result.push(crate::domain::polling_station::PollingStationRequest {
             name: locality.locality_name.name.to_string(),
             number: Some(
@@ -1089,49 +1372,119 @@ pub fn polling_stations_from_eml(
                     .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
             ),
             number_of_voters: pspl.data.parse::<u32>().ok(),
-            polling_station_type: None,
-            address: "".to_string(),
-            postal_code: locality
-                .postal_code
+            polling_station_type: physical_location
+                .reporting_unit_type
                 .as_ref()
-                .map(|pc| &pc.number.number[..])
+                .map(|t| t.copied_value())
+                .transpose()?
+                .map(crate::domain::polling_station::PollingStationType::from_eml_reporting_unit_type),
+            address: location.map(location_address).unwrap_or_default(),
+            // A postal code in the location takes precedence over the legacy postal code
+            postal_code: match location.and_then(|l| l.postal_code.as_ref()) {
+                Some(postal_code) => postal_code.raw().trim().to_string(),
+                None => locality
+                    .postal_code
+                    .as_ref()
+                    .map(|pc| &pc.number.number[..])
+                    .unwrap_or("")
+                    .to_string(),
+            },
+            locality: location
+                .and_then(|l| l.city.as_deref())
                 .unwrap_or("")
+                .trim()
                 .to_string(),
-            locality: "".to_string(),
         });
     }
 
     Ok(result)
 }
 
+/// Formats the address of an EML location as e.g. `Street 12A bis Ingang achterom`.
+fn location_address(location: &Location) -> String {
+    let number = location.number.as_ref().map(|n| n.raw());
+    let house_number = format!(
+        "{}{}",
+        number.as_deref().unwrap_or("").trim(),
+        location.letter.as_deref().unwrap_or("").trim()
+    );
+    [
+        location.street_name.as_deref(),
+        Some(&house_number[..]),
+        location.number_addition.as_deref(),
+        location.additional_address_information.as_deref(),
+    ]
+    .into_iter()
+    .flatten()
+    .map(str::trim)
+    .filter(|part| !part.is_empty())
+    .collect::<Vec<_>>()
+    .join(" ")
+}
+
+/// Builds the EML location of a polling station. Abacus stores the address as free text,
+/// so it is exported as additional address information instead of being split into parts.
+fn polling_station_location(ps: &crate::domain::polling_station::PollingStation) -> Location {
+    let non_empty = |s: &str| (!s.is_empty()).then(|| s.to_string());
+    let mut location = Location::new()
+        .with_additional_address_information_option(non_empty(&ps.address))
+        .with_city_option(non_empty(&ps.locality));
+    // The postal code is not validated in Abacus, so it is exported verbatim.
+    location.postal_code = non_empty(&ps.postal_code).map(StringValue::from_raw);
+    location
+}
+
 pub fn number_of_voters_from_polling_stations_eml(
     polling_stations: &PollingStations,
 ) -> Result<u32, EMLImportError> {
-    let contest = polling_stations
-        .election_event
-        .election
-        .contests
-        .first()
-        .ok_or(EMLImportError::PollingStationsWithoutContest)?;
+    let contest = single_contest(&polling_stations.election_event.election.contests)?;
 
     Ok(max_votes(&contest.max_votes))
 }
 
-pub fn polling_stations_eml_matches_election(
-    polling_stations: &PollingStations,
-    election: &NewElection,
-) -> Result<bool, EMLImportError> {
-    let identifier = &polling_stations.election_event.election.identifier;
-    let election_id = identifier.id.cloned_value()?;
-    let election_date = identifier.election_date.copied_value()?.date;
-    Ok(election_id.to_raw_value().as_ref() == election.election_id
-        && election_date == election.election_date)
+impl crate::domain::polling_station::PollingStationType {
+    /// Converts this polling station type to the corresponding EML reporting unit type.
+    pub fn as_eml_reporting_unit_type(&self) -> eml_nl::utils::ReportingUnitType {
+        match self {
+            crate::domain::polling_station::PollingStationType::FixedLocation => {
+                eml_nl::utils::ReportingUnitType::FixedLocation
+            }
+            crate::domain::polling_station::PollingStationType::Special => {
+                eml_nl::utils::ReportingUnitType::Special
+            }
+            crate::domain::polling_station::PollingStationType::Mobile => {
+                eml_nl::utils::ReportingUnitType::Mobile
+            }
+        }
+    }
+
+    /// Converts an EML reporting unit type to the corresponding polling station type.
+    pub fn from_eml_reporting_unit_type(
+        reporting_unit_type: eml_nl::utils::ReportingUnitType,
+    ) -> Self {
+        match reporting_unit_type {
+            eml_nl::utils::ReportingUnitType::FixedLocation => {
+                crate::domain::polling_station::PollingStationType::FixedLocation
+            }
+            eml_nl::utils::ReportingUnitType::Special => {
+                crate::domain::polling_station::PollingStationType::Special
+            }
+            eml_nl::utils::ReportingUnitType::Mobile => {
+                crate::domain::polling_station::PollingStationType::Mobile
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use apportionment::Fraction;
-    use eml_nl::{documents::election_result::ElectionResultSelectionType, utils::StringValue};
+    use eml_nl::{
+        EMLErrorKind, documents::election_result::ElectionResultSelectionType, io::EMLWrite as _,
+        utils::StringValue,
+    };
 
     use super::*;
     use crate::domain::{
@@ -1139,7 +1492,7 @@ mod tests {
         data_entry::{DataEntryId, DataEntrySource},
         election::{ElectionCategory, tests::election_fixture},
         polling_station::{
-            PollingStationFirstSession, PollingStationForSession,
+            PollingStationFirstSession, PollingStationForSession, PollingStationType,
             test_helpers::polling_stations_fixture,
         },
         results::{
@@ -1148,9 +1501,64 @@ mod tests {
         },
     };
 
+    #[test]
+    fn test_candidates_require_single_contest() {
+        let (mut election, _) =
+            NewElection::from_eml_str(include_str!("tests/eml110a_test.eml.xml"), None, false)
+                .unwrap();
+        let mut candidates = CandidateLists::parse_eml(
+            include_str!("tests/eml230b_test.eml.xml"),
+            EMLParsingMode::Strict,
+        )
+        .unwrap();
+        let contests = &mut candidates.candidate_list.election.contests;
+        contests.push(contests[0].clone());
+        assert_matches!(
+            election.add_candidates_from_eml(&candidates, &CommitteeDistrict::None),
+            Err(EMLImportError::InvalidNumberOfContests { found: 2 })
+        );
+
+        candidates.candidate_list.election.contests.clear();
+        assert_matches!(
+            election.add_candidates_from_eml(&candidates, &CommitteeDistrict::None),
+            Err(EMLImportError::InvalidNumberOfContests { found: 0 })
+        );
+    }
+
+    #[test]
+    fn test_polling_stations_require_single_contest() {
+        let mut polling_stations =
+            parse_polling_stations_eml_str(include_str!("tests/eml110b_test.eml.xml")).unwrap();
+        let contests = &mut polling_stations.election_event.election.contests;
+        contests.push(contests[0].clone());
+        assert_matches!(
+            polling_stations_from_eml(&polling_stations),
+            Err(EMLImportError::InvalidNumberOfContests { found: 2 })
+        );
+        assert_matches!(
+            number_of_voters_from_polling_stations_eml(&polling_stations),
+            Err(EMLImportError::InvalidNumberOfContests { found: 2 })
+        );
+
+        polling_stations.election_event.election.contests.clear();
+        assert_matches!(
+            polling_stations_from_eml(&polling_stations),
+            Err(EMLImportError::InvalidNumberOfContests { found: 0 })
+        );
+        assert_matches!(
+            number_of_voters_from_polling_stations_eml(&polling_stations),
+            Err(EMLImportError::InvalidNumberOfContests { found: 0 })
+        );
+    }
+
     fn source_and_results_gsb(voter_card_count: Option<Count>) -> (DataEntrySource, Results) {
         let mut results = example_results();
-        results.voters_counts_mut().voter_card_count = voter_card_count;
+        if let Some(vcc) = voter_card_count {
+            results.votes_counts_mut().invalid_votes_count += vcc;
+            results.votes_counts_mut().total_votes_cast_count += vcc;
+            results.voters_counts_mut().voter_card_count = Some(vcc);
+            results.voters_counts_mut().total_admitted_voters_count += vcc;
+        }
 
         (
             DataEntrySource::PollingStation(PollingStationForSession::First(
@@ -1189,10 +1597,7 @@ mod tests {
         );
         let res = NewElection::from_eml_str(data, None, false).unwrap_err();
         dbg!(&res);
-        assert!(matches!(
-            res,
-            EMLImportError::MismatchElectionCategoryAndSubCategory
-        ));
+        assert_matches!(res, EMLImportError::EMLError(e) if matches!(e.kind(), EMLErrorKind::InvalidElectionSubcategory));
     }
 
     #[test]
@@ -1251,6 +1656,37 @@ mod tests {
     }
 
     #[test]
+    fn test_eml_repoting_unit_type_conversion() {
+        use eml_nl::utils::ReportingUnitType;
+
+        assert_eq!(
+            PollingStationType::FixedLocation.as_eml_reporting_unit_type(),
+            ReportingUnitType::FixedLocation
+        );
+        assert_eq!(
+            PollingStationType::Special.as_eml_reporting_unit_type(),
+            ReportingUnitType::Special
+        );
+        assert_eq!(
+            PollingStationType::Mobile.as_eml_reporting_unit_type(),
+            ReportingUnitType::Mobile
+        );
+
+        assert_eq!(
+            PollingStationType::from_eml_reporting_unit_type(ReportingUnitType::FixedLocation),
+            PollingStationType::FixedLocation
+        );
+        assert_eq!(
+            PollingStationType::from_eml_reporting_unit_type(ReportingUnitType::Special),
+            PollingStationType::Special
+        );
+        assert_eq!(
+            PollingStationType::from_eml_reporting_unit_type(ReportingUnitType::Mobile),
+            PollingStationType::Mobile
+        );
+    }
+
+    #[test]
     fn test_water_authority_election_name_from_eml() {
         let data = include_str!("tests/definitions/Verkiezingsdefinitie_AB2023_Limburg.eml.xml");
         let (election, _) =
@@ -1295,7 +1731,12 @@ mod tests {
         let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
 
         let eml_count = election
-            .as_count_eml(None, &committee_session, &[], &totals, Local::now())
+            .as_count_eml(
+                None,
+                &committee_session,
+                &CountResultsData::new(&[], &HashMap::new(), &totals, None),
+                Local::now(),
+            )
             .unwrap();
         assert_eq!(
             eml_count
@@ -1316,7 +1757,12 @@ mod tests {
         let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
 
         let eml_count = election
-            .as_count_eml(None, &committee_session, &[], &totals, Local::now())
+            .as_count_eml(
+                None,
+                &committee_session,
+                &CountResultsData::new(&[], &HashMap::new(), &totals, None),
+                Local::now(),
+            )
             .unwrap();
         assert_eq!(
             eml_count
@@ -1327,6 +1773,21 @@ mod tests {
                 .unwrap()
                 .value(),
             "0000"
+        );
+
+        assert_eq!(
+            eml_count
+                .count
+                .counting_method
+                .unwrap()
+                .copied_value()
+                .unwrap(),
+            eml_nl::common::CountingMethodCode::CSO
+        );
+
+        assert_eq!(
+            eml_count.count.phase.unwrap().copied_value().unwrap(),
+            eml_nl::common::PhaseCode::FirstSession
         );
     }
 
@@ -1408,7 +1869,10 @@ mod tests {
         };
 
         let result_csb = election
-            .as_eml_count_contest(&committee_session, &[], &totals)
+            .as_eml_count_contest(
+                &committee_session,
+                &CountResultsData::new(&[], &HashMap::new(), &totals, None),
+            )
             .unwrap();
         let total_votes_csb = result_csb.total_votes.unwrap();
         assert_eq!(
@@ -1427,7 +1891,15 @@ mod tests {
         let committee_session = committee_session_fixture(election.id);
         let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
         let result_gsb = election
-            .as_eml_count_contest(&committee_session, &[source_and_results_gsb(None)], &totals)
+            .as_eml_count_contest(
+                &committee_session,
+                &CountResultsData::new(
+                    &[source_and_results_gsb(None)],
+                    &HashMap::new(),
+                    &totals,
+                    None,
+                ),
+            )
             .unwrap();
 
         let total_votes_gsb = result_gsb.total_votes.unwrap();
@@ -1462,8 +1934,12 @@ mod tests {
         let result = election
             .as_eml_count_contest(
                 &committee_session,
-                &[source_and_results_gsb(Some(17))],
-                &totals,
+                &CountResultsData::new(
+                    &[source_and_results_gsb(Some(17))],
+                    &HashMap::new(),
+                    &totals,
+                    None,
+                ),
             )
             .unwrap();
 
@@ -1481,6 +1957,73 @@ mod tests {
                 .first()
                 .unwrap()
                 .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(17u64))
+        );
+    }
+
+    #[test]
+    fn test_as_eml_count_contest_with_previous_values() {
+        let election = election_fixture(
+            ElectionCategory::WaterAuthority,
+            CommitteeCategory::GSB,
+            &[2, 2],
+        );
+        let committee_session = committee_session_fixture(election.id);
+        let (prev_source, prev_results) = source_and_results_gsb(Some(17));
+        let (new_source, new_results) = source_and_results_gsb(Some(42));
+        let totals =
+            ElectionTotals::tabulate(&election, &[(new_source.clone(), new_results.clone())])
+                .unwrap();
+        let prev_totals =
+            ElectionTotals::tabulate(&election, &[(prev_source.clone(), prev_results.clone())])
+                .unwrap();
+
+        let result = election
+            .as_eml_count_contest(
+                &committee_session,
+                &CountResultsData::new(
+                    &[(new_source, new_results)],
+                    &HashMap::from([(prev_source.number(), (prev_source, prev_results))]),
+                    &totals,
+                    Some(&prev_totals),
+                ),
+            )
+            .unwrap();
+
+        assert_eq!(
+            result
+                .total_votes
+                .as_ref()
+                .unwrap()
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(42u64))
+        );
+        assert_eq!(
+            result
+                .total_votes
+                .as_ref()
+                .unwrap()
+                .previous_uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(17u64))
+        );
+        assert_eq!(
+            result
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(42u64))
+        );
+        assert_eq!(
+            result
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .previous_uncounted_votes
                 .get(&UncountedVotesReason::ValidVoterCards),
             Some(&StringValue::from_value(17u64))
         );
@@ -1544,5 +2087,307 @@ mod tests {
         );
         assert_eq!(second.polling_station.id.raw(), "32");
         assert_eq!(&second.polling_station.data[..], "2000");
+    }
+
+    /// Address, postal code, locality and type of the imported polling stations.
+    fn imported_locations(xml: &str) -> Vec<(String, String, String, Option<PollingStationType>)> {
+        locations(polling_stations_from_eml_str(xml).unwrap().1)
+    }
+
+    fn locations(
+        polling_stations: Vec<crate::domain::polling_station::PollingStationRequest>,
+    ) -> Vec<(String, String, String, Option<PollingStationType>)> {
+        polling_stations
+            .into_iter()
+            .map(|ps| {
+                (
+                    ps.address,
+                    ps.postal_code,
+                    ps.locality,
+                    ps.polling_station_type,
+                )
+            })
+            .collect()
+    }
+
+    fn location(
+        address: &str,
+        postal_code: &str,
+        locality: &str,
+        polling_station_type: Option<PollingStationType>,
+    ) -> (String, String, String, Option<PollingStationType>) {
+        (
+            address.to_string(),
+            postal_code.to_string(),
+            locality.to_string(),
+            polling_station_type,
+        )
+    }
+
+    #[test]
+    fn test_polling_stations_from_legacy_eml() {
+        let (_, polling_stations) =
+            polling_stations_from_eml_str(include_str!("./tests/eml110b_test.eml.xml")).unwrap();
+
+        assert_eq!(polling_stations.len(), 20);
+        let first = &polling_stations[0];
+        assert_eq!(first.name, "Stadhuis");
+        assert_eq!(first.number, Some(1));
+        assert_eq!(first.number_of_voters, Some(1273));
+        assert_eq!(first.polling_station_type, None);
+        assert_eq!(first.address, "");
+        assert_eq!(first.postal_code, "1011 PN");
+        assert_eq!(first.locality, "");
+    }
+
+    #[test]
+    fn test_polling_stations_from_eml_with_locations() {
+        let (_, polling_stations) =
+            polling_stations_from_eml_str(include_str!("./tests/eml110b_v1_3_1.eml.xml")).unwrap();
+
+        // The name still comes from the legacy locality name.
+        assert_eq!(
+            polling_stations
+                .iter()
+                .map(|ps| ps.name.as_str())
+                .collect::<Vec<_>>(),
+            [
+                "Stadhuis",
+                "Melkweg",
+                "Op Rolletjes",
+                "Ziekenhuis",
+                "Bibliotheek",
+                "Sporthal",
+                "Buurthuis"
+            ]
+        );
+
+        assert_eq!(
+            locations(polling_stations),
+            [
+                // Legacy address only
+                location("", "1011 PN", "", None),
+                // Structured address combined with additional information,
+                // the location postal code overrides the legacy postal code
+                location(
+                    "Lijnbaansgracht 234A bis Ingang achterom",
+                    "1017 PH",
+                    "Amsterdam",
+                    Some(PollingStationType::FixedLocation),
+                ),
+                // Additional address information only, legacy postal code fallback
+                location(
+                    "Parkeerplaats bij de Rijksweg A12, 1",
+                    "1234 YQ",
+                    "Heemdamseburg",
+                    Some(PollingStationType::Mobile),
+                ),
+                // Later locations do not fill in missing fields
+                location("Hoofdweg", "", "", Some(PollingStationType::Special)),
+                // An empty location postal code overrides the legacy postal code
+                location("Kerkstraat 3", "", "", None),
+                // Malformed values are imported verbatim
+                location("Sportlaan 12-14", "1234ab", "", None),
+                // Surrounding whitespace is trimmed, whitespace-only parts are skipped
+                location("5 Achteringang", "1234 AB", "Juinen", None),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_polling_stations_from_eml_empty() {
+        let eml = include_str!("./tests/eml110b_test.eml.xml");
+        let mut polling_stations = parse_polling_stations_eml_str(eml).unwrap();
+
+        polling_stations.election_event.election.contests[0]
+            .polling_places
+            .clear();
+
+        let result = polling_stations_from_eml(&polling_stations);
+        assert_matches!(result, Err(EMLImportError::MissingPollingStations));
+    }
+
+    #[test]
+    fn test_as_polling_stations_eml_location() {
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
+        let mut polling_stations = polling_stations_fixture(&[1000, 2000, 3000]);
+        polling_stations[1].polling_station_type = Some(PollingStationType::FixedLocation);
+        polling_stations[2].polling_station_type = Some(PollingStationType::Mobile);
+        polling_stations[2].address = "".to_string();
+        polling_stations[2].locality = "".to_string();
+        polling_stations[2].postal_code = "".to_string();
+
+        let eml = election
+            .as_polling_stations_eml(&polling_stations, None, None)
+            .unwrap();
+        let polling_places = &eml.election_event.election.contests[0].polling_places;
+
+        let first = &polling_places[0].physical_location;
+        // Legacy fields are preserved
+        assert_eq!(&first.address.locality.locality_name.name[..], "Testplek 1");
+        assert_eq!(
+            &first
+                .address
+                .locality
+                .postal_code
+                .as_ref()
+                .unwrap()
+                .number
+                .number[..],
+            "1234 QY"
+        );
+        assert_eq!(first.reporting_unit_type.as_ref().unwrap().raw(), "Special");
+        // Exactly one location, with only the address, postal code and locality set
+        assert_eq!(
+            first.address.locations,
+            [Location {
+                postal_code: Some(StringValue::from_raw("1234 QY")),
+                city: Some("Testdorp".into()),
+                additional_address_information: Some("Teststraat 2a".into()),
+                ..Location::new()
+            }]
+        );
+
+        assert_eq!(
+            polling_places[1]
+                .physical_location
+                .reporting_unit_type
+                .as_ref()
+                .unwrap()
+                .raw(),
+            "FixedLocation"
+        );
+
+        // Empty fields are omitted
+        let third = &polling_places[2].physical_location;
+        assert_eq!(third.reporting_unit_type.as_ref().unwrap().raw(), "Mobile");
+        assert_eq!(third.address.locations, [Location::new()]);
+    }
+
+    #[test]
+    fn test_as_polling_stations_eml_without_type() {
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
+        let mut polling_stations = polling_stations_fixture(&[1000]);
+        polling_stations[0].polling_station_type = None;
+
+        let eml = election
+            .as_polling_stations_eml(&polling_stations, None, None)
+            .unwrap();
+
+        let first = &eml.election_event.election.contests[0].polling_places[0].physical_location;
+        assert!(first.reporting_unit_type.is_none());
+    }
+
+    #[test]
+    fn test_as_polling_stations_eml_roundtrip() {
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
+        let mut polling_stations = polling_stations_fixture(&[1000, 2000, 3000, 4000]);
+        polling_stations[0].address =
+            "Lijnbaansgracht 234A bis, ingang <achterom> & \"zij\"".into();
+        polling_stations[0].locality = "'s-Hertogenbosch".into();
+        polling_stations[0].postal_code = "1017 PH".into();
+        polling_stations[1].polling_station_type = Some(PollingStationType::FixedLocation);
+        polling_stations[2].polling_station_type = Some(PollingStationType::Mobile);
+        polling_stations[3].polling_station_type = None;
+
+        let xml = election
+            .as_polling_stations_eml(&polling_stations, None, None)
+            .unwrap()
+            .write_eml_root_str(true, true)
+            .unwrap();
+
+        // Valid data can be parsed strictly
+        PollingStations::parse_eml(&xml, EMLParsingMode::Strict)
+            .ok()
+            .unwrap();
+
+        assert_eq!(
+            imported_locations(&xml),
+            [
+                location(
+                    "Lijnbaansgracht 234A bis, ingang <achterom> & \"zij\"",
+                    "1017 PH",
+                    "'s-Hertogenbosch",
+                    Some(PollingStationType::Special),
+                ),
+                location(
+                    "Teststraat 2a",
+                    "1234 QY",
+                    "Testdorp",
+                    Some(PollingStationType::FixedLocation),
+                ),
+                location(
+                    "Teststraat 2a",
+                    "1234 QY",
+                    "Testdorp",
+                    Some(PollingStationType::Mobile),
+                ),
+                location("Teststraat 2a", "1234 QY", "Testdorp", None),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_as_polling_stations_eml_roundtrip_malformed_postal_code() {
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
+        let mut polling_stations = polling_stations_fixture(&[1000]);
+        polling_stations[0].postal_code = "1234qy".into();
+
+        let xml = election
+            .as_polling_stations_eml(&polling_stations, None, None)
+            .unwrap()
+            .write_eml_root_str(true, true)
+            .unwrap();
+
+        // The malformed postal code is exported verbatim, so strict parsing fails
+        assert!(
+            PollingStations::parse_eml(&xml, EMLParsingMode::Strict)
+                .ok()
+                .is_err()
+        );
+
+        // The fallback parser used for imports preserves it
+        assert_eq!(imported_locations(&xml)[0].1, "1234qy");
+    }
+
+    #[test]
+    fn test_candidate_gender() {
+        let cases = [
+            // Happy path
+            (Some(Gender::Male), None, Some(CandidateGender::Male)),
+            (Some(Gender::Female), None, Some(CandidateGender::Female)),
+            (Some(Gender::Unknown), None, None),
+            (None, Some(GenderAnnex::Male), Some(CandidateGender::Male)),
+            (
+                None,
+                Some(GenderAnnex::Female),
+                Some(CandidateGender::Female),
+            ),
+            (None, Some(GenderAnnex::Other), Some(CandidateGender::X)),
+            (None, None, None),
+            // Prefer GenderAnnex
+            (
+                Some(Gender::Male),
+                Some(GenderAnnex::Female),
+                Some(CandidateGender::Female),
+            ),
+            (
+                Some(Gender::Unknown),
+                Some(GenderAnnex::Male),
+                Some(CandidateGender::Male),
+            ),
+            (
+                Some(Gender::Female),
+                Some(GenderAnnex::Other),
+                Some(CandidateGender::X),
+            ),
+        ];
+
+        for (gender, gender_annex, expected) in cases {
+            let gender = gender.map(StringValue::from_value);
+            let gender_annex = gender_annex.map(StringValue::from_value);
+            let actual = candidate_gender(&gender, &gender_annex).unwrap();
+            assert_eq!(expected, actual);
+        }
     }
 }

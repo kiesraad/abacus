@@ -136,6 +136,7 @@ pub enum AuditEventType {
     // data entry events
     DataEntryStarted,
     DataEntrySaved,
+    DataEntryImported,
     DataEntryResumed,
     DataEntryDeleted,
     DataEntryDiscarded,
@@ -157,6 +158,8 @@ pub enum AuditEventType {
     DatabaseBackupCreated,
     // signing events
     SigningKeypairCreated,
+    SubCommitteeCertificateAdded,
+    SubCommitteeCertificateDeleted,
     // API events (one for each severity level)
     ApiError,
     ApiWarning,

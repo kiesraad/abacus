@@ -12,7 +12,8 @@ use zeroize::Zeroizing;
 
 use crate::{Certificate, CertificateSubject, EmlSignatureError};
 
-/// How long the certificate remains valid after the election date.
+/// How long the certificate remains valid after the election date, or after
+/// its creation if that is later.
 const CERTIFICATE_VALIDITY_MONTHS: u32 = 3;
 
 /// An RSA-4096 signing key with its self-signed metadata certificate.
@@ -24,7 +25,8 @@ pub struct SigningKeyPair {
 impl SigningKeyPair {
     /// Generate a signing keypair and certificate for one election.
     ///
-    /// Valid from `valid_from` until three months after the election.
+    /// Valid from `valid_from` until three months after the election, or
+    /// three months after `valid_from` if that is later.
     ///
     /// RSA-4096 key generation takes about a second, so call this from a
     /// blocking thread when in async code.
@@ -33,10 +35,7 @@ impl SigningKeyPair {
         valid_from: NaiveDate,
         election_date: NaiveDate,
     ) -> Result<Self, EmlSignatureError> {
-        let not_after = election_date
-            .checked_add_months(Months::new(CERTIFICATE_VALIDITY_MONTHS))
-            .ok_or(EmlSignatureError::ValidityPeriod)?;
-
+        let not_after = expiry_date(valid_from, election_date)?;
         let params = certificate_params(subject, valid_from, not_after)?;
         let key_pair = generate_key_pair()?;
         let certificate_der = params
@@ -85,12 +84,37 @@ impl SigningKeyPair {
     }
 }
 
+impl TryFrom<(String, Zeroizing<Vec<u8>>)> for SigningKeyPair {
+    type Error = EmlSignatureError;
+
+    fn try_from(
+        (certificate, private_key): (String, Zeroizing<Vec<u8>>),
+    ) -> Result<Self, Self::Error> {
+        let certificate = Certificate::from_pem(certificate.as_bytes())?;
+        SigningKeyPair::new(private_key, certificate)
+    }
+}
+
 /// Generate a fresh RSA-4096 keypair ([`crate::RSA_KEY_BITS`]).
 fn generate_key_pair() -> Result<Zeroizing<KeyPair>, EmlSignatureError> {
     // Key size needs to match [`crate::RSA_KEY_BITS`], validated by [`Certificate::from_der`].
     KeyPair::generate_rsa_for(&PKCS_RSA_SHA256, RsaKeySize::_4096)
         .map(Zeroizing::new)
         .map_err(|e| EmlSignatureError::KeyGeneration(e.to_string()))
+}
+
+/// Calculate certificate expiry date: three months after the election or three
+/// months after `valid_from`, whichever is later. A keypair created after the
+/// election, e.g. for an old election during development, then still gets a
+/// certificate that is valid.
+fn expiry_date(
+    valid_from: NaiveDate,
+    election_date: NaiveDate,
+) -> Result<NaiveDate, EmlSignatureError> {
+    valid_from
+        .max(election_date)
+        .checked_add_months(Months::new(CERTIFICATE_VALIDITY_MONTHS))
+        .ok_or(EmlSignatureError::ValidityPeriod)
 }
 
 /// Build the rcgen parameters for the certificate.
@@ -109,10 +133,9 @@ fn certificate_params(
         return Err(EmlSignatureError::ValidityPeriod);
     }
 
-    // TODO #3938 Decide what to do with this check, as it is very impractical during development
-    // if not_before > not_after {
-    //     return Err(EmlSignatureError::ValidityPeriod);
-    // }
+    if not_before > not_after {
+        return Err(EmlSignatureError::ValidityPeriod);
+    }
 
     let (year, month, day) = ymd(not_before);
     let mut params = CertificateParams::default();
@@ -200,25 +223,50 @@ mod tests {
         )
     }
 
+    fn date(year: i32, month: u32, day: u32) -> NaiveDate {
+        NaiveDate::from_ymd_opt(year, month, day).unwrap()
+    }
+
     #[test]
-    #[ignore = "See issue #3938"]
-    fn rejects_impossible_validity_period() {
-        let election_date = NaiveDate::from_ymd_opt(2024, 11, 30).unwrap();
-        let issued = NaiveDate::from_ymd_opt(2024, 11, 1).unwrap();
-        // Created more than three months after the election: never valid.
-        let late = NaiveDate::from_ymd_opt(2025, 3, 1).unwrap();
+    fn expiry_date_after_election() {
+        // Created before the election: three months after the election.
         assert_eq!(
-            SigningKeyPair::generate(&test_subject(), late, election_date).err(),
+            expiry_date(date(2024, 11, 1), date(2024, 11, 30)),
+            Ok(date(2025, 2, 28))
+        );
+        // Created on the election date.
+        assert_eq!(
+            expiry_date(date(2024, 11, 30), date(2024, 11, 30)),
+            Ok(date(2025, 2, 28))
+        );
+    }
+
+    #[test]
+    fn expiry_date_after_creation() {
+        // Created after the election: three months after creation.
+        assert_eq!(
+            expiry_date(date(2025, 3, 1), date(2024, 11, 30)),
+            Ok(date(2025, 6, 1))
+        );
+    }
+
+    #[test]
+    fn rejects_impossible_validity_period() {
+        let election_date = date(2024, 11, 30);
+        let issued = date(2024, 11, 1);
+        // `notBefore` after `notAfter`: not valid.
+        assert_eq!(
+            certificate_params(&test_subject(), date(2025, 3, 1), election_date).err(),
             Some(EmlSignatureError::ValidityPeriod)
         );
         // `notAfter` in year 10000: not representable in a certificate.
-        let far_election = NaiveDate::from_ymd_opt(9999, 11, 30).unwrap();
+        let far_election = date(9999, 11, 30);
         assert_eq!(
             SigningKeyPair::generate(&test_subject(), issued, far_election).err(),
             Some(EmlSignatureError::ValidityPeriod)
         );
         // `notBefore` before 1970: not readable back.
-        let before_epoch = NaiveDate::from_ymd_opt(1969, 12, 31).unwrap();
+        let before_epoch = date(1969, 12, 31);
         assert_eq!(
             SigningKeyPair::generate(&test_subject(), before_epoch, election_date).err(),
             Some(EmlSignatureError::ValidityPeriod)

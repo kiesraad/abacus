@@ -9,29 +9,37 @@ export type CorrectEntry = "first" | "second" | "neither";
 /** Answer to the second question: what to do with the entry that does not match? */
 export type WrongEntryAction = "correct" | "discard";
 
+/** Reasons for blocking a correction */
+export type CorrectionBlockedReason = "first_entry_has_errors" | "first_entry_imported" | "second_entry_has_errors";
+
 /** The form fields and setters shared between the resolve differences hook and form. */
 export interface ResolveDifferencesFormState {
   correctEntry: CorrectEntry | undefined;
   setCorrectEntry: (correctEntry: CorrectEntry) => void;
   wrongEntryAction: WrongEntryAction | undefined;
   setWrongEntryAction: (wrongEntryAction: WrongEntryAction) => void;
-  correctionBlocked: boolean;
+  correctionBlocked: CorrectionBlockedReason | undefined;
   correctEntryError: string | undefined;
   wrongEntryError: string | undefined;
 }
 
-/** Correcting the other entry is blocked when the entry that is kept has errors. */
+/** Correcting the other entry is blocked when the entry that is kept has errors
+ * or if the other entry is an imported first entry. */
 export function isCorrectionBlocked(
   correctEntry: CorrectEntry | undefined,
   differences: DataEntryGetDifferencesResponse | null,
-): boolean {
+): CorrectionBlockedReason | undefined {
   if (correctEntry === "first") {
-    return differences?.first_entry_has_errors ?? false;
+    return differences?.first_entry_has_errors ? "first_entry_has_errors" : undefined;
   }
-  if (correctEntry === "second") {
-    return differences?.second_entry_has_errors ?? false;
+  if (correctEntry === "second" && differences) {
+    return differences.second_entry_has_errors
+      ? "second_entry_has_errors"
+      : differences.first_entry_origin.type === "Import"
+        ? "first_entry_imported"
+        : undefined;
   }
-  return false;
+  return undefined;
 }
 
 export function effectiveWrongEntryAction(

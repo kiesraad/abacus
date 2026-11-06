@@ -7,16 +7,19 @@ import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
 import type {
+  CommitteeSessionStatus,
   DATA_ENTRY_RESET_REQUEST_PATH,
   DataEntrySource,
   DataEntryStatusName,
   PollingStationInvestigation,
 } from "@/types/generated/openapi";
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 
 interface ReadOnlyDataEntryDeleteProps {
   dataEntrySource: DataEntrySource;
   dataEntryId: number;
   status: DataEntryStatusName;
+  committeeSessionStatus: CommitteeSessionStatus;
   onDeleted: () => void;
   onError: (error: AnyApiError) => void;
 }
@@ -25,6 +28,7 @@ export function ReadOnlyDataEntryDelete({
   dataEntrySource,
   dataEntryId,
   status,
+  committeeSessionStatus,
   onDeleted,
   onError,
 }: ReadOnlyDataEntryDeleteProps) {
@@ -54,6 +58,17 @@ export function ReadOnlyDataEntryDelete({
     "definitive",
   ];
 
+  function getConfirmationText() {
+    const nr = getDataEntrySourceNumber(dataEntrySource);
+    if (committeeSessionStatus === "completed") {
+      return t("data_entry_detail.delete_completed_are_you_sure", { nr });
+    }
+    if (statusWithTwoEntries.includes(status)) {
+      return t("data_entry_detail.delete_all_are_you_sure", { nr });
+    }
+    return t("data_entry_detail.delete_are_you_sure", { nr });
+  }
+
   return (
     <div>
       <Button variant="tertiary" leftIcon={<IconTrash />} onClick={toggleModal}>
@@ -62,11 +77,7 @@ export function ReadOnlyDataEntryDelete({
 
       {showModal && (
         <Modal title={t("data_entry_detail.delete")} onClose={toggleModal}>
-          {statusWithTwoEntries.includes(status) ? (
-            <p>{t("data_entry_detail.delete_all_are_you_sure", { nr: dataEntrySource.number })}</p>
-          ) : (
-            <p>{t("data_entry_detail.delete_are_you_sure", { nr: dataEntrySource.number })}</p>
-          )}
+          <p>{getConfirmationText()}</p>
           <nav>
             <Button
               leftIcon={<IconTrash />}

@@ -4,6 +4,7 @@
   "delete": "Invoer verwijderen",
   "delete_all_are_you_sure": "Weet je zeker dat je de invoer voor stembureau {nr} wilt verwijderen? Let op: zowel de eerste als de tweede invoer wordt verwijderd. Deze actie kan niet worden teruggedraaid.",
   "delete_are_you_sure": "Weet je zeker dat je de invoer voor stembureau {nr} wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
+  "delete_completed_are_you_sure": "Weet je zeker dat je de invoer voor stembureau {nr} wilt verwijderen? Let op: het proces-verbaal en andere documenten van deze zitting worden ook verwijderd en kunnen niet meer uit Abacus worden gedownload. Deze actie kan niet worden teruggedraaid.",
   "delete_data_entry": "Verwijder invoer",
   "read_only": {
     "page_title": "Invoer bekijken",

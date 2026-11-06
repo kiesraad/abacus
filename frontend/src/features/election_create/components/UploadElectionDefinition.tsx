@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
+import { CheckHash } from "@/components/check_hash/CheckHash";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { Form } from "@/components/ui/Form/Form";
@@ -12,10 +13,9 @@ import type {
   ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
   ElectionDefinitionValidateResponse,
 } from "@/types/generated/openapi";
+import { formatDateFull } from "@/utils/dateTime";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
-
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import { CheckHash } from "./CheckHash";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UploadElectionDefinition() {
@@ -30,12 +30,12 @@ export function UploadElectionDefinition() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      setFile(currentFile);
       if (await isFileTooLarge(currentFile)) {
         setError(fileTooLargeError(currentFile));
         return;
       }
 
-      setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({ committee_category: "GSB", election_data: data });
 
@@ -90,14 +90,17 @@ export function UploadElectionDefinition() {
 
     return (
       <CheckHash
-        date={state.election.election_date}
         title={state.election.name}
+        subtitle={formatDateFull(new Date(state.election.election_date))}
         header={t("election.check_eml.election_title")}
         description={tx("election.check_eml.election_description", {
           file: () => {
             return <strong>{state.electionDefinitionFileName}</strong>;
           },
         })}
+        instructions={t("election.check_eml.check_hash_instructions")}
+        errorTitle={t("election.check_eml.error.title")}
+        errorDescription={t("election.check_eml.error.description")}
         redactedHash={state.electionDefinitionRedactedHash}
         error={error}
         onSubmit={(chunks) => void onSubmit(chunks)}

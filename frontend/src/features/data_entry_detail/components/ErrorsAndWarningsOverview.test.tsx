@@ -47,8 +47,8 @@ describe("ErrorsAndWarningsOverview", () => {
     expect(getValidationResults(extra_investigation)).toEqual([
       {
         code: "F.101",
-        hasContent: true,
-        hasActions: false,
+        hasContent: false,
+        hasActions: true,
       },
     ]);
 

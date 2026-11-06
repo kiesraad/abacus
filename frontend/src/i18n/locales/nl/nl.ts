@@ -5,6 +5,7 @@ import backups from "./backups.json";
 import candidate from "./candidate.json";
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
+import check_hash from "./check_hash.json";
 import checks_and_corrections from "./checks_and_corrections.json";
 import committee_category from "./committee_category.json";
 import committee_session_status from "./committee_session_status.json";
@@ -12,6 +13,7 @@ import counting_differences_polling_station from "./counting_differences_polling
 import data_entry from "./data_entry.json";
 import data_entry_detail from "./data_entry_detail.json";
 import data_entry_home from "./data_entry_home.json";
+import data_entry_import from "./data_entry_import.json";
 import differences_counts from "./differences_counts.json";
 import election from "./election.json";
 import election_category from "./election_category.json";
@@ -36,6 +38,7 @@ import privacy_statement from "./privacy_statement.json";
 import resolve_differences from "./resolve_differences.json";
 import results from "./results.json";
 import status from "./status.json";
+import sub_committee_keys from "./sub_committee_keys.json";
 import users from "./users.json";
 import voters_votes_counts from "./voters_votes_counts.json";
 
@@ -47,12 +50,14 @@ const nl = {
   candidate,
   candidates_votes,
   check_and_save,
+  check_hash,
   checks_and_corrections,
   committee_category,
   committee_session_status,
   counting_differences_polling_station,
   data_entry,
   data_entry_detail,
+  data_entry_import,
   differences_counts,
   election,
   election_category,
@@ -77,6 +82,7 @@ const nl = {
   privacy_statement,
   resolve_differences,
   status,
+  sub_committee_keys,
   users,
   backups,
   voters_votes_counts,

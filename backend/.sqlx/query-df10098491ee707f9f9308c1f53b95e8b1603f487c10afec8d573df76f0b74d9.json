@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT certificate, private_key FROM signing_keypair WHERE election_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "name": "certificate",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "signing_keypair",
+            "name": "certificate"
+          }
+        }
+      },
+      {
+        "name": "private_key",
+        "ordinal": 1,
+        "type_info": "Blob",
+        "origin": {
+          "Table": {
+            "table": "signing_keypair",
+            "name": "private_key"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "df10098491ee707f9f9308c1f53b95e8b1603f487c10afec8d573df76f0b74d9"
+}

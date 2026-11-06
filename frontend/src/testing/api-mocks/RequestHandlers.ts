@@ -11,6 +11,7 @@ import type {
   ADD_DECEASED_CANDIDATE_REQUEST_PATH,
   ADMIN_EXISTS_REQUEST_PARAMS,
   ADMIN_EXISTS_REQUEST_PATH,
+  AddSubCommitteeCertificateResponse,
   ApportionmentState,
   AUDIT_LOG_LIST_REQUEST_PARAMS,
   AUDIT_LOG_LIST_REQUEST_PATH,
@@ -130,6 +131,12 @@ import type {
   SaveDataEntryResponse,
   SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS,
   SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH,
+  SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS,
+  SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH,
+  SubCommittee,
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PARAMS,
   USER_CREATE_REQUEST_PATH,
@@ -164,6 +171,7 @@ import {
 import { statusResponseMock } from "./ElectionStatusMockData";
 import { logMockResponse } from "./LogMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
+import { addCertificateResponse, subCommitteesMockData } from "./SubCommitteeMockData";
 import { loginResponseMockData, userMockData } from "./UserMockData";
 
 type ParamsToString<T> = {
@@ -341,7 +349,7 @@ export const ElectionCertificateDetailsRequestHandler = http.get<
     election_identifier: "AB2027_Aardenboezem",
     organizational_unit: "Abacus 1.2.0",
     common_name: "Gemeente Juinen",
-    signature_algorithm: "SHA256withRSA",
+    signature_algorithm: "RSA 4096-bit",
     not_before: "2026-01-01T00:00:00Z",
     not_after: "2026-04-01T00:00:00Z",
   };
@@ -362,6 +370,22 @@ export const CSBElectionRequestHandler = http.get<
   ElectionDetailsResponse | ErrorResponse
 >("/api/elections/2" satisfies ELECTION_DETAILS_REQUEST_PATH, () =>
   HttpResponse.json(csbElectionDetailsMockResponse, { status: 200 }),
+);
+
+export const CSBSubCommitteeCertificatesRequestHandler = http.get<
+  ParamsToString<SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS>,
+  null,
+  SubCommittee[]
+>("/api/elections/2/sub_committee_certificates" satisfies SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH, () =>
+  HttpResponse.json(subCommitteesMockData, { status: 200 }),
+);
+
+export const CSBSubCommitteeCertificateAddRequestHandler = http.post<
+  ParamsToString<SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS>,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY,
+  AddSubCommitteeCertificateResponse
+>("/api/elections/2/sub_committee_certificates" satisfies SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH, () =>
+  HttpResponse.json(addCertificateResponse, { status: 201 }),
 );
 
 // get election status handler
@@ -702,6 +726,9 @@ export const handlers: HttpHandler[] = [
   ElectionStatusRequestHandler,
   ElectionCertificateDetailsRequestHandler,
   DismissPublicKeyUploadReminderRequestHandler,
+  CSBElectionRequestHandler,
+  CSBSubCommitteeCertificatesRequestHandler,
+  CSBSubCommitteeCertificateAddRequestHandler,
   CSBElectionStatusRequestHandler,
   GSBABElectionImportRequestHandler,
   GSBGRElectionImportRequestHandler,

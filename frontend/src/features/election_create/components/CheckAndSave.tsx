@@ -71,13 +71,14 @@ export function CheckAndSave() {
   function handleSubmit(data: ElectionCreationRequest) {
     void create(data).then((result) => {
       if (isSuccess(result)) {
+        const { name: electionName, id: electionId } = result.data;
         pushMessage({
           title: t("election.message.election_created", {
             committee_category: t(`committee_category.${committeeCategory}.abbreviation`),
-            name: result.data.name,
+            name: electionName,
           }),
         });
-        void navigate("/elections", { state: { success: true } });
+        void navigate(`/elections/${electionId}`, { state: { success: true } });
       }
     });
   }

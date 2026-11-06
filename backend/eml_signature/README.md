@@ -16,7 +16,7 @@ The certificate's fields are:
 - 160-bit serial
 - No X.509v3 extensions
 - `notBefore`: date of creation
-- `notAfter`: expiration date, three months after the election date
+- `notAfter`: expiration date, three months after the election date or three months after the date of creation, whichever is later
 - The subject DN contains, in order:
 
 | Field | Meaning | Example | Encoding |

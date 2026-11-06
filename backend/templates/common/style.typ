@@ -194,12 +194,15 @@
 ]
 
 // Intentionally blank page before the signature page. Header shows the next level-1 chapter.
-#let blank_page_before_signing(header-right) = {
+#let blank_page_before_signing(header-right, extra-header-left: "") = {
   pagebreak(weak: true)
 
   set page(header: context default_header(
-    query(heading.where(level: 1).after(here())).at(0, default: none),
-    header-right,
+    if extra-header-left != "" {
+      [#query(heading.where(level: 1).after(here())).at(0, default: none) \ #extra-header-left]
+    } else {
+      query(heading.where(level: 1).after(here())).at(0, default: none)
+    }, header-right,
   ))
 
   emph_block[Deze pagina is expres leeg]

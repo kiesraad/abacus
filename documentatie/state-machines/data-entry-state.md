@@ -3,7 +3,11 @@
 This document describes the states a data entry can have.
 The transition labels describe the endpoint that is used for performing the transition.
 
+## Notes on the diagram
+
 The `save` endpoint which is used for [First/Second]EntryInProgress states is kept out, because Mermaid doesn't render self-loops too well.
+
+### Reset and discard
 
 All states also have a `reset` endpoint which transitions to the `Empty` state, which is not shown in the diagram below. For the states `FirstEntryHasErrors` and `EntriesDifferent`, the `reset` is more explicitly called `discard first entry` and `discard both entries`, and shown in the diagram.
 
@@ -11,13 +15,14 @@ Note the difference between `discard` and `reset`:
 - `discard` is a typist removing their own _in-progress_ entry (the `data_entry_discard` endpoint). Discarding an in-progress second entry keeps the finalised first entry. 
 - `reset` is a coordinator clearing the whole data entry back to `Empty` (the `data_entry_reset` endpoint). It always removes _both_ entries.
 
+### Resolving differences
 When resolving differences between the first and second data entry (`EntriesDifferent` state), one of the options for the coordinator is to
 discard one entry. In this case, the remaining entry will from then on be the first entry, and the data entry is open for a new second entry.
 
 Instead of discarding an entry, the coordinator can also have it corrected by the typist who entered it. That is only
 possible when the entry that is kept has no errors. Keeping an entry that has errors while correcting the other one is
 not allowed: the coordinator has to resolve the errors first, so the only option is to discard the other entry, which
-transitions the state to `FirstEntryHasErrors`.
+transitions the state to `FirstEntryHasErrors`. 
 
 Both the first and second entries can have errors in the `EntriesDifferent` state:
 - the first entry through `Empty` -> `FirstEntryInProgress` -> `FirstEntryFinalised` -> `SecondEntryInProgress` ->
@@ -26,10 +31,21 @@ Both the first and second entries can have errors in the `EntriesDifferent` stat
 - the second entry through `Empty` -> `FirstEntryInProgress` -> `FirstEntryFinalised` -> `SecondEntryInProgress` ->
   introduce errors in second entry -> `EntriesDifferent` with errors in second entry.
 
+### Imported data entries
+
+Only a first data entry can be imported. During the import, the data entry is validated for errors. If the data entry contains errors, it's not possible to complete the import.
+
+When a first entry has been imported, and it is deemed incorrect while resolving differences, it is discarded and a new manual data entry is required.
+An imported first entry cannot be corrected.
+
+
+## Data entry state diagram
+
 ```mermaid
 stateDiagram-v2
   [*] --> Empty
   Empty --> FirstEntryInProgress: claim
+  Empty --> FirstEntryFinalised: import
 
   state first_has_errors <<choice>>
   FirstEntryInProgress --> first_has_errors: finalise

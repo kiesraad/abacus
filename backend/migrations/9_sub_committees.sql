@@ -8,6 +8,7 @@ CREATE TABLE sub_committees
     category              TEXT                              NOT NULL,
     authority_id          TEXT                              NOT NULL,
     authority_name        TEXT                              NOT NULL,
+    certificates          TEXT                              NOT NULL DEFAULT '[]',
 
     FOREIGN KEY (committee_session_id) REFERENCES committee_sessions (id),
     FOREIGN KEY (data_entry_id)        REFERENCES data_entries (id),

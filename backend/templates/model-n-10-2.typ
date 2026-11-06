@@ -21,7 +21,7 @@
 #title_page(
   [#input.election.authority_region Stembureau #input.polling_station.number #input.polling_station.name],
   "",
-  [#input.election.name - #format_date(input.election.election_date)],
+  [#get_election_title(input.election), #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst –
     Model N 10-2

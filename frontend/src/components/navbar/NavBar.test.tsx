@@ -253,4 +253,21 @@ describe("NavBar", () => {
       expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     });
   });
+
+  describe("Data entry import (coordinator CSB only)", () => {
+    beforeEach(() => {
+      server.use(CSBElectionRequestHandler);
+    });
+
+    test("election status links for the data entry import page", async () => {
+      await renderNavBar({ pathname: "/elections/2/data-entry/import" }, "coordinator_csb", 2);
+
+      expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Menu" })).toBeVisible();
+      expect(
+        screen.queryByRole("link", { name: ["CSB Heemdamseburg", "—", "Gemeenteraad Heemdamseburg 2026"].join("") }),
+      ).toBeVisible();
+      expect(screen.queryByRole("link", { name: "Zitting CSB" })).toBeVisible();
+    });
+  });
 });

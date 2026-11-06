@@ -83,7 +83,7 @@ type TestVariant = {
 
 const variants: TestVariant[] = [
   {
-    name: "GR CSO",
+    name: "GR-CSO",
     electionDefinition: eml110a,
     candidateDefinition: eml230b,
     countingMethod: "CSO",
@@ -94,7 +94,7 @@ const variants: TestVariant[] = [
     dataEntry: noRecountNoDifferencesDataEntry,
   },
   {
-    name: "GR DSO",
+    name: "GR-DSO",
     electionDefinition: eml110a,
     candidateDefinition: eml230b,
     countingMethod: "DSO",
@@ -105,63 +105,71 @@ const variants: TestVariant[] = [
     dataEntry: checksAndCorrectionsDataEntryDSO,
   },
   {
-    name: "WS CSO",
+    name: "WS-CSO",
     electionDefinition: eml110a_AB,
     candidateDefinition: eml230b_AB,
     countingMethod: "CSO",
     regionNumber: "0123",
     regionName: "Heemdamseburg",
     electionName: "Waterschap Rivier en Polder 2023",
-    filename: "ab2023_heemdamseburg_gemeente_heemdamseburg",
+    filename: "ab2023_rivierenpolder_gemeente_heemdamseburg",
     corrigendumFilename: /Model_Na14-2_AB2023_Stembureau_\d+_Bijlage_1.pdf/,
     dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntry,
   },
   {
-    name: "WS DSO",
+    name: "WS-DSO",
     electionDefinition: eml110a_AB,
     candidateDefinition: eml230b_AB,
     countingMethod: "DSO",
     regionNumber: "0126",
     regionName: "'s-Gravenveen",
     electionName: "Waterschap Rivier en Polder 2023",
-    filename: "ab2023_'s-gravenveen_gemeente_'s-gravenveen",
+    filename: "ab2023_rivierenpolder_gemeente_s-gravenveen",
     corrigendumFilename: /Model_Na14-1_versie_2_AB2023_Stembureau_\d+.pdf/,
     dataEntry: checksAndCorrectionsWithVoterCardCountDataEntryDSO,
   },
   {
-    name: "PS1 CSO",
+    name: "PS1-CSO",
     electionDefinition: eml110a_PS1,
     candidateDefinition: eml230b_PS1,
     countingMethod: "CSO",
     regionNumber: "0124",
     regionName: "Juinen",
     electionName: "Provinciale Staten Oost-Holland 2023",
-    filename: "ps2023_juinen_gemeente_juinen",
+    filename: "ps2023_oostholland_gemeente_juinen",
     corrigendumFilename: /Model_Na14-2_PS2023_Stembureau_\d+_Bijlage_1.pdf/,
     dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntry,
   },
   {
-    name: "PS2 DSO",
+    name: "PS2-DSO",
     electionDefinition: eml110a_PS2,
     candidateDefinition: eml230b_PS2,
     countingMethod: "DSO",
     regionNumber: "0125",
     regionName: "Middelgein",
     electionName: "Provinciale Staten Zuid-Brabant 2023",
-    filename: "ps2023_middelgein_gemeente_middelgein",
+    filename: "ps2023_zuidbrabant_gemeente_middelgein",
     corrigendumFilename: /Model_Na14-1_versie_2_PS2023_Stembureau_\d+.pdf/,
     dataEntry: noChecksAndCorrectionsWithVoterCardCountDataEntryDSO,
   },
 ];
 
 const investigations = [
-  { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
+  {
+    number: "1",
+    name: "Stadhuis",
+    reason: "Reden",
+    findings: "Probleem",
+    correctedResults: true,
+    alertDescription: "Laat het corrigendum door 2 invoerders invoeren in Abacus.",
+  },
   {
     number: "2",
     name: "Basisschool de Regenboog",
     reason: "Reden",
     findings: "Geen probleem",
     correctedResults: false,
+    alertDescription: "",
   },
   {
     number: "5",
@@ -169,6 +177,7 @@ const investigations = [
     reason: "Stembureau vergeten te importeren",
     findings: "Stembureau toegevoegd en ingevoerd",
     correctedResults: true,
+    alertDescription: "Laat het corrigendum door 2 invoerders invoeren in Abacus.",
   },
 ];
 
@@ -270,12 +279,9 @@ for (const variant of variants) {
 
       electionId = election.id;
 
-      await expect(electionsOverviewPage.adminHeader).toBeVisible();
-      await expect(electionsOverviewPage.getAlertElectionCreated("GSB", variant.electionName)).toBeVisible();
-      await electionsOverviewPage.findElectionRowById(electionId).click();
-
       const electionHomePage = new ElectionHome(page);
       await expect(electionHomePage.header).toHaveText(variant.electionName);
+      await expect(electionHomePage.getAlertElectionCreated("GSB", variant.electionName)).toBeVisible();
       const sessionCard = electionHomePage.getCommitteeSessionCard(1);
       await expect(sessionCard).toContainText("Eerste zitting — Klaar voor invoer");
 
@@ -532,6 +538,8 @@ for (const variant of variants) {
       const electionDetails = new ElectionDetailsPgObj(page);
       await expect(electionDetails.header).toHaveText(`Gemeentelijk stembureau ${variant.regionName}`);
       await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
+      await expect(electionHome.header).toContainText(variant.electionName);
+      await expect(electionHome.getCommitteeSessionCard(2)).toContainText("Begon op 18 maart 2026 om 21:34");
 
       await logout(page);
     });
@@ -670,7 +678,7 @@ for (const variant of variants) {
         await investigationsFindingsPage.save.click();
 
         await expect(investigationsOverviewPage.alert).toHaveText(
-          `Onderzoek voor stembureau ${station.number} (${station.name}) aangepast`,
+          `Onderzoek voor stembureau ${station.number} (${station.name}) aangepast${station.alertDescription}`,
         );
 
         await logout(page);
@@ -699,7 +707,6 @@ for (const variant of variants) {
 
         const differencesPage = new DifferencesPage(page);
         await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-        await differencesPage.differenceCompletelyAccountedForNo.check();
         await differencesPage.next.click();
 
         const progressList = new ProgressList(page);

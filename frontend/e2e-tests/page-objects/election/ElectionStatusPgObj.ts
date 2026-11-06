@@ -8,21 +8,27 @@ export class ElectionStatus {
   readonly firstEntryFinished: Locator;
   readonly definitive: Locator;
   readonly notStarted: Locator;
+  readonly notStartedRows: Locator;
   readonly differencesResolved: Locator;
   readonly firstDataEntryResumed: Locator;
   readonly firstDataEntryDiscarded: Locator;
   readonly alertDifferencesResolved: Locator;
   readonly alertFirstDataEntryResumed: Locator;
   readonly alertFirstDataEntryDiscarded: Locator;
+  readonly buttonImportCount: Locator;
+  readonly dataEntryImportSuccess: Locator;
+  readonly alertDataEntryImportSuccess: Locator;
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 1 });
+    this.buttonImportCount = page.getByRole("button", { name: "Tellingsbestand GSB importeren" });
     this.finish = page.getByRole("button", { name: "Invoerfase afronden" });
     this.errorsAndWarnings = page.getByRole("table", { name: "Fouten en waarschuwingen" });
     this.inProgress = page.getByRole("table", { name: "Invoer bezig" });
     this.firstEntryFinished = page.getByRole("table", { name: "Eerste invoer klaar" });
     this.definitive = page.getByRole("table", { name: "Eerste en tweede invoer klaar" });
     this.notStarted = page.getByRole("table", { name: "Werkvoorraad" });
+    this.notStartedRows = this.notStarted.locator("tbody").getByRole("row");
 
     this.differencesResolved = page.getByRole("strong").filter({
       hasText: /Verschil opgelost voor stembureau \d+/,
@@ -33,11 +39,16 @@ export class ElectionStatus {
     this.firstDataEntryDiscarded = page.getByRole("strong").filter({
       hasText: /^Invoer stembureau \d+ verwijderd$/,
     });
+    this.dataEntryImportSuccess = page.getByRole("strong").filter({
+      hasText: /^Tellingsbestand GSB .+ geïmporteerd$/,
+    });
 
     this.alertDifferencesResolved = page.getByRole("alert").filter({ has: this.differencesResolved });
 
     this.alertFirstDataEntryResumed = page.getByRole("alert").filter({ has: this.firstDataEntryResumed });
 
     this.alertFirstDataEntryDiscarded = page.getByRole("alert").filter({ has: this.firstDataEntryDiscarded });
+
+    this.alertDataEntryImportSuccess = page.getByRole("alert").filter({ has: this.dataEntryImportSuccess });
   }
 }

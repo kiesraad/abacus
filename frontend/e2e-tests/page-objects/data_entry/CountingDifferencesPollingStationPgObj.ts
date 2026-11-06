@@ -37,7 +37,7 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
     // B1-2.1 Aantallen kiezers en stemmen
     this.differenceBallotsVotersCompletelyAccountedFor = this.fieldset.getByRole("group").filter({
       hasText:
-        "Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?",
+        "Is in de telresultaten van het stembureau het aantal toegelaten kiezers (D) en het totaal aantal getelde stemmen (H) gelijk OF is er een verschil en is dit verschil volledig verklaard?",
     });
     this.differenceBallotsVotersCompletelyAccountedForYes =
       this.differenceBallotsVotersCompletelyAccountedFor.getByRole("checkbox", {

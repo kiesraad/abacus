@@ -1,6 +1,4 @@
 {
-  "add": "Toevoegen: {name}",
-  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresultaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van het centraal stembureau)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente (voor GSB)</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
   "abort": {
     "action": "Afbreken",
     "description": "<p>De verkiezing wordt pas opgeslagen als je alle stappen doorlopen hebt. Weet je zeker dat je het aanmaken van de verkiezing wilt afbreken?</p>",
@@ -8,25 +6,23 @@
     "keep_input": "Annuleren",
     "title": "Niet opgeslagen wijzigingen"
   },
+  "add": "Toevoegen: {name}",
+  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresultaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van het centraal stembureau)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente (voor GSB)</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
+  "all_districts": "Alle kieskringen",
   "check_and_save": {
     "description": "Je gaat de volgende verkiezing toevoegen:",
     "title": "Controleren en opslaan"
   },
   "check_eml": {
-    "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de volgende kandidaten:",
+    "candidates_description": "Het bestand <file>filename</file> bevat de kandidaten voor onderstaand kiesgebied:",
     "candidates_title": "Controleer kandidatenlijsten",
-    "check_hash": {
-      "description": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
-      "hint": "Vul 4 karakters in",
-      "label": "Controle deel {stub}"
-    },
-    "election_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
+    "check_hash_instructions": "Controleer de volledige digitale vingerafdruk met de code die je van het centraal stembureau hebt ontvangen. Vul ter controle de twee afgeschermde delen hieronder in. Ga alleen verder als alle delen overeenkomen.",
+    "election_description": "Het bestand <file>filename</file> bevat de instellingen voor de volgende verkiezing:",
     "election_title": "Controleer verkiezingsdefinitie",
     "error": {
-      "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
-      "title": "Controle digitale vingerafdruk niet gelukt"
+      "description": "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
+      "title": "Onjuiste vingerafdruk"
     },
-    "list_name": "{location}, kandidatenlijsten {name}",
     "polling_station_title": "Controleer stembureaus"
   },
   "committee_category": {
@@ -36,6 +32,7 @@
   },
   "configuration_not_finished": "De configuratie van Abacus is nog niet afgerond.",
   "create": "Verkiezing toevoegen",
+  "district": "Kieskring",
   "election_category": {
     "title": "Type verkiezing"
   },
@@ -75,7 +72,7 @@
   "polling_stations": {
     "added": "{num} stembureaus",
     "check": {
-      "description": "Het bestand <file>filename</file> is geïmporteerd en bevat onderstaande stembureaus. Zie je een verschil met de vooraf gepubliceerde lijst? Je kan na het toevoegen van deze verkiezing stembureaus toevoegen, verwijderen of aanpassen.",
+      "description": "Het bestand <file>filename</file> bevat onderstaande stembureaus. Zie je een verschil met de vooraf gepubliceerde lijst? Je kan na het toevoegen van deze verkiezing stembureaus toevoegen, verwijderen of aanpassen.",
       "title": "Controleer stembureaus"
     },
     "show_all": "Toon alle {num} stembureaus",

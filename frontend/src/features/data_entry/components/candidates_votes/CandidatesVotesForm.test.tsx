@@ -487,6 +487,44 @@ describe("Test CandidatesVotesForm", () => {
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
+    test("F.401 EmptyTotal is not shown when a correction is pending", async () => {
+      const user = userEvent.setup();
+
+      // The coordinator returned the entry with a difference in the list total
+      const formState = getDefaultDataEntryState().formState;
+      formState.furthest = "save";
+      formState.sections.political_group_votes_1!.correctionWarning = {
+        code: "W002",
+        fields: [candidatesFieldIds.total],
+      };
+      overrideServerClaimDataEntryResponse({
+        formState,
+        results: {},
+        continueToNextSection: false,
+        validationResults: { errors: [validationResultMockData.F401], warnings: [] },
+      });
+      renderForm();
+
+      // The correction warning is shown, but F.401 is not
+      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(
+        "Verschil met andere invoer. Nieuwe invoer nodig",
+      );
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      expect(screen.queryByTestId("missing-total-error")).toBeNull();
+      expect(screen.getByRole("textbox", { name: "Totaal lijst 1" })).not.toHaveFocus();
+
+      // After submitting the list without a total, F.401 is shown as usual
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
+        validation_results: { errors: [validationResultMockData.F401], warnings: [] },
+      });
+      await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+      expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(
+        "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.401)",
+      );
+      expect(screen.getByRole("textbox", { name: "Totaal lijst 1" })).toHaveFocus();
+    });
+
     test("F.402 IncorrectTotal group total", async () => {
       const user = userEvent.setup();
 

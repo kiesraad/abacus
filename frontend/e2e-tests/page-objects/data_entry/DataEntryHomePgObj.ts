@@ -7,7 +7,8 @@ export class DataEntryHomePage {
   readonly feedback: Locator;
   readonly start: Locator;
   readonly submitFeedback: Locator;
-  readonly pollingStations: Locator;
+  readonly dataEntryList: Locator;
+  readonly dataEntries: Locator;
   readonly alert: Locator;
   readonly alertDataEntrySaved: Locator;
   readonly alertDataEntryDifferent: Locator;
@@ -31,7 +32,8 @@ export class DataEntryHomePage {
     this.submitFeedback = page.getByTestId("submitFeedback");
     this.start = page.getByRole("button", { name: "Beginnen" });
 
-    this.pollingStations = page.getByTestId("data_entry_list").locator("tbody").getByRole("row");
+    this.dataEntryList = page.getByTestId("data_entry_list");
+    this.dataEntries = this.dataEntryList.locator("tbody").getByRole("row");
 
     this.alert = page.getByRole("alert");
     this.alertDataEntrySaved = this.alert.filter({ hasText: /(Eerste|Tweede) invoer is opgeslagen/ });
@@ -48,8 +50,8 @@ export class DataEntryHomePage {
     await this.start.click();
   }
 
-  async clickPollingStationFromList(number: number) {
-    await this.page.getByTestId(`data-entry-row-${number}`).click();
+  async clickDataEntryFromList(number: number) {
+    await this.dataEntryList.getByTestId(`data-entry-row-${number}`).click();
   }
 
   async clickDataEntryInProgress(dataEntry: { number: string; name: string }) {

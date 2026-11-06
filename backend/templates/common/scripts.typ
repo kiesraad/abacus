@@ -14,6 +14,18 @@
   } else { "" }
 } else { "" }
 
+#let get_election_title = (election) => if (election.category == "Municipal") {
+  [Verkiezing van de leden van de gemeenteraad van #election.authority_region]
+} else if (election.category == "Provincial") {
+  [Verkiezing van de leden van de Provinciale Staten van #election.authority_region]
+} else if (election.category == "WaterAuthority") {
+  let name_parts = election.official_name.split(" ")
+  name_parts.first() = lower(name_parts.first())
+  [Verkiezing van de leden van het #name_parts.join(" ")]
+} else {
+  ""
+}
+
 // A paragraph with a vertical line on the left
 #let emph_block(content) = {
   block(width: 75%, above: 3em, below: 1.5em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), text(
@@ -446,9 +458,10 @@
     grid.hline(stroke: 2pt),
     v(space),
     text(size: title_size, weight: "semibold", title1),
-    text(size: title_size, weight: "semibold", title2),
+    if title2 != "" {text(size: title_size, weight: "semibold", title2)},
     v(space),
     text(size: subtitle_size, subtitle1),
+    v(space),
     text(size: subtitle_size, subtitle2),
     v(space),
     grid.hline(position: top)

@@ -14,6 +14,7 @@ import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { useDataEntryErrors } from "../hooks/useDataEntryErrors";
 import { DetailNavigation } from "./DetailNavigation";
@@ -23,7 +24,7 @@ export function DetailLayout() {
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
   const dataEntryId = useNumericParam("dataEntryId");
-  const { election } = useElection();
+  const { currentCommitteeSession, election } = useElection();
   const { loading, dataEntry } = useDataEntryErrors(dataEntryId);
   const [error, setError] = useState<AnyApiError>();
   const user = useUser();
@@ -41,7 +42,9 @@ export function DetailLayout() {
   function handleDeleted() {
     pushMessage({
       title: t("data_entry_detail.data_entry_deleted"),
-      text: t("data_entry_detail.data_entry_deleted_details", { nr: dataEntry?.source.number ?? "-" }),
+      text: t("data_entry_detail.data_entry_deleted_details", {
+        nr: dataEntry ? getDataEntrySourceNumber(dataEntry.source) : "-",
+      }),
     });
 
     void navigate(`/elections/${election.id}/status`, { replace: true });
@@ -63,7 +66,7 @@ export function DetailLayout() {
 
       <header>
         <section className="smaller-gap">
-          <DataEntrySourceNumber>{dataEntry.source.number}</DataEntrySourceNumber>
+          <DataEntrySourceNumber>{getDataEntrySourceNumber(dataEntry.source)}</DataEntrySourceNumber>
           <h1>{dataEntry.source.name}</h1>
           <Badge type={dataEntry.status} userRole={user.role} />
         </section>
@@ -73,6 +76,7 @@ export function DetailLayout() {
               dataEntrySource={dataEntry.source}
               dataEntryId={dataEntryId}
               status={dataEntry.status}
+              committeeSessionStatus={currentCommitteeSession.status}
               onDeleted={handleDeleted}
               onError={setError}
             />

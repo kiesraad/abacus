@@ -66,7 +66,6 @@ test.describe("full DSO data entry flow", () => {
 
     const differencesPage = new DifferencesPage(page);
     await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-    await differencesPage.differenceCompletelyAccountedForYes.check();
     await differencesPage.next.click();
 
     const candidatesListPage_1 = new CandidatesListPage(page, 0, "Partijdige Partij");
@@ -166,7 +165,6 @@ test.describe("full DSO data entry flow", () => {
 
     const differencesPage = new DifferencesPage(page);
     await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-    await differencesPage.differenceCompletelyAccountedForYes.check();
     await differencesPage.next.click();
 
     const candidatesListPage_1 = new CandidatesListPage(page, 0, "Partijdige Partij");

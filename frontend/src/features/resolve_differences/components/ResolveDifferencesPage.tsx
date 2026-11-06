@@ -9,7 +9,8 @@ import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
 import type { DataEntryGetDifferencesResponse, DataEntryStatusName } from "@/types/generated/openapi";
-
+import { cn } from "@/utils/classnames";
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { type ResolveOutcome, useDataEntryDifferences } from "../hooks/useDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesForm } from "./ResolveDifferencesForm";
@@ -33,7 +34,7 @@ function resolvedMessageAndPath(
   outcome: ResolveOutcome,
 ): { message: Message; path: string } | null {
   const { differences, electionId, dataEntryId, getName } = navigation;
-  const number = differences.source.number;
+  const number = getDataEntrySourceNumber(differences.source);
   const statusPath = `/elections/${electionId}/status`;
 
   switch (status) {
@@ -45,14 +46,19 @@ function resolvedMessageAndPath(
         },
         path: `${statusPath}/${dataEntryId}/detail`,
       };
-    case "first_entry_finalised":
+    case "first_entry_finalised": {
+      let text = t("election_status.success.data_entry_kept");
+      if (outcome.keptUserId) {
+        text += ` ${t("election_status.success.choose_another_typist", { typist: getName(outcome.keptUserId) })}`;
+      }
       return {
         message: {
           title: t("election_status.success.differences_resolved", { number }),
-          text: t("election_status.success.data_entry_kept", { typist: getName(outcome.keptUserId) }),
+          text: text,
         },
         path: statusPath,
       };
+    }
     case "first_entry_correction":
     case "second_entry_correction":
       return {
@@ -109,14 +115,14 @@ export function ResolveDifferencesPage() {
     return <Loader />;
   }
 
-  const { first_entry, first_entry_user_id, second_entry, second_entry_user_id, source } = differences;
+  const { first_entry, first_entry_origin, second_entry, second_entry_user_id, source } = differences;
 
   return (
     <>
       <PageTitle title={`${t("resolve_differences.page_title")} - Abacus`} />
       <header>
         <section className="smaller-gap">
-          <DataEntrySourceNumber>{source.number}</DataEntrySourceNumber>
+          <DataEntrySourceNumber>{getDataEntrySourceNumber(source)}</DataEntrySourceNumber>
           <h1>{source.name}</h1>
         </section>
       </header>
@@ -126,7 +132,7 @@ export function ResolveDifferencesPage() {
         </aside>
         <article>
           <h2>{t("resolve_differences.title")}</h2>
-          <p className="md">{t("resolve_differences.page_content")}</p>
+          <p className={cn(cls.description, "mb-xl")}>{t("resolve_differences.page_content")}</p>
           <ResolveDifferencesTables
             first={first_entry}
             second={second_entry}
@@ -134,7 +140,11 @@ export function ResolveDifferencesPage() {
             correctEntry={formState.correctEntry}
           />
           <ResolveDifferencesForm
-            firstEntryName={getName(first_entry_user_id)}
+            firstEntryName={
+              first_entry_origin.type === "Typist"
+                ? getName(first_entry_origin.user_id)
+                : t("resolve_differences.imported_from_file")
+            }
             secondEntryName={getName(second_entry_user_id)}
             formState={formState}
             onSubmit={onSubmit}

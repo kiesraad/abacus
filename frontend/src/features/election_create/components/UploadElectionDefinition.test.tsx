@@ -120,7 +120,7 @@ describe("UploadElectionDefinition component", () => {
     });
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Controle digitale vingerafdruk niet gelukt");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Onjuiste vingerafdruk");
   });
 
   test("Shows an error when uploading invalid file", async () => {
@@ -154,8 +154,8 @@ describe("UploadElectionDefinition component", () => {
     await renderPage();
     await uploadFile(file);
 
-    expect(screen.getByLabelText("Geen bestand gekozen")).toBeInTheDocument();
-    expect(screen.getAllByText(filename).length).toBe(1);
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     expect(screen.getByRole("alert")).toHaveTextContent("Ongeldige verkiezingsdefinitie");
     expect(screen.getByRole("alert")).toHaveTextContent(
       `Het bestand ${filename} is te groot. Kies een bestand van maximaal 5 Megabyte`,

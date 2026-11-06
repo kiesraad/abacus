@@ -74,7 +74,7 @@ const variants: TestVariant[] = [
     candidateDefinition: eml230b_AB_more_than_45_candidates,
     regionName: "Rivier en Polder",
     electionName: "Waterschap Rivier en Polder 2023",
-    filename: "ab2023_rivierenpolder_gemeente_rivier-en-polder",
+    filename: "ab2023_rivierenpolder_waterschap_rivier-en-polder",
     dataEntry: noRecountNoDifferencesWithVoterCardCountDataEntryGSB,
     subCommittees: [
       { number: 123, name: "Heemdamseburg" },
@@ -157,12 +157,9 @@ for (const variant of variants) {
 
       electionId = election.id;
 
-      await expect(electionsOverviewPage.adminHeader).toBeVisible();
-      await expect(electionsOverviewPage.getAlertElectionCreated("CSB", variant.electionName)).toBeVisible();
-      await electionsOverviewPage.findElectionRowById(electionId).click();
-
       const electionHomePage = new ElectionHome(page);
       await expect(electionHomePage.header).toHaveText(variant.electionName);
+      await expect(electionHomePage.getAlertElectionCreated("CSB", variant.electionName)).toBeVisible();
       const sessionCard = electionHomePage.getCommitteeSessionCard(1);
       await expect(sessionCard).toContainText("Zitting CSB — Klaar voor invoer");
 
@@ -320,9 +317,9 @@ for (const variant of variants) {
         const dataEntryHomePage = new DataEntryHomePage(page);
         await expect(dataEntryHomePage.fieldset).toBeVisible();
         const rowsVisible = variant.subCommittees.length - idx; // Row is removed after data entry completed.
-        await expect(dataEntryHomePage.pollingStations).toHaveCount(rowsVisible);
+        await expect(dataEntryHomePage.dataEntries).toHaveCount(rowsVisible);
 
-        await dataEntryHomePage.clickPollingStationFromList(subCommittee.number);
+        await dataEntryHomePage.clickDataEntryFromList(subCommittee.number);
 
         await fillDataEntryPagesAndSave(page, variant.dataEntry);
         await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
@@ -346,9 +343,9 @@ for (const variant of variants) {
         const dataEntryHomePage = new DataEntryHomePage(page);
         await expect(dataEntryHomePage.fieldset).toBeVisible();
         const rowsVisible = variant.subCommittees.length - idx; // Row is removed after data entry completed.
-        await expect(dataEntryHomePage.pollingStations).toHaveCount(rowsVisible);
+        await expect(dataEntryHomePage.dataEntries).toHaveCount(rowsVisible);
 
-        await dataEntryHomePage.clickPollingStationFromList(subCommittee.number);
+        await dataEntryHomePage.clickDataEntryFromList(subCommittee.number);
 
         await fillDataEntryPagesAndSave(page, variant.dataEntry);
         await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();

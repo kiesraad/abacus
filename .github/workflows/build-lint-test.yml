@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 0
       # Build frontend+Storybook for embedding in the backend binary
       - name: Setup Node
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           package-manager-cache: false
@@ -66,7 +66,7 @@ jobs:
           rustup toolchain install &&
           rustup target add x86_64-unknown-linux-musl
       - name: Cargo cache
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: "backend -> target"
       - name: Build
@@ -78,6 +78,8 @@ jobs:
 
   backend:
     name: Backend
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -86,6 +88,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
       BINSTALL_DISABLE_TELEMETRY: "true"
+      BINSTALL_NO_CONFIRM: "true"
     steps:
       - uses: actions/checkout@v7.0.1
       # Test backend. Uses the default host target (x86_64-unknown-linux-gnu) for faster linking
@@ -93,12 +96,12 @@ jobs:
       - name: Setup Rust
         run: rustup toolchain install
       - name: Cargo cache
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@b874e25ea559687bec77e281e9b271aa1367b624 # main
+        uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # main
       - name: Create empty frontend build dir for memory-serve
         run: mkdir -p dist dist-storybook
         working-directory: ./frontend
@@ -109,7 +112,9 @@ jobs:
       - name: Check Clippy with all features
         run: cargo clippy --verbose --locked --workspace --all-targets --all-features -- -D warnings
       - name: Install Nextest
-        run: cargo binstall cargo-nextest
+        run: cargo binstall --locked cargo-nextest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Symlink sqlx test directory to /dev/shm
         run: mkdir -p target /dev/shm/sqlx && rm -rf target/sqlx && ln -s /dev/shm/sqlx target/sqlx
       - name: Run tests
@@ -127,6 +132,8 @@ jobs:
 
   cargo-deny:
     name: Cargo deny
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -134,14 +141,17 @@ jobs:
     env:
       CARGO_TERM_COLOR: always
       BINSTALL_DISABLE_TELEMETRY: "true"
+      BINSTALL_NO_CONFIRM: "true"
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Setup Rust
         run: rustup toolchain install
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@b874e25ea559687bec77e281e9b271aa1367b624 # main
+        uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # main
       - name: Install cargo-deny
-        run: cargo binstall --no-confirm cargo-deny
+        run: cargo binstall --locked cargo-deny
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       # Advisories are checked in the scheduled cargo-deny.yml workflow, so that
       # newly published RUSTSEC advisories do not break PRs.
       - name: Check bans, licenses and sources
@@ -156,7 +166,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Setup Node
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           package-manager-cache: false
@@ -199,7 +209,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Setup Node
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           package-manager-cache: false
@@ -272,7 +282,7 @@ jobs:
         working-directory: ./backend/fuzz
         run: rustup toolchain install
       - name: Cargo cache
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: |
             backend/fuzz -> target

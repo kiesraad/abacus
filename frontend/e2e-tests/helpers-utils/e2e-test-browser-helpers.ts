@@ -120,7 +120,7 @@ export async function uploadElectionAndInputHash(page: Page, eml: Eml110a = eml1
 
   const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
-  await checkDefinitionPage.inputHash(eml.hashInput1, eml.hashInput2);
+  await checkDefinitionPage.inputHashFrom(eml.fullHash);
 }
 
 export async function uploadCandidatesAndInputHash(page: Page, eml: Eml230b) {
@@ -128,11 +128,14 @@ export async function uploadCandidatesAndInputHash(page: Page, eml: Eml230b) {
   await expect(uploadCandidateDefinitionPage.header).toBeVisible();
   await uploadCandidateDefinitionPage.uploadFile(eml.path);
   await expect(uploadCandidateDefinitionPage.main).toContainText(eml.filename);
-  await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionDate);
+  await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionIdentifier);
+  if (eml.electionDistrict) {
+    await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionDistrict);
+  }
 
   const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
   await expect(checkCandidateDefinitionPage.header).toBeVisible();
-  await checkCandidateDefinitionPage.inputHash(eml.hashInput1, eml.hashInput2);
+  await checkCandidateDefinitionPage.inputHashFrom(eml.fullHash);
 }
 
 export async function uploadPollingStations(page: Page, eml = eml110b) {

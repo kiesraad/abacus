@@ -53,7 +53,7 @@ export function getCSOInitialValues(election = electionMockData): CSOFirstSessio
   const { voters_counts, votes_counts, differences_counts, political_group_votes } = getCommonInitialValues(election);
   return {
     extra_investigation: {
-      extra_investigation_other_reason: { yes: false, no: false },
+      extra_investigation_done: { yes: false, no: false },
       ballots_recounted_extra_investigation: { yes: false, no: false },
     },
     counting_differences_polling_station: {

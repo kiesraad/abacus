@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
+import { CheckHash } from "@/components/check_hash/CheckHash";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { Form } from "@/components/ui/Form/Form";
@@ -11,10 +12,26 @@ import { t, tx } from "@/i18n/translate";
 import type {
   ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
   ElectionDefinitionValidateResponse,
+  NewElection,
 } from "@/types/generated/openapi";
+import { getDistrictNumber } from "@/utils/election";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import { CheckHash } from "./CheckHash";
+
+function getSubtitle(election: NewElection) {
+  if (election.sub_category === "PS2") {
+    switch (election.committee_category) {
+      case "GSB":
+        if (election.district.district === "Specific") {
+          return `${t("election.district")} ${getDistrictNumber(election.district)} (${election.district.name})`;
+        }
+        break;
+      case "CSB":
+        return t("election.all_districts");
+    }
+  }
+  return undefined;
+}
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UploadCandidatesDefinition() {
@@ -35,12 +52,12 @@ export function UploadCandidatesDefinition() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      setFile(currentFile);
       if (await isFileTooLarge(currentFile)) {
         setError({ title: defaultErrorTitle, message: fileTooLargeError(currentFile) });
         return;
       }
 
-      setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
         committee_category: state.committeeCategory,
@@ -116,17 +133,17 @@ export function UploadCandidatesDefinition() {
 
     return (
       <CheckHash
-        date={state.election.election_date}
-        title={t("election.check_eml.list_name", {
-          location: state.election.authority_region,
-          name: state.election.election_id,
-        })}
+        title={`${state.election.election_id.split("_")[0]} ${state.election.domain?.name}`}
+        subtitle={getSubtitle(state.election)}
         header={t("election.check_eml.candidates_title")}
         description={tx("election.check_eml.candidates_description", {
           file: () => {
             return <strong>{state.candidateDefinitionFileName}</strong>;
           },
         })}
+        instructions={t("election.check_eml.check_hash_instructions")}
+        errorTitle={t("election.check_eml.error.title")}
+        errorDescription={t("election.check_eml.error.description")}
         redactedHash={state.candidateDefinitionRedactedHash}
         error={error ? error.message : undefined}
         onSubmit={(chunks) => void onSubmit(chunks)}

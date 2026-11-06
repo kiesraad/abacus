@@ -360,6 +360,35 @@ describe("ResolveDifferencesPage", () => {
     expect(resolve).toHaveBeenCalledWith("keep_second_and_discard_first");
   });
 
+  test("should block correcting the first entry when the first entry is imported", async () => {
+    const user = userEvent.setup();
+    const resolve = spyOnHandler(DataEntryResolveDifferencesHandler);
+    overrideOnce("get", "/api/data_entries/3/resolve_differences", 200, {
+      ...dataEntryStatusDifferences,
+      first_entry_origin: { type: "Import" },
+    });
+
+    await renderPage();
+    expect(
+      await screen.findByRole("radio", { name: "Eerste invoer (geïmporteerd uit tellingsbestand)" }),
+    ).toBeVisible();
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+
+    expect(
+      await screen.findByText(
+        "De eerste invoer is geïmporteerd uit een tellingsbestand. " +
+          "Afwijkingen met het papieren proces-verbaal kunnen daarin niet worden hersteld. " +
+          "Er is tweede handmatige invoer nodig vanaf het papieren proces-verbaal.",
+      ),
+    ).toBeVisible();
+    expect(
+      await screen.findByRole("radio", { name: "Verschillen laten herstellen door de oorspronkelijke invoerder" }),
+    ).toBeDisabled();
+
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+    expect(resolve).toHaveBeenCalledWith("keep_second_and_discard_first");
+  });
+
   test("should block correcting the second entry when the kept first entry has errors", async () => {
     const user = userEvent.setup();
     const resolve = spyOnHandler(DataEntryResolveDifferencesHandler);

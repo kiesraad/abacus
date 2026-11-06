@@ -1,7 +1,7 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 import * as gte19SeatsAndP7DrawingLots from "../../testing/gte-19-seats-and-p7-drawing-lots";
-import * as lt19SeatsAndP7DrawingLots from "../../testing/lt-19-seats-and-p7-drawing-lots";
+import * as lt19SeatsAndP8DrawingLots from "../../testing/lt-19-seats-and-p8-drawing-lots";
 import { DrawingLotsForList } from "./DrawingLotsForList";
 
 export const HighestAverage: StoryObj = {
@@ -36,9 +36,9 @@ export const LargestRemainder: StoryObj = {
   render: () => {
     return (
       <DrawingLotsForList
-        drawingLotsRequired={lt19SeatsAndP7DrawingLots.drawing_lots_required}
-        options={lt19SeatsAndP7DrawingLots.election.political_groups.filter((pg) =>
-          lt19SeatsAndP7DrawingLots.options.includes(pg.number),
+        drawingLotsRequired={lt19SeatsAndP8DrawingLots.drawing_lots_required}
+        options={lt19SeatsAndP8DrawingLots.election.political_groups.filter((pg) =>
+          lt19SeatsAndP8DrawingLots.options.includes(pg.number),
         )}
       />
     );

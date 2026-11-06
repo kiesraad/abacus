@@ -6,6 +6,7 @@
     <AuthorityAddress/>
   </ManagingAuthority>
   <IssueDate>2022-02-04</IssueDate>
+  <kr:Schema Version="1.3.1"/>
   <kr:CreationDateTime>2022-02-04T11:16:26.827</kr:CreationDateTime>
   <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
   <CandidateList>

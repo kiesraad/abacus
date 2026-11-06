@@ -593,7 +593,7 @@ pub mod tests {
                         votes_cast_greater_than_admitted_voters: false,
                         votes_cast_smaller_than_admitted_voters: false,
                     },
-                difference_completely_accounted_for: YesNo::yes(),
+                difference_completely_accounted_for: YesNo::default(),
             },
             political_group_votes: vec![
                 PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[36, 20]),

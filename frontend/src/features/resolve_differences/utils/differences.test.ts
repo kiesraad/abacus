@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import { resultsMockData } from "@/features/resolve_differences/testing/polling-station-results";
 import {
   type CorrectEntry,
+  type CorrectionBlockedReason,
   getResolveDifferencesAction,
   isCorrectionBlocked,
   sectionHasDifferences,
@@ -10,7 +11,7 @@ import {
 } from "@/features/resolve_differences/utils/differences";
 import { dataEntryStatusDifferences } from "@/testing/api-mocks/DataEntryMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import type { ResolveDifferencesAction } from "@/types/generated/openapi";
+import type { DataEntryOrigin, ResolveDifferencesAction } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 describe("Resolve differences, differences util", () => {
@@ -56,37 +57,158 @@ describe("isCorrectionBlocked", () => {
     correctEntry: CorrectEntry | undefined;
     firstHasErrors: boolean;
     secondHasErrors: boolean;
-    expected: boolean;
+    firstEntryImported: boolean;
+    expected: CorrectionBlockedReason | undefined;
   }>([
     // errors in the entry that is kept block correcting the other one
-    { correctEntry: "first", firstHasErrors: true, secondHasErrors: false, expected: true },
-    { correctEntry: "first", firstHasErrors: false, secondHasErrors: true, expected: false },
-    { correctEntry: "second", firstHasErrors: false, secondHasErrors: true, expected: true },
-    { correctEntry: "second", firstHasErrors: true, secondHasErrors: false, expected: false },
-    { correctEntry: "first", firstHasErrors: true, secondHasErrors: true, expected: true },
-    { correctEntry: "second", firstHasErrors: true, secondHasErrors: true, expected: true },
-    { correctEntry: "first", firstHasErrors: false, secondHasErrors: false, expected: false },
-    { correctEntry: "second", firstHasErrors: false, secondHasErrors: false, expected: false },
+    {
+      correctEntry: "first",
+      firstHasErrors: true,
+      secondHasErrors: false,
+      firstEntryImported: true,
+      expected: "first_entry_has_errors",
+    },
+    {
+      correctEntry: "first",
+      firstHasErrors: true,
+      secondHasErrors: false,
+      firstEntryImported: false,
+      expected: "first_entry_has_errors",
+    },
+    {
+      correctEntry: "first",
+      firstHasErrors: false,
+      secondHasErrors: true,
+      firstEntryImported: true,
+      expected: undefined,
+    },
+    {
+      correctEntry: "first",
+      firstHasErrors: false,
+      secondHasErrors: true,
+      firstEntryImported: false,
+      expected: undefined,
+    },
+    {
+      correctEntry: "second",
+      firstHasErrors: false,
+      secondHasErrors: true,
+      firstEntryImported: true,
+      expected: "second_entry_has_errors",
+    },
+    {
+      correctEntry: "second",
+      firstHasErrors: false,
+      secondHasErrors: true,
+      firstEntryImported: false,
+      expected: "second_entry_has_errors",
+    },
+    {
+      correctEntry: "second",
+      firstHasErrors: true,
+      secondHasErrors: false,
+      firstEntryImported: true,
+      expected: "first_entry_imported",
+    },
+    {
+      correctEntry: "second",
+      firstHasErrors: true,
+      secondHasErrors: false,
+      firstEntryImported: false,
+      expected: undefined,
+    },
+    {
+      correctEntry: "first",
+      firstHasErrors: true,
+      secondHasErrors: true,
+      firstEntryImported: true,
+      expected: "first_entry_has_errors",
+    },
+    {
+      correctEntry: "first",
+      firstHasErrors: true,
+      secondHasErrors: true,
+      firstEntryImported: false,
+      expected: "first_entry_has_errors",
+    },
+    {
+      correctEntry: "second",
+      firstHasErrors: true,
+      secondHasErrors: true,
+      firstEntryImported: true,
+      expected: "second_entry_has_errors",
+    },
+    {
+      correctEntry: "second",
+      firstHasErrors: true,
+      secondHasErrors: true,
+      firstEntryImported: false,
+      expected: "second_entry_has_errors",
+    },
+    {
+      correctEntry: "first",
+      firstHasErrors: false,
+      secondHasErrors: false,
+      firstEntryImported: true,
+      expected: undefined,
+    },
+    {
+      correctEntry: "first",
+      firstHasErrors: false,
+      secondHasErrors: false,
+      firstEntryImported: false,
+      expected: undefined,
+    },
+    {
+      correctEntry: "second",
+      firstHasErrors: false,
+      secondHasErrors: false,
+      firstEntryImported: true,
+      expected: "first_entry_imported",
+    },
+    {
+      correctEntry: "second",
+      firstHasErrors: false,
+      secondHasErrors: false,
+      firstEntryImported: false,
+      expected: undefined,
+    },
     // there is nothing to correct when both entries are discarded, or when no choice was made yet
-    { correctEntry: "neither", firstHasErrors: true, secondHasErrors: true, expected: false },
-    { correctEntry: undefined, firstHasErrors: true, secondHasErrors: true, expected: false },
-  ])("maps (keeping $correctEntry with errors in first: $firstHasErrors, second: $secondHasErrors) to $expected", ({
+    {
+      correctEntry: "neither",
+      firstHasErrors: true,
+      secondHasErrors: true,
+      firstEntryImported: true,
+      expected: undefined,
+    },
+    {
+      correctEntry: undefined,
+      firstHasErrors: true,
+      secondHasErrors: true,
+      firstEntryImported: true,
+      expected: undefined,
+    },
+  ])("maps (keeping $correctEntry with errors in first: $firstHasErrors, second: $secondHasErrors and imported: $firstEntryImported) to $expected", ({
     correctEntry,
     firstHasErrors,
     secondHasErrors,
+    firstEntryImported,
     expected,
   }) => {
     const differences = {
       ...dataEntryStatusDifferences,
       first_entry_has_errors: firstHasErrors,
       second_entry_has_errors: secondHasErrors,
+      first_entry_origin: firstEntryImported
+        ? ({ type: "Import" } as DataEntryOrigin)
+        : ({ type: "Typist", user_id: 1 } as DataEntryOrigin),
     };
 
     expect(isCorrectionBlocked(correctEntry, differences)).toBe(expected);
   });
 
   test("is not blocked while the differences are still loading", () => {
-    expect(isCorrectionBlocked("first", null)).toBe(false);
-    expect(isCorrectionBlocked("second", null)).toBe(false);
+    expect(isCorrectionBlocked("first", null)).toBe(undefined);
+    expect(isCorrectionBlocked("second", null)).toBe(undefined);
   });
 });

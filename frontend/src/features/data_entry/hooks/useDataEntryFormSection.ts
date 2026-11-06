@@ -61,8 +61,8 @@ export function useDataEntryFormSection() {
         errorsAndWarningsAccepted: acceptErrorsAndWarnings,
       };
 
-  // Find error code that is shown on the bottom of the form
-  const trailingError = errors.find("F401");
+  // Find error code that is shown on the bottom of the form, unless a correction warning takes precedence
+  const trailingError = correctionWarning ? undefined : errors.find("F401");
 
   // Whether to show the accept errors and warnings checkbox
   const showAcceptErrorsAndWarnings =

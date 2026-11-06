@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use apportionment::{ApportionmentOutput, CandidateVotes, process};
+use apportionment::{ApportionmentOutput, ApportionmentWarning, CandidateVotes, process};
 use apportionment_fuzz::{
     FuzzedApportionmentInput, SimpleCandidateVotes, SimpleListVotes, init_tracing, run_with_log,
 };
@@ -16,6 +16,27 @@ fuzz_target!(
     let (data, added_votes) = data;
 
     let (alloc, log1) = run_with_log(|| process(&data));
+
+    // Skip cases where there are fewer than 19 seats and both art. P 9 (absolute majority) and
+    // art. P 10 (list exhaustion) are applied.
+    //
+    // Reason is that Abacus does not include the P 9-seat for the max. one seat requirement when
+    // re-assigning residual seats that were freed up after list exhaustion.
+    //
+    // The same check is done below for the second assignment
+    //
+    // related issue: #3219
+    if data.seats < 19
+            && matches!(
+                alloc,
+                Ok(ApportionmentOutput::Completed(ref alloc))
+                    if alloc
+                        .seat_assignment
+                        .warnings()
+                        .contains(&ApportionmentWarning::AbsoluteMajorityAndListExhaustion))
+    {
+        return;
+    }
 
     // Add some votes to the first candidate of the first party
     let mut new_data = FuzzedApportionmentInput {
@@ -45,6 +66,19 @@ fuzz_target!(
         }
 
     let (new_alloc, log2) = run_with_log(|| process(&new_data));
+
+    // Skip when P 9 and P 10 are applied (see comment above)
+    if data.seats < 19
+            && matches!(
+                new_alloc,
+                Ok(ApportionmentOutput::Completed(ref new_alloc))
+                    if new_alloc
+                        .seat_assignment
+                        .warnings()
+                        .contains(&ApportionmentWarning::AbsoluteMajorityAndListExhaustion))
+    {
+        return;
+    }
 
     if let (Ok(ApportionmentOutput::Completed(alloc)), Ok(ApportionmentOutput::Completed(new_alloc))) = (alloc, new_alloc) {
         let seats_per_party: Vec<u32> = alloc

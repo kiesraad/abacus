@@ -12,6 +12,7 @@ import { backupsRoutes } from "@/features/backups/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
 import { detailRoutes } from "@/features/data_entry_detail/routes";
 import { dataEntryHomeRoutes } from "@/features/data_entry_home/routes";
+import { dataEntryImportRoutes } from "@/features/data_entry_import/routes";
 import { devRoutes } from "@/features/dev/routes";
 import { electionCreateRoutes } from "@/features/election_create/routes";
 import { electionManagementRoutes } from "@/features/election_management/routes";
@@ -61,6 +62,10 @@ export const routes: RouteObject[] = [
                 children: [
                   // index
                   ...dataEntryHomeRoutes,
+                  {
+                    path: "import",
+                    children: dataEntryImportRoutes,
+                  },
                   {
                     path: ":dataEntryId/:entryNumber",
                     children: dataEntryRoutes,

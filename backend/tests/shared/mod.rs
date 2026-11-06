@@ -5,7 +5,10 @@ use std::{collections::BTreeMap, net::SocketAddr};
 use abacus::domain::election::{CommitteeCategory, VoteCountingMethod};
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
-use reqwest::Response;
+use reqwest::{
+    Response,
+    multipart::{Form, Part},
+};
 use serde::Serialize;
 
 pub fn differences_counts_zero() -> serde_json::Value {
@@ -17,7 +20,7 @@ pub fn differences_counts_zero() -> serde_json::Value {
             "votes_cast_greater_than_admitted_voters": false,
             "votes_cast_smaller_than_admitted_voters": false,
         },
-        "difference_completely_accounted_for": {"yes": true, "no": false},
+        "difference_completely_accounted_for": {"yes": false, "no": false},
     })
 }
 
@@ -53,7 +56,7 @@ pub fn example_cso_data_entry(client_state: Option<&str>) -> serde_json::Value {
         "data": {
             "model": "CSOFirstSession",
             "extra_investigation": {
-              "extra_investigation_other_reason": { "yes": false, "no": false },
+              "extra_investigation_done": { "yes": false, "no": true },
               "ballots_recounted_extra_investigation": { "yes": false, "no": false },
             },
             "counting_differences_polling_station": {
@@ -698,4 +701,38 @@ pub async fn login_with_credentials(
 
     assert_eq!(response.status(), StatusCode::OK);
     response.headers().get("set-cookie").cloned().unwrap()
+}
+
+/// Sends a POST request with given data as multipart/form-data
+pub async fn post_multipart(url: &str, cookie: &HeaderValue, parts: &[(&str, &[u8])]) -> Response {
+    let form = parts.iter().fold(Form::new(), |form, (name, value)| {
+        form.part(name.to_string(), Part::bytes(value.to_vec()))
+    });
+
+    reqwest::Client::new()
+        .post(url)
+        .header("cookie", cookie)
+        .multipart(form)
+        .send()
+        .await
+        .unwrap()
+}
+
+pub async fn import_certificate(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+    certificate: &str,
+) -> Response {
+    let url = format!("http://{addr}/api/elections/{election_id}/sub_committee_certificates");
+
+    reqwest::Client::new()
+        .post(url)
+        .json(&serde_json::json!({
+            "data": certificate,
+        }))
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap()
 }

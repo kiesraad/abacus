@@ -11,6 +11,7 @@ import type {
   ElectionDefinitionValidateResponse,
   RegionDetails,
 } from "@/types/generated/openapi";
+import { sortList } from "@/utils/sorting";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import cls from "./SelectGSB.module.css";
 
@@ -30,9 +31,7 @@ export function SelectGSB() {
   }
 
   // Sort gsbList alphabetically (ignoring leading `'s-`)
-  const gsbList = [...state.gsbList].sort((a, b) =>
-    a.name.replace(/^('s-)/, "").localeCompare(b.name.replace(/^('s-)/, ""), "nl"),
-  );
+  const gsbList = sortList(state.gsbList, (gsb) => gsb);
 
   async function selectGSB(gsb: RegionDetails) {
     const response = await create({

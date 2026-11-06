@@ -9,7 +9,7 @@ pub enum EmlSignatureError {
     /// The self-signed certificate could not be built.
     CertificateGeneration(String),
     /// The validity period is impossible: a year outside 1970-9999, or
-    /// `valid_from` past expiry (election date + 3 months).
+    /// `notBefore` after `notAfter`.
     ValidityPeriod,
     /// The stored private key is not a parseable PKCS#8 key.
     InvalidPrivateKey(String),

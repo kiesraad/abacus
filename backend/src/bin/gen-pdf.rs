@@ -263,9 +263,9 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-p-22-2-variations/lt-19-seats.json",
     },
     ModelVariant {
-        name: "model-p-22-2-lt-19-seats-and-p7-drawing-lots",
+        name: "model-p-22-2-lt-19-seats-and-p8-drawing-lots",
         model: "model-p-22-2",
-        input: "model-p-22-2-variations/lt-19-seats-and-p7-drawing-lots.json",
+        input: "model-p-22-2-variations/lt-19-seats-and-p8-drawing-lots.json",
     },
     ModelVariant {
         name: "model-p-22-2-lt-19-seats-and-p9-and-p10",
@@ -286,6 +286,11 @@ static VARIANTS: &[ModelVariant] = &[
         name: "model-p-22-2-lt-19-seats-and-p15-drawing-lots",
         model: "model-p-22-2",
         input: "model-p-22-2-variations/lt-19-seats-and-p15-drawing-lots.json",
+    },
+    ModelVariant {
+        name: "model-p-22-2-WS",
+        model: "model-p-22-2",
+        input: "model-p-22-2-variations/model-p-22-2-WS.json",
     },
     ModelVariant {
         name: "model-p-22-2-bijlage-1",

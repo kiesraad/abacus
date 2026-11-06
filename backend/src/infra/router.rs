@@ -25,7 +25,11 @@ use crate::infra::tls::CaCertificate;
 use crate::test_data_gen;
 use crate::{
     AppError, AppState, MAX_BODY_SIZE_MB, api,
-    api::middleware::{airgap, airgap::AirgapDetection, authentication},
+    api::middleware::{
+        airgap,
+        airgap::AirgapDetection,
+        authentication::{self, ratelimit::LoginRateLimit},
+    },
     error,
     infra::{audit_log, backup::BackupConfig},
 };
@@ -274,12 +278,14 @@ pub fn create_router(
     pool: SqlitePool,
     airgap_detection: AirgapDetection,
     backup_config: BackupConfig,
+    login_ratelimit: LoginRateLimit,
 ) -> Result<Router, AppError> {
     let router = axum_router_from_openapi(openapi_router());
     let state = AppState {
         pool,
         airgap_detection,
         backup_config,
+        login_ratelimit,
     };
     let router = add_middleware(router, &state);
     #[cfg(feature = "memory-serve")]

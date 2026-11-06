@@ -83,7 +83,8 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Renders the correct headings and button", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "created" }, []));
+    const electionResponse = getElectionMockData({}, { number: 2, status: "created" }, []);
+    server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
 
     await renderPage("coordinator_gsb");
 
@@ -145,7 +146,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Shows warning if investigations are handled, but there is one missing (singular)", async () => {
-    overrideOnce("get", "/api/elections/1", 200, {
+    const electionResponse = {
       ...getElectionMockData({}, { number: 2 }, [
         { polling_station_id: 1, reason: "Test reason 1", findings: "Test findings 1", corrected_results: false },
         { polling_station_id: 2, reason: "Test reason 2", findings: "Test findings 2", corrected_results: false },
@@ -158,7 +159,8 @@ describe("InvestigationsOverviewPage", () => {
           prev_data_entry_id: undefined,
         },
       ] satisfies PollingStation[],
-    });
+    };
+    server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
 
     await renderPage("coordinator_gsb");
 
@@ -173,7 +175,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Shows warning if investigations are handled, but there are multiple missing (plural)", async () => {
-    overrideOnce("get", "/api/elections/1", 200, {
+    const electionResponse = {
       ...getElectionMockData({}, { number: 2 }, [
         { polling_station_id: 1, reason: "Test reason 1", findings: "Test findings 1", corrected_results: false },
         { polling_station_id: 2, reason: "Test reason 2", findings: "Test findings 2", corrected_results: false },
@@ -190,7 +192,8 @@ describe("InvestigationsOverviewPage", () => {
           prev_data_entry_id: undefined,
         },
       ] satisfies PollingStation[],
-    });
+    };
+    server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
 
     await renderPage("coordinator_gsb");
 
@@ -205,7 +208,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Shows finish data entry message when all investigations are handled and session status != completed", async () => {
-    const electionData = getElectionMockData({}, { number: 2, status: "data_entry" }, [
+    const electionResponse = getElectionMockData({}, { number: 2, status: "data_entry" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",
@@ -213,7 +216,7 @@ describe("InvestigationsOverviewPage", () => {
         corrected_results: false,
       },
     ]);
-    overrideOnce("get", "/api/elections/1", 200, electionData);
+    server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
 
     await renderPage("coordinator_gsb");
 
@@ -248,7 +251,7 @@ describe("InvestigationsOverviewPage", () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
     const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
-    const electionData = getElectionMockData({}, { number: 2, status: "data_entry" }, [
+    const electionResponse = getElectionMockData({}, { number: 2, status: "data_entry" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",
@@ -256,7 +259,7 @@ describe("InvestigationsOverviewPage", () => {
         corrected_results: false,
       },
     ]);
-    overrideOnce("get", "/api/elections/1", 200, electionData);
+    server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
 
     await renderPage("coordinator_gsb");
 
@@ -274,13 +277,13 @@ describe("InvestigationsOverviewPage", () => {
   test("Shows start data entry modal when clicking fill findings button", async () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
 
-    const electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, [
+    const electionResponse = getElectionMockData({}, { number: 2, status: "in_preparation" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",
       },
     ]);
-    overrideOnce("get", "/api/elections/1", 200, electionData);
+    server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
 
     await renderPage("coordinator_gsb");
 
@@ -315,10 +318,11 @@ describe("InvestigationsOverviewPage", () => {
 
     const editLinks = await screen.findAllByRole("link", { name: "Bewerken" });
 
-    expect(editLinks[0]).toHaveAttribute("href", "/elections/1/investigations/1/findings");
-    expect(editLinks[1]).toHaveAttribute("href", "/elections/1/investigations/4/findings");
-    expect(editLinks[2]).toHaveAttribute("href", "/elections/1/investigations/2/findings");
-    expect(editLinks[3]).toHaveAttribute("href", "/elections/1/investigations/8/findings");
+    expect(editLinks[0]).toHaveAttribute("href", "/elections/1/investigations/3/reason");
+    expect(editLinks[1]).toHaveAttribute("href", "/elections/1/investigations/1/findings");
+    expect(editLinks[2]).toHaveAttribute("href", "/elections/1/investigations/4/findings");
+    expect(editLinks[3]).toHaveAttribute("href", "/elections/1/investigations/2/findings");
+    expect(editLinks[4]).toHaveAttribute("href", "/elections/1/investigations/8/findings");
   });
 
   test("Does not show add and edit links to administrator", async () => {

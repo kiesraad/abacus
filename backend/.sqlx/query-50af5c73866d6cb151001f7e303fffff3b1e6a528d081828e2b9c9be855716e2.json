@@ -1,0 +1,21 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT COUNT(*) = 0 as \"result: bool\"\n        FROM sub_committees AS sc\n        LEFT JOIN data_entries AS de ON de.id = sc.data_entry_id\n        WHERE sc.committee_session_id = ?\n          AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "result: bool",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "50af5c73866d6cb151001f7e303fffff3b1e6a528d081828e2b9c9be855716e2"
+}

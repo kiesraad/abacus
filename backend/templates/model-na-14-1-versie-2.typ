@@ -26,7 +26,7 @@
 #title_page(
   is_municipality[#input.election.authority_id #input.election.authority_region][#input.election.authority_region],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
-  [#input.election.name - #format_date(input.election.election_date)],
+  [#get_election_title(input.election), #format_date(input.election.election_date)],
   [
     Verslag van telling van een door het #location_type herteld stembureau -
     Model Na 14-1 (nieuwe zitting)
@@ -55,7 +55,7 @@ Het #location_type heeft de telresultaten van dit stembureau onderzocht en is to
 
 #set page(
   header: context default_header(
-    current_chapter_title(),
+    [#current_chapter_title() \ #input.election.official_name],
     header-right
   )
 )
@@ -220,7 +220,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
   )
 }
 
-#blank_page_before_signing(header-right)
+#blank_page_before_signing(header-right, extra-header-left: input.election.official_name)
 
 = Ondertekening
 

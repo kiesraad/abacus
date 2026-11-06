@@ -31,6 +31,7 @@ export function Alert({
   variant = "default",
 }: AlertProps) {
   const id = useId();
+
   return (
     <div
       className={cn(inline ? cls.inlineAlert : cls.alert, cls[type], margin, variant, { small })}

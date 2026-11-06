@@ -275,7 +275,7 @@ const baseElectionGR = {
   nomination_date: "2026-11-01",
 } satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
 
-const baseElectionPS = {
+const baseElectionPS1 = {
   name: "Provinciale Staten Oost-Holland 2027",
   official_name: "Provinciale Staten Oost-Holland 2027",
   election_id: "PS2027_Juinen",
@@ -290,6 +290,21 @@ const baseElectionPS = {
   number_of_seats: 29,
   election_date: "2027-11-30",
   nomination_date: "2027-11-01",
+} satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
+
+const baseElectionPS2 = {
+  ...baseElectionPS1,
+  district: {
+    district: "Specific",
+    name: "Juinen",
+    key: {
+      category: "ElectoralDistrict",
+      number: 2,
+    },
+    roman_numerals: true,
+    frisian_export_allowed: false,
+  },
+  sub_category: "PS2",
 } satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
 
 const baseElectionABGSB = {
@@ -319,7 +334,7 @@ const baseElectionABCSB = {
 
 const baseElections = {
   Municipal: baseElectionGR,
-  Provincial: baseElectionPS,
+  Provincial: baseElectionPS1,
   WaterAuthority: baseElectionABGSB,
 } satisfies Record<ElectionCategory, Omit<Election, "id" | "committee_category" | "number_of_voters">>;
 
@@ -330,7 +345,7 @@ export const electionListMockResponse: ElectionListResponse = {
     { ...baseElectionGR, id: 2, committee_category: "CSB", authority_id: "CSB", number_of_voters: 0 },
     { ...baseElectionABGSB, id: 3, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
     { ...baseElectionABCSB, id: 4, committee_category: "CSB", authority_id: "CSB", number_of_voters: 0 },
-    { ...baseElectionPS, id: 5, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
+    { ...baseElectionPS1, id: 5, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
   ],
 };
 
@@ -419,6 +434,13 @@ export const csbElectionDetailsMockResponse = getCSBElectionMockData();
 
 export const electionMockData = electionDetailsMockResponse.election;
 export const provincialElectionMockData = getElectionMockData(electionListMockResponse.elections[4]).election;
+export const provincialElectionPS2MockData = getElectionMockData({
+  ...baseElectionPS2,
+  id: 6,
+  committee_category: "GSB",
+  counting_method: "CSO",
+  number_of_voters: 2000,
+}).election;
 export const waterAuthorityElectionMockData = getElectionMockData(electionListMockResponse.elections[2]).election;
 
 export const csbElectionMockData = csbElectionDetailsMockResponse.election;

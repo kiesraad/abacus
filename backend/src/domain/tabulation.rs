@@ -88,7 +88,7 @@ impl ElectionTotals {
                         data_source.number(),
                         validation_results
                     ),
-                    ErrorReference::PollingStationValidationErrors,
+                    ErrorReference::DataEntryValidationErrors,
                 ));
             }
 
@@ -383,7 +383,7 @@ impl CSOInvestigations {
 
         if let Some(true) = result
             .extra_investigation
-            .extra_investigation_other_reason
+            .extra_investigation_done
             .as_bool()
         {
             self.investigated_other_reason
@@ -466,7 +466,7 @@ mod tests {
             next_session_results::NextSessionResults,
             yes_no::YesNo,
         },
-        sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId},
+        sub_committee::{SubCommitteeFirstSession, SubCommitteeId},
         valid_default::ValidDefault,
     };
 
@@ -524,7 +524,7 @@ mod tests {
     fn results_fixture_b() -> Results {
         Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: ExtraInvestigation {
-                extra_investigation_other_reason: YesNo::yes(),
+                extra_investigation_done: YesNo::yes(),
                 ballots_recounted_extra_investigation: YesNo::no(),
             },
             counting_differences_polling_station: ValidDefault::valid_default(),
@@ -818,6 +818,9 @@ mod tests {
                 .differences_counts
                 .compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
+            results
+                .differences_counts
+                .difference_completely_accounted_for = YesNo::default();
         }
 
         let results = ps
@@ -1084,14 +1087,11 @@ mod tests {
                 (
                     DataEntrySource::SubCommittee(SubCommitteeFirstSession {
                         committee_session_id: CommitteeSessionId::from(0),
-                        sub_committee: SubCommittee {
-                            id: SubCommitteeId::from(1),
-                            number: 1,
-                            name: "A".to_string(),
-                            category: GSB,
-                            authority_id: format!("{:0>4}", 1),
-                            authority_name: "A".to_string(),
-                        },
+                        id: SubCommitteeId::from(1),
+                        number: 1,
+                        name: "A".to_string(),
+                        authority_id: format!("{:0>4}", 1),
+                        authority_name: "A".to_string(),
                         data_entry_id: DataEntryId::from(0),
                     }),
                     gsb1_result,
@@ -1099,14 +1099,11 @@ mod tests {
                 (
                     DataEntrySource::SubCommittee(SubCommitteeFirstSession {
                         committee_session_id: CommitteeSessionId::from(0),
-                        sub_committee: SubCommittee {
-                            id: SubCommitteeId::from(2),
-                            number: 2,
-                            name: "B".to_string(),
-                            category: GSB,
-                            authority_id: format!("{:0>4}", 2),
-                            authority_name: "B".to_string(),
-                        },
+                        id: SubCommitteeId::from(2),
+                        number: 2,
+                        name: "B".to_string(),
+                        authority_id: format!("{:0>4}", 2),
+                        authority_name: "B".to_string(),
                         data_entry_id: DataEntryId::from(1),
                     }),
                     gsb2_result,

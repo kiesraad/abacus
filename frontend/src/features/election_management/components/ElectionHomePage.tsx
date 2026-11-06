@@ -30,13 +30,58 @@ import { hasBooleanProperty } from "@/utils/typeChecks";
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
+import { MissingPollingStationsModal } from "./MissingPollingStationsModal";
 
 interface DownloadSectionProps {
   election: Election;
-  committeeSession: CommitteeSession;
+  session: CommitteeSession;
+  numberOfPollingStations: number;
 }
 
-function CSOFirstSessionDownloadSection({ election }: DownloadSectionProps) {
+function EmptyModelsSection({ election, session, numberOfPollingStations }: DownloadSectionProps) {
+  if (session.number === 1) {
+    // Sections for first session
+    if (election.counting_method === "CSO") {
+      return (
+        <CSOFirstSessionDownloadSection
+          election={election}
+          session={session}
+          numberOfPollingStations={numberOfPollingStations}
+        />
+      );
+    } else {
+      return (
+        <DSOFirstSessionDownloadSection
+          election={election}
+          session={session}
+          numberOfPollingStations={numberOfPollingStations}
+        />
+      );
+    }
+  } else {
+    // Sections for next session
+    if (election.counting_method === "CSO") {
+      return (
+        <CSONextSessionDownloadSection
+          election={election}
+          session={session}
+          numberOfPollingStations={numberOfPollingStations}
+        />
+      );
+    } else {
+      return (
+        <DSONextSessionDownloadSection
+          election={election}
+          session={session}
+          numberOfPollingStations={numberOfPollingStations}
+        />
+      );
+    }
+  }
+}
+
+function CSOFirstSessionDownloadSection({ election, numberOfPollingStations }: DownloadSectionProps) {
+  const [showMissingPollingStationsModal, setShowMissingPollingStationsModal] = useState(false);
   return (
     <div id="CSO-first-session-download-section" className="mt-xl">
       <h3 className={cls.tableTitle}>{t("election_management.empty_documents_first_session")}</h3>
@@ -50,7 +95,11 @@ function CSOFirstSessionDownloadSection({ election }: DownloadSectionProps) {
           <Table.ClickRow
             downloadIcon
             onClick={() => {
-              directDownload(`/api/elections/${election.id}/download_n_10_2`);
+              if (numberOfPollingStations === 0) {
+                setShowMissingPollingStationsModal(true);
+              } else {
+                directDownload(`/api/elections/${election.id}/download_n_10_2`);
+              }
             }}
           >
             <Table.Cell>N 10-2</Table.Cell>
@@ -59,7 +108,11 @@ function CSOFirstSessionDownloadSection({ election }: DownloadSectionProps) {
           <Table.ClickRow
             downloadIcon
             onClick={() => {
-              directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
+              if (numberOfPollingStations === 0) {
+                setShowMissingPollingStationsModal(true);
+              } else {
+                directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
+              }
             }}
           >
             <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
@@ -67,11 +120,20 @@ function CSOFirstSessionDownloadSection({ election }: DownloadSectionProps) {
           </Table.ClickRow>
         </Table.Body>
       </Table>
+      {showMissingPollingStationsModal && (
+        <MissingPollingStationsModal
+          to="polling-stations"
+          onClose={() => {
+            setShowMissingPollingStationsModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function DSOFirstSessionDownloadSection({ election, committeeSession }: DownloadSectionProps) {
+function DSOFirstSessionDownloadSection({ election, session, numberOfPollingStations }: DownloadSectionProps) {
+  const [showMissingPollingStationsModal, setShowMissingPollingStationsModal] = useState(false);
   const [showMissingCommitteeSessionDetailsModal, setShowMissingCommitteeSessionDetailsModal] = useState(false);
 
   return (
@@ -87,7 +149,11 @@ function DSOFirstSessionDownloadSection({ election, committeeSession }: Download
           <Table.ClickRow
             downloadIcon
             onClick={() => {
-              directDownload(`/api/elections/${election.id}/download_n_10_1`);
+              if (numberOfPollingStations === 0) {
+                setShowMissingPollingStationsModal(true);
+              } else {
+                directDownload(`/api/elections/${election.id}/download_n_10_1`);
+              }
             }}
           >
             <Table.Cell>N 10-1</Table.Cell>
@@ -96,7 +162,11 @@ function DSOFirstSessionDownloadSection({ election, committeeSession }: Download
           <Table.ClickRow
             downloadIcon
             onClick={() => {
-              directDownload(`/api/elections/${election.id}/download_n_10_1_inlegvel`);
+              if (numberOfPollingStations === 0) {
+                setShowMissingPollingStationsModal(true);
+              } else {
+                directDownload(`/api/elections/${election.id}/download_n_10_1_inlegvel`);
+              }
             }}
           >
             <Table.Cell>N 10-1</Table.Cell>
@@ -105,10 +175,12 @@ function DSOFirstSessionDownloadSection({ election, committeeSession }: Download
           <Table.ClickRow
             downloadIcon
             onClick={() => {
-              if (committeeSessionDetailsPresent(committeeSession)) {
-                directDownload(`/api/elections/${election.id}/download_na_14_1_versie1`);
-              } else {
+              if (numberOfPollingStations === 0) {
+                setShowMissingPollingStationsModal(true);
+              } else if (!committeeSessionDetailsPresent(session)) {
                 setShowMissingCommitteeSessionDetailsModal(true);
+              } else {
+                directDownload(`/api/elections/${election.id}/download_na_14_1_versie1`);
               }
             }}
           >
@@ -117,6 +189,14 @@ function DSOFirstSessionDownloadSection({ election, committeeSession }: Download
           </Table.ClickRow>
         </Table.Body>
       </Table>
+      {showMissingPollingStationsModal && (
+        <MissingPollingStationsModal
+          to="polling-stations"
+          onClose={() => {
+            setShowMissingPollingStationsModal(false);
+          }}
+        />
+      )}
       {showMissingCommitteeSessionDetailsModal && (
         <MissingCommitteeSessionDetailsModal
           to="details"
@@ -425,18 +505,13 @@ export function ElectionHomePage() {
               publicKeyRegistered={!showKeypairReminder}
             />
           </div>
-          {election.committee_category === "GSB" &&
-            (currentCommitteeSession.number === 1 ? (
-              election.counting_method === "CSO" ? (
-                <CSOFirstSessionDownloadSection election={election} committeeSession={currentCommitteeSession} />
-              ) : (
-                <DSOFirstSessionDownloadSection election={election} committeeSession={currentCommitteeSession} />
-              )
-            ) : election.counting_method === "CSO" ? (
-              <CSONextSessionDownloadSection election={election} committeeSession={currentCommitteeSession} />
-            ) : (
-              <DSONextSessionDownloadSection election={election} committeeSession={currentCommitteeSession} />
-            ))}
+          {election.committee_category === "GSB" && (
+            <EmptyModelsSection
+              election={election}
+              session={currentCommitteeSession}
+              numberOfPollingStations={pollingStations.length}
+            />
+          )}
         </article>
       </main>
       <Footer />

@@ -6,6 +6,7 @@ version = 4
 name = "abacus"
 version = "1.2.0"
 dependencies = [
+ "abacus_windows_service",
  "apportionment",
  "argon2",
  "async_zip",
@@ -48,9 +49,16 @@ dependencies = [
  "utoipa",
  "utoipa-axum",
  "utoipa-swagger-ui",
- "windows-service 1.2.0",
  "windows_socket",
  "zeroize",
+]
+
+[[package]]
+name = "abacus_windows_service"
+version = "1.2.0"
+dependencies = [
+ "tokio",
+ "windows-service",
 ]
 
 [[package]]
@@ -5684,14 +5692,6 @@ dependencies = [
  "bitflags",
  "widestring",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "windows-service"
-version = "1.2.0"
-dependencies = [
- "tokio",
- "windows-service 0.8.1",
 ]
 
 [[package]]

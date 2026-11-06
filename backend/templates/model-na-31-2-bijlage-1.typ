@@ -10,7 +10,8 @@
 #show: doc => conf(
   doc,
   header-left: [
-    Bijlage 1 - verslag telling stembureau
+    Bijlage 1 - verslag telling stembureau \
+    #input.election.official_name
   ],
   header-right: [
     #location_name \

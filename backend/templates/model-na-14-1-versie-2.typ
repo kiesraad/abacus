@@ -55,7 +55,7 @@ Het #location_type heeft de telresultaten van dit stembureau onderzocht en is to
 
 #set page(
   header: context default_header(
-    current_chapter_title(),
+    [#current_chapter_title() \ #input.election.official_name],
     header-right
   )
 )
@@ -220,7 +220,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
   )
 }
 
-#blank_page_before_signing(header-right)
+#blank_page_before_signing(header-right, extra-header-left: input.election.official_name)
 
 = Ondertekening
 

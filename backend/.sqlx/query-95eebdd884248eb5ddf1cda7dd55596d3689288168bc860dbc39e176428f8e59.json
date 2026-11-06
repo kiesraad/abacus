@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE polling_stations SET data_entry_id = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "95eebdd884248eb5ddf1cda7dd55596d3689288168bc860dbc39e176428f8e59"
+}

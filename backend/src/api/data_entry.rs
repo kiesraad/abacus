@@ -1504,9 +1504,7 @@ mod tests {
         let polling_station_id = PollingStationId::from(742);
         // Insert investigation with corrected_results and create empty data entry
         // (simulates what the investigation conclude flow does)
-        create_test_investigation(&mut conn, polling_station_id, Some(true))
-            .await
-            .unwrap();
+        create_test_investigation(&mut conn, polling_station_id, Some(true)).await;
         let ps = polling_station_repo::get(&mut conn, polling_station_id)
             .await
             .unwrap();
@@ -1694,9 +1692,7 @@ mod tests {
         let polling_station_id = PollingStationId::from(529);
 
         // Add investigation with corrected_results and create empty data entry
-        create_test_investigation(&mut conn, polling_station_id, Some(true))
-            .await
-            .unwrap();
+        create_test_investigation(&mut conn, polling_station_id, Some(true)).await;
         let ps = polling_station_repo::get(&mut conn, polling_station_id)
             .await
             .unwrap();
@@ -3033,9 +3029,7 @@ mod tests {
         .unwrap();
 
         // Add investigation with corrected_results and create empty data entry
-        create_test_investigation(&mut conn, polling_station_id, Some(true))
-            .await
-            .unwrap();
+        create_test_investigation(&mut conn, polling_station_id, Some(true)).await;
         let ps = polling_station_repo::get(&mut conn, polling_station_id)
             .await
             .unwrap();
@@ -3063,9 +3057,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = PollingStationId::from(742);
         // Add investigation with corrected_results and create empty data entry
-        create_test_investigation(&mut conn, polling_station_id, Some(true))
-            .await
-            .unwrap();
+        create_test_investigation(&mut conn, polling_station_id, Some(true)).await;
         let ps = polling_station_repo::get(&mut conn, polling_station_id)
             .await
             .unwrap();

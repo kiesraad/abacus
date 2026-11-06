@@ -18,12 +18,10 @@ pub use committee_session::{
 };
 #[cfg(test)]
 pub use data_entry::create_definitive_data_entry;
-pub use data_entry::{DataEntryServiceError, election_statuses};
+pub use data_entry::election_statuses;
 #[cfg(test)]
 pub use investigation::create_test_investigation;
-pub use polling_station::{
-    PollingStationServiceError, list_for_session as list_polling_stations_for_session,
-};
+pub use polling_station::list_for_session as list_polling_stations_for_session;
 #[cfg(test)]
 pub use signing::get_existing_signing_keypair;
 pub use signing::{

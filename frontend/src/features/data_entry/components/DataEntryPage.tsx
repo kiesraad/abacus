@@ -22,8 +22,11 @@ export function DataEntryPage() {
 
   // Make sure the data entry belongs to the current committee session
   const dataEntryInCurrentSession = statuses.some((status) => status.data_entry_id === dataEntryId);
+  if (!dataEntryInCurrentSession) {
+    throw new NotFoundError();
+  }
 
-  if (!dataEntryInCurrentSession || (entryNumber !== 1 && entryNumber !== 2)) {
+  if (entryNumber !== 1 && entryNumber !== 2) {
     throw new NotFoundError("error.data_entry_not_found");
   }
 

@@ -78,7 +78,7 @@ describe("routes", () => {
     // Data entry 9876 is not in the status list of election 1
     const router = renderWithRouter("typist_gsb");
     await router.navigate("/elections/1/data-entry/9876/1");
-    await expectNotFound("Het invoernummer is ongeldig");
+    await expectNotFound();
     expect(fetchSpy).not.toHaveBeenCalledWith(expect.stringContaining("/claim"), expect.anything());
   });
 

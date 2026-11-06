@@ -115,6 +115,21 @@ describe("DetailLayout", () => {
     expect(screen.queryByRole("button", { name: "Invoer verwijderen" })).not.toBeInTheDocument();
   });
 
+  test("Shows not found if data entry does not belong to current committee session", async () => {
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    overrideOnce("get", "/api/data_entries/5/get", 200, {
+      ...dataEntryValidGetMockResponse,
+      source: { ...dataEntryValidGetMockResponse.source, committee_session_id: 2 },
+    });
+
+    renderLayout();
+
+    expect(await screen.findByText("Error thrown during render: error.not_found")).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Invoer verwijderen" })).not.toBeInTheDocument();
+  });
+
   test("Redirect to status page on error DataEntryGetNotAllowed", async () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", dataEntryId: "3" });
 

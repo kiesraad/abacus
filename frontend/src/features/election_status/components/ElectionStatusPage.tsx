@@ -183,7 +183,8 @@ export function ElectionStatusPage() {
           statuses={statuses}
           addLinks={
             isCoordinator &&
-            (currentCommitteeSession.status === "data_entry" || currentCommitteeSession.status === "paused")
+            currentCommitteeSession.status !== "created" &&
+            currentCommitteeSession.status !== "in_preparation"
           }
           navigate={(path) => void navigate(path)}
         />

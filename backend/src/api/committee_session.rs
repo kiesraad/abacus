@@ -35,6 +35,7 @@ use crate::{
     service::{
         CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
         change_committee_session_status, list_polling_stations_for_session,
+        validate_committee_session_is_current_committee_session,
     },
 };
 
@@ -107,24 +108,6 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(committee_session_update).authorize(COORDINATOR))
         .routes(routes!(committee_session_status_change).authorize(COORDINATOR))
         .routes(routes!(committee_session_investigations).authorize(COORDINATOR_GSB))
-}
-
-pub async fn validate_committee_session_is_current_committee_session(
-    conn: &mut SqliteConnection,
-    election_id: ElectionId,
-    committee_session_id: CommitteeSessionId,
-) -> Result<CommitteeSession, APIError> {
-    // Get current committee session and check if the committee session id given
-    // matches the current committee session id, return NOT_FOUND otherwise
-    let current_committee_session = get_election_committee_session(conn, election_id).await?;
-    if committee_session_id != current_committee_session.id {
-        Err(APIError::NotFound(
-            "Committee session is not current committee session".to_string(),
-            ErrorReference::EntryNotFound,
-        ))
-    } else {
-        Ok(current_committee_session)
-    }
 }
 
 pub fn verify_committee_session_details_exist(

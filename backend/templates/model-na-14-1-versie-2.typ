@@ -220,7 +220,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
   )
 }
 
-#blank_page_before_signing(header-right)
+#blank_page_before_signing(header-right, extra-header-left: input.election.official_name)
 
 = Ondertekening
 

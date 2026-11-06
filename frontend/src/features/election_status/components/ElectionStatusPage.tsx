@@ -30,11 +30,16 @@ export function ElectionStatusPage() {
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
   const [showPauseModal, setShowPauseModal] = useState(false);
+  const [showDataEntryStartedAlert, setShowDataEntryStartedAlert] = useState(true);
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   useLiveData(refetchElection, true);
   useLiveData(refetchStatuses, true);
+
+  function hideDataEntryStartedAlert() {
+    setShowDataEntryStartedAlert(false);
+  }
 
   function finishDataEntry() {
     void navigate("../report");
@@ -134,10 +139,19 @@ export function ElectionStatusPage() {
           </nav>
         </Modal>
       )}
-      {isCoordinator &&
-      currentCommitteeSession.status !== "completed" &&
-      statuses.length > 0 &&
-      statuses.every((s) => s.status === "definitive") ? (
+      {showDataEntryStartedAlert &&
+      isCoordinator &&
+      currentCommitteeSession.number === 1 &&
+      currentCommitteeSession.status === "data_entry" &&
+      statuses.length === statuses.filter((status) => status.status === "empty").length ? (
+        <Alert type="notify" onClose={hideDataEntryStartedAlert}>
+          <strong className="heading-md">{t("election_status.data_entry_started")}</strong>
+          <p>{t("election_status.data_entry_started_explanation")}</p>
+        </Alert>
+      ) : isCoordinator &&
+        currentCommitteeSession.status !== "completed" &&
+        statuses.length > 0 &&
+        statuses.every((s) => s.status === "definitive") ? (
         <Alert type="success">
           <strong className="heading-md">{t("election_status.definitive.title")}</strong>
           <p>{t(`election_status.definitive.message.${election.committee_category}`)}</p>

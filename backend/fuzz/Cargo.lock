@@ -6,6 +6,7 @@ version = 4
 name = "abacus"
 version = "1.3.0"
 dependencies = [
+ "abacus_windows_service",
  "apportionment",
  "argon2",
  "async_zip",
@@ -37,7 +38,6 @@ dependencies = [
  "ttf-parser",
  "utoipa",
  "utoipa-axum",
- "windows-service 1.3.0",
  "windows_socket",
  "zeroize",
 ]
@@ -49,6 +49,14 @@ dependencies = [
  "abacus",
  "chrono",
  "libfuzzer-sys",
+]
+
+[[package]]
+name = "abacus_windows_service"
+version = "1.3.0"
+dependencies = [
+ "tokio",
+ "windows-service",
 ]
 
 [[package]]
@@ -2964,14 +2972,6 @@ dependencies = [
  "bitflags",
  "widestring",
  "windows-sys",
-]
-
-[[package]]
-name = "windows-service"
-version = "1.3.0"
-dependencies = [
- "tokio",
- "windows-service 0.8.1",
 ]
 
 [[package]]

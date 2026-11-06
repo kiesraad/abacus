@@ -14,6 +14,7 @@ pub use apportionment::{
 pub use committee_session::{
     CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData, FileAuditData,
     change_committee_session_status, delete_committee_session_files,
+    validate_committee_session_is_current_committee_session,
 };
 #[cfg(test)]
 pub use data_entry::create_definitive_data_entry;

@@ -30,7 +30,11 @@ import {
   spyOnHandler,
 } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser, getTypistUser } from "@/testing/user-mock-data";
-import type { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
+import {
+  committeeSessionStatusValues,
+  type ElectionDetailsResponse,
+  type ErrorResponse,
+} from "@/types/generated/openapi";
 import { electionStatusRoutes } from "../routes";
 
 const navigate = vi.fn();
@@ -491,6 +495,41 @@ describe("ElectionStatusPage", () => {
     await waitFor(() => {
       expect(window.location.hash).toEqual("#item-table-not-started");
     });
+  });
+
+  test.each(
+    committeeSessionStatusValues.flatMap((status) => [
+      {
+        status,
+        useUserReturn: getCoordinatorUser(),
+        isClickable: ["data_entry", "paused", "completed"].includes(status),
+      },
+      { status, useUserReturn: getAdminUser(), isClickable: false },
+    ]),
+  )("Table row clickable is $isClickable for $useUserReturn.role when committee session status is $status", async ({
+    status,
+    useUserReturn,
+    isClickable,
+  }) => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(useUserReturn);
+    const user = userEvent.setup();
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(getElectionMockData({}, { status }) satisfies ElectionDetailsResponse, {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage(1);
+
+    await user.click(await screen.findByRole("row", { name: /Testplek/ }));
+
+    if (isClickable) {
+      expect(navigate).toHaveBeenCalledWith("./2/detail");
+    } else {
+      expect(navigate).not.toHaveBeenCalled();
+    }
   });
 
   test("Refetches data every 30 seconds", async () => {

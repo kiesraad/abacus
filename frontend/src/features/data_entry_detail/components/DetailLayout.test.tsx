@@ -8,6 +8,7 @@ import {
   dataEntryHasWarningsGetMockResponse,
   dataEntryValidGetMockResponse,
 } from "@/testing/api-mocks/DataEntryMockData";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   DataEntryGetHandler,
   DataEntryResetHandler,
@@ -106,6 +107,20 @@ describe("DetailLayout", () => {
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("/elections/1/status", { replace: true });
     });
+  });
+
+  test("Delete confirmation warns about deleted documents when committee session is completed", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
+    overrideOnce("get", "/api/data_entries/5/get", 200, dataEntryValidGetMockResponse);
+    const user = userEvent.setup();
+
+    renderLayout();
+
+    await user.click(await screen.findByRole("button", { name: "Invoer verwijderen" }));
+
+    expect(await screen.findByTestId("modal-dialog")).toHaveTextContent(
+      "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Let op: het proces-verbaal en andere documenten van deze zitting worden ook verwijderd en kunnen niet meer uit Abacus worden gedownload. Deze actie kan niet worden teruggedraaid.",
+    );
   });
 
   test("Does not render delete data entry button when first entry has errors", () => {

@@ -15,6 +15,9 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
 jobs:
   build-frontend:
     name: Build production frontend (on linux only)
@@ -47,6 +50,10 @@ jobs:
 
   build:
     name: Build
+    permissions:
+      contents: read
+      attestations: write
+      id-token: write
     needs:
       - build-frontend
     strategy:

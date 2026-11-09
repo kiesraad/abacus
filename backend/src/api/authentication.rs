@@ -21,7 +21,7 @@ use crate::{
             password::{ValidatedPassword, hash_password},
             ratelimit::LoginRateLimit,
         },
-        user::ValidateUserRequest,
+        user::{MAX_NAME_LENGTH, ValidateUserRequest},
     },
     domain::role::Role,
     error::ErrorReference,
@@ -67,6 +67,15 @@ pub struct UserLoginFailedAuditData {
 impl AsAuditEvent for UserLoginFailedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::UserLoginFailed;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Warning;
+}
+
+const MAX_USER_AGENT_LENGTH: usize = 512;
+
+fn truncate_chars(mut s: String, max_chars: usize) -> String {
+    if let Some((idx, _)) = s.char_indices().nth(max_chars) {
+        s.truncate(idx);
+    }
+    s
 }
 
 #[derive(Serialize)]
@@ -223,8 +232,8 @@ async fn login(
                 .log(
                     &mut tx,
                     &UserLoginFailedAuditData {
-                        username,
-                        user_agent: user_agent.clone(),
+                        username: truncate_chars(username, MAX_NAME_LENGTH),
+                        user_agent: truncate_chars(user_agent.clone(), MAX_USER_AGENT_LENGTH),
                     },
                     None,
                 )
@@ -260,7 +269,7 @@ async fn login(
         .log(
             &mut tx,
             &UserLoggedInAuditData {
-                user_agent: user_agent.to_string(),
+                user_agent: truncate_chars(user_agent.to_string(), MAX_USER_AGENT_LENGTH),
                 logged_in_users_count,
             },
             None,
@@ -596,6 +605,35 @@ mod tests {
         api::middleware::authentication::password::hash_test_password,
         repository::user_repo::update_last_activity_at,
     };
+
+    #[test(sqlx::test)]
+    async fn test_login_failed_audit_truncation(pool: SqlitePool) {
+        let result = login(
+            State(pool.clone()),
+            State(LoginRateLimit::default()),
+            ConnectInfo(SocketAddr::from(([127, 0, 0, 1], 1234))),
+            CookieJar::new(),
+            AuditService::new(None, None),
+            Some(TypedHeader("x".repeat(1000).parse().unwrap())),
+            Json(Credentials {
+                username: "é".repeat(1000),
+                password: "wrong_password".to_string(),
+            }),
+        )
+        .await;
+        assert!(result.is_err());
+
+        let mut conn = pool.acquire().await.unwrap();
+        let events = crate::audit_log::list_all(&mut conn).await.unwrap();
+        assert_eq!(events.len(), 1);
+        assert_eq!(
+            *events[0].event(),
+            serde_json::json!({
+                "username": "é".repeat(MAX_NAME_LENGTH),
+                "user_agent": "x".repeat(MAX_USER_AGENT_LENGTH),
+            })
+        );
+    }
 
     #[test(tokio::test)]
     async fn test_set_default_cookie_properties() {

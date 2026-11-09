@@ -3,13 +3,14 @@ import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
+  DataEntryClaimHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { expectErrorPage, expectNotFound, setupTestRouter } from "@/testing/test-utils";
+import { expectErrorPage, expectNotFound, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
 import type { DATA_ENTRY_CLAIM_REQUEST_PATH, ErrorResponse, Role } from "@/types/generated/openapi";
 import { routes } from "./routes";
 
@@ -25,7 +26,7 @@ const renderWithRouter = (userRole: Role | null = null) => {
 
 describe("routes", () => {
   beforeEach(() => {
-    server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
+    server.use(DataEntryClaimHandler, ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
 
     // error is expected
     vi.spyOn(console, "error").mockImplementation(() => {});
@@ -73,13 +74,14 @@ describe("routes", () => {
   });
 
   test("Not found if data entry does not belong to current committee session", async () => {
-    const fetchSpy = vi.spyOn(global, "fetch");
+    const claim = spyOnHandler(DataEntryClaimHandler);
 
     // Data entry 9876 is not in the status list of election 1
     const router = renderWithRouter("typist_gsb");
     await router.navigate("/elections/1/data-entry/9876/1");
+
     await expectNotFound();
-    expect(fetchSpy).not.toHaveBeenCalledWith(expect.stringContaining("/claim"), expect.anything());
+    expect(claim).not.toHaveBeenCalled();
   });
 
   test("Non existing entry number results in not found page", async () => {

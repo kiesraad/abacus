@@ -34,18 +34,13 @@ jobs:
           echo "BUILD_DATE=$BUILD_DATE" >> "$GITHUB_ENV"
       - name: Create release directory
         run: mkdir -p release
-      # The Linux tarball and the Windows binary
+      # The Linux tarball, the Windows binary and the unsigned Windows installer
       - name: Download abacus
         uses: actions/download-artifact@v8
         with:
           pattern: abacus-release-*
           path: release/
           merge-multiple: true
-      - name: Download unsigned Windows installer
-        uses: actions/download-artifact@v8
-        with:
-          name: abacus-windows-installer
-          path: release/
       - name: Rename Windows binary and installer
         run: |
           mv abacus.exe abacus-windows-${{ github.ref_name }}.exe

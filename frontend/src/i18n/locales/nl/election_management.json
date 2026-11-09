@@ -93,6 +93,11 @@
     "enter_details_button": "Details invullen",
     "title": "Vul eerst de details van de zitting in"
   },
+  "missing_polling_stations_modal": {
+    "add_polling_stations_button": "Stembureaus toevoegen",
+    "content": "In deze download zit voor elk onderliggend stembureau een proces-verbaal met de gegevens van dat stembureau al ingevuld. Voeg daarom eerst de onderliggende stembureaus toe.",
+    "title": "Voeg eerst stembureaus toe"
+  },
   "no_polling_stations": "Geen stembureaus",
   "only_add_if_ordered": "Voeg alleen een nieuwe zitting toe als het centraal stembureau hier opdracht voor heeft gegeven.",
   "prepare_new_session": "Nieuwe zitting voorbereiden",

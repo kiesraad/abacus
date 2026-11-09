@@ -6,12 +6,16 @@ use axum::{
 };
 use tracing::error;
 
-use crate::{AppError, ErrorResponse, error::ErrorReference, service::SubCommitteeServiceError};
+use crate::{
+    AppError, ErrorResponse, error::ErrorReference, repository::common::DatabaseError,
+    service::SubCommitteeServiceError,
+};
 
 #[derive(Debug)]
 pub enum GenerateError {
-    DatabaseError(sqlx::Error),
-    UnsupportedError(String),
+    Database(sqlx::Error),
+    DataIntegrity(String),
+    Unsupported(String),
 }
 
 impl std::error::Error for GenerateError {}
@@ -19,28 +23,43 @@ impl std::error::Error for GenerateError {}
 impl Display for GenerateError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            GenerateError::DatabaseError(e) => write!(f, "{}", e),
-            GenerateError::UnsupportedError(e) => write!(f, "{}", e),
+            GenerateError::Database(e) => write!(f, "{}", e),
+            GenerateError::DataIntegrity(e) => write!(f, "{}", e),
+            GenerateError::Unsupported(e) => write!(f, "{}", e),
         }
     }
 }
 
 impl GenerateError {
     pub(crate) fn unsupported(msg: impl Into<String>) -> Self {
-        Self::UnsupportedError(msg.into())
+        Self::Unsupported(msg.into())
     }
 }
 
 impl From<sqlx::Error> for GenerateError {
     fn from(err: sqlx::Error) -> Self {
-        GenerateError::DatabaseError(err)
+        GenerateError::Database(err)
+    }
+}
+
+impl From<DatabaseError> for GenerateError {
+    fn from(err: DatabaseError) -> Self {
+        match err {
+            DatabaseError::Sqlx(e) => GenerateError::Database(e),
+            DatabaseError::DataEntryAlreadyLinked => {
+                GenerateError::DataIntegrity(String::from("Data entry already linked"))
+            }
+            DatabaseError::InvestigationIntegrityError => {
+                GenerateError::DataIntegrity(String::from("Investigation integrity error"))
+            }
+        }
     }
 }
 
 impl From<SubCommitteeServiceError> for GenerateError {
     fn from(err: SubCommitteeServiceError) -> Self {
         match err {
-            SubCommitteeServiceError::DatabaseError(e) => GenerateError::DatabaseError(e),
+            SubCommitteeServiceError::DatabaseError(e) => GenerateError::Database(e),
         }
     }
 }
@@ -49,8 +68,9 @@ impl From<SubCommitteeServiceError> for GenerateError {
 impl From<GenerateError> for AppError {
     fn from(err: GenerateError) -> Self {
         match err {
-            GenerateError::DatabaseError(e) => AppError::Database(e),
-            GenerateError::UnsupportedError(msg) => AppError::StdError(msg),
+            GenerateError::Database(e) => AppError::Database(e),
+            GenerateError::DataIntegrity(msg) => AppError::DataIntegrity(msg),
+            GenerateError::Unsupported(msg) => AppError::StdError(msg),
         }
     }
 }

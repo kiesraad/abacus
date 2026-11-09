@@ -30,7 +30,11 @@ import {
   spyOnHandler,
 } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser, getTypistUser } from "@/testing/user-mock-data";
-import type { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
+import {
+  committeeSessionStatusValues,
+  type ElectionDetailsResponse,
+  type ErrorResponse,
+} from "@/types/generated/openapi";
 import { electionStatusRoutes } from "../routes";
 
 const navigate = vi.fn();
@@ -90,7 +94,8 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
-    // Test that the data entry completed and data entry paused alerts don't exist
+    // Test that the data entry started, data entry completed and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
@@ -98,6 +103,7 @@ describe("ElectionStatusPage", () => {
 
     expect(await screen.findByText("Zitting voorbereiden")).toBeVisible();
 
+    // Test going to polling stations page
     const pollingStationsButton = screen.getByRole("button", { name: "Stembureaus" });
     expect(pollingStationsButton).toBeVisible();
 
@@ -120,12 +126,14 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
-    // Test that the data entry completed and data entry paused alerts don't exist
+    // Test that the data entry started, data entry completed and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
+    // Test starting data entry
     expect(await screen.findByText("Klaar voor invoer")).toBeVisible();
     const startLink = screen.getByRole("button", { name: "Starten" });
     expect(startLink).toBeVisible();
@@ -148,7 +156,8 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
-    // Test that the data entry completed and data entry paused alerts don't exist
+    // Test that the data entry started, data entry completed and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
@@ -165,12 +174,14 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
-    // Test that the data entry completed and data entry paused alerts don't exist
+    // Test that the data entry started, data entry completed and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
+    // Test pausing data entry
     const data_entry_labels = await screen.findAllByText("Invoer bezig");
     expect(data_entry_labels.length).toBe(2);
     const pauseLink = screen.getByRole("button", { name: "Pauzeren" });
@@ -202,7 +213,8 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
-    // Test that the data entry completed and data entry paused alerts don't exist
+    // Test that the data entry started, data entry completed and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
@@ -213,7 +225,66 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByRole("button", { name: "Pauzeren" })).not.toBeInTheDocument();
   });
 
-  test("Finish input alert visible when data entry has completed for coordinator", async () => {
+  test("Page render when data entry started but all data entries empty for coordinator", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
+    const user = userEvent.setup();
+    server.use(
+      http.get("/api/elections/1/status", () =>
+        HttpResponse.json(getElectionStatusMockData([{ status: "empty" }, { status: "empty" }]), {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage(1);
+
+    // Test that the data entry completed and data entry paused alerts don't exist
+    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
+
+    // Test that the data entry started alert is visible
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase gestart");
+    expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+      "Invoerders kunnen nu processen-verbaal invoeren. Hieronder zie je hun voortgang.",
+    );
+    const closeButton = within(alert).getByRole("button", { name: "Melding sluiten" });
+    expect(closeButton).toBeVisible();
+    await user.click(closeButton);
+
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
+  });
+
+  test("Page render for next committee session for coordinator", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(getElectionMockData({}, { number: 2 }) satisfies ElectionDetailsResponse, {
+          status: 200,
+        }),
+      ),
+    );
+    server.use(
+      http.get("/api/elections/1/status", () =>
+        HttpResponse.json(getElectionStatusMockData([{ status: "empty" }, { status: "empty" }]), {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage(1);
+
+    // Test that the data entry started and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
+    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
+  });
+
+  test("Page render when data entry has completed for coordinator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     server.use(
@@ -226,10 +297,12 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
-    // Test that the data entry paused alert doesn't exist
+    // Test that the data entry started and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
+    // Test that the data entry completed alert is visible
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
     expect(
       await screen.findByText(
@@ -267,7 +340,7 @@ describe("ElectionStatusPage", () => {
     vi.useRealTimers();
   });
 
-  test("Finish input alert not visible when data entry has completed for administrator", async () => {
+  test("Page render when data entry has completed for administrator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
     overrideOnce(
       "get",
@@ -278,14 +351,15 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
-    // Test that the data entry completed and data entry paused alerts don't exist
+    // Test that the data entry started, data entry completed and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
   });
 
-  test("Finish input alert visible when data entry has completed and data entry is paused for coordinator", async () => {
+  test("Page render when data entry has completed and data entry is paused for coordinator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     server.use(
@@ -305,8 +379,12 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
+    // Test that the data entry started and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
+
+    // Test that the data entry completed alert is visible
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
     const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
     expect(finishButton).toBeVisible();
@@ -330,8 +408,12 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
+    // Test that the data entry started and data entry completed alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
+
+    // Test that the data entry paused alert is visible
     expect(await screen.findByText("Het invoeren van stemmen is gepauzeerd")).toBeVisible();
     const resumeButton = screen.getByRole("button", { name: "Invoer hervatten" });
     expect(resumeButton).toBeVisible();
@@ -363,7 +445,8 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
-    // Test that the data entry completed and data entry paused alerts don't exist
+    // Test that the data entry started, data entry completed and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
@@ -394,7 +477,8 @@ describe("ElectionStatusPage", () => {
 
     await renderPage(1);
 
-    // Test that the data entry completed and data entry paused alerts don't exist
+    // Test that the data entry started, data entry completed and data entry paused alerts don't exist
+    expect(screen.queryByText("Invoerfase gestart")).not.toBeInTheDocument();
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
@@ -493,6 +577,41 @@ describe("ElectionStatusPage", () => {
     });
   });
 
+  test.each(
+    committeeSessionStatusValues.flatMap((status) => [
+      {
+        status,
+        useUserReturn: getCoordinatorUser(),
+        isClickable: ["data_entry", "paused", "completed"].includes(status),
+      },
+      { status, useUserReturn: getAdminUser(), isClickable: false },
+    ]),
+  )("Table row clickable is $isClickable for $useUserReturn.role when committee session status is $status", async ({
+    status,
+    useUserReturn,
+    isClickable,
+  }) => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(useUserReturn);
+    const user = userEvent.setup();
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(getElectionMockData({}, { status }) satisfies ElectionDetailsResponse, {
+          status: 200,
+        }),
+      ),
+    );
+
+    await renderPage(1);
+
+    await user.click(await screen.findByRole("row", { name: /Testplek/ }));
+
+    if (isClickable) {
+      expect(navigate).toHaveBeenCalledWith("./2/detail");
+    } else {
+      expect(navigate).not.toHaveBeenCalled();
+    }
+  });
+
   test("Refetches data every 30 seconds", async () => {
     vi.useFakeTimers();
     await renderPage(1);
@@ -519,7 +638,7 @@ describe("ElectionStatusPage", () => {
   });
 
   describe("CSB", () => {
-    test("Finish input alert visible when data entry has completed for coordinator", async () => {
+    test("Page render when data entry has completed for coordinator", async () => {
       vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser("csb"));
       const user = userEvent.setup();
       server.use(CSBElectionRequestHandler);
@@ -537,6 +656,7 @@ describe("ElectionStatusPage", () => {
       expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
+      // Test that the data entry completed alert is visible
       expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
       expect(
         await screen.findByText(

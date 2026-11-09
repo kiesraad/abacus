@@ -16,6 +16,8 @@ pub enum AppError {
     DatabaseBusy(String),
     DatabaseReadOnly(String),
     DatabaseDiskFull(String),
+    // integrity
+    DataIntegrity(String),
 }
 
 impl std::error::Error for AppError {}
@@ -139,6 +141,7 @@ impl std::fmt::Display for AppError {
                     "Cannot write to the database file \"{file}\". Please check file permissions."
                 )
             }
+            AppError::DataIntegrity(msg) => write!(f, "Data integrity error: {}", msg),
             AppError::PortAlreadyInUse(port) => {
                 write!(f, "Port {port} is in use. Is Abacus already running?")
             }

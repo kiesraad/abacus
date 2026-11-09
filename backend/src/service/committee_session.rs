@@ -10,6 +10,7 @@ use crate::{
         election::{CommitteeCategory, ElectionId},
         file::{File, FileId},
     },
+    error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{committee_session_repo, file_repo},
     service::update_apportionment_state,
@@ -72,6 +73,25 @@ pub struct FileDeletedAuditData(pub FileAuditData);
 impl AsAuditEvent for FileDeletedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::FileDeleted;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
+
+pub async fn validate_committee_session_is_current_committee_session(
+    conn: &mut SqliteConnection,
+    election_id: ElectionId,
+    committee_session_id: CommitteeSessionId,
+) -> Result<CommitteeSession, APIError> {
+    // Get current committee session and check if the committee session id given
+    // matches the current committee session id, return NOT_FOUND otherwise
+    let current_committee_session =
+        committee_session_repo::get_election_committee_session(conn, election_id).await?;
+    if committee_session_id != current_committee_session.id {
+        Err(APIError::NotFound(
+            "Committee session is not current committee session".to_string(),
+            ErrorReference::EntryNotFound,
+        ))
+    } else {
+        Ok(current_committee_session)
+    }
 }
 
 pub async fn change_committee_session_status(

@@ -1,6 +1,6 @@
 pub mod apportionment_state_repo;
 pub mod committee_session_repo;
-mod common;
+pub mod common;
 pub mod data_entry_repo;
 pub mod election_repo;
 pub mod file_repo;

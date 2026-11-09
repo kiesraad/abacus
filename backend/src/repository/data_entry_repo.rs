@@ -17,7 +17,10 @@ use crate::{
     },
     repository::{
         committee_session_repo,
-        common::{PollingStationRow, PollingStationRowLike, SubCommitteeRow, SubCommitteeRowLike},
+        common::{
+            DatabaseError, PollingStationRow, PollingStationRowLike, SubCommitteeRow,
+            SubCommitteeRowLike,
+        },
         election_repo, polling_station_repo, sub_committee_repo,
     },
 };
@@ -97,10 +100,10 @@ pub async fn update(
     .await
 }
 
-async fn try_fetch_polling_station_for_source(
+async fn try_fetch_polling_station_row(
     tx: &mut SqliteConnection,
     data_entry_id: DataEntryId,
-) -> Result<Option<DataEntrySource>, sqlx::Error> {
+) -> Result<Option<PollingStationRow>, sqlx::Error> {
     query_as!(
         PollingStationRow,
         r#"
@@ -124,7 +127,6 @@ async fn try_fetch_polling_station_for_source(
         "#,
         data_entry_id
     )
-    .map(PollingStationRow::into_polling_station_data_source)
     .fetch_optional(&mut *tx)
     .await
 }
@@ -161,15 +163,12 @@ async fn try_fetch_sub_committee_for_source(
 pub async fn resolve_source(
     conn: &mut SqliteConnection,
     data_entry_id: DataEntryId,
-) -> Result<DataEntrySourceContext, sqlx::Error> {
+) -> Result<DataEntrySourceContext, DatabaseError> {
     let mut tx = conn.begin().await?;
 
-    let ps = try_fetch_polling_station_for_source(&mut tx, data_entry_id).await?;
-
-    let source = if let Some(ps) = ps {
-        ps
-    } else {
-        try_fetch_sub_committee_for_source(&mut tx, data_entry_id).await?
+    let source = match try_fetch_polling_station_row(&mut tx, data_entry_id).await? {
+        Some(row) => row.into_polling_station_data_source()?,
+        None => try_fetch_sub_committee_for_source(&mut tx, data_entry_id).await?,
     };
     let committee_session =
         committee_session_repo::get(&mut tx, source.committee_session_id()).await?;
@@ -233,7 +232,7 @@ pub async fn has_any(
 async fn list_results_for_gsb_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<Vec<(DataEntrySource, Results)>, sqlx::Error> {
+) -> Result<Vec<(DataEntrySource, Results)>, DatabaseError> {
     let polling_stations: HashMap<_, _> =
         polling_station_repo::list_for_session(conn, committee_session_id)
             .await?
@@ -277,7 +276,7 @@ async fn list_results_for_gsb_committee_session(
         .await?;
 
     if results.len() != polling_stations.len() {
-        return Err(sqlx::Error::RowNotFound);
+        return Err(sqlx::Error::RowNotFound.into());
     }
 
     Ok(results)
@@ -329,7 +328,7 @@ async fn list_results_for_csb_committee_session(
 pub async fn list_results_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<Vec<(DataEntrySource, Results)>, sqlx::Error> {
+) -> Result<Vec<(DataEntrySource, Results)>, DatabaseError> {
     let mut tx = conn.begin().await?;
 
     let committee_session = committee_session_repo::get(&mut tx, committee_session_id).await?;
@@ -352,7 +351,7 @@ pub async fn list_results_for_committee_session(
 pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<CommonPollingStationResults, sqlx::Error> {
+) -> Result<CommonPollingStationResults, DatabaseError> {
     let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let prev_data_entry_id = polling_station
         .prev_data_entry_id()
@@ -374,7 +373,7 @@ pub async fn previous_results_for_polling_station(
         Some(Results::DSOFirstSession(results)) => Ok(results.as_common()),
         Some(Results::CSONextSession(results)) => Ok(results.as_common()),
         Some(Results::DSONextSession(results)) => Ok(results.as_common()),
-        _ => Err(sqlx::Error::RowNotFound),
+        _ => Err(sqlx::Error::RowNotFound.into()),
     }
 }
 
@@ -558,7 +557,10 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(
+                results.unwrap_err(),
+                DatabaseError::Sqlx(sqlx::Error::RowNotFound)
+            ));
         }
 
         /// Test with 4th session, one polling station with investigation, but no corrected results
@@ -570,9 +572,7 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(704);
 
-            create_test_investigation(&mut conn, PollingStationId::from(741), Some(false))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, PollingStationId::from(741), Some(false)).await;
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id)
                 .await
@@ -602,9 +602,7 @@ mod tests {
             let committee_session_id = CommitteeSessionId::from(704);
             let polling_station_id = PollingStationId::from(741);
 
-            create_test_investigation(&mut conn, polling_station_id, Some(true))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, polling_station_id, Some(true)).await;
 
             create_definitive_data_entry(&mut conn, polling_station_id, &create_test_results(10))
                 .await
@@ -637,13 +635,14 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(704);
 
-            create_test_investigation(&mut conn, PollingStationId::from(741), Some(true))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, PollingStationId::from(741), Some(true)).await;
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(
+                results.unwrap_err(),
+                DatabaseError::Sqlx(sqlx::Error::RowNotFound)
+            ));
         }
 
         /// Test with 4th session, new polling station with no investigation (error)
@@ -668,7 +667,10 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(
+                results.unwrap_err(),
+                DatabaseError::Sqlx(sqlx::Error::RowNotFound)
+            ));
         }
 
         /// Test with 4th session, new polling station with investigation, but no corrected results (error)
@@ -693,13 +695,14 @@ mod tests {
             .await
             .unwrap();
 
-            create_test_investigation(&mut conn, new_polling_station_id, Some(false))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, new_polling_station_id, Some(false)).await;
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(
+                results.unwrap_err(),
+                DatabaseError::Sqlx(sqlx::Error::RowNotFound)
+            ));
         }
 
         /// Test with 4th session, new polling station with investigation, corrected results=true and results exist
@@ -724,9 +727,7 @@ mod tests {
             .await
             .unwrap();
 
-            create_test_investigation(&mut conn, new_polling_station_id, Some(true))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, new_polling_station_id, Some(true)).await;
 
             create_definitive_data_entry(
                 &mut conn,
@@ -782,13 +783,14 @@ mod tests {
             .await
             .unwrap();
 
-            create_test_investigation(&mut conn, new_polling_station_id, Some(true))
-                .await
-                .unwrap();
+            create_test_investigation(&mut conn, new_polling_station_id, Some(true)).await;
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(
+                results.unwrap_err(),
+                DatabaseError::Sqlx(sqlx::Error::RowNotFound)
+            ));
         }
 
         /// Test with 4th session, new polling station with investigation, corrected results=true and results exist in 3rd session
@@ -903,7 +905,10 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(
+                results.unwrap_err(),
+                DatabaseError::Sqlx(sqlx::Error::RowNotFound)
+            ));
         }
     }
 
@@ -1291,7 +1296,10 @@ mod tests {
 
         let results = previous_results_for_polling_station(&mut conn, polling_station_id).await;
         assert!(results.is_err());
-        assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+        assert!(matches!(
+            results.unwrap_err(),
+            DatabaseError::Sqlx(sqlx::Error::RowNotFound)
+        ));
     }
 
     #[test(sqlx::test(fixtures(

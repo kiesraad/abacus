@@ -24,7 +24,7 @@ export function DetailLayout() {
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
   const dataEntryId = useNumericParam("dataEntryId");
-  const { election } = useElection();
+  const { currentCommitteeSession, election } = useElection();
   const { loading, dataEntry } = useDataEntryErrors(dataEntryId);
   const [error, setError] = useState<AnyApiError>();
   const user = useUser();
@@ -76,6 +76,7 @@ export function DetailLayout() {
               dataEntrySource={dataEntry.source}
               dataEntryId={dataEntryId}
               status={dataEntry.status}
+              committeeSessionStatus={currentCommitteeSession.status}
               onDeleted={handleDeleted}
               onError={setError}
             />

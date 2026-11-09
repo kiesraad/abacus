@@ -10,7 +10,7 @@
 #show: doc => conf(
   doc,
   header-left: [
-    Bijlage 1
+    Bijlage 1 \ #input.election.official_name
   ],
   header-right: [
     #location_name \

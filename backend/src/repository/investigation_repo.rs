@@ -5,7 +5,7 @@ use crate::{
         committee_session::CommitteeSessionId, investigation::InvestigationStatus,
         polling_station::PollingStationId,
     },
-    repository::polling_station_repo::CreateDataEntryError,
+    repository::common::DatabaseError,
 };
 
 pub async fn save(
@@ -55,7 +55,7 @@ pub async fn create(
 pub async fn get(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<Option<InvestigationStatus>, sqlx::Error> {
+) -> Result<Option<InvestigationStatus>, DatabaseError> {
     let row = query!(
         r#"SELECT
             investigation_state,
@@ -66,15 +66,10 @@ pub async fn get(
     .fetch_one(conn)
     .await?;
 
-    Ok(row.investigation_state.map(|json| {
-        let status = json.0;
-        match (&status, row.data_entry_id) {
-            (InvestigationStatus::ConcludedWithNewResults(_), Some(id)) => {
-                status.with_data_entry_id(id)
-            }
-            _ => status,
-        }
-    }))
+    Ok(InvestigationStatus::from_state_and_data_entry_id(
+        row.investigation_state.clone().map(Json::into_inner),
+        row.data_entry_id,
+    )?)
 }
 
 /// Delete the investigation for a given polling station.
@@ -82,7 +77,7 @@ pub async fn get(
 pub async fn delete(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<(), CreateDataEntryError> {
+) -> Result<(), DatabaseError> {
     let row = query!(
         "SELECT data_entry_id FROM polling_stations WHERE id = ?",
         polling_station_id,
@@ -91,7 +86,7 @@ pub async fn delete(
     .await?;
 
     if row.data_entry_id.is_some() {
-        return Err(CreateDataEntryError::DataEntryAlreadyLinked);
+        return Err(DatabaseError::DataEntryAlreadyLinked);
     }
 
     query!(
@@ -167,7 +162,7 @@ mod tests {
 
         assert!(matches!(
             delete(&mut conn, polling_station_id).await,
-            Err(CreateDataEntryError::DataEntryAlreadyLinked)
+            Err(DatabaseError::DataEntryAlreadyLinked)
         ));
     }
 
@@ -177,7 +172,7 @@ mod tests {
 
         assert!(matches!(
             delete(&mut conn, PollingStationId::from(999_999)).await,
-            Err(CreateDataEntryError::Sqlx(sqlx::Error::RowNotFound))
+            Err(DatabaseError::Sqlx(sqlx::Error::RowNotFound))
         ));
     }
 }

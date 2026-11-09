@@ -1,5 +1,7 @@
 {
   "data_entry_is_paused": "Het invoeren van stemmen is gepauzeerd",
+  "data_entry_started": "Invoerfase gestart",
+  "data_entry_started_explanation": "Invoerders kunnen nu processen-verbaal invoeren. Hieronder zie je hun voortgang.",
   "definitive": {
     "title": "Alle stembureaus zijn twee keer ingevoerd",
     "message": {

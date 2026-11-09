@@ -44,7 +44,7 @@ jobs:
       - name: Rename Windows binary and installer
         run: |
           mv abacus.exe abacus-windows-${{ github.ref_name }}.exe
-          mv abacussetup.exe abacussetup-${{ github.ref_name }}-unsigned.exe
+          mv abacussetup.exe abacus-windows-setup-${{ github.ref_name }}-unsigned.exe
         working-directory: release
       - name: Create a SHA256SUMS file
         run: sha256sum -b -- * > SHA256SUMS

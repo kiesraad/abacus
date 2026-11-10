@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 
-import { type AnyApiError, isSuccess } from "@/api/ApiResult";
+import { type AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
@@ -69,7 +69,7 @@ export function useDataEntryDifferences(
   afterSave: (status: DataEntryStatusName, outcome: ResolveOutcome) => void,
 ): DataEntryDifferences {
   const client = useApiClient();
-  const { election } = useElection();
+  const { currentCommitteeSession, election } = useElection();
   const [correctEntry, setCorrectEntryAnswer] = useState<CorrectEntry>();
   const [wrongEntryAction, setWrongEntryAction] = useState<WrongEntryAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
@@ -89,11 +89,12 @@ export function useDataEntryDifferences(
     throw requestState.error;
   }
 
-  let differences = null;
-  let dataEntryStructure = null;
-  if (requestState.status === "success") {
-    differences = requestState.data;
-    dataEntryStructure = getDataEntryStructure(differences.first_entry.model, election);
+  const differences = requestState.status === "success" ? requestState.data : null;
+  const dataEntryStructure = differences ? getDataEntryStructure(differences.first_entry.model, election) : null;
+
+  // Make sure the data entry belongs to the current committee session
+  if (differences && differences.source.committee_session_id !== currentCommitteeSession.id) {
+    throw new NotFoundError();
   }
 
   const correctionBlocked = isCorrectionBlocked(correctEntry, differences);

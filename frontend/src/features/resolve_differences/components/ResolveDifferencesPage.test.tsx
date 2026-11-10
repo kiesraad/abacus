@@ -19,25 +19,27 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { screen, spyOnHandler } from "@/testing/test-utils";
+import { render as renderWithRouter, screen, spyOnHandler } from "@/testing/test-utils";
 import type { DataEntryStatusName } from "@/types/generated/openapi";
 
 import { ResolveDifferencesPage } from "./ResolveDifferencesPage";
 
 const navigate = vi.fn();
 
+const page = (
+  <TestUserProvider userRole="coordinator_gsb">
+    <ElectionProvider electionId={1}>
+      <ElectionStatusProvider electionId={1}>
+        <UsersProvider>
+          <ResolveDifferencesPage />
+        </UsersProvider>
+      </ElectionStatusProvider>
+    </ElectionProvider>
+  </TestUserProvider>
+);
+
 const renderPage = async () => {
-  render(
-    <TestUserProvider userRole="coordinator_gsb">
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <UsersProvider>
-            <ResolveDifferencesPage />
-          </UsersProvider>
-        </ElectionStatusProvider>
-      </ElectionProvider>
-    </TestUserProvider>,
-  );
+  render(page);
   expect(await screen.findByRole("table")).toBeInTheDocument();
 };
 
@@ -101,6 +103,21 @@ describe("ResolveDifferencesPage", () => {
       await screen.findByRole("radio", { name: "Verschillen laten herstellen door de oorspronkelijke invoerder" }),
     ).toBeDisabled();
     expect(await screen.findByRole("radio", { name: "Hele proces-verbaal opnieuw laten invoeren" })).toBeDisabled();
+  });
+
+  test("should show not found if data entry does not belong to current committee session", async () => {
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    overrideOnce("get", "/api/data_entries/3/resolve_differences", 200, {
+      ...dataEntryStatusDifferences,
+      source: { ...dataEntryStatusDifferences.source, committee_session_id: 2 },
+    });
+
+    renderWithRouter(page);
+
+    expect(await screen.findByText("Error thrown during render: error.not_found")).toBeVisible();
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
 
   test("should show the selection in the table", async () => {

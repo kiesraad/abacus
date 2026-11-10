@@ -11,7 +11,7 @@
 #show: doc => conf(
   doc,
   header-left: [
-    Controles en correcties
+    Controles en correcties \ #input.election.official_name
   ],
   header-right: header-right,
   footer: [

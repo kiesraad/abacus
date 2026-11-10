@@ -31,7 +31,7 @@ export const CSO: Story = {
     await expect(firstListItems[0]!).toHaveTextContent("Download het corrigendum en druk het af.");
     await expect(firstListItems[1]!).toHaveTextContent(
       [
-        'Tip: print alleen het onderdeel "B1 - 1 Aanleiding en opdracht onderzoek".',
+        "Tip: print alleen B1 - 1 Aanleiding en opdracht onderzoek.",
         "Druk de rest pas af als uit het onderzoek blijkt dat een hertelling moet worden gedaan.",
       ].join(" "),
     );
@@ -65,7 +65,7 @@ export const DSO: Story = {
     await expect(firstListItems[0]!).toHaveTextContent("Download het corrigendum en druk het af.");
     await expect(firstListItems[1]!).toHaveTextContent(
       [
-        'Tip: print alleen het onderdeel "1. Onderzoek naar telresultaten".',
+        "Tip: print alleen 1. Onderzoek naar telresultaten.",
         "Druk de rest pas af als uit het onderzoek blijkt dat een hertelling moet worden gedaan.",
       ].join(" "),
     );

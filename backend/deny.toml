@@ -38,12 +38,16 @@ multiple-versions = "allow"
 [advisories]
 yanked = "deny"
 ignore = [
-    { id = "RUSTSEC-2024-0320", reason = "yaml-rust is transitively used by Typst, see https://github.com/trishume/syntect/issues/537" },
-    { id = "RUSTSEC-2024-0436", reason = "paste is transitively used by Typst (biblatex, https://github.com/typst/biblatex/issues/87) and by utoipa-axum; unmaintained but no vulnerability" },
-    { id = "RUSTSEC-2024-0449", reason = "unsafe-libyaml is transitively used by Typst and will be replaced in a future release, see https://github.com/typst/hayagriva/pull/502; unmaintained but no vulnerability" },
-    { id = "RUSTSEC-2025-0141", reason = "bincode is used by Typst, see https://github.com/trishume/syntect/issues/606" },
-    { id = "RUSTSEC-2026-0192", reason = "ttf-parser is unmaintained; Typst does not have a fix, see https://github.com/kiesraad/abacus/issues/3849 for direct usage" },
-    { id = "RUSTSEC-2026-0194", reason = "quick-xml <0.41 DoS (quadratic duplicate-attribute check) pulled transitively by Typst (citationberg, plist); no release depending on quick-xml >=0.41 available upstream yet, see https://github.com/tafia/quick-xml/issues/969" },
-    { id = "RUSTSEC-2026-0195", reason = "quick-xml <0.41 DoS (unbounded namespace-declaration allocation) pulled transitively by Typst (citationberg, plist); no release depending on quick-xml >=0.41 available upstream yet, see https://github.com/tafia/quick-xml/issues/969" },
-    { id = "RUSTSEC-2026-0206", reason = "rustybuzz is unmaintained (maintainer recommends harfrust); pulled transitively by Typst; no migration available upstream yet, see https://github.com/harfbuzz/rustybuzz/issues/166" },
+    # Typst
+    { id = "RUSTSEC-2024-0320", reason = "yaml-rust is unmaintained, used via syntect; fixed on syntect main (yaml-rust2), not released yet, see https://github.com/trishume/syntect/issues/537" },
+    { id = "RUSTSEC-2024-0436", reason = "paste is unmaintained, used via biblatex and hayagriva; no fix upstream yet, see https://github.com/typst/biblatex/issues/87" },
+    { id = "RUSTSEC-2024-0449", reason = "unsafe-libyaml is unmaintained, used via serde_yaml (hayagriva, typst-library); fixed on hayagriva main, not released yet, see https://github.com/typst/hayagriva/pull/502" },
+    { id = "RUSTSEC-2025-0141", reason = "bincode is unmaintained, used via syntect; no fix upstream yet, see https://github.com/trishume/syntect/issues/606" },
+    { id = "RUSTSEC-2026-0194", reason = "quick-xml <0.41 has a DoS (quadratic duplicate-attribute check), used via citationberg; fixed on citationberg main, not released yet, see https://github.com/tafia/quick-xml/issues/969" },
+    { id = "RUSTSEC-2026-0195", reason = "quick-xml <0.41 has a DoS (unbounded namespace-declaration allocation), used via citationberg; fixed on citationberg main, not released yet, see https://github.com/tafia/quick-xml/issues/969" },
+    { id = "RUSTSEC-2026-0206", reason = "rustybuzz is unmaintained (successor: harfrust), used via typst-layout, typst-library, krilla and usvg; no fix upstream yet, see https://github.com/harfbuzz/rustybuzz/issues/166" },
+    # Typst, and a direct dependency of abacus
+    { id = "RUSTSEC-2026-0192", reason = "ttf-parser is unmaintained, used directly and via Typst; no fix upstream yet, see https://github.com/kiesraad/abacus/issues/3849" },
+    # sqlx
+    { id = "RUSTSEC-2026-0459", reason = "bundled SQLite <3.54 has a vulnerability, used via libsqlite3-sys 0.37; fixed on sqlx main (allows libsqlite3-sys 0.39), not released yet; Abacus only opens its own database, see https://github.com/kiesraad/abacus/issues/4276" },
 ]

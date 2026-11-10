@@ -1,0 +1,208 @@
+name: Release build
+
+# Builds and tests the release binaries, the Linux tarball and the (unsigned) Windows installer.
+# Shared by release.yml and weekly-e2e-tests.yml.
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Version label used in the Linux tarball name (abacus-linux-<version>.tar.gz)
+        type: string
+        required: true
+      attest:
+        description: Attest build provenance of the release binaries
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-frontend:
+    name: Build production frontend (on linux only)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      SHOW_DEV_PAGE: false
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Setup Node
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install pnpm
+        run: >
+          npm install --global corepack@latest &&
+          corepack enable &&
+          corepack prepare pnpm@latest-11 --activate
+      - name: Install dependencies
+        run: pnpm install --prod
+      - name: Build
+        run: pnpm build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: frontend-production-build
+          path: frontend/dist
+
+  build:
+    name: Build
+    permissions:
+      contents: read
+      attestations: write
+      id-token: write
+    needs:
+      - build-frontend
+    strategy:
+      matrix:
+        target:
+          - os: ubuntu-latest
+            name: x86_64-unknown-linux-musl
+            binary: backend/target/x86_64-unknown-linux-musl/release/abacus
+          - os: windows-latest
+            name: x86_64-pc-windows-msvc
+            binary: backend/target/x86_64-pc-windows-msvc/release/abacus.exe
+    runs-on: ${{ matrix.target.os }}
+    defaults:
+      run:
+        working-directory: ./backend
+    env:
+      CARGO_TERM_COLOR: always
+      SQLX_OFFLINE: "true"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Download Abacus Frontend
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-production-build
+          path: frontend/dist
+      - name: Setup Rust
+        run: rustup toolchain install
+      - name: Install target
+        run: rustup target add ${{ matrix.target.name }}
+      - name: Install musl
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+        if: matrix.target.os == 'ubuntu-latest'
+      - name: Create empty Storybook build dir for memory-serve
+        run: mkdir -p dist-storybook
+        working-directory: ./frontend
+        if: matrix.target.os == 'ubuntu-latest'
+      # The Backend job in build-lint-test.yml checks Clippy only for the host target, so check with musl here
+      - name: Check Clippy with all features
+        run: cargo clippy --locked --workspace --all-targets --all-features --target=${{ matrix.target.name }} -- -D warnings
+        if: matrix.target.os == 'ubuntu-latest'
+      - name: Run tests
+        run: cargo test --locked --release --workspace --no-default-features --features memory-serve,embed-typst,airgap-detection,tls --target=${{ matrix.target.name }}
+      # no airgap detection build, used for the e2e tests and the abacus-test.nl deployment
+      - name: Build without airgap detection
+        run: cargo build --locked --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: abacus-${{ matrix.target.os }}-no-airgap-detection
+          path: ${{ matrix.target.binary }}
+      # airgap detection build
+      - name: Build with airgap detection and TLS
+        run: cargo build --locked --release --no-default-features --features memory-serve,embed-typst,airgap-detection,tls --target=${{ matrix.target.name }}
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: ${{ matrix.target.binary }}
+        if: inputs.attest
+      # Create the tarball here rather than after downloading the artifact, because artifacts don't preserve the executable bit
+      - name: Create Linux tarball
+        run: |
+          mkdir -p "$RUNNER_TEMP/$NAME"
+          cp "${{ matrix.target.binary }}" packaging/linux/abacus.service "$RUNNER_TEMP/$NAME/"
+          tar -czvf "$RUNNER_TEMP/$NAME.tar.gz" -C "$RUNNER_TEMP" "$NAME"
+        working-directory: .
+        env:
+          NAME: abacus-linux-${{ inputs.version }}
+        if: matrix.target.os == 'ubuntu-latest'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: abacus-release-ubuntu-latest
+          path: ${{ runner.temp }}/abacus-linux-${{ inputs.version }}.tar.gz
+        if: matrix.target.os == 'ubuntu-latest'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: abacus-release-windows-latest
+          path: ${{ matrix.target.binary }}
+        if: matrix.target.os == 'windows-latest'
+
+  build-installer:
+    name: Build Windows installer
+    needs:
+      - build
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: packaging/windows
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Download Abacus
+        uses: actions/download-artifact@v8
+        with:
+          name: abacus-release-windows-latest
+          path: packaging/windows
+      - name: Download Visual C++ Redistributable
+        run: Invoke-WebRequest -Uri https://aka.ms/vc14/vc_redist.x64.exe -OutFile VC_redist.x64.exe
+      # Inno Setup is preinstalled on the runner image
+      - name: Compile installer
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" abacus.iss'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: abacus-release-windows-installer
+          path: packaging/windows/Output/abacussetup.exe
+
+  playwright-e2e:
+    name: Playwright e2e tests (${{ matrix.os }} ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+    needs:
+      - build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        shardIndex: [1, 2]
+        shardTotal: [2]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      RELEASE_BUILD: true
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Setup Node
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install pnpm
+        run: >
+          npm install --global --force corepack@latest &&
+          corepack enable &&
+          corepack prepare pnpm@latest-11 --activate
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install Playwright Browsers
+        run: pnpm playwright install --with-deps --no-shell
+      - name: Download abacus
+        uses: actions/download-artifact@v8
+        with:
+          name: abacus-${{ matrix.os }}-no-airgap-detection
+          path: builds/backend
+      - name: make backend build executable
+        run: chmod a+x ../builds/backend/abacus
+        if: runner.os != 'Windows'
+      - name: Run Playwright e2e tests
+        run: pnpm test:e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-release-${{ matrix.os }}-${{ matrix.shardIndex }}
+          path: frontend/playwright-report/
+          retention-days: 30

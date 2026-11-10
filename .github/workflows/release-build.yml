@@ -96,12 +96,19 @@ jobs:
         if: matrix.target.os == 'ubuntu-latest'
       - name: Run tests
         run: cargo test --locked --release --workspace --no-default-features --features memory-serve,embed-typst,airgap-detection,tls --target=${{ matrix.target.name }}
-      # no airgap detection build, used for the e2e tests and the abacus-test.nl deployment
+      # no airgap detection build, used for the abacus-test.nl deployment
       - name: Build without airgap detection
         run: cargo build --locked --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
       - uses: actions/upload-artifact@v7
         with:
           name: abacus-${{ matrix.target.os }}-no-airgap-detection
+          path: ${{ matrix.target.binary }}
+      # TLS build without airgap detection, used for the e2e tests
+      - name: Build with TLS, without airgap detection
+        run: cargo build --locked --release --no-default-features --features memory-serve,embed-typst,tls --target=${{ matrix.target.name }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: abacus-${{ matrix.target.os }}-e2e-tls
           path: ${{ matrix.target.binary }}
       # airgap detection build
       - name: Build with airgap detection and TLS
@@ -173,6 +180,7 @@ jobs:
         working-directory: frontend
     env:
       RELEASE_BUILD: true
+      E2E_TLS: true
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Setup Node
@@ -192,7 +200,7 @@ jobs:
       - name: Download abacus
         uses: actions/download-artifact@v8
         with:
-          name: abacus-${{ matrix.os }}-no-airgap-detection
+          name: abacus-${{ matrix.os }}-e2e-tls
           path: builds/backend
       - name: make backend build executable
         run: chmod a+x ../builds/backend/abacus

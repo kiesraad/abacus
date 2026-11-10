@@ -1,5 +1,5 @@
 {
-  "abacus_creates_the_corrigendum": "Abacus maakt voor elk stembureau een vooringevuld corrigendum (Na 14-2 Bijlage 1)",
+  "abacus_creates_the_corrigendum": "Abacus maakt voor elk stembureau een vooringevuld corrigendum ({model})",
   "add_investigation": "Onderzoek toevoegen",
   "add_investigation_for_each_csb_request": "Voeg alle onderzoeksverzoeken van het centraal stembureau toe.",
   "add_missing_polling_station": "Ontbrekend stembureau toevoegen",
@@ -10,6 +10,10 @@
   "corrected_results_inserted": "De gecorrigeerde uitkomst is ingevoerd",
   "corrected_results_not_yet_inserted": "Laat twee invoerders het corrigendum overnemen in Abacus",
   "corrigendum_data_entry": "Invoer corrigendum bezig",
+  "corrigendum_model": {
+    "CSO": "Na 14-2 Bijlage 1",
+    "DSO": "Na 14-1, versie 2"
+  },
   "delete_are_you_sure": "Je kan dit niet ongedaan maken. Weet je zeker dat je dit onderzoek wilt verwijderen?",
   "delete_data_entry": "<strong>Let op:</strong> De gecorrigeerde telresultaten die al zijn ingevoerd worden ook verwijderd.",
   "delete_investigation": "Onderzoek verwijderen",
@@ -62,7 +66,10 @@
     "investigate_results": "Onderzoek de resultaten van het stembureau en besluit of een hertelling nodig is.",
     "more_investigations": "Moeten er voor meerdere stembureaus onderzoeken worden gedaan? Maak dan voor ieder stembureau een onderzoek aan.",
     "nav_title": "Corrigendum printen",
-    "print_recommendation": "<strong>Tip</strong>: print eerst alleen de eerste pagina. Druk de rest pas af als uit het onderzoek blijkt dat een hertelling moet worden gedaan.",
+    "print_recommendation": {
+      "CSO": "<strong>Tip</strong>: print alleen het onderdeel \"B1 - 1 Aanleiding en opdracht onderzoek\". Druk de rest pas af als uit het onderzoek blijkt dat een hertelling moet worden gedaan.",
+      "DSO": "<strong>Tip</strong>: print alleen het onderdeel \"1. Onderzoek naar telresultaten\". Druk de rest pas af als uit het onderzoek blijkt dat een hertelling moet worden gedaan."
+    },
     "recount_needed": "Moet er herteld worden? Print dan de overige pagina's van het corrigendum. Daarop worden de gecorrigeerde telresultaten ingevoerd.",
     "title": "Print het corrigendum"
   },

@@ -4,6 +4,7 @@ import { NotFoundError } from "@/api/ApiResult";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { DataEntryHeader } from "@/features/data_entry/components/DataEntryHeader";
 import { useElection } from "@/hooks/election/useElection";
+import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUser } from "@/hooks/user/useUser";
 import type { FormSectionId } from "@/types/types";
@@ -16,7 +17,14 @@ export function DataEntryPage() {
   const dataEntryId = useNumericParam("dataEntryId");
   const entryNumber = useNumericParam("entryNumber");
   const { election } = useElection();
+  const { statuses } = useElectionStatus();
   const user = useUser();
+
+  // Make sure the data entry belongs to the current committee session
+  const dataEntryInCurrentSession = statuses.some((status) => status.data_entry_id === dataEntryId);
+  if (!dataEntryInCurrentSession) {
+    throw new NotFoundError();
+  }
 
   if (entryNumber !== 1 && entryNumber !== 2) {
     throw new NotFoundError("error.data_entry_not_found");

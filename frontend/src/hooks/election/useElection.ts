@@ -1,5 +1,6 @@
 import { useContext } from "react";
 
+import { NotFoundError } from "@/api/ApiResult";
 import { ElectionProviderContext } from "./ElectionProviderContext";
 
 // fetch the current election, committee session and polling stations from the context
@@ -23,6 +24,11 @@ export function useElection(pollingStationId?: number) {
   const investigation = pollingStation
     ? investigations.find((psi) => psi.polling_station_id === pollingStation.id)
     : undefined;
+
+  // If a pollingStationId is provided and no matching polling station was found, throw NotFoundError
+  if (pollingStationId !== undefined && !pollingStation) {
+    throw new NotFoundError();
+  }
 
   return {
     currentCommitteeSession,

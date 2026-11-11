@@ -297,58 +297,22 @@ function Alerts() {
   );
 }
 
-interface CommitteeSessionModalsProps {
-  showAddModal: boolean;
-  onCloseAddModal: () => void;
-}
-
-function CommitteeSessionModals({ showAddModal, onCloseAddModal }: CommitteeSessionModalsProps) {
-  const location = useLocation();
+function AddCommitteeSessionModal({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate();
-  const { currentCommitteeSession, election, investigations, refetch } = useElection();
-  const showDeleteModal = hasBooleanProperty(location.state, "showDeleteModal") && location.state.showDeleteModal;
+  const { currentCommitteeSession, election, refetch } = useElection();
 
   const createPath: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${election.id}/committee_sessions`;
-  const removePath: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
-  const { create, remove } = useCrud({ createPath, removePath, throwAllErrors: true });
+  const { create } = useCrud({ createPath, throwAllErrors: true });
 
-  function closeDeleteModal() {
-    void navigate(".", { replace: true });
-  }
-
-  if (showAddModal) {
-    if (!committeeSessionDetailsPresent(currentCommitteeSession)) {
-      return (
-        <Modal title={t("election_management.missing_committee_session_details_modal.title")} onClose={onCloseAddModal}>
-          <p>{t("election_management.missing_committee_session_details_modal.content")}</p>
-          <nav>
-            <Button variant="primary" size="xl" onClick={() => void navigate(`/elections/${election.id}/details`)}>
-              {t("election_management.missing_committee_session_details_modal.enter_details_button")}
-            </Button>
-            <Button variant="secondary" onClick={onCloseAddModal}>
-              {t("cancel")}
-            </Button>
-          </nav>
-        </Modal>
-      );
-    }
-
+  if (!committeeSessionDetailsPresent(currentCommitteeSession)) {
     return (
-      <Modal title={t("election_management.investigation_ordered_by_csb_modal.title")} onClose={onCloseAddModal}>
-        <p>{t("election_management.investigation_ordered_by_csb_modal.only_add_if_ordered")}</p>
-        <p>{t("election_management.investigation_ordered_by_csb_modal.if_gsb_correction")}</p>
+      <Modal title={t("election_management.missing_committee_session_details_modal.title")} onClose={onClose}>
+        <p>{t("election_management.missing_committee_session_details_modal.content")}</p>
         <nav>
-          <Button
-            variant="primary"
-            size="xl"
-            onClick={() => {
-              void create({}).then(() => void refetch());
-              onCloseAddModal();
-            }}
-          >
-            {t("election_management.yes_add_session")}
+          <Button variant="primary" size="xl" onClick={() => void navigate(`/elections/${election.id}/details`)}>
+            {t("election_management.missing_committee_session_details_modal.enter_details_button")}
           </Button>
-          <Button variant="secondary" onClick={onCloseAddModal}>
+          <Button variant="secondary" onClick={onClose}>
             {t("cancel")}
           </Button>
         </nav>
@@ -356,8 +320,38 @@ function CommitteeSessionModals({ showAddModal, onCloseAddModal }: CommitteeSess
     );
   }
 
-  if (!showDeleteModal) {
-    return null;
+  return (
+    <Modal title={t("election_management.investigation_ordered_by_csb_modal.title")} onClose={onClose}>
+      <p>{t("election_management.investigation_ordered_by_csb_modal.only_add_if_ordered")}</p>
+      <p>{t("election_management.investigation_ordered_by_csb_modal.if_gsb_correction")}</p>
+      <nav>
+        <Button
+          variant="primary"
+          size="xl"
+          onClick={() => {
+            void create({}).then(() => void refetch());
+            onClose();
+          }}
+        >
+          {t("election_management.yes_add_session")}
+        </Button>
+        <Button variant="secondary" onClick={onClose}>
+          {t("cancel")}
+        </Button>
+      </nav>
+    </Modal>
+  );
+}
+
+function DeleteCommitteeSessionModal() {
+  const navigate = useNavigate();
+  const { currentCommitteeSession, election, investigations, refetch } = useElection();
+
+  const removePath: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
+  const { remove } = useCrud({ removePath, throwAllErrors: true });
+
+  function closeDeleteModal() {
+    void navigate(".", { replace: true });
   }
 
   if (investigations.length > 0) {
@@ -415,8 +409,11 @@ function CommitteeSessionModals({ showAddModal, onCloseAddModal }: CommitteeSess
 export function ElectionHomePage() {
   const { currentCommitteeSession, committeeSessions, election, pollingStations, showKeypairReminder, refetch } =
     useElection();
+  const location = useLocation();
   const { isCoordinator, role } = useUserRole();
+
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
+  const showDeleteModal = hasBooleanProperty(location.state, "showDeleteModal") && location.state.showDeleteModal;
 
   // re-fetch election when component mounts
   useEffect(() => {
@@ -437,12 +434,14 @@ export function ElectionHomePage() {
       </header>
       <Messages />
       <Alerts />
-      <CommitteeSessionModals
-        showAddModal={showAddCommitteeSessionModal}
-        onCloseAddModal={() => {
-          setShowAddCommitteeSessionModal(false);
-        }}
-      />
+      {showAddCommitteeSessionModal && (
+        <AddCommitteeSessionModal
+          onClose={() => {
+            setShowAddCommitteeSessionModal(false);
+          }}
+        />
+      )}
+      {showDeleteModal && <DeleteCommitteeSessionModal />}
       <main className={cls.electionHome}>
         <article>
           <div className="mb-xl">

@@ -133,75 +133,109 @@ describe("ElectionHomePage", () => {
       ]);
     });
 
-    test("Shows create new committee session button and clicking it creates a new committee session", async () => {
-      const user = userEvent.setup();
-      server.use(CommitteeSessionCreateHandler);
-      const sessionCreateRequestSpy = spyOnHandler(CommitteeSessionCreateHandler);
-      const electionData = getElectionMockData({}, { status: "completed" });
-      server.use(
-        http.get("/api/elections/1", () =>
-          HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
-        ),
-      );
+    describe("Add committee session", () => {
+      test("With details, modal shows and adds session", async () => {
+        const user = userEvent.setup();
+        server.use(CommitteeSessionCreateHandler);
+        const sessionCreateRequestSpy = spyOnHandler(CommitteeSessionCreateHandler);
+        const electionData = getElectionMockData(
+          {},
+          { status: "completed", start_date_time: "2026-03-18T21:36:00", location: "Test Location" },
+        );
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
 
-      await renderGSBPage("coordinator_gsb");
+        await renderGSBPage("coordinator_gsb");
 
-      const committee_session_cards = await screen.findByTestId("committee-session-cards");
-      expect(committee_session_cards).toBeVisible();
-      expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
-        /Eerste zitting — Invoer afgerond/,
-      );
-      expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+        const committee_session_cards = await screen.findByTestId("committee-session-cards");
+        expect(committee_session_cards).toBeVisible();
+        expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+          /Eerste zitting — Invoer afgerond/,
+        );
+        expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
-      const createButton = screen.getByRole("button", { name: "Nieuwe zitting voorbereiden" });
-      expect(createButton).toBeVisible();
+        const createButton = screen.getByRole("button", { name: "Nieuwe zitting voorbereiden" });
+        expect(createButton).toBeVisible();
 
-      await user.click(createButton);
+        await user.click(createButton);
 
-      const modal = await screen.findByRole("dialog");
-      expect(modal).toBeVisible();
-      const title = within(modal).getByText("Onderzoek in opdracht van het CSB?");
-      expect(title).toBeVisible();
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        const title = within(modal).getByText("Onderzoek in opdracht van het CSB?");
+        expect(title).toBeVisible();
 
-      const addButton = within(modal).getByRole("button", { name: "Ja, zitting toevoegen" });
-      expect(addButton).toBeVisible();
-      await user.click(addButton);
+        const addButton = within(modal).getByRole("button", { name: "Ja, zitting toevoegen" });
+        expect(addButton).toBeVisible();
+        await user.click(addButton);
 
-      expect(sessionCreateRequestSpy).toHaveBeenCalledOnce();
-    });
+        expect(sessionCreateRequestSpy).toHaveBeenCalledOnce();
+      });
 
-    test("Does not show create new committee session button for administrator", async () => {
-      const electionData = getElectionMockData({}, { status: "completed" });
-      server.use(
-        http.get("/api/elections/1", () =>
-          HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
-        ),
-      );
+      test("Without details, modal 'missing committee session details' is shown", async () => {
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
 
-      await renderGSBPage("administrator");
+        const user = userEvent.setup();
+        server.use(CommitteeSessionCreateHandler);
+        const sessionCreateRequestSpy = spyOnHandler(CommitteeSessionCreateHandler);
+        const electionData = getElectionMockData({}, { status: "completed" });
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
 
-      const committee_session_cards = await screen.findByTestId("committee-session-cards");
-      expect(committee_session_cards).toBeVisible();
-      expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
-        /Eerste zitting — Invoer afgerond/,
-      );
+        await renderGSBPage("coordinator_gsb");
+        expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+        await user.click(screen.getByRole("button", { name: "Nieuwe zitting voorbereiden" }));
 
-      expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        expect(within(modal).getByText("Vul eerst de details van de zitting in")).toBeVisible();
 
-      expect(await screen.findByRole("heading", { level: 3, name: "Over deze verkiezing" })).toBeVisible();
-      const election_information_table = await screen.findByTestId("election-information-table");
-      expect(election_information_table).toBeVisible();
-      expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
-        ["Kiesgebied", "0035 - Heemdamseburg"],
-        ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
-        ["Aantal kiesgerechtigden", "2.000"],
-        ["Type stembureau", "Gemeentelijk stembureau"],
-        ["Publieke sleutel", "Bekijken en downloaden"],
-        ["Stembureaus", "8 stembureaus"],
-        ["Type stemopneming", "Centrale stemopneming"],
-      ]);
+        const detailButton = within(modal).getByRole("button", { name: "Details invullen" });
+        expect(detailButton).toBeVisible();
+        await user.click(detailButton);
+
+        expect(sessionCreateRequestSpy).not.toHaveBeenCalled();
+        expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/details");
+      });
+
+      test("Does not show create new committee session button for administrator", async () => {
+        const electionData = getElectionMockData({}, { status: "completed" });
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("administrator");
+
+        const committee_session_cards = await screen.findByTestId("committee-session-cards");
+        expect(committee_session_cards).toBeVisible();
+        expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+          /Eerste zitting — Invoer afgerond/,
+        );
+
+        expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+        expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+
+        expect(await screen.findByRole("heading", { level: 3, name: "Over deze verkiezing" })).toBeVisible();
+        const election_information_table = await screen.findByTestId("election-information-table");
+        expect(election_information_table).toBeVisible();
+        expect(election_information_table).toHaveTableContent([
+          ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+          ["Kiesgebied", "0035 - Heemdamseburg"],
+          ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
+          ["Aantal kiesgerechtigden", "2.000"],
+          ["Type stembureau", "Gemeentelijk stembureau"],
+          ["Publieke sleutel", "Bekijken en downloaden"],
+          ["Stembureaus", "8 stembureaus"],
+          ["Type stemopneming", "Centrale stemopneming"],
+        ]);
+      });
     });
 
     describe("Delete committee session", () => {

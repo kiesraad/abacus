@@ -317,9 +317,9 @@ function CommitteeSessionModals({ showAddModal, onCloseAddModal }: CommitteeSess
 
   if (showAddModal) {
     return (
-      <Modal title={t("election_management.investigation_ordered_by_csb")} onClose={onCloseAddModal}>
-        <p>{t("election_management.only_add_if_ordered")}</p>
-        <p>{t("election_management.if_gsb_correction")}</p>
+      <Modal title={t("election_management.investigation_ordered_by_csb_modal.title")} onClose={onCloseAddModal}>
+        <p>{t("election_management.investigation_ordered_by_csb_modal.only_add_if_ordered")}</p>
+        <p>{t("election_management.investigation_ordered_by_csb_modal.if_gsb_correction")}</p>
         <nav>
           <Button
             variant="primary"

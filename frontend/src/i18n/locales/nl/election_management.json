@@ -83,10 +83,13 @@
   "enter_a_number": "Voer een getal in",
   "enter_number_of_voters": "Voer het aantal kiesgerechtigden voor deze verkiezing in zoals door de burgemeester en wethouders aan het gemeentelijk stembureau is doorgegeven.",
   "how_many_voters": "Hoeveel kiesgerechtigden telt het GSB?",
-  "if_gsb_correction": "Wil het gemeentelijk stembureau zelf een fout herstellen en is de zitting nog niet afgesloten door de voorzitter? Ga dan verder in de eerste zitting.",
   "import_sub_committee_keys": "Publieke sleutels GSB's importeren",
-  "investigation_ordered_by_csb": "Onderzoek in opdracht van het CSB?",
   "lists_and_candidates": "Lijsten en kandidaten",
+  "investigation_ordered_by_csb_modal": {
+    "title": "Onderzoek in opdracht van het CSB?",
+    "only_add_if_ordered": "Voeg alleen een nieuwe zitting toe als het centraal stembureau hier opdracht voor heeft gegeven.",
+    "if_gsb_correction": "Wil het gemeentelijk stembureau zelf een fout herstellen en is de zitting nog niet afgesloten door de voorzitter? Ga dan verder in de eerste zitting."
+  },
   "missing_committee_session_details_modal": {
     "ask_coordinator": "Vraag de coördinator om de details van de zitting in te vullen.",
     "content": "Op het corrigendum worden de plaats en tijd van de zitting weergegeven. Deze zijn nog niet ingevuld. Om het corrigendum te kunnen gebruiken, moeten deze gegevens eerst ingevuld worden.",
@@ -99,7 +102,6 @@
     "title": "Voeg eerst stembureaus toe"
   },
   "no_polling_stations": "Geen stembureaus",
-  "only_add_if_ordered": "Voeg alleen een nieuwe zitting toe als het centraal stembureau hier opdracht voor heeft gegeven.",
   "prepare_new_session": "Nieuwe zitting voorbereiden",
   "requested_investigations": "Aangevraagde onderzoeken",
   "results_and_documents": "Resultaten en documenten",

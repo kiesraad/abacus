@@ -22,6 +22,7 @@ jobs:
         workflow:
           - weekly-e2e-tests.yml
           - cargo-deny.yml
+          - pnpm-audit.yml
     steps:
       - name: Dispatch workflow
         run: gh workflow run "$WORKFLOW" --ref release-1.2

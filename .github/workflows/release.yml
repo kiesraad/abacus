@@ -6,8 +6,45 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
+  check-version:
+    name: Check version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Compare versions
+        env:
+          TAG: ${{ github.ref_name }}
+        shell: python
+        run: |
+          import json, os, sys, tomllib
+
+          tag = os.environ["TAG"]
+          expected = tag.removeprefix("v")
+
+          with open("backend/Cargo.toml", "rb") as f:
+              cargo = tomllib.load(f)
+          with open("backend/openapi.json") as f:
+              openapi = json.load(f)
+          with open("frontend/package.json") as f:
+              frontend = json.load(f)
+
+          versions = {
+              "backend/Cargo.toml": cargo["workspace"]["package"]["version"],
+              "backend/openapi.json": openapi["info"]["version"],
+              "frontend/package.json": frontend["version"],
+          }
+
+          mismatches = {file: version for file, version in versions.items() if version != expected}
+          for file, version in mismatches.items():
+              print(f"::error file={file}::Version {version} does not match tag {tag}, bump it to {expected} before tagging")
+          sys.exit(1 if mismatches else 0)
+
   build:
     name: Release build
+    needs:
+      - check-version
     permissions:
       contents: read
       attestations: write

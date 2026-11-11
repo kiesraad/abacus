@@ -1,5 +1,6 @@
 use axum::{
     extract::{Path, State},
+    http::StatusCode,
     response::IntoResponse,
 };
 use axum_extra::response::Attachment;
@@ -20,14 +21,37 @@ use crate::{
         models::{
             ModelN10_1InlegvelInput, ModelN10_1Input, ModelN10_2Input, ModelNa14_1Versie1Input,
             ModelNa31_1InlegvelInput, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput,
-            ToPdfFileModel, votes_table::CandidatesTables,
+            ToPdfFileModel, error::ModelsError, votes_table::CandidatesTables,
         },
         role::Role,
     },
-    error::ErrorReference,
+    error::{ApiErrorResponse, ErrorReference},
     repository::{committee_session_repo, election_repo, user_repo::User},
     service::list_polling_stations_for_session,
 };
+
+impl ApiErrorResponse for ModelsError {
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        match self {
+            ModelsError::DataIntegrityError(_message) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorResponse::new(
+                    "Internal server error",
+                    ErrorReference::InternalServerError,
+                    true,
+                ),
+            ),
+        }
+    }
+
+    fn log(&self) {
+        match self {
+            ModelsError::DataIntegrityError(message) => {
+                error!("Models data integrity error: {}", message);
+            }
+        }
+    }
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;

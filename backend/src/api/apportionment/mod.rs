@@ -14,7 +14,7 @@ pub use self::{
 use crate::{
     APIError, AppState,
     api::middleware::authentication::RouteAuthorization,
-    domain::role::Role,
+    domain::{apportionment_state::ApportionmentStateError, role::Role},
     error::{ApiErrorResponse, ErrorReference, ErrorResponse},
 };
 
@@ -82,6 +82,33 @@ impl ApiErrorResponse for ApportionmentApiError {
                     "Apportionment expects lists and candidates to be sorted",
                     ErrorReference::InternalServerError,
                     true,
+                ),
+            ),
+        }
+    }
+}
+
+impl ApiErrorResponse for ApportionmentStateError {
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        match self {
+            ApportionmentStateError::CandidateNotFound => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new("Candidate not found", ErrorReference::EntryNotFound, false),
+            ),
+            ApportionmentStateError::CandidateNotUnique => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new(
+                    "Candidate not unique",
+                    ErrorReference::EntryNotUnique,
+                    false,
+                ),
+            ),
+            ApportionmentStateError::InvalidState => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new(
+                    "Invalid state",
+                    ErrorReference::InvalidStateTransition,
+                    false,
                 ),
             ),
         }

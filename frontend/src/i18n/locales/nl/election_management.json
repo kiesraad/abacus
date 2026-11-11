@@ -90,6 +90,11 @@
     "only_add_if_ordered": "Voeg alleen een nieuwe zitting toe als het centraal stembureau hier opdracht voor heeft gegeven.",
     "if_gsb_correction": "Wil het gemeentelijk stembureau zelf een fout herstellen en is de zitting nog niet afgesloten door de voorzitter? Ga dan verder in de eerste zitting."
   },
+  "missing_committee_session_details_modal": {
+    "content": "Voordat je een nieuwe zitting kunt toevoegen, moeten de details van de huidige zitting ingevuld zijn.",
+    "enter_details_button": "Details invullen",
+    "title": "Vul eerst de details van de zitting in"
+  },
   "missing_committee_session_details_corrigendum_modal": {
     "ask_coordinator": "Vraag de coördinator om de details van de zitting in te vullen.",
     "content": "Op het corrigendum worden de plaats en tijd van de zitting weergegeven. Deze zijn nog niet ingevuld. Om het corrigendum te kunnen gebruiken, moeten deze gegevens eerst ingevuld worden.",

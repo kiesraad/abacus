@@ -317,6 +317,22 @@ function CommitteeSessionModals({ showAddModal, onCloseAddModal }: CommitteeSess
   }
 
   if (showAddModal) {
+    if (!committeeSessionDetailsPresent(currentCommitteeSession)) {
+      return (
+        <Modal title={t("election_management.missing_committee_session_details_modal.title")} onClose={onCloseAddModal}>
+          <p>{t("election_management.missing_committee_session_details_modal.content")}</p>
+          <nav>
+            <Button variant="primary" size="xl" onClick={() => void navigate(`/elections/${election.id}/details`)}>
+              {t("election_management.missing_committee_session_details_modal.enter_details_button")}
+            </Button>
+            <Button variant="secondary" onClick={onCloseAddModal}>
+              {t("cancel")}
+            </Button>
+          </nav>
+        </Modal>
+      );
+    }
+
     return (
       <Modal title={t("election_management.investigation_ordered_by_csb_modal.title")} onClose={onCloseAddModal}>
         <p>{t("election_management.investigation_ordered_by_csb_modal.only_add_if_ordered")}</p>

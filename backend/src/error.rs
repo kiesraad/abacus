@@ -23,14 +23,13 @@ use crate::{
         middleware::authentication::error::AuthenticationError,
     },
     domain::{
-        committee_session::CommitteeSessionError, election::InvalidElectionError,
-        models::error::ModelsError, results::IncorrectResultsModel, role::RoleNotAuthorizedError,
-        validate::DataError,
+        election::InvalidElectionError, results::IncorrectResultsModel,
+        role::RoleNotAuthorizedError, validate::DataError,
     },
     eml::EMLImportError,
     infra::backup::BackupError,
     repository::common as common_repo,
-    service::{SigningServiceError, SubCommitteeCertificateError, SubCommitteeServiceError},
+    service::{SigningServiceError, SubCommitteeServiceError},
 };
 
 /// Trait for error types that can be converted to HTTP response parts
@@ -335,6 +334,12 @@ impl IntoResponse for APIError {
     }
 }
 
+impl<T: ApiErrorResponse> From<T> for APIError {
+    fn from(err: T) -> Self {
+        APIError::Delegated(Box::new(err))
+    }
+}
+
 impl From<JsonRejection> for APIError {
     fn from(rejection: JsonRejection) -> Self {
         APIError::JsonRejection(rejection)
@@ -436,18 +441,6 @@ impl From<Box<dyn Error>> for APIError {
     }
 }
 
-impl From<CommitteeSessionError> for APIError {
-    fn from(err: CommitteeSessionError) -> Self {
-        APIError::Delegated(Box::new(err))
-    }
-}
-
-impl From<SubCommitteeCertificateError> for APIError {
-    fn from(err: SubCommitteeCertificateError) -> Self {
-        APIError::Delegated(Box::new(err))
-    }
-}
-
 impl From<DataEntryImportError> for APIError {
     fn from(err: DataEntryImportError) -> Self {
         match err {
@@ -489,12 +482,6 @@ impl From<DataEntryImportError> for APIError {
 impl From<InvalidElectionError> for APIError {
     fn from(err: InvalidElectionError) -> Self {
         APIError::DataIntegrityError(err.0)
-    }
-}
-
-impl From<ModelsError> for APIError {
-    fn from(err: ModelsError) -> Self {
-        APIError::Delegated(Box::new(err))
     }
 }
 

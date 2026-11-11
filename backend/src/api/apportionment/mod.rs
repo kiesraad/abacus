@@ -104,12 +104,6 @@ impl From<apportionment::ApportionmentError> for APIError {
     }
 }
 
-impl From<ApportionmentApiError> for APIError {
-    fn from(err: ApportionmentApiError) -> Self {
-        APIError::Delegated(Box::new(err))
-    }
-}
-
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
     use handlers::*;

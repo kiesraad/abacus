@@ -82,7 +82,7 @@ describe("InvestigationsOverviewPage", () => {
     );
   });
 
-  test("Renders the correct headings and button", async () => {
+  test("Renders page correctly for CSO election and no investigations", async () => {
     const electionResponse = getElectionMockData({}, { number: 2, status: "created" }, []);
     server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
 
@@ -94,6 +94,42 @@ describe("InvestigationsOverviewPage", () => {
     ).toBeVisible();
 
     expect(await screen.findByText("Voeg alle onderzoeksverzoeken van het centraal stembureau toe.")).toBeVisible();
+
+    const listItems = await screen.findAllByRole("listitem");
+    expect(listItems).toHaveLength(3);
+    expect(listItems[0]).toHaveTextContent(
+      "Voer de aanleiding in. Zijn er meerdere verzoeken voor hetzelfde stembureau? Combineer die dan.",
+    );
+    expect(listItems[1]).toHaveTextContent(
+      "Abacus maakt voor elk stembureau een vooringevuld corrigendum (Na 14-2 Bijlage 1)",
+    );
+    expect(listItems[2]).toHaveTextContent("Print dit corrigendum en voer het onderzoek uit");
+
+    expect(await screen.findByRole("link", { name: "Onderzoek toevoegen" })).toBeVisible();
+  });
+
+  test("Renders page correctly for DSO election and no investigations", async () => {
+    const electionResponse = getElectionMockData({ counting_method: "DSO" }, { number: 2, status: "created" }, []);
+    server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
+
+    await renderPage("coordinator_gsb");
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Onderzoeken in tweede zitting" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Onderzoeksverzoeken vanuit het centraal stembureau" }),
+    ).toBeVisible();
+
+    expect(await screen.findByText("Voeg alle onderzoeksverzoeken van het centraal stembureau toe.")).toBeVisible();
+
+    const listItems = await screen.findAllByRole("listitem");
+    expect(listItems).toHaveLength(3);
+    expect(listItems[0]).toHaveTextContent(
+      "Voer de aanleiding in. Zijn er meerdere verzoeken voor hetzelfde stembureau? Combineer die dan.",
+    );
+    expect(listItems[1]).toHaveTextContent(
+      "Abacus maakt voor elk stembureau een vooringevuld corrigendum (Na 14-1, versie 2)",
+    );
+    expect(listItems[2]).toHaveTextContent("Print dit corrigendum en voer het onderzoek uit");
 
     expect(await screen.findByRole("link", { name: "Onderzoek toevoegen" })).toBeVisible();
   });

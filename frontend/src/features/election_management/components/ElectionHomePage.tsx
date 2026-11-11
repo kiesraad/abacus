@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
-import { MissingCommitteeSessionDetailsModal } from "@/components/committee_session/MissingCommitteeSessionDetailsModal";
+import { MissingCommitteeSessionDetailsCorrigendumModal } from "@/components/committee_session/MissingCommitteeSessionDetailsCorrigendumModal";
 import { Footer } from "@/components/footer/Footer";
 import { IconTrash } from "@/components/generated/icons";
 import { Messages } from "@/components/messages/Messages";
@@ -100,7 +100,8 @@ function CSOFirstSessionDownloadSection({ election, numberOfPollingStations }: D
 
 function DSOFirstSessionDownloadSection({ election, session, numberOfPollingStations }: DownloadSectionProps) {
   const [showMissingPollingStationsModal, setShowMissingPollingStationsModal] = useState(false);
-  const [showMissingCommitteeSessionDetailsModal, setShowMissingCommitteeSessionDetailsModal] = useState(false);
+  const [showMissingCommitteeSessionDetailsCorrigendumModal, setShowMissingCommitteeSessionDetailsCorrigendumModal] =
+    useState(false);
 
   return (
     <div id="DSO-first-session-download-section" className="mt-xl">
@@ -144,7 +145,7 @@ function DSOFirstSessionDownloadSection({ election, session, numberOfPollingStat
               if (numberOfPollingStations === 0) {
                 setShowMissingPollingStationsModal(true);
               } else if (!committeeSessionDetailsPresent(session)) {
-                setShowMissingCommitteeSessionDetailsModal(true);
+                setShowMissingCommitteeSessionDetailsCorrigendumModal(true);
               } else {
                 directDownload(`/api/elections/${election.id}/download_na_14_1_versie1`);
               }
@@ -163,11 +164,11 @@ function DSOFirstSessionDownloadSection({ election, session, numberOfPollingStat
           }}
         />
       )}
-      {showMissingCommitteeSessionDetailsModal && (
-        <MissingCommitteeSessionDetailsModal
+      {showMissingCommitteeSessionDetailsCorrigendumModal && (
+        <MissingCommitteeSessionDetailsCorrigendumModal
           to="details"
           onClose={() => {
-            setShowMissingCommitteeSessionDetailsModal(false);
+            setShowMissingCommitteeSessionDetailsCorrigendumModal(false);
           }}
         />
       )}

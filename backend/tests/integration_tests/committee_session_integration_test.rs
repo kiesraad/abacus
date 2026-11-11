@@ -10,7 +10,7 @@ use test_log::test;
 use crate::{
     shared::{
         FixtureUser::*, change_status_committee_session, create_cso_result, create_investigation,
-        get_election_committee_session, login,
+        get_election_committee_session, login, update_committee_session_details,
     },
     utils::serve_api,
 };
@@ -40,8 +40,26 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     let election_id = 5;
+    let committee_session_id = 6;
 
-    change_status_committee_session(&addr, &coordinator_cookie, election_id, 6, "completed").await;
+    change_status_committee_session(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        committee_session_id,
+        "completed",
+    )
+    .await;
+    update_committee_session_details(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        committee_session_id,
+        "Juinen",
+        "2026-03-18",
+        "10:45",
+    )
+    .await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["status"], "completed");

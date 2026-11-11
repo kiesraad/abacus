@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { type AnyApiError, isSuccess } from "@/api/ApiResult";
+import { type AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
@@ -29,7 +29,7 @@ interface DataEntryErrors {
 export function useDataEntryErrors(dataEntryId: number): DataEntryErrors {
   const navigate = useNavigate();
   const client = useApiClient();
-  const { election } = useElection();
+  const { currentCommitteeSession, election } = useElection();
   const [action, setAction] = useState<ResolveErrorsAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
@@ -51,6 +51,14 @@ export function useDataEntryErrors(dataEntryId: number): DataEntryErrors {
     } else {
       throw requestState.error;
     }
+  }
+
+  // Make sure the data entry belongs to the current committee session
+  if (
+    requestState.status === "success" &&
+    requestState.data.source.committee_session_id !== currentCommitteeSession.id
+  ) {
+    throw new NotFoundError();
   }
 
   const onSubmit = async (afterSave: (action: ResolveErrorsAction) => void) => {

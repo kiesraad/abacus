@@ -29,7 +29,11 @@ import {
   type ElectionDetailsResponse,
   type ElectionStatusResponse,
 } from "@/types/generated/openapi";
+import { fireConfetti } from "@/utils/confetti";
 import { DataEntryHomePage } from "./DataEntryHomePage";
+
+// jsdom has no canvas 2d context or matchMedia
+vi.mock("@/utils/confetti");
 
 async function renderDataEntryHomePage(
   category: CommitteeCategory,
@@ -84,6 +88,7 @@ describe("DataEntryHomePage", () => {
 
     // Test that the message doesn't exist
     expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
+    expect(fireConfetti).not.toHaveBeenCalled();
   });
 
   test.each(committeeCategoryValues)("Alert visible when completed (%s)", async (cat: CommitteeCategory) => {
@@ -91,6 +96,7 @@ describe("DataEntryHomePage", () => {
     await renderDataEntryHomePage(cat, {}, statusResponse);
 
     expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
+    expect(fireConfetti).toHaveBeenCalledOnce();
   });
 
   test.each(committeeCategoryValues)("Messages are shown (%s)", async (cat: CommitteeCategory) => {

@@ -1,4 +1,4 @@
-import { render as rtlRender } from "@testing-library/react";
+import { fireEvent, render as rtlRender } from "@testing-library/react";
 import { HttpResponse, http } from "msw";
 import type { ReactNode } from "react";
 import * as ReactRouter from "react-router";
@@ -18,8 +18,12 @@ import { server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { renderReturningRouter, screen, within } from "@/testing/test-utils";
 import type { ElectionDetailsResponse } from "@/types/generated/openapi";
+import { fireConfetti } from "@/utils/confetti";
 
 import { ElectionReportPage } from "./ElectionReportPage";
+
+// jsdom has no canvas 2d context or matchMedia
+vi.mock("@/utils/confetti");
 
 const navigate = vi.fn();
 
@@ -97,7 +101,14 @@ describe("GSBElectionReportSection", () => {
         "EML- en CSV-bestanden met digitale telresultaten, en een digitale handtekening van het EML-bestand.",
       ),
     ).toBeInTheDocument();
-    expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
+    const downloadLink = await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ });
+    expect(downloadLink).toBeVisible();
+
+    downloadLink.addEventListener("click", (event) => {
+      event.preventDefault();
+    });
+    fireEvent.click(downloadLink);
+    expect(fireConfetti).toHaveBeenCalledExactlyOnceWith(downloadLink);
   });
 
   test("If there is an investigation with corrections, page refers to three documents in the zip", async () => {

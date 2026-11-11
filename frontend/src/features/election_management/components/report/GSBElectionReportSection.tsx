@@ -3,6 +3,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { t, tx } from "@/i18n/translate";
 import type { CommitteeSession, Election } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
+import { fireConfetti } from "@/utils/confetti";
 import { formatDateTimeFull } from "@/utils/dateTime";
 
 import { useCommitteeSessionInvestigationListRequest } from "../../hooks/useCommitteeSessionInvestigationListRequest";
@@ -57,6 +58,9 @@ export function GSBElectionReportSection({ election, committeeSession, sessionLa
             sessionLabel: sessionLabel.toLowerCase(),
           })}
           subtitle={t("election_management.zip_file")}
+          onClick={(e) => {
+            fireConfetti(e.currentTarget);
+          }}
         />
       </div>
       <section className={cn(cls.reportInfoSection, "sm")}>

@@ -5,6 +5,7 @@ import { useApportionmentStateRequest } from "@/hooks/apportionment/useApportion
 import { t, tx } from "@/i18n/translate";
 import type { CommitteeSession, Election } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
+import { fireConfetti } from "@/utils/confetti";
 import { formatDateTimeFull } from "@/utils/dateTime";
 import cls from "../ElectionManagement.module.css";
 
@@ -47,12 +48,18 @@ export function CSBElectionReportSection({ election, committeeSession, sessionLa
           href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results_csb`}
           title={t("election_management.CSB.determination_election_results.download")}
           subtitle={t("election_management.zip_file")}
+          onClick={(e) => {
+            fireConfetti(e.currentTarget);
+          }}
         />
         <DownloadButton
           icon="download"
           href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_attachment_csb`}
           title={t("election_management.CSB.p_22_2_attachment.download")}
           subtitle={t("election_management.zip_file")}
+          onClick={(e) => {
+            fireConfetti(e.currentTarget);
+          }}
         />
         <DownloadButton
           icon="download"
@@ -61,6 +68,9 @@ export function CSBElectionReportSection({ election, committeeSession, sessionLa
             sessionLabel: sessionLabel.toLowerCase(),
           })}
           subtitle={t("election_management.zip_file")}
+          onClick={(e) => {
+            fireConfetti(e.currentTarget);
+          }}
         />
       </div>
       <section className={cn(cls.reportInfoSection, "sm")}>

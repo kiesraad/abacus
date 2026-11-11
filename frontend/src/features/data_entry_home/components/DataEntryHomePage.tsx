@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLocation } from "react-router";
 import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
 import { Footer } from "@/components/footer/Footer";
@@ -12,6 +13,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useLiveData } from "@/hooks/useLiveData";
 import { t } from "@/i18n/translate";
+import { fireConfetti } from "@/utils/confetti";
 import { DataEntryPicker } from "./DataEntryPicker";
 import { ElectionProgress } from "./ElectionProgress";
 
@@ -25,6 +27,14 @@ export function DataEntryHomePage() {
   useLiveData(refetchStatuses, true);
   useLiveData(refetchElection, true);
 
+  const allDefinitive = statuses.length > 0 && statuses.every((s) => s.status === "definitive");
+
+  useEffect(() => {
+    if (allDefinitive) {
+      fireConfetti();
+    }
+  }, [allDefinitive]);
+
   return (
     <>
       <PageTitle title={`${t("data_entry.pick_polling_station")} - Abacus`} />
@@ -37,7 +47,7 @@ export function DataEntryHomePage() {
         <CommitteeSessionPausedModal committeeCategory={election.committee_category} />
       )}
       <Messages autoCloseTimeout={300_000} /> {/* auto close success alerts after 5 minutes */}
-      {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
+      {allDefinitive && (
         <Alert type="success">
           <strong className="heading-md">{t("data_entry.completed.all_entries_completed")}</strong>
           <p>{t("data_entry.completed.thank_you")}</p>

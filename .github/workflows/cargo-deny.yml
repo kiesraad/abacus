@@ -36,7 +36,7 @@ jobs:
       - name: Setup Rust
         run: rustup toolchain install
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # main
+        uses: cargo-bins/cargo-binstall@v1.26.2
       - name: Install cargo-deny
         run: cargo binstall cargo-deny
       - name: Check advisories (backend workspace)

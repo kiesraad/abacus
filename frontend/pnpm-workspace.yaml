@@ -26,7 +26,9 @@ overrides:
   # @codecov/vite-plugin does not have official support for Vite 8, but works:
   # https://github.com/codecov/codecov-javascript-bundler-plugins/issues/264
   "vite": "catalog:"
-  # Fix GHSA-mrhx-c7xc-m3w5
+  # Fix GHSA-mrhx-c7xc-m3w5: @codecov/bundler-plugin-core requires zod ^3, which has no patched release
   "zod@<4.6.6": "4.6.6"
-  # Fix GHSA-xjj6-f33q-929c, GHSA-4qv8-2p9j-2685
-  "undici@>=6.0.0 <6.29.1": "6.29.1"
+  # Fix GHSA-g3hv-75wg-m249: eslint and @eslint/config-array require minimatch ^10, which has no patched release
+  "minimatch@>=7.0.0 <11.0.1": "11.0.5"
+  # Fix GHSA-3g3m-2fjr-6pw4: @storybook/react-vite requires a docgen plugin that depends on glob ^13, which has no patched release
+  "glob@>=9.0.0 <14.0.2": "14.0.4"

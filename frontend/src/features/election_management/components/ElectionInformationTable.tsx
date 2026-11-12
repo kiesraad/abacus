@@ -2,8 +2,8 @@ import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import type { CommitteeSession, ElectionWithPoliticalGroups, Role } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
+import { getDistrictNumber } from "@/utils/election";
 import { formatNumber } from "@/utils/number";
-
 import cls from "./ElectionManagement.module.css";
 
 interface ElectionInformationTableProps {
@@ -49,6 +49,20 @@ export function ElectionInformationTable({
             {new Date(election.election_date).toLocaleString(t("date_locale"), { day: "numeric", month: "long" })}
           </Table.Cell>
         </Table.Row>
+        {election.district.district === "Specific" && (
+          <Table.Row>
+            <Table.HeaderCell scope="row" className="normal">
+              {t("election.district")}
+            </Table.HeaderCell>
+            <Table.Cell>{`${getDistrictNumber(election.district)} - ${election.district.name}`}</Table.Cell>
+          </Table.Row>
+        )}
+        <Table.Row>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("election_management.lists_and_candidates")}
+          </Table.HeaderCell>
+          <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
+        </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.electoral_area")}
@@ -56,12 +70,6 @@ export function ElectionInformationTable({
           <Table.Cell>
             {election.authority_id} - {election.authority_region}
           </Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.HeaderCell scope="row" className="normal">
-            {t("election_management.lists_and_candidates")}
-          </Table.HeaderCell>
-          <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
         {election.committee_category === "GSB" && (
           <Table.Row to={rowLink}>

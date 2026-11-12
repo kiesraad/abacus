@@ -1,13 +1,17 @@
 {
   "admitted_voters_after_recount": "Toegelaten kiezers na hertelling door gemeentelijk stembureau",
   "form_title": {
+    "DSOFirstSession": "Toegelaten kiezers en uitgebrachte stemmen",
     "CSOFirstSession": "Toegelaten kiezers en uitgebrachte stemmen",
+    "DSONextSession": "Toegelaten kiezers en uitgebrachte stemmen",
     "CSONextSession": "Toegelaten kiezers en uitgebrachte stemmen",
     "GSB": "Kiesgerechtigden, toegelaten kiezers en uitgebrachte stemmen"
   },
   "short_title": "Aantal kiezers en stemmen",
   "section_number": {
+    "DSOFirstSession": "2.1 en 2.2",
     "CSOFirstSession": "B1-3.1 en 3.2",
+    "DSONextSession": "2.1 en 2.2",
     "CSONextSession": "B1-2.1 en 2.2",
     "GSB": ""
   },
@@ -15,7 +19,8 @@
   "voters_counts": {
     "poll_card_count": "Stempassen",
     "proxy_certificate_count": "Volmachtbewijzen",
-    "total_admitted_voters_count": "Totaal toegelaten kiezers"
+    "total_admitted_voters_count": "Totaal toegelaten kiezers",
+    "voter_card_count": "Kiezerspassen"
   },
   "votes_counts": {
     "total_votes_candidates_count": "Totaal stemmen op kandidaten",

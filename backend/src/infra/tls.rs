@@ -3,7 +3,7 @@
 //! Self-signed certificate authority for serving Abacus over HTTPS.
 //! Certificates are generated with rcgen with the aws-lc-rs backend.
 
-use std::{fs, path::Path};
+use std::{fs, path::Path, sync::Arc};
 
 use chrono::{DateTime, Datelike, Duration, Utc};
 use rcgen::{
@@ -14,10 +14,9 @@ use rustls_pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer, pem::P
 
 use crate::AppError;
 
-const CA_CERT_PEM: &str = "ca.pem";
-const CA_CERT_DER: &str = "ca.cer";
+pub const CA_CERT_PEM: &str = "ca.pem";
+pub const CA_CERT_DER: &str = "ca.cer";
 const CA_KEY_DER: &str = "ca-key.der";
-const LEAF_CERT_PEM: &str = "leaf.pem";
 
 fn tls_err<E: core::fmt::Debug>(e: E) -> AppError {
     AppError::Tls(format!("{e:?}"))
@@ -25,9 +24,22 @@ fn tls_err<E: core::fmt::Debug>(e: E) -> AppError {
 
 /// The local CA certificate, in the two encodings clients import:
 /// PEM (Linux/macOS/Firefox) and DER (Windows `.cer`).
+#[derive(Clone)]
 pub struct CaCertificate {
     pub pem: String,
     pub der: Vec<u8>,
+}
+
+impl CaCertificate {
+    /// SHA-256 fingerprint of the CA certificate (colon-separated hex).
+    pub fn sha256_fingerprint(&self) -> String {
+        sha256_fingerprint(&self.der)
+    }
+
+    /// SHA-1 fingerprint of the CA certificate (colon-separated hex).
+    pub fn sha1_fingerprint(&self) -> String {
+        sha1_fingerprint(&self.der)
+    }
 }
 
 /// TLS certificates: the local CA and leaf certificate and the leaf private key
@@ -37,22 +49,50 @@ pub struct TlsCertificates {
     pub leaf_key: PrivateKeyDer<'static>,
 }
 
-/// Load or generate the CA and create a new leaf certificate
-pub fn load_or_generate(tls_dir: &Path) -> Result<TlsCertificates, AppError> {
+impl TlsCertificates {
+    /// Build the rustls server config with the leaf certificate.
+    pub fn server_config(&self) -> Result<Arc<rustls::ServerConfig>, AppError> {
+        let provider = Arc::new(rustls::crypto::aws_lc_rs::default_provider());
+        let config = rustls::ServerConfig::builder_with_provider(provider)
+            .with_safe_default_protocol_versions()
+            .map_err(tls_err)?
+            .with_no_client_auth()
+            .with_single_cert(vec![self.leaf_cert.clone()], self.leaf_key.clone_key())
+            .map_err(tls_err)?;
+        Ok(Arc::new(config))
+    }
+}
+
+/// Create the TLS directory (if missing) and lock it down to the owner on unix.
+fn ensure_tls_dir(tls_dir: &Path) -> Result<(), AppError> {
     fs::create_dir_all(tls_dir)?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(tls_dir, fs::Permissions::from_mode(0o700))?;
     }
+    Ok(())
+}
+
+/// Load or generate the CA and create a new leaf certificate
+pub fn load_or_generate(tls_dir: &Path) -> Result<TlsCertificates, AppError> {
+    ensure_tls_dir(tls_dir)?;
 
     let (issuer, ca) = load_or_generate_ca(tls_dir)?;
-    let (leaf_cert, leaf_key) = create_leaf(tls_dir, &issuer, &get_subjects())?;
+    let (leaf_cert, leaf_key) = create_leaf(&issuer, &get_subjects())?;
     Ok(TlsCertificates {
         ca,
         leaf_cert,
         leaf_key,
     })
+}
+
+/// Ensure the TLS directory and persisted CA exist, without creating a leaf certificate.
+/// Used by `--init-tls`, the Windows installer runs this before importing the CA.
+pub fn init_ca(tls_dir: &Path) -> Result<CaCertificate, AppError> {
+    ensure_tls_dir(tls_dir)?;
+    let (_issuer, ca) = load_or_generate_ca(tls_dir)?;
+    Ok(ca)
 }
 
 /// Load the persisted local CA or generate and persist a new one.
@@ -88,9 +128,10 @@ fn load_ca(
     let ca_key = KeyPair::try_from(key_der.as_slice()).map_err(tls_err)?;
     let issuer = Issuer::from_ca_cert_der(&cert_der, ca_key).map_err(tls_err)?;
     tracing::info!(
-        "Loaded the local CA from {:?} (SHA-256 fingerprint {})",
+        "Loaded the local CA from {:?}\n  SHA-256 fingerprint {}\n  SHA-1 fingerprint   {}",
         cert_pem_path,
-        fingerprint(&der),
+        sha256_fingerprint(&der),
+        sha1_fingerprint(&der),
     );
     Ok((issuer, CaCertificate { pem, der }))
 }
@@ -112,9 +153,10 @@ fn generate_ca(
     write_file(key_der_path, &key_der, 0o600)?;
 
     tracing::warn!(
-        "Generated a new local CA at {:?} (SHA-256 fingerprint {}).",
+        "Generated a new local CA at {:?}\n  SHA-256 fingerprint {}\n  SHA-1 fingerprint   {}",
         cert_pem_path,
-        fingerprint(&der),
+        sha256_fingerprint(&der),
+        sha1_fingerprint(&der),
     );
 
     let issuer = Issuer::from_ca_cert_der(ca_cert.der(), ca_key).map_err(tls_err)?;
@@ -135,7 +177,6 @@ fn get_ca_params() -> Result<CertificateParams, AppError> {
 
 /// Create a fresh server (leaf) certificate signed by the CA
 fn create_leaf(
-    tls_dir: &Path,
     issuer: &Issuer<'_, KeyPair>,
     subjects: &[String],
 ) -> Result<(CertificateDer<'static>, PrivateKeyDer<'static>), AppError> {
@@ -155,26 +196,22 @@ fn create_leaf(
 
     let cert = params.signed_by(&leaf_key, issuer).map_err(tls_err)?;
     let cert_der = cert.der().clone();
-
-    // TODO: for now persist the leaf to disk so the certificate can be inspected - remove in #3411
-    write_file(&tls_dir.join(LEAF_CERT_PEM), cert.pem().as_bytes(), 0o644)?;
-
     tracing::info!(
-        "Created a new server certificate (SHA-256 fingerprint {})",
-        fingerprint(&cert_der),
+        "Created a new server certificate for {subjects:?} (SHA-256 fingerprint {})",
+        sha256_fingerprint(&cert_der),
     );
     let key_der = PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(pkcs8));
     Ok((cert_der, key_der))
 }
 
 /// Get the Subject Alternative Names for the leaf certificate:
-/// localhost, `abacus.local`, and every routable LAN address
+/// localhost, `abacus.internal`, and every routable LAN address
 fn get_subjects() -> Vec<String> {
     let mut subjects = vec![
         "localhost".to_owned(),
         "127.0.0.1".to_owned(),
         "::1".to_owned(),
-        "abacus.local".to_owned(),
+        "abacus.internal".to_owned(),
     ];
     if let Ok(interfaces) = if_addrs::get_if_addrs() {
         for iface in interfaces {
@@ -210,16 +247,29 @@ fn ymd(dt: DateTime<Utc>) -> Result<(i32, u8, u8), AppError> {
         u8::try_from(dt.day()).map_err(tls_err)?,
     ))
 }
-/// SHA-256 fingerprint of a DER-encoded certificate
-/// Uppercase colon-separated hex is used by most browsers and the OpenSSL CLI.
-fn fingerprint(der: &[u8]) -> String {
-    use sha2::{Digest, Sha256};
-
-    Sha256::digest(der)
+/// Format a digest as uppercase colon-separated hex, as used by most browsers
+/// and the OpenSSL CLI.
+fn format_fingerprint(digest: &[u8]) -> String {
+    digest
         .iter()
         .map(|b| format!("{b:02X}"))
         .collect::<Vec<_>>()
         .join(":")
+}
+
+/// SHA-256 fingerprint of a DER-encoded certificate.
+fn sha256_fingerprint(der: &[u8]) -> String {
+    use sha2::{Digest, Sha256};
+
+    format_fingerprint(&Sha256::digest(der))
+}
+
+/// SHA-1 fingerprint of a DER-encoded certificate.
+/// Windows shows the SHA-1/ digest as the certificate "thumbprint"
+fn sha1_fingerprint(der: &[u8]) -> String {
+    use sha1::{Digest, Sha1};
+
+    format_fingerprint(&Sha1::digest(der))
 }
 
 /// Write `bytes` to `path` with mode permission bits (only on Unix).
@@ -256,6 +306,11 @@ mod tests {
             "leaf key should be PKCS#8"
         );
 
+        // the leaf certificate and key build a valid rustls server config
+        first
+            .server_config()
+            .expect("server config should build from the leaf certificate");
+
         // check that ca.cer is equal to the returned DER
         assert_eq!(fs::read(tls_dir.join(CA_CERT_DER)).unwrap(), first.ca.der);
         // and check that the PEM representation matches the DER
@@ -285,8 +340,62 @@ mod tests {
             second.leaf_cert.as_ref(),
             "each call creates a fresh leaf"
         );
+    }
 
-        // clean up
-        dir.close().expect("temporary directory is cleaned up");
+    /// Test that `init_ca` persists the CA (and only the CA, no leaf) and reuses it on a second call
+    #[test]
+    fn init_ca_persists_and_reuses() {
+        let dir = tempfile::tempdir().unwrap();
+        let tls_dir = dir.path().join("tls");
+
+        let first = init_ca(&tls_dir).unwrap();
+
+        // exactly the three CA files exist; no leaf certificate was persisted
+        for file in [CA_CERT_PEM, CA_CERT_DER, CA_KEY_DER] {
+            assert!(tls_dir.join(file).exists(), "{file} should be persisted");
+        }
+        assert_eq!(
+            fs::read_dir(&tls_dir).unwrap().count(),
+            3,
+            "only the three CA files should exist, no leaf"
+        );
+
+        // ca.cer matches the returned DER
+        assert_eq!(fs::read(tls_dir.join(CA_CERT_DER)).unwrap(), first.der);
+
+        // fingerprints are uppercase colon-separated hex
+        let assert_fingerprint = |fp: &str, digest_bytes: usize, name: &str| {
+            let expected_len = 3 * digest_bytes - 1;
+            assert_eq!(
+                fp.len(),
+                expected_len,
+                "{name} fingerprint should be {expected_len} chars, got {fp}"
+            );
+            assert!(
+                fp.chars()
+                    .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == ':'),
+                "{name} fingerprint should be uppercase colon-separated hex, got {fp}"
+            );
+        };
+        assert_fingerprint(&first.sha256_fingerprint(), 32, "SHA-256");
+        assert_fingerprint(&first.sha1_fingerprint(), 20, "SHA-1");
+
+        // check file permissions
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let key_mode = fs::metadata(tls_dir.join(CA_KEY_DER))
+                .unwrap()
+                .permissions()
+                .mode()
+                & 0o777;
+            assert_eq!(key_mode, 0o600, "the CA private key must be private");
+            let dir_mode = fs::metadata(&tls_dir).unwrap().permissions().mode() & 0o777;
+            assert_eq!(dir_mode, 0o700, "the tls directory must be private");
+        }
+
+        // a second call reuses the same persisted CA
+        let second = init_ca(&tls_dir).unwrap();
+        assert_eq!(first.der, second.der, "CA persists across runs");
     }
 }

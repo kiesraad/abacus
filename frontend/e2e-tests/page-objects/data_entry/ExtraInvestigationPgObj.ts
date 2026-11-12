@@ -5,15 +5,15 @@ import type { ExtraInvestigation } from "@/types/generated/openapi";
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export const noExtraInvestigation: ExtraInvestigation = {
-  extra_investigation_other_reason: { yes: false, no: true },
-  ballots_recounted_extra_investigation: { yes: false, no: true },
+  extra_investigation_done: { yes: false, no: true },
+  ballots_recounted_extra_investigation: { yes: false, no: false },
 };
 
 export class ExtraInvestigationPage extends DataEntryBasePage {
   readonly fieldset: Locator;
-  readonly extraInvestigationOtherReason: Locator;
-  readonly extraInvestigationOtherReasonYes: Locator;
-  readonly extraInvestigationOtherReasonNo: Locator;
+  readonly extraInvestigationDone: Locator;
+  readonly extraInvestigationDoneYes: Locator;
+  readonly extraInvestigationDoneNo: Locator;
   readonly ballotsRecounted: Locator;
   readonly ballotsRecountedYes: Locator;
   readonly ballotsRecountedNo: Locator;
@@ -23,15 +23,14 @@ export class ExtraInvestigationPage extends DataEntryBasePage {
     super(page);
 
     this.fieldset = page.getByRole("group", {
-      name: /^Alleen bij extra onderzoek B1-1/,
+      name: /^Extra onderzoek B1-1/,
     });
 
-    this.extraInvestigationOtherReason = this.fieldset.getByRole("group").filter({
-      hasText:
-        "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
+    this.extraInvestigationDone = this.fieldset.getByRole("group").filter({
+      hasText: "Heeft het gemeentelijk stembureau extra onderzoek gedaan?",
     });
-    this.extraInvestigationOtherReasonYes = this.extraInvestigationOtherReason.getByRole("checkbox", { name: "Ja" });
-    this.extraInvestigationOtherReasonNo = this.extraInvestigationOtherReason.getByRole("checkbox", { name: "Nee" });
+    this.extraInvestigationDoneYes = this.extraInvestigationDone.getByRole("checkbox", { name: "Ja" });
+    this.extraInvestigationDoneNo = this.extraInvestigationDone.getByRole("checkbox", { name: "Nee" });
 
     this.ballotsRecounted = this.fieldset.getByRole("group").filter({
       hasText: "Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?",
@@ -43,16 +42,16 @@ export class ExtraInvestigationPage extends DataEntryBasePage {
   }
 
   async fillAndClickNext(extraInvestigation: ExtraInvestigation) {
-    if (extraInvestigation.extra_investigation_other_reason.yes) {
-      await this.extraInvestigationOtherReasonYes.check();
+    if (extraInvestigation.extra_investigation_done.yes) {
+      await this.extraInvestigationDoneYes.check();
     } else {
-      await this.extraInvestigationOtherReasonYes.uncheck();
+      await this.extraInvestigationDoneYes.uncheck();
     }
 
-    if (extraInvestigation.extra_investigation_other_reason.no) {
-      await this.extraInvestigationOtherReasonNo.check();
+    if (extraInvestigation.extra_investigation_done.no) {
+      await this.extraInvestigationDoneNo.check();
     } else {
-      await this.extraInvestigationOtherReasonNo.uncheck();
+      await this.extraInvestigationDoneNo.uncheck();
     }
 
     if (extraInvestigation.ballots_recounted_extra_investigation.yes) {

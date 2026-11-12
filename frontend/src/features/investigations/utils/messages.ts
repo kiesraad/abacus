@@ -47,3 +47,8 @@ export function getInvestigationUpdatedMessage(
     } as Message;
   }
 }
+
+export function withCorrigendumInstruction(message: Message): Message {
+  const instruction = t("investigations.message.enter_corrigendum");
+  return { ...message, text: typeof message.text === "string" ? `${message.text}\n${instruction}` : instruction };
+}

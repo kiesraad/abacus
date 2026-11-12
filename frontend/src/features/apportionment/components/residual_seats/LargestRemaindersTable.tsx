@@ -9,18 +9,18 @@ import cls from "../Apportionment.module.css";
 
 interface LargestRemaindersTableProps {
   steps: LargestRemainderAssignmentStep[];
-  finalStanding: ListSeatAssignment[];
+  standings: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
 }
 
 export function LargestRemaindersTable({
   steps,
-  finalStanding,
+  standings,
   politicalGroups,
   resultChanges,
 }: LargestRemaindersTableProps) {
-  const finalStandingPgsMeetingThreshold = finalStanding.filter(
+  const standingsPgsMeetingThreshold = standings.filter(
     (listSeatAssignment) => listSeatAssignment.meets_remainder_threshold,
   );
   return (
@@ -35,18 +35,18 @@ export function LargestRemaindersTable({
         <Table.HeaderCell className="text-align-r">{t("apportionment.residual_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStandingPgsMeetingThreshold.map((listSeatAssignment) => {
+        {standingsPgsMeetingThreshold.map((listSeatAssignment) => {
           let residualSeats = steps.filter((step) => {
             return step.change.selected_list_number === listSeatAssignment.list_number;
           }).length;
           const listResultChanges = resultChanges.filter(
-            (change) => change.type === "residual_seat" && change.listNumber === listSeatAssignment.list_number,
+            (change) => change.seat_type === "ResidualSeat" && change.listNumber === listSeatAssignment.list_number,
           );
           listResultChanges.forEach((listResultChange) => {
-            residualSeats = residualSeats + listResultChange.increase - listResultChange.decrease;
+            residualSeats = residualSeats + listResultChange.delta;
           });
           const listFullSeatsNotes = resultChanges.filter(
-            (change) => change.type === "full_seat" && change.listNumber === listSeatAssignment.list_number,
+            (change) => change.seat_type === "FullSeat" && change.listNumber === listSeatAssignment.list_number,
           );
           return (
             <Table.Row key={listSeatAssignment.list_number}>

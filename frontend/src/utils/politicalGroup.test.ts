@@ -16,7 +16,7 @@ describe("formatPoliticalGroupName", () => {
       candidates: [],
     };
 
-    expect(formatPoliticalGroupName(politicalGroup1)).toBe("Lijst 10 - Group Name");
+    expect(formatPoliticalGroupName(politicalGroup1)).toBe("Lijst 10 – Group Name");
     expect(formatPoliticalGroupName(politicalGroup1, false)).toBe("Group Name");
   });
 
@@ -35,7 +35,7 @@ describe("formatPoliticalGroupName", () => {
       ],
     };
 
-    expect(formatPoliticalGroupName(politicalGroup)).toBe("Lijst 123 - Blanco (de Boer, A.B.)");
+    expect(formatPoliticalGroupName(politicalGroup)).toBe("Lijst 123 – Blanco (de Boer, A.B.)");
     expect(formatPoliticalGroupName(politicalGroup, false)).toBe("Blanco (de Boer, A.B.)");
   });
 });

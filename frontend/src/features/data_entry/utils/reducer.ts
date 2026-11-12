@@ -1,9 +1,21 @@
 import { assertStateIsLoaded } from "@/features/data_entry/utils/utils";
 import type { DataEntryId, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import type { FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import type { ClientState, DataEntryAction, DataEntryState, EntryNumber } from "../types/types";
-import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
+import {
+  addCorrectionWarnings,
+  getInitialFormState,
+  getNextSectionID,
+  isCachedSectionDisabled,
+  resetDisabledSectionValues,
+  resetFieldValues,
+  restoreCorrectionFormState,
+  restoreFormState,
+  updateDisabledSections,
+  updateFormStateAfterSubmit,
+} from "./dataEntryUtils";
 
 export function getInitialState(
   election: ElectionWithPoliticalGroups,
@@ -33,41 +45,56 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
     case "DATA_ENTRY_CLAIMED": {
       const model = action.dataEntry.data.model;
       const dataEntryStructure = getDataEntryStructure(model, state.election);
+
+      let targetFormSectionId: FormSectionId;
+
+      const results = structuredClone(action.dataEntry.data);
+      // make sure that the values of disabled sections are reset
+      resetDisabledSectionValues(dataEntryStructure, results);
+
+      const formState = getInitialFormState(dataEntryStructure);
+      updateDisabledSections(formState, dataEntryStructure, results);
+
       if (action.dataEntry.client_state) {
-        const { formState, targetFormSectionId } = buildFormState(
+        targetFormSectionId = restoreFormState(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           action.dataEntry.client_state as ClientState,
+          formState,
           action.dataEntry.validation_results,
           dataEntryStructure,
         );
-        return {
-          ...state,
-          dataEntryStructure,
+      } else if (action.dataEntry.is_correction) {
+        // an entry that was returned for correction and has no client state left to restore
+        targetFormSectionId = restoreCorrectionFormState(
           formState,
-          targetFormSectionId,
-          previousResults: action.dataEntry.previous_results ?? null,
-          results: action.dataEntry.data,
-          source: action.dataEntry.source,
-          dataEntryStatus: action.dataEntry.status,
-          error: null,
-        };
-      } else {
-        const targetFormSectionId = dataEntryStructure[0]?.id;
-        if (targetFormSectionId === undefined) {
-          throw new Error("Cannot determine initial section from dataEntryStructure");
-        }
-        return {
-          ...state,
+          action.dataEntry.validation_results,
           dataEntryStructure,
-          formState: getInitialFormState(dataEntryStructure),
-          targetFormSectionId,
-          previousResults: action.dataEntry.previous_results ?? null,
-          results: action.dataEntry.data,
-          source: action.dataEntry.source,
-          dataEntryStatus: action.dataEntry.status,
-          error: null,
-        };
+        );
+
+        if (action.dataEntry.correction_warnings) {
+          addCorrectionWarnings(dataEntryStructure, action.dataEntry.correction_warnings, formState);
+          resetFieldValues(
+            dataEntryStructure,
+            action.dataEntry.correction_warnings,
+            action.dataEntry.previous_results,
+            results,
+          );
+        }
+      } else {
+        targetFormSectionId = formState.furthest;
       }
+
+      return {
+        ...state,
+        dataEntryStructure,
+        formState,
+        targetFormSectionId,
+        previousResults: action.dataEntry.previous_results ?? null,
+        results,
+        source: action.dataEntry.source,
+        dataEntryStatus: action.dataEntry.status,
+        error: null,
+      };
     }
     case "DATA_ENTRY_CLAIM_FAILED":
       return {
@@ -114,6 +141,9 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
       };
     case "FORM_SAVED": {
       assertStateIsLoaded(state);
+      updateDisabledSections(state.formState, state.dataEntryStructure, action.data);
+      const cache = isCachedSectionDisabled(state.formState, state.cache) ? null : state.cache;
+
       const formState = updateFormStateAfterSubmit(
         state.dataEntryStructure,
         state.formState,
@@ -131,6 +161,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         targetFormSectionId: action.continueToNextSection
           ? getNextSectionID(formState, action.sectionId)
           : state.targetFormSectionId,
+        cache,
       };
     }
     case "RESET_TARGET_FORM_SECTION":

@@ -77,7 +77,7 @@ test.describe("CSB election apportionment", () => {
 
     const listDetailsPage = new ApportionmentListDetails(page);
     await expect(listDetailsPage.header).toBeVisible();
-    await expect(listDetailsPage.header).toContainText("Lijst 1 - Partijdige Partij");
+    await expect(listDetailsPage.header).toContainText("Lijst 1 – Partijdige Partij");
     await expect(listDetailsPage.alert).toBeVisible();
     await expect(listDetailsPage.alert).toContainText(
       "Kandidaat 5 is buiten beschouwing gelaten bij het verdelen van de zetels vanwege overlijden.Stemmen op overleden kandidaten zijn wel meegeteld als stemmen op diens lijst.",

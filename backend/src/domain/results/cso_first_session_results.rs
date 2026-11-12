@@ -18,7 +18,7 @@ use crate::domain::{compare::Compare, field_path::FieldPath};
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CSOFirstSessionResults {
-    /// Extra investigation ("B1-1 Alleen bij extra onderzoek")
+    /// Extra investigation ("B1-1 Extra onderzoek")
     pub extra_investigation: ExtraInvestigation,
     /// Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau")
     pub counting_differences_polling_station: CountingDifferencesPollingStation,
@@ -37,9 +37,9 @@ impl CSOFirstSessionResults {
     pub fn admitted_voters_have_been_recounted(&self) -> bool {
         matches!(
             self.counting_differences_polling_station
-                .unexplained_difference_ballots_voters
+                .difference_ballots_voters_completely_accounted_for
                 .as_bool(),
-            Some(true)
+            Some(false)
         ) || matches!(
             self.counting_differences_polling_station
                 .difference_ballots_per_list
@@ -91,5 +91,53 @@ impl Compare for CSOFirstSessionResults {
             different_fields,
             &path.field("political_group_votes"),
         );
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use test_log::test;
+
+    use super::*;
+    use crate::domain::results::yes_no::YesNo;
+
+    fn results(
+        difference_ballots_voters_completely_accounted_for: YesNo,
+        difference_ballots_per_list: YesNo,
+        difference_completely_accounted_for: YesNo,
+    ) -> CSOFirstSessionResults {
+        CSOFirstSessionResults {
+            counting_differences_polling_station: CountingDifferencesPollingStation {
+                difference_ballots_voters_completely_accounted_for,
+                difference_ballots_per_list,
+            },
+            differences_counts: DifferencesCounts {
+                difference_completely_accounted_for,
+                ..Default::default()
+            },
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn test_admitted_voters_have_been_recounted() {
+        // name, B1-2.1, B1-2.3, B1-3.3.2 (D vs H), expected
+        #[rustfmt::skip]
+        let cases = [
+            ("no answer",                  YesNo::default(), YesNo::default(), YesNo::default(), false),
+            ("B1-2.1 not accounted for",   YesNo::no(),      YesNo::default(), YesNo::default(), true),
+            ("B1-2.1 accounted for",       YesNo::yes(),     YesNo::default(), YesNo::default(), false),
+            ("B1-2.3 difference per list", YesNo::default(), YesNo::yes(),     YesNo::default(), true),
+            ("B1-3.3.2 not accounted for", YesNo::default(), YesNo::default(), YesNo::no(),      true),
+            ("nothing wrong",              YesNo::yes(),     YesNo::no(),      YesNo::yes(),     false),
+        ];
+
+        for (name, ballots_voters, per_list, d_and_h, expected) in cases {
+            assert_eq!(
+                results(ballots_voters, per_list, d_and_h).admitted_voters_have_been_recounted(),
+                expected,
+                "Failed: {name}"
+            );
+        }
     }
 }

@@ -1,10 +1,18 @@
 import type {
+  ApportionmentState,
   CandidateNomination,
   CommitteeSession,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   SeatAssignment,
 } from "@/types/generated/openapi";
+
+export const state: ApportionmentState = {
+  type: "Finalised",
+  deceased_candidates: [],
+  lists_drawn: [],
+  candidates_drawn: [],
+};
 
 export const seat_assignment: SeatAssignment = {
   seats: 6,
@@ -596,7 +604,7 @@ export const seat_assignment: SeatAssignment = {
       ],
     },
   ],
-  final_standing: [
+  standings: [
     {
       list_number: 1,
       votes_cast: 5,
@@ -765,8 +773,8 @@ export const candidate_nomination: CandidateNomination = {
   ],
 };
 
-export const election_summary: ElectionSummary = {
-  number_of_voters: 100,
+export const election_totals: ElectionTotals = {
+  committee_specific: { committee: "CSB", number_of_voters: 100 },
   voters_counts: {
     poll_card_count: 60,
     proxy_certificate_count: 1,
@@ -792,11 +800,6 @@ export const election_summary: ElectionSummary = {
       count: 0,
       data_entry_sources: [],
     },
-  },
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    ballots_recounted: [],
-    investigated_other_reason: [],
   },
   political_group_votes: [
     {
@@ -855,17 +858,22 @@ export const committee_session: CommitteeSession = {
 
 export const election: ElectionWithPoliticalGroups = {
   id: 6,
-  name: "Test Election < 19 seats & List Exhaustion",
-  counting_method: "CSO",
+  name: "Election < 19 seats & List Exhaustion",
+  official_name: "Gemeenteraad Juinen 2026",
   committee_category: "CSB",
-  election_id: "TestLocation_2026",
-  location: "Test Location",
-  domain_id: "0000",
+  election_id: "GR2026_Juinen",
+  location: "Juinen",
+  authority_id: "CSB",
+  authority_name: "Juinen",
+  authority_region: "Juinen",
+  district: { district: "None" },
+  domain: { id: "0035", name: "Juinen" },
   category: "Municipal",
+  sub_category: "GR1",
   number_of_seats: 6,
+  number_of_voters: 1,
   election_date: "2026-03-18",
   nomination_date: "2026-02-02",
-  number_of_voters: 1,
   political_groups: [
     {
       number: 1,

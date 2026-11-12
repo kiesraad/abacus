@@ -307,7 +307,7 @@ describe("ElectionReportPage", () => {
     expect(
       await screen.findByRole("heading", {
         level: 2,
-        name: "Telresultaten eerste zitting gemeentelijk stembureau gemeente Heemdamseburg",
+        name: "Telresultaten eerste zitting gemeentelijk stembureau Heemdamseburg",
       }),
     ).toBeVisible();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
@@ -332,9 +332,7 @@ describe("ElectionReportPage", () => {
     renderPage("CSB");
 
     expect(await screen.findByRole("heading", { level: 1, name: "Proces-verbaal centraal stembureau" })).toBeVisible();
-    expect(
-      await screen.findByRole("heading", { level: 2, name: "Zetelverdeling gemeente Heemdamseburg" }),
-    ).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling Heemdamseburg" })).toBeVisible();
     expect(await screen.findByRole("link", { name: /Vaststelling uitslag/ })).toBeVisible();
   });
 });

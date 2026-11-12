@@ -1,61 +1,75 @@
-.DownloadButton {
-  width: 100%;
+.downloadButton {
   max-width: 32rem;
-  color: var(--interactive-default);
-  border-color: var(--bg-gray-darkest);
-  background: var(--button-color-secondary);
   border-radius: 0.5rem;
-  text-decoration: none;
+  overflow: hidden;
 
-  display: inline-flex;
-  gap: 0.75rem;
-  padding: 1rem;
-  cursor: pointer;
+  display: flex;
+  flex-direction: column;
 
-  svg {
-    width: 1.5rem;
-    height: 1.5rem;
-    stroke-width: 0;
-    stroke: var(--base-blue);
-    fill: var(--base-blue);
+  > div {
+    background-color: var(--blue-700);
+    padding: var(--space-md);
+    color: var(--base-white);
+    font-family: var(--font-number);
+    font-size: var(--font-size-xs);
+    line-height: 1rem;
   }
 
-  & > span {
-    display: inline-flex;
-    flex-direction: column;
-
-    .title {
-      font-weight: bold;
-    }
-
-    .subtitle {
-      color: var(--gray-600);
-    }
-  }
-
-  &.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-
-    & > span .title {
-      color: var(--gray-400);
-    }
-  }
-
-  &:hover {
-    .title {
-      text-decoration: underline;
-    }
-  }
-
-  &:focus,
-  &:focus-visible {
-    .title {
-      text-decoration: underline;
-    }
-  }
-
-  &:visited {
+  a {
     color: var(--interactive-default);
+    background: var(--button-color-secondary);
+    text-decoration: none;
+
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    cursor: pointer;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      stroke-width: 0;
+      stroke: var(--base-blue);
+      fill: var(--base-blue);
+    }
+
+    & > span {
+      display: inline-flex;
+      flex-direction: column;
+
+      .title {
+        font-weight: bold;
+      }
+
+      .subtitle {
+        color: var(--gray-600);
+      }
+    }
+
+    &.disabled {
+      pointer-events: none;
+      cursor: not-allowed;
+
+      & > span .title {
+        color: var(--gray-400);
+      }
+    }
+
+    &:hover {
+      .title {
+        text-decoration: underline;
+      }
+    }
+
+    &:focus,
+    &:focus-visible {
+      .title {
+        text-decoration: underline;
+      }
+    }
+
+    &:visited {
+      color: var(--interactive-default);
+    }
   }
 }

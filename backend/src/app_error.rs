@@ -6,15 +6,18 @@ pub enum AppError {
     Json(serde_json::Error),
     Io(std::io::Error),
     Environment(tracing_subscriber::filter::FromEnvError),
-    StdError(Box<dyn std::error::Error>),
+    StdError(String),
     // server specific
     PortAlreadyInUse(u16),
     PermissionDeniedToBindPort(u16),
     Tls(String),
+    WindowsService(String),
     // sqlite specific
     DatabaseBusy(String),
     DatabaseReadOnly(String),
     DatabaseDiskFull(String),
+    // integrity
+    DataIntegrity(String),
 }
 
 impl std::error::Error for AppError {}
@@ -112,12 +115,6 @@ impl From<tracing_subscriber::filter::FromEnvError> for AppError {
     }
 }
 
-impl From<Box<dyn std::error::Error>> for AppError {
-    fn from(err: Box<dyn std::error::Error>) -> Self {
-        AppError::StdError(err)
-    }
-}
-
 impl std::fmt::Display for AppError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -144,6 +141,7 @@ impl std::fmt::Display for AppError {
                     "Cannot write to the database file \"{file}\". Please check file permissions."
                 )
             }
+            AppError::DataIntegrity(msg) => write!(f, "Data integrity error: {}", msg),
             AppError::PortAlreadyInUse(port) => {
                 write!(f, "Port {port} is in use. Is Abacus already running?")
             }
@@ -153,8 +151,9 @@ impl std::fmt::Display for AppError {
                     "Permission denied to bind to port {port}. On Unix systems, binding to ports below 1024 requires elevated privileges."
                 )
             }
-            AppError::StdError(e) => write!(f, "{}", e),
+            AppError::StdError(msg) => write!(f, "{}", msg),
             AppError::Tls(e) => write!(f, "TLS error: {}", e),
+            AppError::WindowsService(e) => write!(f, "Windows service error: {}", e),
         }
     }
 }

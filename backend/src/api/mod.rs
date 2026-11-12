@@ -1,6 +1,7 @@
 pub mod apportionment;
 pub mod audit;
 pub mod authentication;
+pub mod backup;
 pub mod committee_session;
 pub mod data_entry;
 pub mod document;
@@ -10,6 +11,7 @@ pub mod middleware;
 pub mod polling_station;
 pub mod providers;
 pub mod report;
+pub mod signing;
 
 #[cfg(test)]
 pub mod tests;

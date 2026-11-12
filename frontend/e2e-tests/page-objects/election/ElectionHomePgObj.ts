@@ -1,9 +1,14 @@
 import type { Locator, Page } from "@playwright/test";
+import type { CommitteeCategory } from "@/types/generated/openapi";
 
 export class ElectionHome {
   readonly header: Locator;
   readonly alert: Locator;
   readonly alertLinkToPollingStations: Locator;
+  readonly alertRegisterPublicKey: Locator;
+  readonly alertRegisterPublicKeyButton: Locator;
+  readonly alertPublicKeyRegistered: Locator;
+  readonly importKeysButton: Locator;
   readonly detailsButton: Locator;
   readonly startButton: Locator;
   readonly statusButton: Locator;
@@ -14,12 +19,19 @@ export class ElectionHome {
   readonly pollingStationsRow: Locator;
   readonly downloadNa31_2Bijlage1: Locator;
   readonly downloadN10_2: Locator;
-  readonly downloadInlegvel: Locator;
+  readonly downloadNa31_2Inlegvel: Locator;
+  readonly downloadNa31_1Inlegvel: Locator;
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 1 });
     this.alert = page.getByRole("alert");
     this.alertLinkToPollingStations = this.alert.getByRole("link", { name: "Stembureaus beheren" });
+    this.alertRegisterPublicKey = this.alert.filter({ hasText: "Publieke sleutel registreren" });
+    this.alertRegisterPublicKeyButton = this.alertRegisterPublicKey.getByRole("link", {
+      name: "Publieke sleutel registreren",
+    });
+    this.alertPublicKeyRegistered = this.alert.filter({ hasText: "Publieke sleutel geregistreerd" });
+    this.importKeysButton = page.getByRole("button", { name: "Publieke sleutels GSB's importeren" });
     this.detailsButton = page.getByRole("button", { name: "Details van de zitting" });
     this.startButton = page.getByRole("button", { name: "Start invoer" });
     this.statusButton = page.getByRole("link", { name: "Bekijk voortgang" });
@@ -30,10 +42,15 @@ export class ElectionHome {
     this.pollingStationsRow = page.getByRole("rowheader", { name: "Stembureaus" });
     this.downloadNa31_2Bijlage1 = page.getByRole("cell", { name: "Na 31-2 Bijlage 1" });
     this.downloadN10_2 = page.getByRole("cell", { name: "N 10-2" });
-    this.downloadInlegvel = page.getByRole("cell", { name: "Na 31-2 Inlegvel" });
+    this.downloadNa31_2Inlegvel = page.getByRole("cell", { name: "Na 31-2 Inlegvel" });
+    this.downloadNa31_1Inlegvel = page.getByRole("cell", { name: "Na 31-1 Inlegvel" });
   }
 
   getCommitteeSessionCard(number: number) {
     return this.page.getByTestId(`session-${number}`);
+  }
+
+  getAlertElectionCreated(committeeCategory: CommitteeCategory, electionName: string) {
+    return this.alert.filter({ hasText: `Verkiezing ${committeeCategory} ${electionName} toegevoegd` });
   }
 }

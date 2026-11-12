@@ -25,7 +25,7 @@ export function ApportionmentFullSeatsPage() {
   });
 
   if (error) {
-    return <ApportionmentErrorPage sectionTitle={t("apportionment.details_full_seats")} error={error} />;
+    return <ApportionmentErrorPage sectionTitle={t("apportionment.allocation_of_full_seats")} error={error} />;
   }
   if (seatAssignment) {
     const { fullSeatRemovalSteps } = getRemovalSteps(seatAssignment);
@@ -35,14 +35,14 @@ export function ApportionmentFullSeatsPage() {
       resultChanges.push({
         listNumber: step.change.list_retracted_seat,
         footnoteNumber: footnoteNumber,
-        increase: 0,
-        decrease: 1,
-        type: "full_seat",
+        delta: -1,
+        seat_type: "FullSeat",
+        type: "FullSeatRemoval",
       });
     });
     return (
       <>
-        {renderTitleAndHeader(t("apportionment.details_full_seats"))}
+        {renderTitleAndHeader(t("apportionment.allocation_of_full_seats"))}
         <main>
           <article className={cls.article}>
             <div className={cn(cls.tableDiv, "mb-lg")}>
@@ -50,7 +50,7 @@ export function ApportionmentFullSeatsPage() {
                 <h2 className={cls.tableTitle}>{t("apportionment.how_often_is_quota_met")}</h2>
                 <span className={cls.tableInformation}>{t("apportionment.full_seats_information")}</span>
                 <FullSeatsTable
-                  finalStanding={seatAssignment.final_standing}
+                  standings={seatAssignment.standings}
                   politicalGroups={election.political_groups}
                   quota={seatAssignment.quota}
                   resultChanges={resultChanges}

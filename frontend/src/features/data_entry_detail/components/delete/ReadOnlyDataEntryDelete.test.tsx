@@ -5,11 +5,16 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { DataEntryResetHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import type { DATA_ENTRY_RESET_REQUEST_PATH, DataEntrySource, DataEntryStatusName } from "@/types/generated/openapi";
+import type {
+  CommitteeSessionStatus,
+  DATA_ENTRY_RESET_REQUEST_PATH,
+  DataEntrySource,
+  DataEntryStatusName,
+} from "@/types/generated/openapi";
 
 import { ReadOnlyDataEntryDelete } from "./ReadOnlyDataEntryDelete";
 
-function renderComponent(status: DataEntryStatusName) {
+function renderComponent(status: DataEntryStatusName, committeeSessionStatus: CommitteeSessionStatus) {
   const onDeleted = vi.fn();
   const onError = vi.fn();
   const { data_entry_id, id, name, number, address, postal_code, locality } = pollingStationMockData[4]!;
@@ -31,6 +36,7 @@ function renderComponent(status: DataEntryStatusName) {
       dataEntrySource={source}
       dataEntryId={data_entry_id!}
       status={status}
+      committeeSessionStatus={committeeSessionStatus}
       onDeleted={onDeleted}
       onError={onError}
     ></ReadOnlyDataEntryDelete>,
@@ -46,8 +52,21 @@ describe("ReadOnlyDataEntryDelete", () => {
     deleteDataEntry = spyOnHandler(DataEntryResetHandler);
   });
 
-  test("delete after confirm", async () => {
-    const { onDeleted } = renderComponent("first_entry_finalised");
+  const oneEntryText =
+    "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Deze actie kan niet worden teruggedraaid.";
+  const twoEntriesText =
+    "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Let op: zowel de eerste als de tweede invoer wordt verwijderd. Deze actie kan niet worden teruggedraaid.";
+  const completedText =
+    "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Let op: het proces-verbaal en andere documenten van deze zitting worden ook verwijderd en kunnen niet meer uit Abacus worden gedownload. Deze actie kan niet worden teruggedraaid.";
+  test.each<[DataEntryStatusName, CommitteeSessionStatus, string]>([
+    ["first_entry_finalised", "data_entry", oneEntryText],
+    ["second_entry_in_progress", "data_entry", twoEntriesText],
+    ["first_entry_correction", "data_entry", twoEntriesText],
+    ["second_entry_correction", "data_entry", twoEntriesText],
+    ["definitive", "data_entry", twoEntriesText],
+    ["definitive", "completed", completedText],
+  ])("delete after confirm for data entry status %s and committee session status %s", async (status, committeeSessionStatus, text) => {
+    const { onDeleted } = renderComponent(status, committeeSessionStatus);
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
@@ -55,27 +74,7 @@ describe("ReadOnlyDataEntryDelete", () => {
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
     const modal = await screen.findByTestId("modal-dialog");
-    expect(modal).toHaveTextContent(
-      "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
-    );
-
-    await user.click(screen.getByRole("button", { name: "Verwijder invoer" }));
-    expect(deleteDataEntry).toHaveBeenCalledOnce();
-    expect(onDeleted).toHaveBeenCalledOnce();
-  });
-
-  test("Renders different text when there are 2 data entries", async () => {
-    const { onDeleted } = renderComponent("definitive");
-
-    const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
-
-    expect(await screen.findByRole("dialog")).toBeInTheDocument();
-
-    const modal = await screen.findByTestId("modal-dialog");
-    expect(modal).toHaveTextContent(
-      "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Let op: zowel de eerste als de tweede invoer wordt verwijderd. Deze actie kan niet worden teruggedraaid.",
-    );
+    expect(modal).toHaveTextContent(text);
 
     await user.click(screen.getByRole("button", { name: "Verwijder invoer" }));
     expect(deleteDataEntry).toHaveBeenCalledOnce();
@@ -83,7 +82,7 @@ describe("ReadOnlyDataEntryDelete", () => {
   });
 
   test("cancel delete", async () => {
-    const { onDeleted } = renderComponent("first_entry_finalised");
+    const { onDeleted } = renderComponent("first_entry_finalised", "data_entry");
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
@@ -103,7 +102,7 @@ describe("ReadOnlyDataEntryDelete", () => {
       reference: "InvalidSession",
     });
 
-    const { onDeleted, onError } = renderComponent("first_entry_finalised");
+    const { onDeleted, onError } = renderComponent("first_entry_finalised", "data_entry");
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));

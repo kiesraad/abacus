@@ -1,4 +1,4 @@
-import type { Locator, Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 import type { GSBResults, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
@@ -10,6 +10,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   readonly numberOfVoters: Locator;
   readonly pollCardCount: Locator;
   readonly proxyCertificateCount: Locator;
+  readonly voterCardCount: Locator;
   readonly totalAdmittedVotersCount: Locator;
   readonly politicalGroupTotalVotes: Locator;
   readonly totalVotesCandidatesCount: Locator;
@@ -38,6 +39,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     // voters counts
     this.pollCardCount = page.getByRole("textbox", { name: "A Stempassen" });
     this.proxyCertificateCount = page.getByRole("textbox", { name: "B Volmachtbewijzen" });
+    this.voterCardCount = page.getByRole("textbox", { name: "C Kiezerspassen" });
     this.totalAdmittedVotersCount = page.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
 
     // votes counts
@@ -60,16 +62,27 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   async inputVotersCounts(votersCounts: VotersCounts) {
     await this.pollCardCount.fill(votersCounts.poll_card_count.toString());
     await this.proxyCertificateCount.fill(votersCounts.proxy_certificate_count.toString());
+    if (votersCounts.voter_card_count !== undefined) {
+      await this.voterCardCount.fill(votersCounts.voter_card_count.toString());
+    } else {
+      await expect(this.voterCardCount).toBeDisabled();
+    }
     await this.totalAdmittedVotersCount.fill(votersCounts.total_admitted_voters_count.toString());
   }
 
   async getVotersCounts(): Promise<VotersCounts> {
-    return {
+    const data: VotersCounts = {
       // using Number() so that "" is parsed to 0
       poll_card_count: Number(await this.pollCardCount.inputValue()),
       proxy_certificate_count: Number(await this.proxyCertificateCount.inputValue()),
       total_admitted_voters_count: Number(await this.totalAdmittedVotersCount.inputValue()),
     };
+
+    if (!(await this.voterCardCount.isDisabled())) {
+      data.voter_card_count = Number(await this.voterCardCount.inputValue());
+    }
+
+    return data;
   }
 
   async inputVotesCounts(votesCounts: VotesCounts) {

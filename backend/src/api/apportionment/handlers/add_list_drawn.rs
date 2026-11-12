@@ -74,20 +74,21 @@ mod tests {
 
     #[test(sqlx::test(fixtures(
         path = "../../../../fixtures",
-        scripts("election_5_with_results")
+        scripts("election_8_csb_with_results")
     )))]
     async fn test_add_list_drawn(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let user = User::test_user(Role::CoordinatorCSB, UserId::from(3));
         let audit_service = AuditService::new(Some(user.clone()), None);
-        let id = CommitteeSessionId::from(6);
+        let id = CommitteeSessionId::from(801);
 
         committee_session_repo::change_status(&mut conn, id, CommitteeSessionStatus::Completed)
             .await
             .expect("should change committee session status");
 
         let drawing_lots_required = DrawingLotsRequired::ListDrawingLotsRequired(
-            ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
+            ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(AbsoluteMajorityDrawingLots {
+                assign_to: PGNumber::from(1),
                 options: PGNumber::from_values(vec![8, 9]),
             }),
         );
@@ -106,9 +107,12 @@ mod tests {
         .expect("should upsert initial state");
 
         let list_drawn = ListDrawn {
-            variant: ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
-                options: PGNumber::from_values(vec![8, 9]),
-            }),
+            variant: ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(
+                AbsoluteMajorityDrawingLots {
+                    assign_to: PGNumber::from(1),
+                    options: PGNumber::from_values(vec![8, 9]),
+                },
+            ),
             drawn: PGNumber::from(8),
         };
 
@@ -116,7 +120,7 @@ mod tests {
             user,
             State(pool),
             audit_service,
-            Path(ElectionId::from(5)),
+            Path(ElectionId::from(8)),
             Json::from(list_drawn.clone()),
         )
         .await

@@ -1,8 +1,8 @@
 use typst::{
     Library, LibraryExt, World,
     diag::{FileError, FileResult},
-    foundations::{Bytes, Datetime},
-    syntax::{FileId, Source, VirtualPath},
+    foundations::{Bytes, Datetime, Duration},
+    syntax::{FileId, RootedPath, Source, VirtualPath, VirtualRoot},
     text::{Font, FontBook},
     utils::LazyHash,
 };
@@ -29,7 +29,10 @@ impl PdfWorld {
             .iter()
             .map(|s| {
                 Source::new(
-                    FileId::new(None, VirtualPath::new(s.path)),
+                    FileId::new(RootedPath::new(
+                        VirtualRoot::Project,
+                        VirtualPath::new(s.path).expect("correct VirtualPath based on SourceFile"),
+                    )),
                     s.content.into(),
                 )
             })
@@ -46,12 +49,16 @@ impl PdfWorld {
         let main_template_path = input.main_template_path();
         let main_source = sources
             .iter()
-            .find(|s| s.id().vpath().as_rootless_path().to_str() == Some(main_template_path))
+            .find(|s| s.id().vpath().get_without_slash() == main_template_path)
             .cloned()
             .ok_or_else(|| PdfGenError::TemplateNotFound(main_template_path.to_string()))?;
 
         let input_data = (
-            FileId::new(None, VirtualPath::new(input.input_path())),
+            FileId::new(RootedPath::new(
+                VirtualRoot::Project,
+                VirtualPath::new(input.input_path())
+                    .map_err(|e| PdfGenError::Typst(e.to_string()))?,
+            )),
             Bytes::from_string(input.input_json()),
         );
 
@@ -86,7 +93,7 @@ impl World for PdfWorld {
             }
         }
 
-        Err(FileError::NotFound(id.vpath().as_rootless_path().into()))
+        Err(FileError::NotFound(id.vpath().get_without_slash().into()))
     }
 
     fn file(&self, id: FileId) -> FileResult<Bytes> {
@@ -95,21 +102,21 @@ impl World for PdfWorld {
             return Ok(self.input_data.1.clone());
         }
 
-        Err(FileError::NotFound(id.vpath().as_rootless_path().into()))
+        Err(FileError::NotFound(id.vpath().get_without_slash().into()))
     }
 
     fn font(&self, index: usize) -> Option<Font> {
         self.fonts.get(index).cloned()
     }
 
-    fn today(&self, offset: Option<i64>) -> Option<Datetime> {
+    fn today(&self, offset: Option<Duration>) -> Option<Datetime> {
         use chrono::Datelike;
 
         // get the current time using chrono
         let now = chrono::Local::now();
         let naive = match offset {
             None => now.naive_local(),
-            Some(o) => now.naive_utc() + chrono::Duration::try_hours(o)?,
+            Some(o) => now.naive_utc() + chrono::Duration::try_hours(o.decompose()[2])?,
         };
 
         Datetime::from_ymd(

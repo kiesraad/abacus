@@ -27,6 +27,8 @@ const FIXTURES: &[Fixture] = load_fixtures!([
     "election_1",
     "election_5_with_results",
     "election_8_csb_with_results",
+    "election_11_dso",
+    "election_12_dso_with_results",
     "users"
 ]);
 

@@ -16,7 +16,7 @@ pub struct SeatAssignmentDetails<LN> {
     pub residual_seats: u32,
     pub quota: Fraction,
     pub steps: Vec<SeatChangeStep<LN>>,
-    pub final_standing: Vec<ListSeatAssignment<LN>>,
+    pub standings: Vec<ListSeatAssignment<LN>>,
 }
 
 impl<LN: Copy> SeatAssignmentDetails<LN> {
@@ -89,19 +89,19 @@ impl<LN: Copy + Debug> From<ListStanding<LN>> for ListSeatAssignment<LN> {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ListStanding<LN> {
     /// List number for which this standing applies
-    pub list_number: LN,
+    list_number: LN,
     /// The number of votes cast for this list
-    pub votes_cast: u64,
+    votes_cast: u64,
     /// The remainder of votes that was not used to get full seats (does not have to be a whole number of votes)
-    pub remainder_votes: Fraction,
+    remainder_votes: Fraction,
     /// Whether the remainder votes meet the threshold to be applicable for largest remainder seat assignment
-    pub meets_remainder_threshold: bool,
+    meets_remainder_threshold: bool,
     /// The number of votes per seat if a new seat would be added to the current residual seats
-    pub next_votes_per_seat: Fraction,
+    next_votes_per_seat: Fraction,
     /// The number of full seats this list got assigned
-    pub full_seats: u32,
+    full_seats: u32,
     /// The current number of residual seats this list got assigned
-    pub residual_seats: u32,
+    residual_seats: u32,
 }
 
 impl<LN: Debug> ListStanding<LN> {
@@ -133,15 +133,31 @@ impl<LN: Debug> ListStanding<LN> {
         }
     }
 
-    /// Add a residual seat to the list and return the updated instance
-    pub fn add_residual_seat(self) -> Self {
+    /// Remove a full seat from the list
+    pub fn remove_full_seat(&mut self) {
+        assert!(self.full_seats > 0);
+        info!("Removing full seat from list {:?}", self.list_number);
+        self.full_seats -= 1;
+        self.next_votes_per_seat =
+            Fraction::from(self.votes_cast) / Fraction::from(self.total_seats() + 1);
+        // NB: remainder_votes is not updated!
+    }
+
+    /// Add a residual seat to the list
+    pub fn add_residual_seat(&mut self) {
         info!("Adding residual seat to list {:?}", self.list_number);
-        ListStanding {
-            residual_seats: self.residual_seats + 1,
-            next_votes_per_seat: Fraction::from(self.votes_cast)
-                / Fraction::from(self.total_seats() + 2),
-            ..self
-        }
+        self.residual_seats += 1;
+        self.next_votes_per_seat =
+            Fraction::from(self.votes_cast) / Fraction::from(self.total_seats() + 1);
+    }
+
+    /// Remove a residual seat from the list
+    pub fn remove_residual_seat(&mut self) {
+        assert!(self.residual_seats > 0);
+        info!("Removing residual seat from list {:?}", self.list_number);
+        self.residual_seats -= 1;
+        self.next_votes_per_seat =
+            Fraction::from(self.votes_cast) / Fraction::from(self.total_seats() + 1);
     }
 
     /// Returns the total number of seats assigned to this list
@@ -150,8 +166,62 @@ impl<LN: Debug> ListStanding<LN> {
     }
 }
 
-/// Records the change for a specific seat, and how the standing is once
-/// that seat was assigned or removed
+impl<LN: Copy> ListStanding<LN> {
+    pub fn list_number(self) -> LN {
+        self.list_number
+    }
+    pub fn votes_cast(self) -> u64 {
+        self.votes_cast
+    }
+    pub fn remainder_votes(self) -> Fraction {
+        self.remainder_votes
+    }
+    pub fn meets_remainder_threshold(self) -> bool {
+        self.meets_remainder_threshold
+    }
+    pub fn next_votes_per_seat(self) -> Fraction {
+        self.next_votes_per_seat
+    }
+    pub fn full_seats(self) -> u32 {
+        self.full_seats
+    }
+    pub fn residual_seats(self) -> u32 {
+        self.residual_seats
+    }
+}
+
+pub trait GetListStandingByNumber {
+    type ListNumber;
+
+    fn get_by_number(&self, number: Self::ListNumber) -> &ListStanding<Self::ListNumber>;
+
+    fn get_by_number_mut(
+        &mut self,
+        number: Self::ListNumber,
+    ) -> &mut ListStanding<Self::ListNumber>;
+}
+
+impl<LN: Copy + PartialEq> GetListStandingByNumber for [ListStanding<LN>] {
+    type ListNumber = LN;
+
+    fn get_by_number(&self, number: Self::ListNumber) -> &ListStanding<Self::ListNumber> {
+        self.iter()
+            .find(|s| s.list_number() == number)
+            .expect("ListStanding should exist")
+    }
+
+    fn get_by_number_mut(
+        &mut self,
+        number: Self::ListNumber,
+    ) -> &mut ListStanding<Self::ListNumber> {
+        self.iter_mut()
+            .find(|s| s.list_number() == number)
+            .expect("ListStanding should exist")
+    }
+}
+
+/// Records the change for a specific seat and how the standing were
+/// before that change was applied
 #[derive(Clone, Debug, PartialEq)]
 pub struct SeatChangeStep<LN> {
     pub residual_seat_number: Option<u32>,
@@ -279,6 +349,8 @@ pub struct HighestAverageAssignedSeat<LN> {
     pub list_exhausted: Vec<LN>,
     /// This is the votes per seat achieved by the selected list
     pub votes_per_seat: Fraction,
+    /// Details for drawing lots if required
+    pub drawing_lots: Option<ListDrawingLotsVariant<LN>>,
 }
 
 /// Contains the details for an assigned seat, assigned through the largest remainder method.
@@ -292,6 +364,8 @@ pub struct LargestRemainderAssignedSeat<LN> {
     pub list_assigned: Vec<LN>,
     /// The number of remainder votes achieved by the selected list
     pub remainder_votes: Fraction,
+    /// Details for drawing lots if required
+    pub drawing_lots: Option<ListDrawingLotsVariant<LN>>,
 }
 
 /// Contains information about the enactment of article P 9 of the Kieswet.
@@ -301,6 +375,8 @@ pub struct AbsoluteMajorityReassignedSeat<LN> {
     pub list_retracted_seat: LN,
     /// List number which the residual seat is assigned to
     pub list_assigned_seat: LN,
+    // Details for drawing lots if required
+    pub drawing_lots: Option<ListDrawingLotsVariant<LN>>,
 }
 
 /// Contains information about the enactment of article P 10 of the Kieswet.
@@ -317,7 +393,11 @@ pub type RemainderAssignmentResult<LN> = Result<RemainderAssignment<LN>, Apporti
 
 pub enum RemainderAssignment<LN> {
     Completed(Vec<SeatChangeStep<LN>>, Vec<ListStanding<LN>>),
-    DrawingLotsRequired(ListDrawingLotsVariant<LN>, Vec<SeatChangeStep<LN>>),
+    DrawingLotsRequired(
+        ListDrawingLotsVariant<LN>,
+        Vec<SeatChangeStep<LN>>,
+        Vec<ListStanding<LN>>,
+    ),
 }
 
 /// Result type for absolute majority reassignment: updated standings and optional seat change.
@@ -326,4 +406,78 @@ pub type AbsoluteMajorityResult<LN> = Result<AbsoluteMajority<LN>, Apportionment
 pub enum AbsoluteMajority<LN> {
     Completed(Vec<ListStanding<LN>>, Option<SeatChange<LN>>),
     DrawingLotsRequired(ListDrawingLotsVariant<LN>),
+}
+
+#[cfg(test)]
+pub(crate) mod tests {
+    use crate::{Fraction, seat_assignment::ListStanding, test_helpers::ListVotesMock};
+
+    #[test]
+    #[expect(clippy::too_many_lines)]
+    fn test_list_standing_functions() {
+        let candidate_votes: Vec<u32> = vec![100, 100, 100];
+        let votes_cast: u64 = candidate_votes.iter().sum::<u32>() as u64;
+        let mut standing = ListStanding::new(
+            &ListVotesMock::from_test_data_auto(1, candidate_votes),
+            Fraction {
+                numerator: 50,
+                denominator: 1,
+            },
+        );
+        assert_eq!(standing.full_seats(), 6);
+        assert_eq!(standing.residual_seats(), 0);
+        assert_eq!(
+            standing.total_seats(),
+            standing.full_seats() + standing.residual_seats()
+        );
+        assert_eq!(
+            standing.next_votes_per_seat,
+            Fraction {
+                numerator: votes_cast,
+                denominator: (standing.total_seats() + 1) as u64
+            }
+        );
+        standing.add_residual_seat();
+        assert_eq!(standing.full_seats(), 6);
+        assert_eq!(standing.residual_seats(), 1);
+        assert_eq!(
+            standing.total_seats(),
+            standing.full_seats() + standing.residual_seats()
+        );
+        assert_eq!(
+            standing.next_votes_per_seat,
+            Fraction {
+                numerator: votes_cast,
+                denominator: (standing.total_seats() + 1) as u64
+            }
+        );
+        standing.remove_residual_seat();
+        assert_eq!(standing.full_seats(), 6);
+        assert_eq!(standing.residual_seats(), 0);
+        assert_eq!(
+            standing.total_seats(),
+            standing.full_seats() + standing.residual_seats()
+        );
+        assert_eq!(
+            standing.next_votes_per_seat,
+            Fraction {
+                numerator: votes_cast,
+                denominator: (standing.total_seats() + 1) as u64
+            }
+        );
+        standing.remove_full_seat();
+        assert_eq!(standing.full_seats(), 5);
+        assert_eq!(standing.residual_seats(), 0);
+        assert_eq!(
+            standing.total_seats(),
+            standing.full_seats() + standing.residual_seats()
+        );
+        assert_eq!(
+            standing.next_votes_per_seat,
+            Fraction {
+                numerator: votes_cast,
+                denominator: (standing.total_seats() + 1) as u64
+            }
+        );
+    }
 }

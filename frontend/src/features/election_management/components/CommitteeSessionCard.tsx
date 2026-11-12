@@ -98,7 +98,7 @@ export function CommitteeSessionCard({
   ...props
 }: CommitteeSessionCardProps & DivProps) {
   const navigate = useNavigate();
-  const { isCoordinator } = useUserRole();
+  const { isAdministrator, isCoordinator } = useUserRole();
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${committeeSession.election_id}/committee_sessions/${committeeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
@@ -140,6 +140,13 @@ export function CommitteeSessionCard({
     to: "investigations",
   };
 
+  const subCommitteeKeysButtonLink: ButtonLink = {
+    id: committeeSession.id,
+    label: t("election_management.import_sub_committee_keys"),
+    to: "sub-committees",
+  };
+  const showSubCommitteeKeys = isCurrentSession && committeeCategory === "CSB" && isAdministrator;
+
   const deleteButtonLink: ButtonLink = {
     id: committeeSession.id,
     label: t("election_management.delete_session"),
@@ -149,11 +156,13 @@ export function CommitteeSessionCard({
 
   switch (committeeSession.status) {
     case "created":
+      addIf(subCommitteeKeysButtonLink, showSubCommitteeKeys);
       addIf(investigationsButtonLink, isCurrentSession && isNextSession);
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
       break;
     case "in_preparation":
+      addIf(subCommitteeKeysButtonLink, showSubCommitteeKeys);
       addIf(investigationsButtonLink, isCurrentSession && isNextSession);
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
@@ -167,6 +176,7 @@ export function CommitteeSessionCard({
       }
       break;
     case "data_entry":
+      addIf(subCommitteeKeysButtonLink, showSubCommitteeKeys);
       addIf(investigationsButtonLink, isCurrentSession && isNextSession);
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
 
@@ -187,6 +197,7 @@ export function CommitteeSessionCard({
         },
         isCurrentSession,
       );
+      addIf(subCommitteeKeysButtonLink, showSubCommitteeKeys);
       addIf(investigationsButtonLink, isCurrentSession && isNextSession);
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       break;

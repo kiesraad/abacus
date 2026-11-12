@@ -15,11 +15,13 @@ export function ElectionStatusProvider({ children, electionId }: ElectionStatusP
     <RequestStateHandler
       requestState={requestState}
       notFoundMessage="error.election_not_found"
-      renderOnSuccess={(data) => (
-        <ElectionStatusProviderContext.Provider value={{ statuses: data.statuses, refetch }}>
-          {children}
-        </ElectionStatusProviderContext.Provider>
-      )}
+      renderOnSuccess={(data) => {
+        return (
+          <ElectionStatusProviderContext.Provider value={{ statuses: data.statuses, refetch }}>
+            {children}
+          </ElectionStatusProviderContext.Provider>
+        );
+      }}
     />
   );
 }

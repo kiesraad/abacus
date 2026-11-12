@@ -11,6 +11,7 @@ type Props = {
   sourceType: DataEntrySource["type"];
   sourceNumber: DataEntrySource["number"];
   sourceName: DataEntrySource["name"];
+  sourceAuthorityId?: string;
   dataEntryStatus: DataEntryStatusName;
 };
 
@@ -40,6 +41,7 @@ export const PollingStation: StoryObj<Props> = {
         type: args.sourceType,
         number: args.sourceNumber,
         name: args.sourceName,
+        authority_id: args.sourceAuthorityId,
       },
       dataEntryStatus: args.dataEntryStatus,
     } as DataEntryStateAndActionsLoaded;
@@ -58,7 +60,7 @@ export const PollingStation: StoryObj<Props> = {
   },
   play: async ({ canvas }) => {
     const headerInfo = canvas.getByRole("banner");
-    await expect(headerInfo).toHaveTextContent("33" + "Op Rolletjes" + "1e invoer" + "Invoer afbreken");
+    await expect(headerInfo).toHaveTextContent(["33", "Op Rolletjes", "1e invoer", "Invoer afbreken"].join(""));
   },
 };
 
@@ -68,11 +70,12 @@ export const SubCommittee: StoryObj<Props> = {
     sourceType: "SubCommittee",
     sourceNumber: 1,
     sourceName: "Hilversum",
+    sourceAuthorityId: "0042",
     dataEntryStatus: "first_entry_finalised",
   },
   play: async ({ canvas }) => {
     const headerInfo = canvas.getByRole("banner");
-    await expect(headerInfo).toHaveTextContent("1" + "Hilversum" + "2e invoer" + "Invoer afbreken");
+    await expect(headerInfo).toHaveTextContent(["0042", "Hilversum", "2e invoer", "Invoer afbreken"].join(""));
   },
 };
 

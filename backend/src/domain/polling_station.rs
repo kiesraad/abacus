@@ -3,6 +3,7 @@ use axum::{
     extract::FromRequest,
     response::{IntoResponse, Response},
 };
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
@@ -12,7 +13,7 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::DataEntryId,
-        election::ElectionId,
+        election::{ElectionId, ElectionWithPoliticalGroups, NewElection},
         identifier::id,
         investigation::{InvestigationStatus, PollingStationInvestigation},
     },
@@ -75,6 +76,20 @@ impl IntoResponse for PollingStationResponse {
     }
 }
 
+pub struct PollingStationsElectionIdentifier {
+    pub election_id: String,
+    pub election_date: NaiveDate,
+}
+
+impl PollingStationsElectionIdentifier {
+    pub fn matches_election(&self, election: &ElectionWithPoliticalGroups) -> bool {
+        self.election_id == election.election_id && self.election_date == election.election_date
+    }
+    pub fn matches_new_election(&self, election: &NewElection) -> bool {
+        self.election_id == election.election_id && self.election_date == election.election_date
+    }
+}
+
 /// Polling station of a certain [crate::domain::election::Election]
 #[derive(Clone, Serialize, Deserialize, ToSchema, Debug, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
@@ -119,11 +134,6 @@ pub struct PollingStationFileRequest {
     pub data: String,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct PollingStationRequestListResponse {
-    pub polling_stations: Vec<PollingStationRequest>,
-}
-
 /// Type of Polling station
 #[derive(
     Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
@@ -133,17 +143,6 @@ pub enum PollingStationType {
     FixedLocation,
     Special,
     Mobile,
-}
-
-impl From<String> for PollingStationType {
-    fn from(value: String) -> Self {
-        match value.as_str() {
-            "FixedLocation" => Self::FixedLocation,
-            "Special" => Self::Special,
-            "Mobile" => Self::Mobile,
-            _ => panic!("invalid PollingStationType `{value}`"),
-        }
-    }
 }
 
 /// Polling station in a first committee session.
@@ -364,5 +363,68 @@ pub(crate) mod test_helpers {
             });
         }
         polling_stations
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::domain::election::{
+        CommitteeCategory, ElectionCategory,
+        tests::{election_fixture, new_election_fixture},
+    };
+
+    fn date(s: &str) -> NaiveDate {
+        NaiveDate::parse_from_str(s, "%Y-%m-%d").unwrap()
+    }
+
+    #[test]
+    fn test_polling_stations_election_identifier_matches_election() {
+        let ps_identifier = PollingStationsElectionIdentifier {
+            election_id: "GR_2024".to_string(),
+            election_date: date("2024-03-27"),
+        };
+
+        let mut election =
+            election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2, 3]);
+
+        for (election_id, election_date, expect_match) in [
+            ("GR_2024", date("2024-03-27"), true),
+            ("GR_2028", date("2024-03-27"), false),
+            ("GR_2024", date("2028-03-27"), false),
+        ] {
+            election.election_id = election_id.to_string();
+            election.election_date = election_date;
+
+            assert_eq!(
+                ps_identifier.matches_election(&election),
+                expect_match,
+                "failed for {election_id}, {election_date}",
+            );
+        }
+    }
+
+    #[test]
+    fn test_polling_stations_election_identifier_matches_new_election() {
+        let ps_identifier = PollingStationsElectionIdentifier {
+            election_id: "GR_2024".to_string(),
+            election_date: date("2024-03-27"),
+        };
+
+        for (election_id, election_date, expect_match) in [
+            ("GR_2024", "2024-03-27", true),
+            ("GR_2028", "2024-03-27", false),
+            ("GR_2024", "2028-03-27", false),
+        ] {
+            let new_election = new_election_fixture()
+                .with_election_id(election_id)
+                .with_election_date(election_date);
+
+            assert_eq!(
+                ps_identifier.matches_new_election(&new_election),
+                expect_match,
+                "failed for {election_id}, {election_date}",
+            );
+        }
     }
 }

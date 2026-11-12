@@ -1,11 +1,23 @@
 {
   "F101": {
     "coordinator": {
-      "title": "Beide vragen moeten beantwoord ofwel overgeslagen zijn",
-      "content": "Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden.\nAls er geen extra onderzoek is gedaan, moeten deze vragen overgeslagen worden."
+      "title": "De eerste vraag moet beantwoord worden",
+      "actions": "<ul><li>Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.</li></ul>"
     }
   },
   "F102": {
+    "coordinator": {
+      "title": "De tweede vraag moet beantwoord worden",
+      "content": "Als er extra onderzoek is gedaan, moeten beide vragen beantwoord worden."
+    }
+  },
+  "F103": {
+    "coordinator": {
+      "title": "De tweede vraag moet overgeslagen worden",
+      "content": "Als er geen extra onderzoek is gedaan, mag alleen de eerste vraag beantwoord worden."
+    }
+  },
+  "F104": {
     "coordinator": {
       "title": "Er mag maar één antwoord per vraag worden gegeven"
     }
@@ -20,9 +32,68 @@
       "title": "Er mag maar één antwoord per vraag worden gegeven"
     }
   },
+  "F121": {
+    "typist": {
+      "actions": "<ul><li>Beantwoord de vragen over het papieren proces-verbaal.</li><li>Overleg met de coördinator als je twijfelt.</li></ul>"
+    },
+    "coordinator": {
+      "title": "Er is niet correct aangegeven welke documenten zijn ingevoerd",
+      "actions": "<ul><li>Bekijk welke documenten aanwezig zijn.</li><li>Geef daarna de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.</li></ul>"
+    }
+  },
+  "F122": {
+    "typist": {
+      "title": "Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn",
+      "actions": "<ul><li>Overleg met de coördinator over het ontbrekende inlegvel.</li></ul>"
+    },
+    "coordinator": {
+      "title": "Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn",
+      "actions": "<ul><li>Zorg dat een correct ingevuld inlegvel wordt toegevoegd.</li><li>Geef daarna de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.</li></ul>"
+    }
+  },
+  "F131": {
+    "coordinator": {
+      "title": "De vragen op het inlegvel zijn niet volledig beantwoord",
+      "actions": "<ul><li>Zorg dat het inlegvel volledig is ingevuld.</li><li>Geef daarna de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.</li></ul>"
+    }
+  },
+  "F132": {
+    "typist": {
+      "content": "Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.",
+      "actions": "<ul><li>Overleg met de coördinator.</li></ul>"
+    },
+    "coordinator": {
+      "title": "Onterecht corrigendum?",
+      "content": "Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.",
+      "actions": "<ul><li>Als er geen gecorrigeerde telresultaten zijn, dan hoort er ook geen corrigendum te zijn.</li><li>Verwijder het corrigendum, of geef op het inlegvel aan dat er wel gecorrigeerde telresultaten zijn.</li><li>Geef daarna de invoer terug aan de invoerder.</li></ul>"
+    }
+  },
+  "F133": {
+    "typist": {
+      "content": "Er is geen corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' wel gecorrigeerde telresultaten.",
+      "actions": "<ul><li>Overleg met de coördinator.</li></ul>"
+    },
+    "coordinator": {
+      "title": "Ontbrekend corrigendum?",
+      "content": "Er is geen corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' wel gecorrigeerde telresultaten.",
+      "actions": "<ul><li>Als er gecorrigeerde telresultaten zijn, dan hoort er ook een corrigendum te zijn.</li><li>Voeg het correcte corrigendum toe, of geef op het inlegvel aan dat er geen gecorrigeerde telresultaten zijn.</li><li>Geef daarna de invoer terug aan de invoerder.</li></ul>"
+    }
+  },
+  "F134": {
+    "coordinator": {
+      "title": "Er mag maar 1 antwoord per vraag worden gegeven",
+      "actions": "<ul><li>Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.</li></ul>"
+    }
+  },
+  "F135": {
+    "coordinator": {
+      "title": "Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn",
+      "actions": "<ul><li>Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.</li></ul>"
+    }
+  },
   "F201": {
     "coordinator": {
-      "title": "A en B tellen niet op tot D",
+      "title": "A, B en C tellen niet op tot D",
       "content": "Controleer in rubriek 3.3 (eerste zitting) of 2.3 (volgende zitting) of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.",
       "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
     }
@@ -102,7 +173,21 @@
   },
   "F310": {
     "coordinator": {
-      "title": "Deze vraag moet precies één antwoord hebben"
+      "title": "Deze vraag moet precies één antwoord hebben",
+      "content": "Bij vraag 3.2.3 (eerste zitting) of 2.3.2 (volgende zitting) moet één antwoord gekozen worden."
+    }
+  },
+  "F311": {
+    "coordinator": {
+      "title": "Hertel onverklaard verschil",
+      "content": "Er is een onverklaard verschil dat herteld moet worden.",
+      "actions": "<ul><li>Hertel de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.</li><li>Vul nieuwe telresultaten op een corrigendum in.</li><li>Is er al herteld? Zorg dan dat het inlegvel 'controles en correcties' wordt ingevuld en toegevoegd aan het proces-verbaal van het stembureau.</li></ul>"
+    }
+  },
+  "F313": {
+    "coordinator": {
+      "title": "Deze vraag moet overgelagen worden",
+      "content": "D en H zijn gelijk, dus er is geen onverklaard verschil. Vraag 3.2.3 (eerste zitting) of 2.3.2 (volgende zitting) moet overgeslagen worden."
     }
   },
   "F401": {
@@ -143,6 +228,17 @@
     },
     "coordinator": {
       "title": "W.001 is er alleen voor invoerders",
+      "content": "Voor de coördinator hebben we het scherm 'verschillen oplossen'."
+    }
+  },
+  "W002": {
+    "typist": {
+      "title": "Verschil met andere invoer. Nieuwe invoer nodig",
+      "content": "Een coördinator heeft beide invoeren vergeleken, en aangegeven dat in deze invoer fouten zijn gemaakt. Neem de gemarkeerde velden opnieuw over van het papieren proces verbaal.",
+      "actions": "<ul><li>Heb je alles ingevuld en komt je invoer overeen met het papier? Ga dan verder.</li></ul>"
+    },
+    "coordinator": {
+      "title": "W.002 is er alleen voor invoerders",
       "content": "Voor de coördinator hebben we het scherm 'verschillen oplossen'."
     }
   },

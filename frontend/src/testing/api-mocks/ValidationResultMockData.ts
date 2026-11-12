@@ -13,6 +13,14 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     fields: ["data.extra_investigation"],
     code: "F102",
   },
+  F103: {
+    fields: ["data.extra_investigation"],
+    code: "F103",
+  },
+  F104: {
+    fields: ["data.extra_investigation"],
+    code: "F104",
+  },
   F111: {
     fields: ["data.counting_differences_polling_station"],
     code: "F111",
@@ -20,6 +28,34 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
   F112: {
     fields: ["data.counting_differences_polling_station"],
     code: "F112",
+  },
+  F121: {
+    fields: ["data.about_report"],
+    code: "F121",
+  },
+  F122: {
+    fields: ["data.about_report"],
+    code: "F122",
+  },
+  F131: {
+    fields: ["data.checks_and_corrections"],
+    code: "F131",
+  },
+  F132: {
+    fields: ["data.checks_and_corrections"],
+    code: "F132",
+  },
+  F133: {
+    fields: ["data.checks_and_corrections"],
+    code: "F133",
+  },
+  F134: {
+    fields: ["data.checks_and_corrections"],
+    code: "F134",
+  },
+  F135: {
+    fields: ["data.checks_and_corrections"],
+    code: "F135",
   },
   F201: {
     fields: [
@@ -83,9 +119,17 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     fields: ["data.differences_counts.difference_completely_accounted_for"],
     code: "F310",
   },
+  F311: {
+    fields: ["data.differences_counts.difference_completely_accounted_for"],
+    code: "F311",
+  },
   F312: {
     fields: ["data.differences_counts.more_ballots_count", "data.differences_counts.fewer_ballots_count"],
     code: "F312",
+  },
+  F313: {
+    fields: ["data.differences_counts.difference_completely_accounted_for"],
+    code: "F313",
   },
   F401: {
     fields: ["data.political_group_votes.0.total"],
@@ -103,6 +147,10 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     code: "F403",
   },
   W001: { fields: ["data.voters_counts.poll_card_count"], code: "W001" },
+  W002: {
+    fields: ["data.voters_counts.poll_card_count", "data.voters_counts.proxy_certificate_count"],
+    code: "W002",
+  },
   W201: { fields: ["data.votes_counts.blank_votes_count"], code: "W201" },
   W202: { fields: ["data.votes_counts.invalid_votes_count"], code: "W202" },
   W203: {

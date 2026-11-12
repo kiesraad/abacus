@@ -30,7 +30,7 @@ pub struct SeatAssignment {
     pub residual_seats: u32,
     pub quota: DisplayFraction,
     pub steps: Vec<SeatChangeStep>,
-    pub final_standing: Vec<ListSeatAssignment>,
+    pub standings: Vec<ListSeatAssignment>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
@@ -78,6 +78,24 @@ impl SeatChange {
         matches!(self, Self::ListExhaustionRemoval(_))
     }
 
+    pub fn drawn_lots(&self) -> Option<&ListDrawingLotsVariant> {
+        match self {
+            Self::HighestAverageAssignment(highest_average_assigned_seat) => {
+                highest_average_assigned_seat.drawing_lots.as_ref()
+            }
+            Self::UniqueHighestAverageAssignment(unique_highest_average_assigned_seat) => {
+                unique_highest_average_assigned_seat.drawing_lots.as_ref()
+            }
+            Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
+                largest_remainder_assigned_seat.drawing_lots.as_ref()
+            }
+            Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
+                absolute_majority_reassigned_seat.drawing_lots.as_ref()
+            }
+            Self::ListExhaustionRemoval(_) => None,
+        }
+    }
+
     pub fn list_number_assigned(&self) -> PGNumber {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
@@ -112,26 +130,37 @@ impl SeatChange {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
+#[cfg_attr(test, derive(Default))]
 pub struct HighestAverageAssignedSeat {
     pub selected_list_number: PGNumber,
     pub list_options: Vec<PGNumber>,
     pub list_assigned: Vec<PGNumber>,
     pub list_exhausted: Vec<PGNumber>,
     pub votes_per_seat: DisplayFraction,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub drawing_lots: Option<ListDrawingLotsVariant>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
+#[cfg_attr(test, derive(Default))]
 pub struct LargestRemainderAssignedSeat {
     pub selected_list_number: PGNumber,
     pub list_options: Vec<PGNumber>,
     pub list_assigned: Vec<PGNumber>,
     pub remainder_votes: DisplayFraction,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub drawing_lots: Option<ListDrawingLotsVariant>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct AbsoluteMajorityReassignedSeat {
     pub list_retracted_seat: PGNumber,
     pub list_assigned_seat: PGNumber,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub drawing_lots: Option<ListDrawingLotsVariant>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
@@ -196,6 +225,7 @@ impl From<&apportionment::SeatChange<PGNumber>> for SeatChange {
                 list_assigned: c.list_assigned.clone(),
                 list_exhausted: c.list_exhausted.clone(),
                 votes_per_seat: DisplayFraction::from(c.votes_per_seat),
+                drawing_lots: c.drawing_lots.clone().map(Into::into),
             };
 
         match change {
@@ -209,12 +239,14 @@ impl From<&apportionment::SeatChange<PGNumber>> for SeatChange {
                     list_options: c.list_options.clone(),
                     list_assigned: c.list_assigned.clone(),
                     remainder_votes: DisplayFraction::from(c.remainder_votes),
+                    drawing_lots: c.drawing_lots.clone().map(Into::into),
                 })
             }
             AbsoluteMajorityReassignment(c) => {
                 SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
                     list_retracted_seat: c.list_retracted_seat,
                     list_assigned_seat: c.list_assigned_seat,
+                    drawing_lots: c.drawing_lots.clone().map(Into::into),
                 })
             }
             ListExhaustionRemoval(c) => {
@@ -236,13 +268,13 @@ impl From<&apportionment::SeatChangeStep<PGNumber>> for SeatChangeStep {
                 .standings
                 .iter()
                 .map(|standing| ListStanding {
-                    list_number: standing.list_number,
-                    votes_cast: standing.votes_cast,
-                    remainder_votes: DisplayFraction::from(standing.remainder_votes),
-                    meets_remainder_threshold: standing.meets_remainder_threshold,
-                    next_votes_per_seat: DisplayFraction::from(standing.next_votes_per_seat),
-                    full_seats: standing.full_seats,
-                    residual_seats: standing.residual_seats,
+                    list_number: standing.list_number(),
+                    votes_cast: standing.votes_cast(),
+                    remainder_votes: DisplayFraction::from(standing.remainder_votes()),
+                    meets_remainder_threshold: standing.meets_remainder_threshold(),
+                    next_votes_per_seat: DisplayFraction::from(standing.next_votes_per_seat()),
+                    full_seats: standing.full_seats(),
+                    residual_seats: standing.residual_seats(),
                 })
                 .collect(),
         }
@@ -251,6 +283,7 @@ impl From<&apportionment::SeatChangeStep<PGNumber>> for SeatChangeStep {
 
 /// Fraction with the integer part split out for display purposes
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
+#[cfg_attr(test, derive(Default))]
 pub struct DisplayFraction {
     pub integer: u64,
     pub numerator: u64,
@@ -328,26 +361,50 @@ pub enum ListDrawingLotsVariant {
     HighestAverageResidualSeat(HighestAverageResidualSeatDrawingLots),
     /// Draw lots for assigning a largest remainder residual seat
     LargestRemainderResidualSeat(LargestRemainderResidualSeatDrawingLots),
-    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9)
-    AbsoluteMajority(AbsoluteMajorityDrawingLots),
+    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9),
+    /// retracted seat was from a highest average assignment
+    AbsoluteMajorityHighestAverage(AbsoluteMajorityDrawingLots),
+    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9),
+    /// retracted seat was from a largest remainder assignment
+    AbsoluteMajorityLargestRemainder(AbsoluteMajorityDrawingLots),
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+#[cfg_attr(test, derive(Default))]
 pub struct HighestAverageResidualSeatDrawingLots {
+    pub max_average: DisplayFraction,
+    pub residual_seat_numbers: Vec<u32>,
+    pub options: Vec<PGNumber>,
+    pub list_averages: Vec<ListAverage>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct ListAverage {
+    pub pg_number: PGNumber,
     pub average: DisplayFraction,
-    pub residual_seat_numbers: Vec<u32>,
-    pub options: Vec<PGNumber>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+#[cfg_attr(test, derive(Default))]
 pub struct LargestRemainderResidualSeatDrawingLots {
-    pub remainder: DisplayFraction,
+    pub max_remainder: DisplayFraction,
     pub residual_seat_numbers: Vec<u32>,
     pub options: Vec<PGNumber>,
+    pub list_remainders: Vec<ListRemainder>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct ListRemainder {
+    pub pg_number: PGNumber,
+    pub remainder: DisplayFraction,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+#[cfg_attr(test, derive(Default))]
 pub struct AbsoluteMajorityDrawingLots {
+    /// The list where the reassigned residual seat will go to
+    pub assign_to: PGNumber,
+    /// The list options where the residual seat should come from
     pub options: Vec<PGNumber>,
 }
 
@@ -364,6 +421,12 @@ pub struct ListDrawn {
 pub struct CandidateDrawingLotsVariant {
     /// The list the candidate needs to be drawn from
     pub list: PGNumber,
+    /// The total number of seats for the list
+    pub total_seats: u32,
+    /// The number of votes, equal for these candidates
+    pub number_of_votes: u32,
+    /// The seat numbers that the candidates can be drawn for
+    pub seat_numbers: Vec<u32>,
     /// The candidates that lots are drawn for
     pub options: Vec<CandidateNumber>,
 }

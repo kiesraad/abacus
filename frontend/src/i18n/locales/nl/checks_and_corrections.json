@@ -1,0 +1,26 @@
+{
+  "form_title": "Controles en correcties",
+  "form_description": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+  "short_title": "Controles en correcties",
+  "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+  "own_initiative": "Op eigen initiatief van het gemeentelijk stembureau",
+  "reason_investigation_own_initiative": {
+    "title": "Waarom heeft het gemeentelijk stembureau de telresultaten onderzocht?",
+    "short_title": "Waarom heeft het GSB de telresultaten onderzocht?",
+    "unaccounted_difference": "Vanwege een onverklaard verschil",
+    "other_error": "Vanwege (het vermoeden van) een andere fout"
+  },
+  "corrected_results_own_initiative": {
+    "title": "Zijn er gecorrigeerde telresultaten?",
+    "short_title": "Zijn er gecorrigeerde telresultaten?",
+    "no": "Nee, de oorspronkelijke telresultaten waren correct",
+    "yes": "Ja, er zijn gecorrigeerde telresultaten"
+  },
+  "corrected_results_csb_request": {
+    "title": "Zijn er gecorrigeerde telresultaten?",
+    "short_title": "Zijn er gecorrigeerde telresultaten?",
+    "no": "Nee, de oorspronkelijke telresultaten waren correct",
+    "yes": "Ja, er zijn gecorrigeerde telresultaten"
+  },
+  "csb_request": "Op verzoek van het centraal stembureau"
+}

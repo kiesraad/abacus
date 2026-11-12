@@ -1,5 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { HttpResponse, http } from "msw";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
@@ -18,7 +19,7 @@ import {
   candidate_nomination,
   committee_session,
   election,
-  election_summary,
+  election_totals,
   seat_assignment,
 } from "../../testing/lt-19-seats";
 import { ApportionmentProvider } from "../ApportionmentProvider";
@@ -39,12 +40,19 @@ const renderAddDeceasedCandidatePage = (electionId: number) => {
 describe("AddDeceasedCandidatesPage", () => {
   beforeEach(() => {
     overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
-    overrideOnce("post", "/api/elections/3/apportionment", 200, {
-      seat_assignment: seat_assignment,
-      candidate_nomination: candidate_nomination,
-      election_summary: election_summary,
-      warnings: [],
-    } satisfies ElectionApportionmentResponse);
+    server.use(
+      http.post("/api/elections/3/apportionment", () =>
+        HttpResponse.json(
+          {
+            seat_assignment: seat_assignment,
+            candidate_nomination: candidate_nomination,
+            election_totals: election_totals,
+            warnings: [],
+          } satisfies ElectionApportionmentResponse,
+          { status: 200 },
+        ),
+      ),
+    );
     server.use(GetApportionmentStateRequestHandler);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
@@ -65,7 +73,12 @@ describe("AddDeceasedCandidatesPage", () => {
       DrawingLots: {
         state: {
           deceased_candidates: [],
-          drawing_lots_required: { variant: "AbsoluteMajority", options: [1, 2], type: "ListDrawingLotsRequired" },
+          drawing_lots_required: {
+            variant: "AbsoluteMajorityLargestRemainder",
+            assign_to: 1,
+            options: [2, 3],
+            type: "ListDrawingLotsRequired",
+          },
           candidates_drawn: [],
           lists_drawn: [],
           type: "DrawingLots",
@@ -106,7 +119,7 @@ describe("AddDeceasedCandidatesPage", () => {
     renderAddDeceasedCandidatePage(3);
     expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaat" }));
 
-    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 1 - Political Group A" }));
+    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 1 – Political Group A" }));
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
@@ -116,13 +129,13 @@ describe("AddDeceasedCandidatesPage", () => {
       ["2", "Oud, J. (Johan)"],
       ["3", "Oud, M. (Marijke)"],
       ["4", "Jansen, A. (Arie)"],
-      ["5", "Van der Weijden, H. (Henk)"],
-      ["6", "Van der Weijden, B. (Berta)"],
+      ["5", "van der Weijden, H. (Henk)"],
+      ["6", "van der Weijden, B. (Berta)"],
       ["7", "Oud, K. (Klaas)"],
       ["8", "Bakker, S. (Sophie)"],
-      ["9", "De Vries, J. (Johan)"],
-      ["10", "Van den Berg, M. (Marijke)"],
-      ["11", "De Jong, R. (Rolf)"],
+      ["9", "de Vries, J. (Johan)"],
+      ["10", "van den Berg, M. (Marijke)"],
+      ["11", "de Jong, R. (Rolf)"],
       ["12", "Kok, K. (Karin)"],
     ]);
 
@@ -190,7 +203,7 @@ describe("AddDeceasedCandidatesPage", () => {
     expect(group8).toHaveAttribute("aria-current", "false");
     expect(within(group8).queryByRole("img")).not.toBeInTheDocument();
 
-    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 1 - Political Group A" }));
+    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 1 – Political Group A" }));
 
     await user.click(within(group2).getByRole("button"));
 
@@ -203,7 +216,7 @@ describe("AddDeceasedCandidatesPage", () => {
     const group2Icon = within(group2).getByRole("img");
     expect(group2Icon).toHaveAccessibleName("je bent hier");
 
-    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 2 - Political Group B" }));
+    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 2 – Political Group B" }));
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
@@ -211,10 +224,10 @@ describe("AddDeceasedCandidatesPage", () => {
       ["Nummer", "Kandidaat"],
       ["1", "Bakker, T. (Tinus)"],
       ["2", "Po, D."],
-      ["3", "De Vries, W. (Willem)"],
+      ["3", "de Vries, W. (Willem)"],
       ["4", "Kloosterboer, K. (Klaas)"],
       ["5", "Jansen, L. (Liesbeth)"],
-      ["6", "Van den Berg, H. (Henk)"],
+      ["6", "van den Berg, H. (Henk)"],
     ]);
 
     // Check if clicking the row works

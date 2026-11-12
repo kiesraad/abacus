@@ -62,11 +62,11 @@ describe("DataEntrySection", () => {
     test.each([
       {
         sectionId: "political_group_votes_1",
-        expectedTitle: "Lijst 1 - Vurige Vleugels Partij",
+        expectedTitle: "Lijst 1 – Vurige Vleugels Partij",
       },
       {
         sectionId: "political_group_votes_2",
-        expectedTitle: "Lijst 2 - Wijzen van Water en Wind",
+        expectedTitle: "Lijst 2 – Wijzen van Water en Wind",
       },
     ])("does not display badge for $sectionId", async ({ sectionId, expectedTitle }) => {
       renderComponent(sectionId);
@@ -108,7 +108,7 @@ describe("DataEntrySection", () => {
       const router = renderComponent("extra_investigation");
 
       // Wait for the page to be loaded
-      const title = await screen.findByText("Alleen bij extra onderzoek");
+      const title = await screen.findByText("Extra onderzoek");
       expect(title).toBeInTheDocument();
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });

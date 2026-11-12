@@ -2,6 +2,7 @@
   "add_choice": "Hoe wil je stembureaus toevoegen?",
   "address": "Straatnaam en huisnummer",
   "create": "Stembureau toevoegen",
+  "export": "Lijst exporteren",
   "edit_not_allowed_alert": {
     "description": "De invoerfase van de eerste zitting is al gestart. Na het starten van de invoerfase kan alleen een coördinator de lijst met stembureaus nog bewerken.",
     "title": "Stembureaus kunnen niet aangepast worden"

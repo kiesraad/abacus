@@ -1,6 +1,8 @@
-use std::{future::Future, net::SocketAddr, str::FromStr};
+#![cfg_attr(test, allow(clippy::too_many_lines, clippy::cognitive_complexity))]
 
-use api::middleware::airgap::AirgapDetection;
+use std::{future::Future, net::SocketAddr, pin::Pin, str::FromStr};
+
+use api::middleware::{airgap::AirgapDetection, authentication::ratelimit::LoginRateLimit};
 use axum::{extract::FromRef, serve::ListenerExt};
 use serde::Serialize;
 use sqlx::{
@@ -27,7 +29,7 @@ pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
 #[cfg(feature = "dev-database")]
 use infra::seed_data;
-use infra::{audit_log, router};
+use infra::{audit_log, backup::BackupConfig, router};
 
 use crate::{
     app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath},
@@ -57,28 +59,55 @@ impl SqlitePoolExt for SqlitePool {
 pub struct AppState {
     pool: SqlitePool,
     airgap_detection: AirgapDetection,
+    backup_config: BackupConfig,
+    login_ratelimit: LoginRateLimit,
+}
+
+/// Start airgap detection if enabled, logging which path was taken.
+fn setup_airgap_detection(pool: &SqlitePool, enable: bool) -> AirgapDetection {
+    if enable {
+        info!("Airgap detection is enabled, starting airgap detection task...");
+        AirgapDetection::start(pool.clone())
+    } else {
+        warn!("Airgap detection is disabled, this is not allowed in production.");
+        AirgapDetection::nop()
+    }
+}
+
+/// Log startup, start airgap detection, and build the router shared by the
+/// HTTP and HTTPS servers.
+fn build_app(
+    pool: &SqlitePool,
+    enable_airgap_detection: bool,
+    backup_config: BackupConfig,
+) -> Result<axum::Router, AppError> {
+    info!("Starting Abacus (version {})", env!("ABACUS_GIT_VERSION"));
+    let airgap_detection = setup_airgap_detection(pool, enable_airgap_detection);
+    router::create_router(
+        pool.clone(),
+        airgap_detection,
+        backup_config,
+        LoginRateLimit::default(),
+    )
+}
+
+/// Close the database pool (flushing SQLite WAL/shm) and log a clean shutdown.
+async fn close_and_log(pool: SqlitePool) {
+    pool.close().await;
+    info!("Abacus has shut down gracefully.");
 }
 
 /// Start the API server on the given port, using the given database pool.
-#[allow(clippy::cognitive_complexity)]
 pub async fn start_server(
     pool: SqlitePool,
     listener: TcpListener,
     enable_airgap_detection: bool,
+    backup_config: BackupConfig,
+    shutdown_signal: ShutdownSignal,
 ) -> Result<(), AppError> {
-    info!("Starting Abacus (version {})", env!("ABACUS_GIT_VERSION"));
-    let airgap_detection = if enable_airgap_detection {
-        info!("Airgap detection is enabled, starting airgap detection task...");
+    let app = build_app(&pool, enable_airgap_detection, backup_config)?;
 
-        AirgapDetection::start(pool.clone())
-    } else {
-        warn!("Airgap detection is disabled, this is not allowed in production.");
-
-        AirgapDetection::nop()
-    };
-
-    let app = router::create_router(pool.clone(), airgap_detection)?;
-
+    warn!("TLS is disabled, serving Abacus over plain HTTP. This is not allowed in production.");
     info!("Starting Abacus on http://{}", listener.local_addr()?);
     let listener = listener.tap_io(|tcp_stream| {
         if let Err(err) = tcp_stream.set_nodelay(true) {
@@ -90,72 +119,126 @@ pub async fn start_server(
         listener,
         app.into_make_service_with_connect_info::<SocketAddr>(),
     )
-    .with_graceful_shutdown(shutdown_signal())
+    .with_graceful_shutdown(shutdown_signal)
     .await?;
 
-    // close the database, this will flush the shm and wal files for sqlite
-    pool.close().await;
-
-    info!("Abacus has shut down gracefully.");
+    close_and_log(pool).await;
 
     Ok(())
 }
 
-/// Graceful shutdown, useful for Docker containers.
+/// Start the API server over HTTPS using axum-server/rustls.
+#[cfg(feature = "tls")]
+pub async fn start_server_tls(
+    pool: SqlitePool,
+    listener: TcpListener,
+    enable_airgap_detection: bool,
+    backup_config: BackupConfig,
+    tls_config: std::sync::Arc<rustls::ServerConfig>,
+    ca: std::sync::Arc<infra::tls::CaCertificate>,
+    shutdown_signal: ShutdownSignal,
+) -> Result<(), AppError> {
+    use std::time::Duration;
+
+    use axum_server::{
+        accept::NoDelayAcceptor,
+        tls_rustls::{RustlsAcceptor, RustlsConfig},
+    };
+    use hyper::http::{HeaderValue, header};
+    use tower_http::set_header::SetResponseHeaderLayer;
+
+    let app = build_app(&pool, enable_airgap_detection, backup_config)?
+        .merge(infra::router::ca_router(&ca))
+        .layer(SetResponseHeaderLayer::overriding(
+            header::STRICT_TRANSPORT_SECURITY,
+            HeaderValue::from_static("max-age=31536000; includeSubDomains"),
+        ));
+
+    info!("Starting Abacus on https://{}", listener.local_addr()?);
+
+    // Set up graceful shutdown from the existing signal handler
+    let handle = axum_server::Handle::new();
+    let shutdown_handle = handle.clone();
+    tokio::spawn(async move {
+        shutdown_signal.await;
+        shutdown_handle.graceful_shutdown(Some(Duration::from_secs(10)));
+    });
+
+    // Serve Abacus using the axum-server/rustls acceptor
+    let acceptor =
+        RustlsAcceptor::new(RustlsConfig::from_config(tls_config)).acceptor(NoDelayAcceptor::new());
+    let std_listener = listener.into_std()?;
+    axum_server::from_tcp(std_listener)?
+        .acceptor(acceptor)
+        .handle(handle)
+        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
+        .await?;
+
+    close_and_log(pool).await;
+
+    Ok(())
+}
+
+/// Future that completes when the server should shut down gracefully
+pub type ShutdownSignal = Pin<Box<dyn Future<Output = ()> + Send>>;
+
+/// Graceful shutdown signal handler.
 ///
 /// Copied from the
 /// [axum graceful-shutdown example](https://github.com/tokio-rs/axum/blob/6318b57fda6b524b4d3c7909e07946e2b246ebd2/examples/graceful-shutdown/src/main.rs)
 /// (under the MIT license).
-pub async fn shutdown_signal() {
-    let ctrl_c = async {
-        signal::ctrl_c()
-            .await
-            .expect("failed to install Ctrl+C handler");
-    };
+pub fn shutdown_signal() -> ShutdownSignal {
+    Box::pin(async {
+        let ctrl_c = async {
+            signal::ctrl_c()
+                .await
+                .expect("failed to install Ctrl+C handler");
+        };
 
-    #[cfg(unix)]
-    let terminate = async {
-        signal::unix::signal(signal::unix::SignalKind::terminate())
-            .expect("failed to install terminate signal handler")
-            .recv()
-            .await;
-    };
+        #[cfg(unix)]
+        let terminate = async {
+            signal::unix::signal(signal::unix::SignalKind::terminate())
+                .expect("failed to install terminate signal handler")
+                .recv()
+                .await;
+        };
 
-    #[cfg(unix)]
-    let quit = async {
-        signal::unix::signal(signal::unix::SignalKind::quit())
-            .expect("failed to install quit signal handler")
-            .recv()
-            .await;
-    };
+        #[cfg(unix)]
+        let quit = async {
+            signal::unix::signal(signal::unix::SignalKind::quit())
+                .expect("failed to install quit signal handler")
+                .recv()
+                .await;
+        };
 
-    #[cfg(windows)]
-    let terminate = async {
-        signal::windows::ctrl_close()
-            .expect("failed to install CTRL_CLOSE handler")
-            .recv()
-            .await
-    };
+        #[cfg(windows)]
+        let terminate = async {
+            signal::windows::ctrl_close()
+                .expect("failed to install CTRL_CLOSE handler")
+                .recv()
+                .await
+        };
 
-    #[cfg(windows)]
-    let quit = async {
-        signal::windows::ctrl_shutdown()
-            .expect("failed to install CTRL_SHUTDOWN handler")
-            .recv()
-            .await
-    };
+        #[cfg(windows)]
+        let quit = async {
+            signal::windows::ctrl_shutdown()
+                .expect("failed to install CTRL_SHUTDOWN handler")
+                .recv()
+                .await
+        };
 
-    #[cfg(not(any(unix, windows)))]
-    let terminate = std::future::pending::<()>();
+        #[cfg(not(any(unix, windows)))]
+        let terminate = std::future::pending::<()>();
 
-    #[cfg(not(any(unix, windows)))]
-    let quit = std::future::pending::<()>();
+        #[cfg(not(any(unix, windows)))]
+        let quit = std::future::pending::<()>();
 
-    tokio::select! {
-        _ = ctrl_c => {},
-        _ = terminate => {},
-        _ = quit => {},
-    }
+        tokio::select! {
+            _ = ctrl_c => {},
+            _ = terminate => {},
+            _ = quit => {},
+        }
+    })
 }
 
 #[derive(Serialize)]
@@ -234,7 +317,7 @@ mod test {
     use tokio::net::TcpListener;
 
     use super::start_server;
-    use crate::{AppError, create_sqlite_pool};
+    use crate::{AppError, create_sqlite_pool, infra::backup::BackupConfig, shutdown_signal};
 
     pub(crate) async fn run_server_test<F, Fut>(pool: SqlitePool, test_fn: F)
     where
@@ -247,8 +330,12 @@ mod test {
         let base_url = format!("http://{addr}");
 
         // Start server in background task
+        let backup_dir = tempfile::tempdir().unwrap();
+        let backup_config = BackupConfig::new(backup_dir.path().to_path_buf());
         let server_task = tokio::spawn(async move {
-            start_server(pool, listener, false).await.unwrap();
+            start_server(pool, listener, false, backup_config, shutdown_signal())
+                .await
+                .unwrap();
         });
 
         // Run the test
@@ -347,7 +434,7 @@ mod test {
             #[cfg(feature = "memory-serve")]
             {
                 let response = reqwest::get(format!("{base_url}/")).await.unwrap();
-                assert_eq!(response.headers()["cache-control"], "max-age:300, private");
+                assert_eq!(response.headers()["cache-control"], "max-age=300, private");
             }
         })
         .await;
@@ -399,5 +486,201 @@ mod test {
         .await;
 
         assert!(matches!(result, Err(AppError::DatabaseReadOnly(_))));
+    }
+
+    /// TLS tests
+    #[cfg(feature = "tls")]
+    mod tls {
+        use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+
+        use reqwest::StatusCode;
+        use sqlx::SqlitePool;
+        use test_log::test;
+        use tokio::{net::TcpListener, task::JoinHandle};
+
+        use crate::{
+            infra::audit_log, infra::backup::BackupConfig, infra::tls::load_or_generate,
+            shutdown_signal, start_server_tls,
+        };
+
+        /// Helper to start an HTTPS server on `bind_addr` with a new CA+leaf certificate
+        async fn spawn_https_server(
+            pool: SqlitePool,
+            bind_addr: &str,
+        ) -> (SocketAddr, String, JoinHandle<()>) {
+            let dir = tempfile::tempdir().unwrap();
+            let certificates = load_or_generate(&dir.path().join("tls")).unwrap();
+            let ca_pem = certificates.ca.pem.clone();
+            let server_config = certificates.server_config().unwrap();
+            let ca = std::sync::Arc::new(certificates.ca);
+            let backup_config = BackupConfig::new(dir.path().join("backups"));
+
+            let listener = TcpListener::bind(bind_addr).await.unwrap();
+            let addr = listener.local_addr().unwrap();
+            let task = tokio::spawn(async move {
+                start_server_tls(
+                    pool,
+                    listener,
+                    false,
+                    backup_config,
+                    server_config,
+                    ca,
+                    shutdown_signal(),
+                )
+                .await
+                .unwrap();
+            });
+            (addr, ca_pem, task)
+        }
+
+        /// A reqwest client that trusts only the given CA (no system roots).
+        fn client_trusting(ca_pem: &str) -> reqwest::Client {
+            let ca = reqwest::Certificate::from_pem(ca_pem.as_bytes()).unwrap();
+            reqwest::Client::builder()
+                .tls_certs_only([ca])
+                .build()
+                .unwrap()
+        }
+
+        /// Assert that an HTTPS server is reachable and a login succeeds
+        async fn assert_login_works(pool: SqlitePool, bind_addr: &str, expected_ip: IpAddr) {
+            let (addr, ca_pem, task) = spawn_https_server(pool.clone(), bind_addr).await;
+            let base = format!("https://{addr}");
+            let client = client_trusting(&ca_pem);
+
+            // account endpoint can be loaded without TLS error
+            let account = client
+                .get(format!("{base}/api/account"))
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(
+                account.status(),
+                StatusCode::UNAUTHORIZED,
+                "leaf must chain to the trusted CA"
+            );
+
+            // A valid login over HTTPS succeeds
+            let login = client
+                .post(format!("{base}/api/login"))
+                .json(&serde_json::json!({"username": "admin1", "password": "Admin1Password01"}))
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(
+                login.status(),
+                StatusCode::OK,
+                "login over HTTPS should succeed"
+            );
+
+            // Login audit event records correct client IP
+            let mut conn = pool.acquire().await.unwrap();
+            let events = audit_log::list_all(&mut conn).await.unwrap();
+            let last = events.last().expect("there should be an audit event");
+            assert_eq!(
+                last.ip(),
+                Some(expected_ip),
+                "the real client IP should reach the audit log"
+            );
+            assert_eq!(last.username(), Some("admin1"));
+
+            task.abort();
+            let _ = task.await;
+        }
+
+        #[test(sqlx::test(fixtures("../fixtures/users.sql")))]
+        async fn test_login_ipv4(pool: SqlitePool) {
+            assert_login_works(pool, "127.0.0.1:0", IpAddr::V4(Ipv4Addr::LOCALHOST)).await;
+        }
+
+        #[test(sqlx::test(fixtures("../fixtures/users.sql")))]
+        async fn test_login_ipv6(pool: SqlitePool) {
+            assert_login_works(pool, "[::1]:0", IpAddr::V6(Ipv6Addr::LOCALHOST)).await;
+        }
+
+        /// A client that has not imported the local CA must fail the TLS handshake.
+        #[test(sqlx::test(fixtures("../fixtures/users.sql")))]
+        async fn test_https_client_fails_without_ca(pool: SqlitePool) {
+            let (addr, _ca_pem, task) = spawn_https_server(pool, "127.0.0.1:0").await;
+
+            // Default client does not trust our local test CA
+            let client = reqwest::Client::new();
+            let err = client
+                .get(format!("https://{addr}/api/account"))
+                .send()
+                .await
+                .expect_err("a client that does not trust the local CA must fail the handshake");
+
+            // Connection should fail during the TLS handshake
+            assert!(
+                err.is_connect(),
+                "expected a connect-phase error, got: {err:?}"
+            );
+            assert!(
+                format!("{err:?}").contains("UnknownIssuer"),
+                "expected an untrusted-issuer certificate error, got: {err:?}"
+            );
+
+            task.abort();
+            let _ = task.await;
+        }
+
+        /// Test that HSTS header is present on HTTPS responses
+        #[test(sqlx::test)]
+        async fn test_hsts_header(pool: SqlitePool) {
+            let (addr, ca_pem, task) = spawn_https_server(pool, "127.0.0.1:0").await;
+            let client = client_trusting(&ca_pem);
+
+            let api_response = client
+                .get(format!("https://{addr}/api/account"))
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(
+                api_response.headers()["strict-transport-security"],
+                "max-age=31536000; includeSubDomains"
+            );
+
+            let ca_response = client
+                .get(format!("https://{addr}/ca.pem"))
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(
+                ca_response.headers()["strict-transport-security"],
+                "max-age=31536000; includeSubDomains"
+            );
+
+            task.abort();
+            let _ = task.await;
+        }
+
+        /// The CA certificate is downloadable over HTTPS as well as over the
+        /// plaintext HTTP redirect server.
+        #[test(sqlx::test)]
+        async fn test_ca_download_over_https(pool: SqlitePool) {
+            let (addr, ca_pem, task) = spawn_https_server(pool, "127.0.0.1:0").await;
+            let client = client_trusting(&ca_pem);
+
+            let response = client
+                .get(format!("https://{addr}/ca.pem"))
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(response.status(), StatusCode::OK);
+            assert_eq!(
+                response.headers()[reqwest::header::X_CONTENT_TYPE_OPTIONS],
+                "nosniff",
+                "the CA download carries the app's security headers"
+            );
+            assert_eq!(
+                response.text().await.unwrap(),
+                ca_pem,
+                "the served CA matches the trusted CA"
+            );
+
+            task.abort();
+            let _ = task.await;
+        }
     }
 }

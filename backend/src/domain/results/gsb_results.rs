@@ -196,7 +196,7 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        election::{CommitteeCategory, PGNumber, tests::election_fixture},
+        election::{CommitteeCategory, ElectionCategory, PGNumber, tests::election_fixture},
         results::political_group_total_votes::PoliticalGroupTotalVotes,
     };
 
@@ -206,6 +206,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 90,
                 proxy_certificate_count: 0,
+                voter_card_count: None,
                 total_admitted_voters_count: 90,
             },
             votes_counts: VotesCounts {
@@ -236,6 +237,7 @@ mod tests {
         data.validate(
             // Adjust election political group list to the given test data
             &election_fixture(
+                ElectionCategory::Municipal,
                 CommitteeCategory::GSB,
                 &data
                     .political_group_votes

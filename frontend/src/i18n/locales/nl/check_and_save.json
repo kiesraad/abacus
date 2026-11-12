@@ -1,5 +1,6 @@
 {
   "title": "Controleren en opslaan",
+  "correction_warnings": "Je kan de resultaten van dit stembureau nog niet opslaan. Los onderstaande waarschuwingen op om verder te gaan.",
   "counts_add_up": {
     "warnings": "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn waarschuwingen die moeten worden gecontroleerd.",
     "no_warnings": "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen."

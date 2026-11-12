@@ -130,7 +130,7 @@ Storybook runs on [http://localhost:6006](http://localhost:6006) and provides an
 Prerequisites:
 
 - [Node](https://nodejs.org) v24
-- [pnpm](https://pnpm.io/) v10
+- [pnpm](https://pnpm.io/) v11
 
 Install npm dependencies, skipping development dependencies:
 
@@ -170,6 +170,7 @@ The application uses the following dependencies:
 - `jsdom`: a pure-JavaScript implementation of many web standards for use with Node.js
 - `testing-library`: (React) component and dom test utilities
 - `playwright`: e2e testing framework
+- `fflate`: ZIP reading in e2e tests
 - `biome`: formatter and linter
 - `eslint`: Linter
 

@@ -8,7 +8,7 @@ The Abacus apportionment crate has several fuzz targets that check our implement
 
 ## Running
 
-[cargo fuzz](https://rust-fuzz.github.io/book/cargo-fuzz/tutorial.html) is used as a fuzzing tool. A nightly version of the Rust toolchain is required; when using `rustup` this should get taken care of automatically because of the `rust-toolchain` file in this directory.
+[cargo fuzz](https://rust-fuzz.github.io/book/cargo-fuzz/tutorial.html) is used as a fuzzing tool. A nightly version of the Rust toolchain is required; when using `rustup` this should get taken care of automatically because of the `rust-toolchain.toml` file in this directory. Run the commands below from within this directory, so that the pinned nightly toolchain is used.
 
 Basic commands:
 - Installation: `cargo install cargo-fuzz`
@@ -17,5 +17,20 @@ Basic commands:
 
 More documentation can be found in the [Rust Fuzz Book](https://rust-fuzz.github.io/book/cargo-fuzz.html).
 
+Every fuzz target except `differential_osv2020` is fuzzed nightly in CI, with one job per fuzz target. The differential
+target is skipped because it needs the external OSV2020 wrapper binary. Pull requests only lint the fuzz targets using
+Clippy. See [fuzzing in CI](../../fuzz/README.md#fuzzing-in-ci) for details.
+
 To check the fuzz test coverage, see the [instructions in our `fuzz` package](../../fuzz/README.md#checking-the-fuzz-test-coverage).
 The `coverage_differential_osv2020.sh` script can be used as a starting point depending on your system configuration.
+
+### Running Differential fuzzing
+
+Running the `differential_osv2002` target requires extra steps:
+
+1. Clone https://github.com/kiesraad/osv2020-apportionment-wrapper
+2. Follow the instructions in the README
+3. Point the `OSV2020_WRAPPER_BIN` environment to the output of `./gradlew installDist`. For example:
+```sh
+OSV2020_WRAPPER_BIN=~/osv2020-apportionment-wrapper/apportionment-wrapper/build/install/apportionment-wrapper/bin/apportionment-wrapper cargo fuzz run differential_osv2020
+```

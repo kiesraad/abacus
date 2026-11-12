@@ -51,6 +51,66 @@ describe("useKeyboard", () => {
     expect(onSubmit).toHaveBeenCalled();
   });
 
+  test("Enter moves focus to next input", async () => {
+    const onSubmit = vi.fn();
+
+    render(
+      <FormWithNavigation onSubmit={onSubmit}>
+        <input id="test-input" />
+        <div>
+          <input type="checkbox" id="checkbox1" />
+          <div>
+            <label htmlFor="checkbox">"buzzme"</label>
+          </div>
+        </div>
+        <div>
+          <input type="checkbox" id="checkbox2" />
+          <div>
+            <label htmlFor="checkbox">"buzzme"</label>
+          </div>
+        </div>
+        <div>
+          <input type="radio" id="radio1" />
+          <div>
+            <label htmlFor="radio">"buzzme"</label>
+          </div>
+        </div>
+        <div>
+          <input type="radio" id="radio2" />
+          <div>
+            <label htmlFor="radio">"buzzme"</label>
+          </div>
+        </div>
+        <button id="test-submit-button" type="submit">
+          Submit
+        </button>
+      </FormWithNavigation>,
+    );
+    const user = userEvent.setup();
+
+    const firstCheckbox = screen.getByTestId("checkbox1");
+    const secondCheckbox = screen.getByTestId("checkbox2");
+    const firstRadio = screen.getByTestId("radio1");
+    const secondRadio = screen.getByTestId("radio2");
+    const submitButton = screen.getByTestId("test-submit-button");
+
+    await user.type(screen.getByTestId("test-input"), "hello world");
+    await user.keyboard("{enter}");
+    expect(firstCheckbox).toHaveFocus();
+
+    await user.keyboard("{enter}");
+    expect(secondCheckbox).toHaveFocus();
+
+    await user.keyboard("{enter}");
+    expect(firstRadio).toHaveFocus();
+
+    await user.keyboard("{enter}");
+    expect(secondRadio).toHaveFocus();
+
+    await user.keyboard("{enter}");
+    expect(submitButton).toHaveFocus();
+  });
+
   test("Enter submits when submit button has focus", async () => {
     const onSubmit = vi.fn((e: SubmitEvent) => {
       e.preventDefault();

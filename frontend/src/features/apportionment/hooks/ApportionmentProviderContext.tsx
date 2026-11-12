@@ -1,23 +1,23 @@
 import { createContext } from "react";
 
-import type { ApiError, ApiResult } from "@/api/ApiResult";
+import type { ApiError } from "@/api/ApiResult";
 import type {
   ApportionmentState,
   ApportionmentWarning,
   CandidateNomination,
-  ElectionSummary,
+  ElectionTotals,
   SeatAssignment,
 } from "@/types/generated/openapi";
 
 export interface iElectionApportionmentProviderContext {
   seatAssignment?: SeatAssignment;
   candidateNomination?: CandidateNomination;
-  electionSummary?: ElectionSummary;
+  electionSummary?: ElectionTotals;
   warnings: ApportionmentWarning[];
   state?: ApportionmentState;
   error?: ApiError;
   isLoading: boolean;
-  refetchState: (controller?: AbortController) => Promise<ApiResult<ApportionmentState>>;
+  refetch: (controller?: AbortController) => Promise<void>;
 }
 
 export const ApportionmentProviderContext = createContext<iElectionApportionmentProviderContext | undefined>(undefined);

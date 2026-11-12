@@ -12,16 +12,21 @@ use crate::{
         apportionment::{
             AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
             HighestAverageResidualSeatDrawingLots, LargestRemainderResidualSeatDrawingLots,
-            ListDrawingLotsVariant, SeatAssignment,
+            ListAverage, ListDrawingLotsVariant, ListRemainder, SeatAssignment,
         },
         apportionment_state::{ApportionmentState, ApportionmentStateError, DrawingLotsRequired},
-        committee_session::CommitteeSessionId,
+        committee_session::CommitteeSession,
         committee_session_status::CommitteeSessionStatus,
-        election::{CandidateNumber, ElectionId, ElectionWithPoliticalGroups, PGNumber},
-        summary::ElectionSummary,
+        election::{
+            CandidateNumber, CommitteeCategory, ElectionId, ElectionWithPoliticalGroups, PGNumber,
+        },
+        results::VerifyModels,
+        tabulation::ElectionTotals,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{apportionment_state_repo, committee_session_repo, data_entry_repo},
+    repository::{
+        apportionment_state_repo, committee_session_repo, data_entry_repo, election_repo,
+    },
     service,
 };
 
@@ -44,7 +49,12 @@ struct ApportionmentStateChange {
 pub async fn get_state(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-) -> Result<(CommitteeSessionId, ApportionmentState), APIError> {
+) -> Result<(CommitteeSession, ApportionmentState), APIError> {
+    let election = election_repo::get(conn, election_id).await?;
+    if election.committee_category != CommitteeCategory::CSB {
+        return Err(ApportionmentApiError::NotCSBElection.into());
+    }
+
     let committee_session =
         committee_session_repo::get_election_committee_session(conn, election_id).await?;
 
@@ -56,7 +66,7 @@ pub async fn get_state(
         .await?
         .unwrap_or(ApportionmentState::Uninitialised);
 
-    Ok((committee_session.id, state))
+    Ok((committee_session, state))
 }
 
 /// Update apportionment state:
@@ -70,11 +80,11 @@ pub async fn update_state(
     election_id: ElectionId,
     update_fn: impl FnOnce(ApportionmentState) -> Result<ApportionmentState, ApportionmentStateError>,
 ) -> Result<ApportionmentState, APIError> {
-    let (id, state) = get_state(conn, election_id).await?;
+    let (committee_session, state) = get_state(conn, election_id).await?;
 
     let state = update_fn(state).map_err(|err| APIError::Delegated(Box::new(err)))?;
 
-    apportionment_state_repo::upsert(conn, id, &state).await?;
+    apportionment_state_repo::upsert(conn, committee_session.id, &state).await?;
 
     audit_service
         .log(
@@ -112,11 +122,11 @@ pub async fn next_state(
     .await
 }
 
-#[allow(clippy::large_enum_variant)]
+#[derive(Debug)]
 pub enum ApportionmentResult {
     Ok(ElectionApportionmentResponse),
-    ListDrawingLotsRequired(ListDrawingLotsVariant, ElectionSummary, SeatAssignment),
-    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant, ElectionSummary, SeatAssignment),
+    ListDrawingLotsRequired(ListDrawingLotsVariant, ElectionTotals, SeatAssignment),
+    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant, ElectionTotals, SeatAssignment),
 }
 
 impl From<apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>>
@@ -125,6 +135,9 @@ impl From<apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>>
     fn from(value: apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>) -> Self {
         CandidateDrawingLotsVariant {
             list: value.list,
+            total_seats: value.total_seats,
+            number_of_votes: value.number_of_votes,
+            seat_numbers: value.seat_numbers,
             options: value.options,
         }
     }
@@ -135,33 +148,56 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
         match value {
             apportionment::ListDrawingLotsVariant::HighestAverageResidualSeat(
                 apportionment::HighestAverageResidualSeatDrawingLots {
-                    average,
+                    max_average,
                     residual_seat_numbers,
                     options,
+                    list_averages,
                 },
             ) => ListDrawingLotsVariant::HighestAverageResidualSeat(
                 HighestAverageResidualSeatDrawingLots {
-                    average: average.into(),
+                    max_average: max_average.into(),
                     residual_seat_numbers,
                     options,
+                    list_averages: list_averages
+                        .into_iter()
+                        .map(|(ln, avg)| ListAverage {
+                            pg_number: ln,
+                            average: avg.into(),
+                        })
+                        .collect(),
                 },
             ),
             apportionment::ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 apportionment::LargestRemainderResidualSeatDrawingLots {
-                    remainder,
+                    max_remainder,
                     residual_seat_numbers,
                     options,
+                    list_remainders,
                 },
             ) => ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 LargestRemainderResidualSeatDrawingLots {
-                    remainder: remainder.into(),
+                    max_remainder: max_remainder.into(),
                     residual_seat_numbers,
                     options,
+                    list_remainders: list_remainders
+                        .into_iter()
+                        .map(|(ln, rem)| ListRemainder {
+                            pg_number: ln,
+                            remainder: rem.into(),
+                        })
+                        .collect(),
                 },
             ),
-            apportionment::ListDrawingLotsVariant::AbsoluteMajority(
-                apportionment::AbsoluteMajorityDrawingLots { options },
-            ) => ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots { options }),
+            apportionment::ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(
+                apportionment::AbsoluteMajorityDrawingLots { assign_to, options },
+            ) => ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(
+                AbsoluteMajorityDrawingLots { assign_to, options },
+            ),
+            apportionment::ListDrawingLotsVariant::AbsoluteMajorityLargestRemainder(
+                apportionment::AbsoluteMajorityDrawingLots { assign_to, options },
+            ) => ListDrawingLotsVariant::AbsoluteMajorityLargestRemainder(
+                AbsoluteMajorityDrawingLots { assign_to, options },
+            ),
         }
     }
 }
@@ -174,15 +210,21 @@ pub async fn process(
     conn: &mut SqliteConnection,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<ApportionmentResult, APIError> {
-    let (committee_session_id, state) = service::get_apportionment_state(conn, election.id).await?;
+    if election.committee_category != CommitteeCategory::CSB {
+        return Err(ApportionmentApiError::NotCSBElection.into());
+    }
+
+    let (committee_session, state) = service::get_apportionment_state(conn, election.id).await?;
 
     let data_entry_results =
-        data_entry_repo::list_results_for_committee_session(conn, committee_session_id).await?;
-    let election_summary = ElectionSummary::from_results(election, &data_entry_results)?;
+        data_entry_repo::list_results_for_committee_session(conn, committee_session.id).await?;
+    data_entry_results.verify_models(election, &committee_session)?;
+
+    let election_totals = ElectionTotals::tabulate(election, &data_entry_results)?;
 
     let input = ApportionmentInputData::new(
         election.number_of_seats,
-        &election_summary.political_group_votes,
+        &election_totals.political_group_votes,
         state.get_deceased_candidates(),
         state.get_lists_drawn(),
         state.get_candidates_drawn(),
@@ -196,7 +238,7 @@ pub async fn process(
                     &output.candidate_nomination,
                     &election.political_groups,
                 ),
-                election_summary: election_summary.clone(),
+                election_totals: election_totals.clone(),
                 warnings: output
                     .seat_assignment
                     .warnings()
@@ -208,14 +250,14 @@ pub async fn process(
         ApportionmentOutput::ListDrawingLotsRequired(variant, preliminary_seat_assignment) => {
             ApportionmentResult::ListDrawingLotsRequired(
                 variant.into(),
-                election_summary.clone(),
+                election_totals.clone(),
                 map_seat_assignment(&preliminary_seat_assignment),
             )
         }
         ApportionmentOutput::CandidateDrawingLotsRequired(variant, seat_assignment) => {
             ApportionmentResult::CandidateDrawingLotsRequired(
                 variant.into(),
-                election_summary.clone(),
+                election_totals.clone(),
                 map_seat_assignment(&seat_assignment),
             )
         }
@@ -236,8 +278,8 @@ mod tests {
         infra::audit_log::assert_last_event,
     };
 
-    const ELECTION_ID: u32 = 5;
-    const COMMITTEE_SESSION_ID: u32 = 6;
+    const ELECTION_ID: u32 = 8;
+    const COMMITTEE_SESSION_ID: u32 = 801;
 
     async fn set_states(
         conn: &mut SqliteConnection,
@@ -258,6 +300,31 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_process_requires_csb_election(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let election = election_repo::get(&mut conn, ElectionId::from(5))
+            .await
+            .unwrap();
+
+        let err = process(&mut conn, &election)
+            .await
+            .expect_err("should error for a non-CSB election");
+
+        assert_delegated(err, &ApportionmentApiError::NotCSBElection);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_get_state_requires_csb_election(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+
+        let err = get_state(&mut conn, ElectionId::from(5))
+            .await
+            .expect_err("should error for a non-CSB election");
+
+        assert_delegated(err, &ApportionmentApiError::NotCSBElection);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_election_not_found(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -277,7 +344,7 @@ mod tests {
         );
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_invalid_committee_session_status(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -295,7 +362,7 @@ mod tests {
         assert_delegated(err, &ApportionmentApiError::CommitteeSessionNotCompleted);
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_get_apportionment_state_not_found(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -303,15 +370,15 @@ mod tests {
         set_states(&mut conn, CommitteeSessionStatus::Completed, None).await;
 
         // Returns a new ApportionmentState::Uninitialised
-        let (id, state) = get_state(&mut conn, ElectionId::from(ELECTION_ID))
+        let (session, state) = get_state(&mut conn, ElectionId::from(ELECTION_ID))
             .await
             .expect("should get state");
 
-        assert_eq!(id, CommitteeSessionId::from(COMMITTEE_SESSION_ID));
+        assert_eq!(session.id, CommitteeSessionId::from(COMMITTEE_SESSION_ID));
         assert_eq!(state, ApportionmentState::Uninitialised);
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_update_apportionment_state_not_found(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -338,7 +405,7 @@ mod tests {
         assert_eq!(state, Some(ApportionmentState::Uninitialised));
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_update_apportionment_state(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -387,6 +454,7 @@ mod tests {
                 "election_id": ELECTION_ID,
                 "state": "RegisteringDeceasedCandidates",
             }),
+            None,
         )
         .await;
     }

@@ -28,8 +28,7 @@ export function GSBElectionReportSection({ election, committeeSession, sessionLa
   const wasCorrected = requestState.data.investigations.some((i) => i.corrected_results);
   const formTitle = `
     ${t("election_report.counting_results")} ${sessionLabel.toLowerCase()} 
-    ${t(`committee_category.GSB.short`).toLowerCase()} ${t("municipality").toLowerCase()} 
-    ${election.location}
+    ${t("committee_category.GSB.short").toLowerCase()} ${election.authority_region}
   `;
 
   return (

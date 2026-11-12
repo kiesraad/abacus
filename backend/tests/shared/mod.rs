@@ -2,10 +2,13 @@
 
 use std::{collections::BTreeMap, net::SocketAddr};
 
-use abacus::domain::election::CommitteeCategory;
+use abacus::domain::election::{CommitteeCategory, VoteCountingMethod};
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
-use reqwest::Response;
+use reqwest::{
+    Response,
+    multipart::{Form, Part},
+};
 use serde::Serialize;
 
 pub fn differences_counts_zero() -> serde_json::Value {
@@ -17,7 +20,7 @@ pub fn differences_counts_zero() -> serde_json::Value {
             "votes_cast_greater_than_admitted_voters": false,
             "votes_cast_smaller_than_admitted_voters": false,
         },
-        "difference_completely_accounted_for": {"yes": true, "no": false},
+        "difference_completely_accounted_for": {"yes": false, "no": false},
     })
 }
 
@@ -46,23 +49,73 @@ pub fn political_group_votes_from_test_data_auto(
     })
 }
 
-/// Example data entry for an election with two parties with two candidates.
+/// Example CSO data entry for an election with two parties with two candidates.
 pub fn example_cso_data_entry(client_state: Option<&str>) -> serde_json::Value {
     serde_json::json!({
         "progress": 60,
         "data": {
             "model": "CSOFirstSession",
             "extra_investigation": {
-              "extra_investigation_other_reason": { "yes": false, "no": false },
+              "extra_investigation_done": { "yes": false, "no": true },
               "ballots_recounted_extra_investigation": { "yes": false, "no": false },
             },
             "counting_differences_polling_station": {
                 "difference_ballots_per_list": {"yes": false, "no": true},
-                "unexplained_difference_ballots_voters": {"yes": false, "no": true},
+                "difference_ballots_voters_completely_accounted_for": {"yes": true, "no": false},
             },
             "voters_counts": {
                 "poll_card_count": 102,
                 "proxy_certificate_count": 2,
+                "total_admitted_voters_count": 104,
+            },
+            "votes_counts": {
+                "political_group_total_votes": [
+                    {
+                        "number": 1,
+                        "total": 60,
+                    },
+                    {
+                        "number": 2,
+                        "total": 42,
+                    },
+                ],
+                "total_votes_candidates_count": 102,
+                "blank_votes_count": 1,
+                "invalid_votes_count": 1,
+                "total_votes_cast_count": 104,
+            },
+            "differences_counts": differences_counts_zero(),
+            "political_group_votes": [
+                political_group_votes_from_test_data_auto(1, &[40, 20]),
+                political_group_votes_from_test_data_auto(2, &[30, 12]),
+            ],
+        },
+        "client_state": client_state,
+    })
+}
+
+/// Example DSO data entry for an election with two parties with two candidates.
+pub fn example_dso_data_entry(client_state: Option<&str>) -> serde_json::Value {
+    serde_json::json!({
+        "progress": 60,
+        "data": {
+            "model": "DSOFirstSession",
+            "about_report": {
+                "corrigendum_present": "TwoDocuments",
+                "checks_and_corrections_present": "PagePresent"
+            },
+            "checks_and_corrections": {
+                "reason_investigation_own_initiative": {
+                    "unaccounted_difference": true,
+                    "other_error": true
+                },
+                "corrected_results_own_initiative": { "yes": true, "no": false },
+                "corrected_results_csb_request": { "yes": false, "no": false }
+            },
+            "voters_counts": {
+                "poll_card_count": 101,
+                "proxy_certificate_count": 2,
+                "voter_card_count": 1,
                 "total_admitted_voters_count": 104,
             },
             "votes_counts": {
@@ -289,6 +342,7 @@ pub async fn create_any_result(
     data_entry_id: u32,
     election_id: u32,
     committee_category: CommitteeCategory,
+    counting_method: Option<VoteCountingMethod>,
 ) {
     let typist_cookie = login(
         addr,
@@ -304,7 +358,11 @@ pub async fn create_any_result(
         data_entry_id,
         1,
         match committee_category {
-            CommitteeCategory::GSB => example_cso_data_entry(None),
+            CommitteeCategory::GSB => match counting_method {
+                Some(VoteCountingMethod::CSO) => example_cso_data_entry(None),
+                Some(VoteCountingMethod::DSO) => example_dso_data_entry(None),
+                None => panic!("Invalid election {election_id:?}"),
+            },
             CommitteeCategory::CSB => example_gsb_data_entry(None),
         },
     )
@@ -323,7 +381,11 @@ pub async fn create_any_result(
         data_entry_id,
         2,
         match committee_category {
-            CommitteeCategory::GSB => example_cso_data_entry(None),
+            CommitteeCategory::GSB => match counting_method {
+                Some(VoteCountingMethod::CSO) => example_cso_data_entry(None),
+                Some(VoteCountingMethod::DSO) => example_dso_data_entry(None),
+                None => panic!("Invalid election {election_id:?}"),
+            },
             CommitteeCategory::CSB => example_gsb_data_entry(None),
         },
     )
@@ -332,11 +394,36 @@ pub async fn create_any_result(
 }
 
 pub async fn create_cso_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
-    create_any_result(addr, data_entry_id, election_id, CommitteeCategory::GSB).await;
+    create_any_result(
+        addr,
+        data_entry_id,
+        election_id,
+        CommitteeCategory::GSB,
+        Some(VoteCountingMethod::CSO),
+    )
+    .await;
+}
+
+pub async fn create_dso_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
+    create_any_result(
+        addr,
+        data_entry_id,
+        election_id,
+        CommitteeCategory::GSB,
+        Some(VoteCountingMethod::DSO),
+    )
+    .await;
 }
 
 pub async fn create_gsb_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
-    create_any_result(addr, data_entry_id, election_id, CommitteeCategory::CSB).await;
+    create_any_result(
+        addr,
+        data_entry_id,
+        election_id,
+        CommitteeCategory::CSB,
+        None,
+    )
+    .await;
 }
 
 pub async fn create_any_result_with_non_example_data_entry(
@@ -614,4 +701,38 @@ pub async fn login_with_credentials(
 
     assert_eq!(response.status(), StatusCode::OK);
     response.headers().get("set-cookie").cloned().unwrap()
+}
+
+/// Sends a POST request with given data as multipart/form-data
+pub async fn post_multipart(url: &str, cookie: &HeaderValue, parts: &[(&str, &[u8])]) -> Response {
+    let form = parts.iter().fold(Form::new(), |form, (name, value)| {
+        form.part(name.to_string(), Part::bytes(value.to_vec()))
+    });
+
+    reqwest::Client::new()
+        .post(url)
+        .header("cookie", cookie)
+        .multipart(form)
+        .send()
+        .await
+        .unwrap()
+}
+
+pub async fn import_certificate(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+    certificate: &str,
+) -> Response {
+    let url = format!("http://{addr}/api/elections/{election_id}/sub_committee_certificates");
+
+    reqwest::Client::new()
+        .post(url)
+        .json(&serde_json::json!({
+            "data": certificate,
+        }))
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap()
 }

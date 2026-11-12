@@ -2,6 +2,8 @@
 //!
 //! Crate also contains a definition of a fraction, which is used in all calculations.
 
+#![cfg_attr(test, allow(clippy::too_many_lines, clippy::cognitive_complexity))]
+
 mod candidate_nomination;
 mod fraction;
 mod seat_assignment;
@@ -16,7 +18,10 @@ use self::{
     seat_assignment::{as_candidate_nomination_input, seat_assignment},
 };
 pub use self::{
-    candidate_nomination::{CandidateNomination, CandidateNominationDetails, PreferenceThreshold},
+    candidate_nomination::{
+        Candidate, CandidateNomination, CandidateNominationDetails, CandidateRanking,
+        ListCandidateNomination, PreferenceThreshold,
+    },
     fraction::Fraction,
     seat_assignment::{
         ApportionmentWarning, HighestAverageAssignedSeat, SeatAssignment, SeatAssignmentDetails,
@@ -47,6 +52,20 @@ pub enum ApportionmentOutput<'a, T: ApportionmentInput> {
 pub fn process<T: ApportionmentInput>(
     input: &T,
 ) -> Result<ApportionmentOutput<'_, T>, ApportionmentError> {
+    // Check if all list votes are sorted by number
+    if !input.list_votes().is_sorted_by_key(|lv| lv.number()) {
+        return Err(ApportionmentError::UnsortedInput);
+    }
+
+    // Check if all candidate votes are sorted by number
+    if input
+        .list_votes()
+        .iter()
+        .any(|lv| !lv.candidate_votes().is_sorted_by_key(|cv| cv.number()))
+    {
+        return Err(ApportionmentError::UnsortedInput);
+    }
+
     let seat_assignment = match seat_assignment(input)? {
         SeatAssignment::Completed(seat_assignment) => seat_assignment,
         SeatAssignment::DrawingLotsRequired(variant, seat_assignment) => {
@@ -58,15 +77,16 @@ pub fn process<T: ApportionmentInput>(
     };
 
     let candidate_nomination_input = as_candidate_nomination_input(input, &seat_assignment);
-    let candidate_nomination = match candidate_nomination(&candidate_nomination_input)? {
-        CandidateNomination::Completed(candidate_nomination) => candidate_nomination,
-        CandidateNomination::DrawingLotsRequired(variant) => {
-            return Ok(ApportionmentOutput::CandidateDrawingLotsRequired(
-                variant,
-                seat_assignment,
-            ));
-        }
-    };
+    let candidate_nomination =
+        match candidate_nomination(&candidate_nomination_input, input.candidates_drawn())? {
+            CandidateNomination::Completed(candidate_nomination) => candidate_nomination,
+            CandidateNomination::DrawingLotsRequired(variant) => {
+                return Ok(ApportionmentOutput::CandidateDrawingLotsRequired(
+                    variant,
+                    seat_assignment,
+                ));
+            }
+        };
 
     Ok(ApportionmentOutput::Completed(ApportionmentDetails {
         seat_assignment,
@@ -76,11 +96,14 @@ pub fn process<T: ApportionmentInput>(
 
 #[cfg(test)]
 mod tests {
-    use std::collections::{HashMap, HashSet};
+    use std::{
+        assert_matches,
+        collections::{HashMap, HashSet},
+    };
 
     use super::{ApportionmentOutput, process};
     use crate::{
-        Fraction,
+        ApportionmentError, Fraction,
         test_helpers::{
             check_chosen_candidates, check_list_candidate_nomination,
             get_total_seats_from_apportionment_result,
@@ -315,6 +338,53 @@ mod tests {
         );
     }
 
+    /// Same as `test_apportionment_process`, but on list 1 we mark candidate 3 as deceased:
+    /// a candidate with 0 votes who would have been elected purely because of their
+    /// position on the list (list 1 gets 7 seats, only candidate 1 is nominated
+    /// preferentially, candidates 2..=7 would be nominated based on list position).
+    ///
+    /// Seat assignment must be unchanged (list 1 still has enough alive candidates).
+    /// In the candidate nomination for list 1, candidate 3 is skipped and candidate 8
+    /// takes the last seat instead.
+    #[test]
+    fn test_apportionment_process_with_deceased_candidate_elected_by_list_position() {
+        let mut input = seat_assignment_fixture_with_default_50_candidates(
+            15,
+            vec![540, 160, 160, 80, 80, 80, 60, 40],
+        );
+        input.deceased_candidates = HashMap::from([(1, HashSet::from([3]))]);
+
+        let Ok(ApportionmentOutput::Completed(result)) = process(&input) else {
+            panic!("should be Completed")
+        };
+
+        // Seat assignment is identical to the `test_apportionment_process` test.
+        assert_eq!(result.seat_assignment.full_seats, 13);
+        assert_eq!(result.seat_assignment.residual_seats, 2);
+        let total_seats = get_total_seats_from_apportionment_result(&result.seat_assignment);
+        assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
+
+        // List 1: candidate 1 still gets the preferential seat; the other 6 seats are
+        // assigned by list position, skipping deceased candidate 3.
+        let expected_ranking: Vec<u32> = [1, 2].into_iter().chain(4..=50).collect();
+        check_list_candidate_nomination(
+            &result.candidate_nomination.list_candidate_nomination[0],
+            &[1],
+            &[2, 4, 5, 6, 7, 8],
+            &expected_ranking,
+        );
+
+        // List 1 chosen: candidates 1, 2 (indices 0..2) and 4..=8 (indices 3..8)
+        // Not chosen: candidate 3 (deceased, index 2) and candidates 9..=50 (indices 8..)
+        let list1 = &input.list_votes[0];
+        check_chosen_candidates(
+            &result.candidate_nomination.chosen_candidates,
+            list1.number,
+            &[&list1.candidate_votes[..2], &list1.candidate_votes[3..8]].concat(),
+            &[&list1.candidate_votes[2..3], &list1.candidate_votes[8..]].concat(),
+        );
+    }
+
     /// Scenarios testing deceased candidates and seat assignment.
     ///
     /// All cases share the same small fixture:
@@ -324,7 +394,7 @@ mod tests {
     /// List 3: 80 -> 0 full seats, 1 residual (largest remainder = 80, threshold 72)
     /// Initial distribution: [3, 1, 1].
     #[test]
-    #[allow(clippy::too_many_lines, reason = "Written out cases take many lines")]
+    #[expect(clippy::too_many_lines, reason = "Written out cases take many lines")]
     fn test_apportionment_process_with_deceased_scenarios() {
         struct Case {
             name: &'static str,
@@ -353,6 +423,16 @@ mod tests {
                 // List 3 already got a largest remainder seat, so only list 2 qualifies.
                 deceased: HashMap::from([(1, HashSet::from([3]))]),
                 expected_seats: vec![2, 2, 1],
+                expects_exhaustion_step: true,
+            },
+            Case {
+                name: "deceased on multiple lists -> list 2 blocked, seat goes to list 3 via UHA",
+                // List 1, # alive = 2, list 1 seats = 3 -> exhausted by 1.
+                // List 2, # alive = 1, list 2 seats = 1 -> not retracted, but exhausted.
+                // Unlike the single-list case above, list 2 cannot absorb the retracted
+                // seat: it goes to list 3 through unique-highest-average instead.
+                deceased: HashMap::from([(1, HashSet::from([3])), (2, HashSet::from([2]))]),
+                expected_seats: vec![2, 1, 2],
                 expects_exhaustion_step: true,
             },
             Case {
@@ -404,5 +484,29 @@ mod tests {
                 case.name, result.seat_assignment.steps,
             );
         }
+    }
+
+    #[test]
+    fn test_apportionment_process_unsorted_list_number_fails() {
+        let mut input = seat_assignment_fixture_with_default_50_candidates(
+            15,
+            vec![540, 160, 160, 80, 80, 80, 60, 40],
+        );
+
+        input.list_votes.reverse();
+
+        assert_matches!(process(&input), Err(ApportionmentError::UnsortedInput));
+    }
+
+    #[test]
+    fn test_apportionment_process_unsorted_list_candidate_number_fails() {
+        let mut input = seat_assignment_fixture_with_default_50_candidates(
+            15,
+            vec![540, 160, 160, 80, 80, 80, 60, 40],
+        );
+
+        input.list_votes[1].candidate_votes.reverse();
+
+        assert_matches!(process(&input), Err(ApportionmentError::UnsortedInput));
     }
 }

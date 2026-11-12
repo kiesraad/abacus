@@ -35,7 +35,7 @@ pub async fn get(
 ) -> Result<Option<ApportionmentState>, sqlx::Error> {
     let row = query!(
         r#"
-            SELECT state AS "state: Json<ApportionmentState>"
+            SELECT state
             FROM apportionment
             WHERE committee_session_id = $1
         "#,
@@ -83,20 +83,22 @@ mod tests {
                 drawing_lots_required: DrawingLotsRequired::ListDrawingLotsRequired(
                     ListDrawingLotsVariant::HighestAverageResidualSeat(
                         HighestAverageResidualSeatDrawingLots {
-                            average: DisplayFraction {
+                            max_average: DisplayFraction {
                                 integer: 0,
                                 numerator: 1,
                                 denominator: 2,
                             },
                             residual_seat_numbers: vec![1],
                             options: PGNumber::from_values(vec![1, 2, 3]),
+                            list_averages: vec![],
                         },
                     ),
                 ),
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
                 lists_drawn: vec![ListDrawn {
-                    variant: ListDrawingLotsVariant::AbsoluteMajority(
+                    variant: ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(
                         AbsoluteMajorityDrawingLots {
+                            assign_to: PGNumber::from(1),
                             options: PGNumber::from_values(vec![2, 3, 4]),
                         },
                     ),
@@ -110,6 +112,9 @@ mod tests {
                 candidates_drawn: vec![CandidateDrawn {
                     variant: CandidateDrawingLotsVariant {
                         list: PGNumber::from(1),
+                        total_seats: 3,
+                        number_of_votes: 1000,
+                        seat_numbers: vec![1, 2, 3],
                         options: CandidateNumber::from_values(vec![2, 3, 4]),
                     },
                     drawn: CandidateNumber::from(1),

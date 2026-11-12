@@ -45,6 +45,11 @@ pub enum InvestigationStatusName {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InvestigationError {
+    IntegrityError,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InvestigationTransitionError {
     Invalid,
     RequiresCorrectedResults,
@@ -54,6 +59,24 @@ impl InvestigationStatus {
     /// Create a new investigation (initial state)
     pub fn new(reason: String) -> Self {
         Self::InProgress(InvestigationInProgress { reason })
+    }
+
+    pub fn from_state_and_data_entry_id(
+        state: Option<Self>,
+        data_entry_id: Option<DataEntryId>,
+    ) -> Result<Option<Self>, InvestigationError> {
+        match (&state, data_entry_id) {
+            // An investigation with new results must have a data entry ID
+            (Some(Self::ConcludedWithNewResults(_)), Some(id)) => {
+                Ok(state.map(|status| status.with_data_entry_id(id)))
+            }
+            // An investigation **without** new results must not have a data entry ID
+            (Some(Self::InProgress(_) | Self::ConcludedWithoutNewResults(_)), None) => Ok(state),
+            // No investigation, there must not be a data entry ID
+            (None, None) => Ok(None),
+            // All other situations
+            _ => Err(InvestigationError::IntegrityError),
+        }
     }
 
     /// InProgress -> ConcludedWithoutNewResults
@@ -320,6 +343,31 @@ mod tests {
         assert_eq!(s.findings(), None);
         assert_eq!(s.data_entry_id(), None);
         assert_eq!(s.corrected_results(), None);
+    }
+
+    #[test]
+    fn test_from_state_and_data_entry_id() {
+        let de_id = DataEntryId::from(9901);
+
+        #[rustfmt::skip]
+        let cases = [
+            // Valid cases
+            (Some(concluded_with(DataEntryId::default())), Some(de_id), Ok(Some(concluded_with(de_id)))),
+            (Some(in_progress()), None, Ok(Some(in_progress()))),
+            (Some(concluded_without()), None, Ok(Some(concluded_without()))),
+            (None, None, Ok(None)),
+            // Invalid cases
+            (None, Some(de_id), Err(InvestigationError::IntegrityError)),
+            (Some(in_progress()), Some(de_id), Err(InvestigationError::IntegrityError)),
+            (Some(concluded_without()), Some(de_id), Err(InvestigationError::IntegrityError)),
+            (Some(concluded_with(DataEntryId::default())), None, Err(InvestigationError::IntegrityError)),
+        ];
+        for (state, data_entry_id, expected) in cases {
+            assert_eq!(
+                InvestigationStatus::from_state_and_data_entry_id(state, data_entry_id),
+                expected
+            );
+        }
     }
 
     #[test]

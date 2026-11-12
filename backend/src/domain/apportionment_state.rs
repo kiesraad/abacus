@@ -308,11 +308,12 @@ mod tests {
     use crate::domain::apportionment::{AbsoluteMajorityDrawingLots, CandidateDrawingLotsVariant};
 
     fn list_required() -> DrawingLotsRequired {
-        DrawingLotsRequired::ListDrawingLotsRequired(ListDrawingLotsVariant::AbsoluteMajority(
-            AbsoluteMajorityDrawingLots {
+        DrawingLotsRequired::ListDrawingLotsRequired(
+            ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(AbsoluteMajorityDrawingLots {
+                assign_to: PGNumber::from(1),
                 options: PGNumber::from_values(vec![8, 9]),
-            },
-        ))
+            }),
+        )
     }
 
     fn list_drawn() -> ListDrawn {
@@ -329,6 +330,9 @@ mod tests {
     fn candidate_required() -> DrawingLotsRequired {
         DrawingLotsRequired::CandidateDrawingLotsRequired(CandidateDrawingLotsVariant {
             list: PGNumber::from(1),
+            total_seats: 2,
+            number_of_votes: 1000,
+            seat_numbers: vec![1, 2, 3],
             options: CandidateNumber::from_values(vec![3, 4, 5]),
         })
     }
@@ -445,6 +449,9 @@ mod tests {
                     state.clone().add_candidate_drawn(CandidateDrawn {
                         variant: CandidateDrawingLotsVariant {
                             list: PGNumber::from(1),
+                            total_seats: 2,
+                            number_of_votes: 1000,
+                            seat_numbers: vec![1, 2, 3],
                             options: CandidateNumber::from_values(vec![3, 4, 5]),
                         },
                         drawn: CandidateNumber::from(4),

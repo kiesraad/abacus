@@ -1,22 +1,14 @@
 pub use pdf_gen_types::*;
 use tracing::error;
 
-#[cfg(not(any(feature = "dev", feature = "static", feature = "stub")))]
-compile_error!("either `dev`, `static`, or `stub` feature must be enabled");
-
-#[cfg(all(not(feature = "dev"), not(feature = "static"), feature = "stub"))]
+#[cfg(not(feature = "static"))]
 pub async fn generate_pdf(_input: impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
-    unimplemented!("pdf_gen wrapper built with `stub` feature; PDF generation is unavailable")
+    unimplemented!("pdf_gen wrapper built without `static` feature; PDF generation is unavailable")
 }
 
 #[cfg(feature = "static")]
 pub async fn generate_pdf(input: impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
     tokio::task::spawn_blocking(move || pdf_gen_impl::generate_pdf(&input)).await?
-}
-
-#[cfg(all(not(feature = "static"), feature = "dev"))]
-pub async fn generate_pdf(input: impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
-    tokio::task::spawn_blocking(move || pdf_gen_dylib::pdf_gen_dyn_generate_pdf(&input)).await?
 }
 
 /// Generates a ZIP file containing the PDFs for the provided inputs.

@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, fmt::Debug};
+use std::fmt::Debug;
 
 use tracing::{debug, info};
 
@@ -37,13 +37,17 @@ pub fn assign_remainder<'b, T: ListVotes>(
 
     while residual_seat_number != total_residual_seats {
         let exhausted_list_numbers =
-            exhausted_list_numbers(&current_standings, exclude_exhausted_lists);
+            if let Some((list_votes, deceased_candidates)) = exclude_exhausted_lists {
+                exhausted_list_numbers(&current_standings, list_votes, deceased_candidates)
+            } else {
+                vec![]
+            };
 
         // Stop assigning when no list is eligible, either when every non-exhausted list has zero
         // votes or every list is exhausted. Any remaining seats will be reported as unassigned.
         let any_eligible = current_standings
             .iter()
-            .any(|s| s.votes_cast > 0 && !exhausted_list_numbers.contains(&s.list_number));
+            .any(|s| s.votes_cast() > 0 && !exhausted_list_numbers.contains(&s.list_number()));
         if !any_eligible {
             info!(
                 "No eligible lists remain, {} seat(s) left unassigned",
@@ -69,6 +73,7 @@ pub fn assign_remainder<'b, T: ListVotes>(
                 return Ok(RemainderAssignment::DrawingLotsRequired(
                     variant,
                     steps.clone(),
+                    current_standings,
                 ));
             }
         };
@@ -77,34 +82,38 @@ pub fn assign_remainder<'b, T: ListVotes>(
 
         // update the current standing by finding the selected group and
         // adding the residual seat to their tally
-        current_standings = current_standings
-            .into_iter()
-            .map(|s| {
-                if s.list_number == change.list_number_assigned() {
-                    s.add_residual_seat()
-                } else {
-                    s
-                }
-            })
-            .collect();
+        let list_standing = current_standings
+            .iter_mut()
+            .find(|s| s.list_number() == change.list_number_assigned())
+            .expect("should be able to find list standing");
+
+        list_standing.add_residual_seat();
 
         // add the update to the remainder assignment steps
-        steps.push(SeatChangeStep {
+        let step = SeatChangeStep {
             standings,
             residual_seat_number: Some(residual_seat_number),
             change,
-        });
+        };
+        assert_ne!(
+            step.standings, current_standings,
+            "standings should be different"
+        );
+        steps.push(step);
     }
 
     Ok(RemainderAssignment::Completed(steps, current_standings))
 }
 
-/// Get a vector with the list number that was assigned the last residual seat.  
-/// If the last residual seat was assigned to a list with the same
-/// remainder/votes per seat as lists assigned a seat in previous steps,
-/// return all list numbers that had the same remainder/votes per seat.
-fn list_assigned_from_previous_step<LN: Copy + Eq>(
-    selected_list: &ListStanding<LN>,
+/// Gets the list numbers that have been assigned a seat during consecutive
+/// assignment steps of the same type.
+///
+/// If the previous step is of the same [SeatChange] type (checked via `matcher`)
+/// and the `selected_list_number` was among the previous options (because it
+/// had the same remainder/votes per seat), the previous step `list_assigned` is
+/// taken as the starting point. `selected_list_number` is then appended.
+fn extend_list_assigned_from_previous_step<LN: Copy + Eq>(
+    selected_list_number: LN,
     previous_steps: &[SeatChangeStep<LN>],
     matcher: fn(&SeatChange<LN>) -> bool,
 ) -> Vec<LN> {
@@ -114,45 +123,22 @@ fn list_assigned_from_previous_step<LN: Copy + Eq>(
         && previous_step
             .change
             .list_options()
-            .contains(&selected_list.list_number)
+            .contains(&selected_list_number)
     {
         list_assigned = previous_step.change.list_assigned()
     }
-    list_assigned.push(selected_list.list_number);
+    list_assigned.push(selected_list_number);
     list_assigned
 }
 
-/// Returns the number of seats assigned with largest remainder method.
-fn list_largest_remainder_assigned_seats<LN: Copy + Eq>(
+/// Returns an iterator with steps of the given type and given list_number_assigned
+fn steps_of_type_assigning_to_list<LN: Copy + Eq>(
     previous_steps: &[SeatChangeStep<LN>],
+    matcher: fn(&SeatChange<LN>) -> bool,
     list_number: LN,
-) -> usize {
-    previous_steps
-        .iter()
-        .filter(|prev| {
-            prev.change.is_changed_by_largest_remainder_assignment()
-                && prev.change.list_number_assigned() == list_number
-        })
-        .count()
-}
-
-/// Returns a vector with list numbers of which the same number of seats are assigned
-/// compared to the number of candidates.
-fn list_numbers_without_empty_seats<'a, T: ListVotes>(
-    standings: impl Iterator<Item = &'a ListStanding<T::ListNumber>>,
-    input_list_votes: &[T],
-    deceased_candidates: &DeceasedCandidates<T>,
-) -> Vec<T::ListNumber>
-where
-    T::ListNumber: 'a,
-{
-    standings.fold(vec![], |mut list_numbers_without_empty_seats, s| {
-        let number_of_candidates =
-            get_number_of_candidates(input_list_votes, s.list_number, deceased_candidates);
-        if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
-            list_numbers_without_empty_seats.push(s.list_number)
-        }
-        list_numbers_without_empty_seats
+) -> impl Iterator<Item = &SeatChangeStep<LN>> {
+    previous_steps.iter().filter(move |step| {
+        matcher(&step.change) && step.change.list_number_assigned() == list_number
     })
 }
 
@@ -160,11 +146,18 @@ where
 /// Artikel P 10 Kieswet.
 fn exhausted_list_numbers<T: ListVotes>(
     standings: &[ListStanding<T::ListNumber>],
-    exclude_exhausted_lists: Option<(&[T], &DeceasedCandidates<T>)>,
+    list_votes: &[T],
+    deceased_candidates: &DeceasedCandidates<T>,
 ) -> Vec<T::ListNumber> {
-    let exhausted = exclude_exhausted_lists.map_or_else(Vec::new, |(list_votes, deceased)| {
-        list_numbers_without_empty_seats(standings.iter(), list_votes, deceased)
-    });
+    let exhausted: Vec<T::ListNumber> = standings
+        .iter()
+        .filter(|s| {
+            get_number_of_candidates(list_votes, s.list_number(), deceased_candidates)
+                <= s.total_seats()
+        })
+        .map(|s| s.list_number())
+        .collect();
+
     if !exhausted.is_empty() {
         debug!("Exhausted lists in accordance with Article P 10 Kieswet: {exhausted:?}");
     }
@@ -173,39 +166,49 @@ fn exhausted_list_numbers<T: ListVotes>(
 
 /// Returns if a list qualifies for an extra seat.
 fn list_qualifies_for_extra_seat<LN: Copy + Eq>(
-    number_of_seats_largest_remainders: usize,
-    number_of_seats_unique_highest_averages_option: Option<usize>,
     previous_steps: &[SeatChangeStep<LN>],
     list_number: LN,
+    check_for_unique_highest_average_seats: bool,
 ) -> bool {
+    let number_of_seats_largest_remainders = steps_of_type_assigning_to_list(
+        previous_steps,
+        SeatChange::is_changed_by_largest_remainder_assignment,
+        list_number,
+    )
+    .count();
+
     // A list qualifies for an extra seat if in a previous step, a seat has been removed
     // due to absolute majority reassignment, and that that seat has then been removed due
     // to list exhaustion. In that case, the seat can be returned to the original list.
-    let has_retracted_seat: bool = previous_steps.iter().any(|prev| {
+    let has_absolute_majority_retracted_seat = previous_steps.iter().any(|prev| {
         prev.change.is_changed_by_absolute_majority_reassignment()
             && prev.change.list_number_retracted() == list_number
     });
 
-    // In case of largest remainder assignment
-    if number_of_seats_unique_highest_averages_option.is_none() {
-        // If no largest remainder seat has been assigned to this list
-        // or the largest remainder assigned seat has been retracted
-        number_of_seats_largest_remainders == 0
-            || (has_retracted_seat && number_of_seats_largest_remainders == 1)
-    }
     // In case of unique highest average assignment
-    else if let Some(number_of_seats_unique_highest_averages) =
-        number_of_seats_unique_highest_averages_option
-    {
+    if check_for_unique_highest_average_seats {
+        let number_of_seats_unique_highest_averages = steps_of_type_assigning_to_list(
+            previous_steps,
+            SeatChange::is_changed_by_unique_highest_average_assignment,
+            list_number,
+        )
+        .count();
         // If no unique highest average seat has been assigned to this list
         // or (the unique highest average assigned seat has been retracted,
         // and no largest remainder seat has been retracted and reassigned)
         number_of_seats_unique_highest_averages == 0
-            || (has_retracted_seat
+            || (has_absolute_majority_retracted_seat
                 && number_of_seats_unique_highest_averages == 1
+                // It is possible to receive one LR seat, then get it retracted
+                // and then received back again based on LR, which would mean 2.
                 && number_of_seats_largest_remainders <= 1)
-    } else {
-        false
+    }
+    // In case of largest remainder assignment
+    else {
+        // If no largest remainder seat has been assigned to this list
+        // or the largest remainder assigned seat has been retracted
+        number_of_seats_largest_remainders == 0
+            || (has_absolute_majority_retracted_seat && number_of_seats_largest_remainders == 1)
     }
 }
 
@@ -223,15 +226,10 @@ fn list_standings_qualifying_for_largest_remainder<'a, LN: Copy + Eq>(
     exhausted_list_numbers: &[LN],
 ) -> impl Iterator<Item = &'a ListStanding<LN>> {
     standings.iter().filter(|&s| {
-        s.votes_cast > 0
-            && s.meets_remainder_threshold
-            && !exhausted_list_numbers.contains(&s.list_number)
-            && list_qualifies_for_extra_seat(
-                list_largest_remainder_assigned_seats(previous_steps, s.list_number),
-                None,
-                previous_steps,
-                s.list_number,
-            )
+        s.votes_cast() > 0
+            && s.meets_remainder_threshold()
+            && !exhausted_list_numbers.contains(&s.list_number())
+            && list_qualifies_for_extra_seat(previous_steps, s.list_number(), false)
     })
 }
 
@@ -245,37 +243,15 @@ fn list_standings_qualifying_for_unique_highest_average<'a, LN: Copy + Eq>(
     exhausted_list_numbers: &[LN],
 ) -> impl Iterator<Item = &'a ListStanding<LN>> {
     standings.iter().filter(|&s| {
-        s.votes_cast > 0
-            && !exhausted_list_numbers.contains(&s.list_number)
-            && list_qualifies_for_extra_seat(
-                list_largest_remainder_assigned_seats(previous_steps, s.list_number),
-                Some(list_unique_highest_average_assigned_seats(
-                    previous_steps,
-                    s.list_number,
-                )),
-                previous_steps,
-                s.list_number,
-            )
+        s.votes_cast() > 0
+            && !exhausted_list_numbers.contains(&s.list_number())
+            && list_qualifies_for_extra_seat(previous_steps, s.list_number(), true)
     })
-}
-
-/// Returns the number of seats assigned with highest averages method.
-fn list_unique_highest_average_assigned_seats<LN: Copy + Eq>(
-    previous_steps: &[SeatChangeStep<LN>],
-    list_number: LN,
-) -> usize {
-    previous_steps
-        .iter()
-        .filter(|prev| {
-            prev.change
-                .is_changed_by_unique_highest_average_assignment()
-                && prev.change.list_number_assigned() == list_number
-        })
-        .count()
 }
 
 enum ListStandings<'a, LN> {
     Completed(Vec<&'a ListStanding<LN>>),
+    CompletedWithDrawingLots(Vec<&'a ListStanding<LN>>, ListDrawingLotsVariant<LN>),
     DrawingLotsRequired(ListDrawingLotsVariant<LN>),
 }
 
@@ -289,8 +265,10 @@ enum ListStandings<'a, LN> {
 /// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
+#[expect(clippy::cognitive_complexity)]
 fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
     standings: impl Iterator<Item = &'a ListStanding<LN>>,
+    list_averages: Vec<(LN, Fraction)>,
     available_residual_seats: u32,
     residual_seat_number: u32,
     lists_drawn: &mut impl Iterator<Item = &'b (impl ListDrawn<LN> + 'b)>,
@@ -301,12 +279,12 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
         (Fraction::ZERO, vec![]),
         |(current_max, mut max_groups), s| {
             // If this average is higher than any previously seen, we reset the list of groups matching
-            if s.next_votes_per_seat > current_max {
-                (s.next_votes_per_seat, vec![s])
+            if s.next_votes_per_seat() > current_max {
+                (s.next_votes_per_seat(), vec![s])
             } else {
                 // If the next average seats for this list is the same as the
                 // max we add it to the list of groups that have that current maximum
-                if s.next_votes_per_seat == current_max {
+                if s.next_votes_per_seat() == current_max {
                     max_groups.push(s);
                 }
                 (current_max, max_groups)
@@ -331,11 +309,12 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
 
         let variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
             HighestAverageResidualSeatDrawingLots {
-                average: max_average,
+                max_average,
                 residual_seat_numbers: (residual_seat_number
                     ..residual_seat_number + available_residual_seats)
                     .collect(),
                 options: list_numbers(&lists),
+                list_averages,
             },
         );
 
@@ -344,21 +323,21 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
             return Ok(ListStandings::DrawingLotsRequired(variant));
         };
 
-        // Assert the required variant including all data
-        if list_drawn.variant() != variant {
-            return Err(ApportionmentError::InvalidLotDrawing(
-                "Variant mismatch".to_string(),
-            ));
-        }
+        variant.validate(list_drawn)?;
 
         let list = lists
             .iter()
-            .find(|list| list.list_number == *list_drawn.drawn())
+            .find(|list| list.list_number() == *list_drawn.drawn())
             .ok_or(ApportionmentError::InvalidLotDrawing(
                 "Unknown list number".to_string(),
             ))?;
 
-        Ok(ListStandings::Completed(vec![list]))
+        debug!(
+            "Assigned seat to list {:?} after drawing of lots",
+            list.list_number()
+        );
+
+        Ok(ListStandings::CompletedWithDrawingLots(vec![list], variant))
     } else {
         Ok(ListStandings::Completed(lists))
     }
@@ -371,8 +350,10 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
 /// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
+#[expect(clippy::cognitive_complexity)]
 fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
     standings: impl Iterator<Item = &'a ListStanding<LN>>,
+    list_remainders: Vec<(LN, Fraction)>,
     available_residual_seats: u32,
     residual_seat_number: u32,
     lists_drawn: &mut impl Iterator<Item = &'b (impl ListDrawn<LN> + 'b)>,
@@ -382,12 +363,12 @@ fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
         (Fraction::ZERO, vec![]),
         |(current_max, mut max_groups), s| {
             // If this remainder is higher than any previously seen, we reset the list of groups matching
-            if s.remainder_votes > current_max {
-                (s.remainder_votes, vec![s])
+            if s.remainder_votes() > current_max {
+                (s.remainder_votes(), vec![s])
             } else {
                 // If the remainder for this list is the same as the
                 // max we add it to the list of groups that have that current maximum
-                if s.remainder_votes == current_max {
+                if s.remainder_votes() == current_max {
                     max_groups.push(s);
                 }
                 (current_max, max_groups)
@@ -412,11 +393,12 @@ fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
 
         let variant = ListDrawingLotsVariant::LargestRemainderResidualSeat(
             LargestRemainderResidualSeatDrawingLots {
-                remainder: max_remainder,
+                max_remainder,
                 residual_seat_numbers: (residual_seat_number
                     ..residual_seat_number + available_residual_seats)
                     .collect(),
                 options: list_numbers(&lists),
+                list_remainders,
             },
         );
 
@@ -425,21 +407,21 @@ fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
             return Ok(ListStandings::DrawingLotsRequired(variant));
         };
 
-        // Assert the required variant including all data
-        if list_drawn.variant() != variant {
-            return Err(ApportionmentError::InvalidLotDrawing(
-                "Variant mismatch".to_string(),
-            ));
-        }
+        variant.validate(list_drawn)?;
 
         let list = lists
             .iter()
-            .find(|list| list.list_number == *list_drawn.drawn())
+            .find(|list| list.list_number() == *list_drawn.drawn())
             .ok_or(ApportionmentError::InvalidLotDrawing(
                 "Unknown list number".to_string(),
             ))?;
 
-        Ok(ListStandings::Completed(vec![list]))
+        debug!(
+            "Assigned seat to list {:?} after drawing of lots",
+            list.list_number()
+        );
+
+        Ok(ListStandings::CompletedWithDrawingLots(vec![list], variant))
     } else {
         Ok(ListStandings::Completed(lists))
     }
@@ -466,7 +448,7 @@ fn step_assign_residual_seat<'a, 'b, LN: Copy + Debug + Eq>(
         debug!("Assigning residual seat {residual_seat_number} using highest averages method");
         // [Artikel P 7 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP7)
         step_assign_remainder_using_highest_averages(
-            standings.iter(),
+            standings,
             residual_seats,
             previous_steps,
             exhausted_list_numbers,
@@ -487,72 +469,114 @@ fn step_assign_residual_seat<'a, 'b, LN: Copy + Debug + Eq>(
     }
 }
 
+/// Select the lists that qualify for the next highest averages residual seat.
+///
+/// When check_for_unique is true, every list that did not yet get a residual seat qualifies.
+/// If none qualify (or check_for_unique is false), falls back to every non-exhausted list with votes.
+/// The returned boolean indicates whether unique highest average assignment is used
+fn lists_qualifying_for_highest_average<'a, LN: Copy + Debug + Eq>(
+    standings: &'a [ListStanding<LN>],
+    previous_steps: &'a [SeatChangeStep<LN>],
+    exhausted_list_numbers: &[LN],
+    check_for_unique: bool,
+) -> (bool, Vec<&'a ListStanding<LN>>) {
+    let unique_qualifying_standings = if check_for_unique {
+        list_standings_qualifying_for_unique_highest_average(
+            standings,
+            previous_steps,
+            exhausted_list_numbers,
+        )
+        .collect()
+    } else {
+        vec![]
+    };
+
+    if !unique_qualifying_standings.is_empty() {
+        debug!("Assign residual seat using unique highest averages method");
+        (true, unique_qualifying_standings)
+    } else {
+        debug!("Assign residual seat using highest averages method");
+        let qualifying_standings = standings
+            .iter()
+            .filter(|&s| s.votes_cast() > 0 && !exhausted_list_numbers.contains(&s.list_number()))
+            .collect();
+        (false, qualifying_standings)
+    }
+}
+
 /// Assign the next residual seat, and return which group that seat was assigned to.
 ///
 /// This assignment is done according to the rules for elections with 19 seats or more.
 fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 'a>(
-    standings: impl Iterator<Item = &'a ListStanding<LN>>,
+    standings: &'a [ListStanding<LN>],
     residual_seats: u32,
     previous_steps: &[SeatChangeStep<LN>],
     exhausted_list_numbers: &[LN],
-    unique: bool,
+    check_for_unique: bool,
     residual_seat_number: u32,
     lists_drawn: &mut impl Iterator<Item = &'b (impl ListDrawn<LN> + 'b)>,
 ) -> Result<ResidualSeat<LN>, ApportionmentError> {
-    // Get an iterator that lists all the list standings without exhausted lists
-    // and without lists that have zero votes cast.
-    let mut qualifying_for_highest_average = standings
-        .into_iter()
-        .filter(|&s| s.votes_cast > 0 && !exhausted_list_numbers.contains(&s.list_number))
-        .peekable();
+    let (unique, qualifying) = lists_qualifying_for_highest_average(
+        standings,
+        previous_steps,
+        exhausted_list_numbers,
+        check_for_unique,
+    );
 
-    if qualifying_for_highest_average.peek().is_some() {
-        let selected_lists = match lists_with_highest_average(
-            qualifying_for_highest_average,
-            residual_seats,
-            residual_seat_number,
-            lists_drawn,
-        )? {
-            ListStandings::Completed(lists) => lists,
-            ListStandings::DrawingLotsRequired(variant) => {
-                return Ok(ResidualSeat::DrawingLotsRequired(variant));
-            }
-        };
-
-        let selected_list = selected_lists[0];
-        let assigned_seat = HighestAverageAssignedSeat {
-            selected_list_number: selected_list.list_number,
-            list_assigned: list_assigned_from_previous_step(
-                selected_list,
-                previous_steps,
-                if unique {
-                    SeatChange::is_changed_by_unique_highest_average_assignment
-                } else {
-                    SeatChange::is_changed_by_highest_average_assignment
-                },
-            ),
-            list_options: selected_lists.iter().map(|list| list.list_number).collect(),
-            list_exhausted: exhausted_list_numbers.to_vec(),
-            votes_per_seat: selected_list.next_votes_per_seat,
-        };
-        if unique {
-            Ok(ResidualSeat::SeatChange(
-                SeatChange::UniqueHighestAverageAssignment(assigned_seat),
-            ))
-        } else {
-            Ok(ResidualSeat::SeatChange(
-                SeatChange::HighestAverageAssignment(assigned_seat),
-            ))
-        }
-    } else {
+    let mut qualifying_for_highest_average = qualifying.into_iter().peekable();
+    if qualifying_for_highest_average.peek().is_none() {
         // Unreachable: `assign_remainder` breaks the loop before this can be reached
         unreachable!("step_assign_remainder_using_highest_averages called with no eligible lists")
     }
+
+    // List averages of all standings
+    let list_averages = standings
+        .iter()
+        .map(|s| (s.list_number(), s.next_votes_per_seat()))
+        .collect();
+    let (selected_list, list_options, drawing_lots) = match lists_with_highest_average(
+        qualifying_for_highest_average,
+        list_averages,
+        residual_seats,
+        residual_seat_number,
+        lists_drawn,
+    )? {
+        ListStandings::Completed(lists) => (lists[0], list_numbers(&lists), None),
+        ListStandings::CompletedWithDrawingLots(lists, variant) => {
+            (lists[0], variant.options().to_vec(), Some(variant))
+        }
+        ListStandings::DrawingLotsRequired(variant) => {
+            return Ok(ResidualSeat::DrawingLotsRequired(variant));
+        }
+    };
+
+    let assigned_seat = HighestAverageAssignedSeat {
+        selected_list_number: selected_list.list_number(),
+        list_assigned: extend_list_assigned_from_previous_step(
+            selected_list.list_number(),
+            previous_steps,
+            if unique {
+                SeatChange::is_changed_by_unique_highest_average_assignment
+            } else {
+                SeatChange::is_changed_by_highest_average_assignment
+            },
+        ),
+        list_options,
+        list_exhausted: exhausted_list_numbers.to_vec(),
+        votes_per_seat: selected_list.next_votes_per_seat(),
+        drawing_lots,
+    };
+
+    let change = if unique {
+        SeatChange::UniqueHighestAverageAssignment(assigned_seat)
+    } else {
+        SeatChange::HighestAverageAssignment(assigned_seat)
+    };
+    Ok(ResidualSeat::SeatChange(change))
 }
 
 /// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with less than 19 seats.
-#[expect(clippy::cognitive_complexity, clippy::too_many_lines)]
 fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
     standings: &'a [ListStanding<LN>],
     residual_seats: u32,
@@ -572,68 +596,1749 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
     // If there is at least one element in the iterator, we know we can still do a largest remainder assignment
     if qualifying_for_remainder.peek().is_some() {
         debug!("Assign residual seat using largest remainders method");
-        let selected_lists = match lists_with_largest_remainder(
+        // List remainders of all standings
+        let list_remainders = standings
+            .iter()
+            .map(|s| (s.list_number(), s.remainder_votes()))
+            .collect();
+        let (selected_list, list_options, drawing_lots) = match lists_with_largest_remainder(
             qualifying_for_remainder,
+            list_remainders,
             residual_seats,
             residual_seat_number,
             lists_drawn,
         )? {
-            ListStandings::Completed(lists) => lists,
+            ListStandings::Completed(lists) => (lists[0], list_numbers(&lists), None),
+            ListStandings::CompletedWithDrawingLots(lists, variant) => {
+                (lists[0], variant.options().to_vec(), Some(variant))
+            }
             ListStandings::DrawingLotsRequired(variant) => {
                 return Ok(ResidualSeat::DrawingLotsRequired(variant));
             }
         };
 
-        let selected_list = selected_lists[0];
         Ok(ResidualSeat::SeatChange(
             SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
-                selected_list_number: selected_list.list_number,
-                list_assigned: list_assigned_from_previous_step(
-                    selected_list,
+                selected_list_number: selected_list.list_number(),
+                list_assigned: extend_list_assigned_from_previous_step(
+                    selected_list.list_number(),
                     previous_steps,
                     SeatChange::is_changed_by_largest_remainder_assignment,
                 ),
-                list_options: selected_lists.iter().map(|list| list.list_number).collect(),
-                remainder_votes: selected_list.remainder_votes,
+                list_options,
+                remainder_votes: selected_list.remainder_votes(),
+                drawing_lots,
             }),
         ))
     } else {
-        // We've now exhausted the largest remainder seats, we now do unique highest average instead:
-        // we allow every group to get a seat, not allowing any group to get a second residual seat
-        // while there are still lists that did not get a residual seat.
-        let mut qualifying_for_unique_highest_average =
-            list_standings_qualifying_for_unique_highest_average(
-                standings,
-                previous_steps,
-                exhausted_list_numbers,
+        // We've now exhausted the largest remainder seats, we now do unique highest average instead
+        // Param check_for_unique is enabled, so we first assign seats to lists that did not yet
+        // get a residual seat assigned, and only if there are no such lists left, we assign seats
+        // to lists that already got a residual seat assigned.
+        debug!("Assign residual seat using unique highest averages method");
+        step_assign_remainder_using_highest_averages(
+            standings,
+            residual_seats,
+            previous_steps,
+            exhausted_list_numbers,
+            true,
+            residual_seat_number,
+            lists_drawn,
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        seat_assignment::AbsoluteMajorityReassignedSeat,
+        test_helpers::{CandidateVotesMock, ListVotesMock},
+    };
+
+    fn standing(list_number: u32, votes_cast: u32) -> ListStanding<u32> {
+        ListStanding::new(
+            &ListVotesMock {
+                number: list_number,
+                candidate_votes: vec![CandidateVotesMock(1, votes_cast)],
+            },
+            Fraction::new(100, 1),
+        )
+    }
+
+    fn highest_average_step(
+        selected_list_number: u32,
+        list_options: Vec<u32>,
+        list_assigned: Vec<u32>,
+    ) -> SeatChangeStep<u32> {
+        SeatChangeStep {
+            residual_seat_number: None,
+            standings: vec![],
+            change: SeatChange::HighestAverageAssignment(HighestAverageAssignedSeat {
+                selected_list_number,
+                list_options,
+                list_assigned,
+                list_exhausted: vec![],
+                votes_per_seat: Fraction::ZERO,
+                drawing_lots: None,
+            }),
+        }
+    }
+
+    fn unique_highest_average_step(list_number: u32) -> SeatChangeStep<u32> {
+        SeatChangeStep {
+            residual_seat_number: None,
+            standings: vec![],
+            change: SeatChange::UniqueHighestAverageAssignment(HighestAverageAssignedSeat {
+                selected_list_number: list_number,
+                list_options: vec![list_number],
+                list_assigned: vec![list_number],
+                list_exhausted: vec![],
+                votes_per_seat: Fraction::ZERO,
+                drawing_lots: None,
+            }),
+        }
+    }
+
+    fn largest_remainder_step(list_number: u32) -> SeatChangeStep<u32> {
+        SeatChangeStep {
+            residual_seat_number: None,
+            standings: vec![],
+            change: SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
+                selected_list_number: list_number,
+                list_options: vec![list_number],
+                list_assigned: vec![list_number],
+                remainder_votes: Fraction::ZERO,
+                drawing_lots: None,
+            }),
+        }
+    }
+
+    fn absolute_majority_reassignment_step(
+        list_retracted_seat: u32,
+        list_assigned_seat: u32,
+    ) -> SeatChangeStep<u32> {
+        SeatChangeStep {
+            residual_seat_number: None,
+            standings: vec![],
+            change: SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
+                list_retracted_seat,
+                list_assigned_seat,
+                drawing_lots: None,
+            }),
+        }
+    }
+
+    mod assign_remainder {
+        use std::collections::HashMap;
+
+        use super::*;
+        use crate::test_helpers::ListDrawnMock;
+
+        #[test]
+        fn test_returns_previous_steps_and_standings_when_no_residual_seats_remain() {
+            // Validate if steps given to the function are returned as-is when no seats have to be assigned
+            let standings = [standing(1, 100), standing(2, 80)];
+            let previous_steps = vec![highest_average_step(2, vec![2], vec![2])];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                2,
+                2,
+                &previous_steps,
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps, previous_steps);
+            assert_eq!(final_standings, standings.to_vec());
+        }
+
+        #[test]
+        fn test_uses_highest_averages_for_large_councils() {
+            // next votes per seat: list 1: 100/2 = 50, list 2: 80, list 3: 60.
+            // Seat 1 goes to list 2, after which its average drops to 80/2 = 40,
+            // so seat 2 goes to list 3
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 60)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                2,
+                0,
+                &[],
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert!(
+                steps
+                    .iter()
+                    .all(|s| s.change.is_changed_by_highest_average_assignment())
+            );
+            assert_eq!(steps.len(), 2);
+            // Should be standings before the change
+            assert_eq!(steps[0].standings, standings.to_vec());
+            assert_eq!(steps[0].residual_seat_number, Some(1));
+            assert_eq!(steps[0].change.list_number_assigned(), 2);
+
+            assert_eq!(steps[1].residual_seat_number, Some(2));
+            assert_eq!(steps[1].change.list_number_assigned(), 3);
+
+            assert_eq!(final_standings[0].residual_seats(), 0);
+            assert_eq!(final_standings[1].residual_seats(), 1);
+            assert_eq!(final_standings[2].residual_seats(), 1);
+        }
+
+        #[test]
+        fn test_uses_largest_remainder_for_small_councils() {
+            // remainder votes: list 1: 150 - 100 = 50, list 2: 80.
+            // Seat 1 goes to list 2, after which it no longer qualifies,
+            // so seat 2 goes to list 1
+            let standings = [standing(1, 150), standing(2, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                18,
+                2,
+                0,
+                &[],
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert!(
+                steps
+                    .iter()
+                    .all(|s| s.change.is_changed_by_largest_remainder_assignment())
+            );
+            assert_eq!(steps.len(), 2);
+            assert_eq!(final_standings[0].residual_seats(), 1);
+            assert_eq!(steps[0].change.list_number_assigned(), 2);
+            assert_eq!(final_standings[1].residual_seats(), 1);
+            assert_eq!(steps[1].change.list_number_assigned(), 1);
+        }
+
+        #[test]
+        fn test_counts_from_current_residual_seat_number() {
+            let standings = [standing(1, 100), standing(2, 80)];
+            let previous_steps = vec![highest_average_step(1, vec![1], vec![1])];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                2,
+                // Starting at 1
+                1,
+                &previous_steps,
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, _)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps.len(), 2);
+            assert_eq!(steps[0], previous_steps[0]);
+            // So next is 2
+            assert_eq!(steps[1].residual_seat_number, Some(2));
+            assert_eq!(steps[1].change.list_number_assigned(), 2);
+        }
+
+        #[test]
+        fn test_stops_when_no_list_has_votes() {
+            // Should stop due to no eligible lists
+            let standings = [standing(1, 0), standing(2, 0)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                1,
+                0,
+                &[],
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps, vec![]);
+            assert_eq!(final_standings, standings.to_vec());
+        }
+
+        #[test]
+        fn test_stops_when_all_lists_are_exhausted() {
+            // Should stop due to no eligible lists
+            // List 1 has 1 full seat and only 1 candidate, so it is exhausted
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100])];
+            let standings = [standing(1, 100)];
+            let deceased = HashMap::new();
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder(
+                &standings,
+                19,
+                1,
+                0,
+                &[],
+                Some((&lists, &deceased)),
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps, vec![]);
+            assert_eq!(final_standings, standings.to_vec());
+        }
+
+        #[test]
+        fn test_excludes_exhausted_lists_from_assignment() {
+            // List 1 has the highest average but is exhausted (1 seat, 1 candidate)
+            // List 1 highest average = 100/2 = 50, list 2 = 40
+            let lists = [
+                ListVotesMock::from_test_data_auto(1, vec![100]),
+                ListVotesMock::from_test_data_auto(2, vec![40, 0]),
+            ];
+            let standings = [standing(1, 100), standing(2, 40)];
+            let deceased = HashMap::new();
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder(
+                &standings,
+                19,
+                1,
+                0,
+                &[],
+                Some((&lists, &deceased)),
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, _)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps.len(), 1);
+            assert_eq!(steps[0].change.list_number_assigned(), 2);
+        }
+
+        #[test]
+        fn test_returns_drawing_lots_required_when_tied() {
+            // Lists 2 and 3 are tied at 80 votes per seat, with only 1 seat available
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                1,
+                0,
+                &[],
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::DrawingLotsRequired(variant, steps, final_standings)) =
+                result
+            else {
+                panic!("expected DrawingLotsRequired");
+            };
+            assert_eq!(variant.options(), vec![2, 3]);
+            assert_eq!(steps, vec![]);
+            assert_eq!(final_standings, standings.to_vec());
+        }
+
+        #[test]
+        fn test_continues_after_drawing_lots() {
+            // Lists 2 and 3 are tied at 80 votes per seat, with only 1 seat available;
+            // list 3 is drawn
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    max_average: Fraction::new(80, 1),
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_averages: vec![
+                        (1, Fraction::new(50, 1)),
+                        (2, Fraction::new(80, 1)),
+                        (3, Fraction::new(80, 1)),
+                    ],
+                },
+            );
+            let lists_drawn = [ListDrawnMock::new(&variant, 3)];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                1,
+                0,
+                &[],
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps.len(), 1);
+            assert_eq!(steps[0].change.list_number_assigned(), 3);
+            assert_eq!(final_standings[0].residual_seats(), 0);
+            assert_eq!(final_standings[1].residual_seats(), 0);
+            assert_eq!(final_standings[2].residual_seats(), 1);
+        }
+    }
+
+    mod extend_list_assigned_from_previous_step {
+        use super::*;
+
+        #[test]
+        fn test_returns_only_given_list_number_when_no_previous_steps() {
+            assert_eq!(
+                extend_list_assigned_from_previous_step(
+                    1,
+                    &[],
+                    SeatChange::is_changed_by_highest_average_assignment,
+                ),
+                vec![1]
+            );
+        }
+
+        #[test]
+        fn test_returns_only_given_list_number_when_last_step_does_not_match_type() {
+            let previous_steps = vec![unique_highest_average_step(1)];
+
+            assert_eq!(
+                extend_list_assigned_from_previous_step(
+                    1,
+                    &previous_steps,
+                    SeatChange::is_changed_by_highest_average_assignment,
+                ),
+                vec![1]
+            );
+        }
+
+        #[test]
+        fn test_returns_only_given_list_number_when_not_in_previous_step_options() {
+            let previous_steps = vec![highest_average_step(1, vec![1, 2], vec![1])];
+
+            assert_eq!(
+                extend_list_assigned_from_previous_step(
+                    3,
+                    &previous_steps,
+                    SeatChange::is_changed_by_highest_average_assignment,
+                ),
+                vec![3]
+            );
+        }
+
+        #[test]
+        fn test_returns_all_lists_when_selected_list_in_previous_step_options() {
+            let previous_steps = vec![
+                highest_average_step(1, vec![1, 2, 3], vec![1]),
+                highest_average_step(2, vec![2, 3], vec![1, 2]),
+            ];
+
+            assert_eq!(
+                extend_list_assigned_from_previous_step(
+                    3,
+                    &previous_steps,
+                    SeatChange::is_changed_by_highest_average_assignment,
+                ),
+                vec![1, 2, 3]
+            );
+        }
+
+        #[test]
+        fn test_only_considers_the_last_step() {
+            let previous_steps = vec![
+                highest_average_step(1, vec![1, 2], vec![1]),
+                largest_remainder_step(3),
+            ];
+
+            assert_eq!(
+                extend_list_assigned_from_previous_step(
+                    2,
+                    &previous_steps,
+                    SeatChange::is_changed_by_highest_average_assignment,
+                ),
+                vec![2]
+            );
+        }
+    }
+
+    #[test]
+    fn test_steps_of_type_assigning_to_list() {
+        let previous_steps = vec![
+            highest_average_step(1, vec![1, 2], vec![1]),
+            largest_remainder_step(2),
+            highest_average_step(2, vec![2, 3], vec![1, 2]),
+        ];
+
+        let steps_for_list_1: Vec<_> = steps_of_type_assigning_to_list(
+            &previous_steps,
+            SeatChange::is_changed_by_highest_average_assignment,
+            1,
+        )
+        .collect();
+        assert_eq!(steps_for_list_1.len(), 1);
+        assert_eq!(steps_for_list_1[0].change.list_number_assigned(), 1);
+    }
+
+    mod exhausted_list_numbers {
+        use std::collections::{HashMap, HashSet};
+
+        use super::*;
+
+        #[test]
+        fn test_returns_empty_when_there_are_no_standings() {
+            assert_eq!(
+                exhausted_list_numbers::<ListVotesMock>(&[], &[], &HashMap::new()),
+                vec![]
+            );
+        }
+
+        #[test]
+        fn test_returns_lists_with_as_many_seats_as_candidates() {
+            let lists = [
+                // 1 full seat, 2 candidates: not exhausted
+                ListVotesMock::from_test_data_auto(1, vec![100, 0]),
+                // 1 full seat, 1 candidate: exhausted
+                ListVotesMock::from_test_data_auto(2, vec![100]),
+                // 0 full seats, 1 candidate: not exhausted
+                ListVotesMock::from_test_data_auto(3, vec![50]),
+            ];
+            let standings = [standing(1, 100), standing(2, 100), standing(3, 50)];
+
+            assert_eq!(
+                exhausted_list_numbers(&standings, &lists, &HashMap::new()),
+                vec![2]
+            );
+        }
+
+        #[test]
+        fn test_counts_residual_seats_towards_exhaustion() {
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100, 0])];
+            let mut standings = [standing(1, 100)];
+            // 1 full seat and 1 residual seat, total of 2 candidates
+            standings[0].add_residual_seat();
+
+            assert_eq!(
+                exhausted_list_numbers(&standings, &lists, &HashMap::new()),
+                vec![1]
+            );
+        }
+
+        #[test]
+        fn test_deceased_candidates_reduce_the_number_of_candidates() {
+            // 1 full seat and 2 candidates, but candidate 2 is deceased
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100, 0])];
+            let standings = [standing(1, 100)];
+            let deceased = HashMap::from([(1, HashSet::from([2]))]);
+
+            assert_eq!(
+                exhausted_list_numbers(&standings, &lists, &deceased),
+                vec![1]
+            );
+        }
+
+        #[test]
+        fn test_returns_lists_with_more_seats_than_candidates() {
+            // 2 full seats, 1 candidate
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![200])];
+            let standings = [standing(1, 200)];
+
+            assert_eq!(
+                exhausted_list_numbers(&standings, &lists, &HashMap::new()),
+                vec![1]
+            );
+        }
+    }
+
+    mod list_qualifies_for_extra_seat {
+        use super::*;
+
+        const LIST: u32 = 1;
+        const OTHER_LIST: u32 = 2;
+
+        #[test]
+        fn test_largest_remainder_qualify_when_no_seat_assigned() {
+            let previous_steps = vec![];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_qualify_when_seat_assigned_to_other_list() {
+            let previous_steps = vec![largest_remainder_step(OTHER_LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_qualify_when_unique_highest_average_step() {
+            let previous_steps = vec![unique_highest_average_step(LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_not_qualify_when_seat_assigned() {
+            let previous_steps = vec![largest_remainder_step(LIST)];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_qualify_when_seat_retracted_by_absolute_majority() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_not_qualify_when_seat_retracted_from_other_list() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                absolute_majority_reassignment_step(OTHER_LIST, LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_not_qualify_with_two_assigned_seats_even_after_retraction() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                largest_remainder_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_no_seat_assigned() {
+            let previous_steps = vec![];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_seat_assigned_to_other_list() {
+            let previous_steps = vec![unique_highest_average_step(OTHER_LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_largest_remainder_step() {
+            let previous_steps = vec![largest_remainder_step(LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_not_qualify_when_seat_assigned() {
+            let previous_steps = vec![unique_highest_average_step(LIST)];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_seat_retracted_by_absolute_majority() {
+            let previous_steps = vec![
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_retracted_with_one_largest_remainder() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_not_qualify_when_retracted_with_two_largest_remainders() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                largest_remainder_step(LIST),
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_not_qualify_with_two_assigned_seats_even_after_retraction() {
+            let previous_steps = vec![
+                unique_highest_average_step(LIST),
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+    }
+
+    mod list_standings_qualifying_for_largest_remainder {
+        use super::*;
+
+        #[test]
+        fn test_excludes_lists_without_votes() {
+            let standings = [standing(1, 100), standing(2, 0)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_largest_remainder(&standings, &[], &[]).collect();
+            assert_eq!(list_numbers(&qualifying), vec![1]);
+        }
+
+        #[test]
+        fn test_excludes_lists_below_the_remainder_threshold() {
+            // remainder_threshold = 75 (75% of quota)
+            let standings = [standing(1, 76), standing(2, 75), standing(3, 74)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_largest_remainder(&standings, &[], &[]).collect();
+            assert_eq!(list_numbers(&qualifying), vec![1, 2]);
+        }
+
+        #[test]
+        fn test_excludes_exhausted_lists() {
+            let standings = [standing(1, 100), standing(2, 100)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_largest_remainder(&standings, &[], &[2]).collect();
+            assert_eq!(list_numbers(&qualifying), vec![1]);
+        }
+
+        #[test]
+        fn test_excludes_lists_already_assigned_a_largest_remainder_seat() {
+            let standings = [standing(1, 100), standing(2, 100)];
+            let previous_steps = vec![largest_remainder_step(1)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_largest_remainder(&standings, &previous_steps, &[])
+                    .collect();
+            assert_eq!(list_numbers(&qualifying), vec![2]);
+        }
+    }
+
+    mod list_standings_qualifying_for_unique_highest_average {
+        use super::*;
+
+        #[test]
+        fn test_excludes_lists_without_votes() {
+            let standings = [standing(1, 100), standing(2, 0)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_unique_highest_average(&standings, &[], &[])
+                    .collect();
+            assert_eq!(list_numbers(&qualifying), vec![1]);
+        }
+
+        #[test]
+        fn test_does_not_apply_the_remainder_threshold() {
+            // remainder_threshold = 75 (75% of quota)
+            let standings = [standing(1, 74)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_unique_highest_average(&standings, &[], &[])
+                    .collect();
+            assert_eq!(list_numbers(&qualifying), vec![1]);
+        }
+
+        #[test]
+        fn test_excludes_exhausted_lists() {
+            let standings = [standing(1, 100), standing(2, 100)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_unique_highest_average(&standings, &[], &[2])
+                    .collect();
+            assert_eq!(list_numbers(&qualifying), vec![1]);
+        }
+
+        #[test]
+        fn test_excludes_lists_already_assigned_a_unique_highest_average_seat() {
+            let standings = [standing(1, 100), standing(2, 100)];
+            let previous_steps = vec![unique_highest_average_step(1)];
+
+            let qualifying: Vec<_> = list_standings_qualifying_for_unique_highest_average(
+                &standings,
+                &previous_steps,
+                &[],
             )
-            .peekable();
-        if qualifying_for_unique_highest_average.peek().is_some() {
-            debug!("Assign residual seat using unique highest averages method");
-            step_assign_remainder_using_highest_averages(
-                qualifying_for_unique_highest_average,
-                residual_seats,
-                previous_steps,
-                exhausted_list_numbers,
-                true,
-                residual_seat_number,
-                lists_drawn,
-            )
-        } else {
-            // We've now even exhausted unique highest average seats: every group that qualified
-            // got a largest remainder seat, and every group also had at least a single residual seat
-            // assigned to them. We now allow any residual seats to be assigned using the highest
-            // averages procedure
-            debug!("Assign residual seat using highest averages method");
-            step_assign_remainder_using_highest_averages(
+            .collect();
+            assert_eq!(list_numbers(&qualifying), vec![2]);
+        }
+    }
+
+    mod lists_with_highest_average {
+        use super::*;
+        use crate::test_helpers::ListDrawnMock;
+
+        /// Get the list averages of all standings
+        fn list_averages(standings: &[ListStanding<u32>]) -> Vec<(u32, Fraction)> {
+            standings
+                .iter()
+                .map(|s| (s.list_number(), s.next_votes_per_seat()))
+                .collect()
+        }
+
+        #[test]
+        fn test_returns_the_single_list_with_the_highest_average() {
+            // next votes per seat: list 1: 100/2 = 50, list 2: 80, list 3: 60
+            // list 2 has the highest average, so it should be returned
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 60)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = lists_with_highest_average(
                 standings.iter(),
-                residual_seats,
-                previous_steps,
-                exhausted_list_numbers,
+                list_averages(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::Completed(lists)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(list_numbers(&lists), vec![2]);
+        }
+
+        #[test]
+        fn test_returns_all_tied_lists_when_enough_seats_are_available() {
+            // next votes per seat: list 1: 100/2 = 50, lists 2 and 3: 80
+            // 2 seats are available, so both lists 2 and 3 can be assigned a seat
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                2,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::Completed(lists)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(list_numbers(&lists), vec![2, 3]);
+        }
+
+        #[test]
+        fn test_requires_drawing_lots_when_tied_lists_exceed_available_seats() {
+            // next votes per seat: list 1: 100/2 = 50, lists 2 and 3: 80
+            // only 1 seat available, but 2 lists have the same highest average
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                1,
+                3,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::DrawingLotsRequired(variant)) = result else {
+                panic!("expected DrawingLotsRequired");
+            };
+            assert_eq!(
+                variant,
+                ListDrawingLotsVariant::HighestAverageResidualSeat(
+                    HighestAverageResidualSeatDrawingLots {
+                        max_average: Fraction::new(80, 1),
+                        residual_seat_numbers: vec![3],
+                        options: vec![2, 3],
+                        list_averages: list_averages(&standings),
+                    }
+                )
+            );
+        }
+
+        #[test]
+        fn test_assigns_the_seat_to_the_drawn_list() {
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let expected_variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    max_average: Fraction::new(80, 1),
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_averages: list_averages(&standings),
+                },
+            );
+            let lists_drawn = [ListDrawnMock::new(&expected_variant, 3)];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::CompletedWithDrawingLots(lists, variant)) = result else {
+                panic!("expected CompletedWithDrawingLots");
+            };
+            assert_eq!(list_numbers(&lists), vec![3]);
+            assert_eq!(variant, expected_variant);
+        }
+
+        #[test]
+        fn test_returns_error_when_drawn_list_has_a_different_variant() {
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let other_variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    max_average: Fraction::ZERO,
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_averages: vec![],
+                },
+            );
+            let lists_drawn = [ListDrawnMock::new(&other_variant, 3)];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Err(error) = result else {
+                panic!("expected an error");
+            };
+            assert_eq!(
+                error,
+                ApportionmentError::InvalidLotDrawing("Variant mismatch".to_string())
+            );
+        }
+
+        #[test]
+        fn test_returns_error_when_drawn_list_is_not_one_of_the_options() {
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    max_average: Fraction::new(80, 1),
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_averages: list_averages(&standings),
+                },
+            );
+            // List 1 does not have the highest average and is not an option
+            let lists_drawn = [ListDrawnMock::new(&variant, 1)];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Err(error) = result else {
+                panic!("expected an error");
+            };
+            assert_eq!(
+                error,
+                ApportionmentError::InvalidLotDrawing("Invalid number drawn".to_string())
+            );
+        }
+    }
+
+    mod lists_with_largest_remainder {
+        use super::*;
+        use crate::test_helpers::ListDrawnMock;
+
+        /// Get the list remainders of all standings
+        fn remainders(standings: &[ListStanding<u32>]) -> Vec<(u32, Fraction)> {
+            standings
+                .iter()
+                .map(|s| (s.list_number(), s.remainder_votes()))
+                .collect()
+        }
+
+        #[test]
+        fn test_returns_the_single_list_with_the_largest_remainder() {
+            // remainder votes: list 1: 150 - 100 = 50, list 2: 80, list 3: 60
+            let standings = [standing(1, 150), standing(2, 80), standing(3, 60)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = lists_with_largest_remainder(
+                standings.iter(),
+                remainders(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::Completed(lists)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(list_numbers(&lists), vec![2]);
+        }
+
+        #[test]
+        fn test_returns_all_tied_lists_when_enough_seats_are_available() {
+            // remainder votes: list 1: 150 - 100 = 50, lists 2 and 3: 80
+            let standings = [standing(1, 150), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = lists_with_largest_remainder(
+                standings.iter(),
+                remainders(&standings),
+                2,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::Completed(lists)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(list_numbers(&lists), vec![2, 3]);
+        }
+
+        #[test]
+        fn test_requires_drawing_lots_when_tied_lists_exceed_available_seats() {
+            let standings = [standing(1, 150), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = lists_with_largest_remainder(
+                standings.iter(),
+                remainders(&standings),
+                1,
+                3,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::DrawingLotsRequired(variant)) = result else {
+                panic!("expected DrawingLotsRequired");
+            };
+            assert_eq!(
+                variant,
+                ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                    LargestRemainderResidualSeatDrawingLots {
+                        max_remainder: Fraction::new(80, 1),
+                        residual_seat_numbers: vec![3],
+                        options: vec![2, 3],
+                        list_remainders: remainders(&standings),
+                    }
+                )
+            );
+        }
+
+        #[test]
+        fn test_assigns_the_seat_to_the_drawn_list() {
+            let standings = [standing(1, 150), standing(2, 80), standing(3, 80)];
+            let expected_variant = ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                LargestRemainderResidualSeatDrawingLots {
+                    max_remainder: Fraction::new(80, 1),
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_remainders: remainders(&standings),
+                },
+            );
+            let lists_drawn = [ListDrawnMock::new(&expected_variant, 3)];
+
+            let result = lists_with_largest_remainder(
+                standings.iter(),
+                remainders(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::CompletedWithDrawingLots(lists, variant)) = result else {
+                panic!("expected CompletedWithDrawingLots");
+            };
+            assert_eq!(list_numbers(&lists), vec![3]);
+            assert_eq!(variant, expected_variant);
+        }
+
+        #[test]
+        fn test_returns_error_when_drawn_list_has_a_different_variant() {
+            let standings = [standing(1, 150), standing(2, 80), standing(3, 80)];
+            let other_variant = ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                LargestRemainderResidualSeatDrawingLots {
+                    max_remainder: Fraction::ZERO,
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_remainders: vec![],
+                },
+            );
+            let lists_drawn = [ListDrawnMock::new(&other_variant, 3)];
+
+            let result = lists_with_largest_remainder(
+                standings.iter(),
+                remainders(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Err(error) = result else {
+                panic!("expected an error");
+            };
+            assert_eq!(
+                error,
+                ApportionmentError::InvalidLotDrawing("Variant mismatch".to_string())
+            );
+        }
+
+        #[test]
+        fn test_returns_error_when_drawn_list_is_not_one_of_the_options() {
+            let standings = [standing(1, 150), standing(2, 80), standing(3, 80)];
+            let variant = ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                LargestRemainderResidualSeatDrawingLots {
+                    max_remainder: Fraction::new(80, 1),
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_remainders: remainders(&standings),
+                },
+            );
+            // List 1 does not have the largest remainder and is not an option
+            let lists_drawn = [ListDrawnMock::new(&variant, 1)];
+
+            let result = lists_with_largest_remainder(
+                standings.iter(),
+                remainders(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Err(error) = result else {
+                panic!("expected an error");
+            };
+            assert_eq!(
+                error,
+                ApportionmentError::InvalidLotDrawing("Invalid number drawn".to_string())
+            );
+        }
+    }
+
+    #[test]
+    #[expect(clippy::too_many_lines)]
+    fn test_lists_qualifying_for_highest_average() {
+        // Lists 1-3 have votes, list 4 has none (and should never qualify).
+        let standings = [
+            standing(1, 100),
+            standing(2, 80),
+            standing(3, 80),
+            standing(4, 0),
+        ];
+
+        struct Case {
+            description: &'static str,
+            check_for_unique: bool,
+            exhausted: Vec<u32>,
+            previous_steps: Vec<SeatChangeStep<u32>>,
+            expected_unique: bool,
+            expected_lists: Vec<u32>,
+        }
+
+        let cases = vec![
+            Case {
+                description: "regular method qualifies every list with votes",
+                check_for_unique: false,
+                exhausted: vec![],
+                previous_steps: vec![],
+                expected_unique: false,
+                expected_lists: vec![1, 2, 3],
+            },
+            Case {
+                description: "regular method excludes exhausted lists",
+                check_for_unique: false,
+                exhausted: vec![2],
+                previous_steps: vec![],
+                expected_unique: false,
+                expected_lists: vec![1, 3],
+            },
+            Case {
+                description: "unique method qualifies every list with votes when none got a seat",
+                check_for_unique: true,
+                exhausted: vec![],
+                previous_steps: vec![],
+                expected_unique: true,
+                expected_lists: vec![1, 2, 3],
+            },
+            Case {
+                description: "unique method excludes lists that already got a unique seat",
+                check_for_unique: true,
+                exhausted: vec![],
+                previous_steps: vec![unique_highest_average_step(1)],
+                expected_unique: true,
+                expected_lists: vec![2, 3],
+            },
+            Case {
+                description: "unique method also excludes exhausted lists",
+                check_for_unique: true,
+                exhausted: vec![3],
+                previous_steps: vec![unique_highest_average_step(1)],
+                expected_unique: true,
+                expected_lists: vec![2],
+            },
+            Case {
+                description: "falls back to regular method when every list got a unique seat",
+                check_for_unique: true,
+                exhausted: vec![],
+                previous_steps: vec![
+                    unique_highest_average_step(1),
+                    unique_highest_average_step(2),
+                    unique_highest_average_step(3),
+                ],
+                expected_unique: false,
+                expected_lists: vec![1, 2, 3],
+            },
+        ];
+
+        for case in cases {
+            let (unique, qualifying) = lists_qualifying_for_highest_average(
+                &standings,
+                &case.previous_steps,
+                &case.exhausted,
+                case.check_for_unique,
+            );
+
+            assert_eq!(
+                unique, case.expected_unique,
+                "unique flag: {}",
+                case.description
+            );
+            assert_eq!(
+                list_numbers(&qualifying),
+                case.expected_lists,
+                "qualifying lists: {}",
+                case.description
+            );
+        }
+    }
+
+    mod step_assign_remainder_using_highest_averages {
+        use super::*;
+        use crate::test_helpers::ListDrawnMock;
+
+        #[test]
+        fn test_assigns_seat_to_the_list_with_the_highest_average() {
+            // next votes per seat: list 1: 100/2 = 50, list 2: 80, list 3: 60
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 60)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_highest_averages(
+                &standings,
+                1,
+                &[],
+                &[],
                 false,
-                residual_seat_number,
-                lists_drawn,
-            )
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(
+                change,
+                SeatChange::HighestAverageAssignment(HighestAverageAssignedSeat {
+                    selected_list_number: 2,
+                    list_assigned: vec![2],
+                    list_options: vec![2],
+                    list_exhausted: vec![],
+                    votes_per_seat: Fraction::new(80, 1),
+                    drawing_lots: None,
+                })
+            );
+        }
+
+        #[test]
+        fn test_reports_all_tied_lists_as_options() {
+            // lists 2 and 3 are tied at 80 votes per seat, with 2 seats available
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_highest_averages(
+                &standings,
+                2,
+                &[],
+                &[],
+                false,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(change.list_number_assigned(), 2);
+            assert_eq!(change.list_options(), vec![2, 3]);
+        }
+
+        #[test]
+        fn test_extends_list_assigned_from_the_previous_step() {
+            // List 2 already got its seat in the previous step (next average 80/2 = 40),
+            // so list 3 (80) is selected now
+            let mut standings = [standing(2, 80), standing(3, 80)];
+            standings[0].add_residual_seat();
+            let previous_steps = vec![highest_average_step(2, vec![2, 3], vec![2])];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_highest_averages(
+                &standings,
+                1,
+                &previous_steps,
+                &[],
+                false,
+                2,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(change.list_number_assigned(), 3);
+            assert_eq!(change.list_assigned(), vec![2, 3]);
+        }
+
+        #[test]
+        fn test_excludes_exhausted_lists_and_returns_them() {
+            // next votes per seat: list 1: 100/2 = 50, list 2: 80
+            // List 2 has the highest average but is exhausted according to exhausted_list_numbers
+            let standings = [standing(1, 100), standing(2, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_highest_averages(
+                &standings,
+                1,
+                &[],
+                &[2],
+                false,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(
+                change,
+                SeatChange::HighestAverageAssignment(HighestAverageAssignedSeat {
+                    selected_list_number: 1,
+                    list_assigned: vec![1],
+                    list_options: vec![1],
+                    list_exhausted: vec![2],
+                    votes_per_seat: Fraction::new(50, 1),
+                    drawing_lots: None,
+                })
+            );
+        }
+
+        #[test]
+        fn test_unique_assignment_skips_lists_that_already_received_unique_assignment() {
+            // next votes per seat: list 1: 100/2 = 50, list 2: 80
+            // List 2 has the highest average but already got a unique highest average seat
+            let standings = [standing(1, 100), standing(2, 80)];
+            let previous_steps = vec![unique_highest_average_step(2)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_highest_averages(
+                &standings,
+                1,
+                &previous_steps,
+                &[],
+                true,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(
+                change,
+                SeatChange::UniqueHighestAverageAssignment(HighestAverageAssignedSeat {
+                    selected_list_number: 1,
+                    list_assigned: vec![1],
+                    list_options: vec![1],
+                    list_exhausted: vec![],
+                    votes_per_seat: Fraction::new(50, 1),
+                    drawing_lots: None,
+                })
+            );
+        }
+
+        #[test]
+        fn test_falls_back_to_regular_assignment_when_every_list_got_a_unique_seat() {
+            let standings = [standing(1, 100), standing(2, 80)];
+            let previous_steps = vec![
+                unique_highest_average_step(1),
+                unique_highest_average_step(2),
+            ];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_highest_averages(
+                &standings,
+                1,
+                &previous_steps,
+                &[],
+                true,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            // All lists qualify again and the change is a regular (non-unique) assignment
+            assert!(change.is_changed_by_highest_average_assignment());
+            assert_eq!(change.list_number_assigned(), 2);
+        }
+
+        #[test]
+        fn test_returns_drawing_lots_required_when_tie_exceeds_available_seats() {
+            // lists 2 and 3 are tied at 80 votes per seat, with 1 seat available
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_highest_averages(
+                &standings,
+                1,
+                &[],
+                &[],
+                false,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::DrawingLotsRequired(variant)) = result else {
+                panic!("expected DrawingLotsRequired");
+            };
+            assert_eq!(
+                variant,
+                ListDrawingLotsVariant::HighestAverageResidualSeat(
+                    HighestAverageResidualSeatDrawingLots {
+                        max_average: Fraction::new(80, 1),
+                        residual_seat_numbers: vec![1],
+                        options: vec![2, 3],
+                        // The averages of all standings, including list 1
+                        list_averages: vec![
+                            (1, Fraction::new(50, 1)),
+                            (2, Fraction::new(80, 1)),
+                            (3, Fraction::new(80, 1)),
+                        ],
+                    }
+                )
+            );
+        }
+
+        #[test]
+        fn test_assigns_the_seat_to_the_drawn_list() {
+            let standings = [standing(2, 80), standing(3, 80)];
+            let variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    max_average: Fraction::new(80, 1),
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_averages: vec![(2, Fraction::new(80, 1)), (3, Fraction::new(80, 1))],
+                },
+            );
+            let lists_drawn = [ListDrawnMock::new(&variant, 3)];
+
+            let result = step_assign_remainder_using_highest_averages(
+                &standings,
+                1,
+                &[],
+                &[],
+                false,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(
+                change,
+                SeatChange::HighestAverageAssignment(HighestAverageAssignedSeat {
+                    selected_list_number: 3,
+                    list_assigned: vec![3],
+                    list_options: vec![2, 3],
+                    list_exhausted: vec![],
+                    votes_per_seat: Fraction::new(80, 1),
+                    drawing_lots: Some(variant),
+                })
+            );
+        }
+
+        #[test]
+        #[should_panic(expected = "no eligible lists")]
+        fn test_panics_when_no_lists_are_eligible() {
+            let standings = [standing(1, 0)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let _ = step_assign_remainder_using_highest_averages(
+                &standings,
+                1,
+                &[],
+                &[],
+                false,
+                1,
+                &mut lists_drawn.iter(),
+            );
+        }
+    }
+
+    mod step_assign_remainder_using_largest_remainder {
+        use super::*;
+        use crate::test_helpers::ListDrawnMock;
+
+        #[test]
+        fn test_assigns_seat_to_the_list_with_the_largest_remainder() {
+            // remainder votes: list 1: 150 - 100 = 50, list 2: 90, list 3: 80
+            let standings = [standing(1, 150), standing(2, 90), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_largest_remainder(
+                &standings,
+                1,
+                &[],
+                &[],
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(
+                change,
+                SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
+                    selected_list_number: 2,
+                    list_assigned: vec![2],
+                    list_options: vec![2],
+                    remainder_votes: Fraction::new(90, 1),
+                    drawing_lots: None,
+                })
+            );
+        }
+
+        #[test]
+        fn test_reports_all_tied_lists_as_options() {
+            // lists 2 and 3 are tied at 80 votes, with 2 seats available
+            let standings = [standing(1, 150), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_largest_remainder(
+                &standings,
+                2,
+                &[],
+                &[],
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(change.list_number_assigned(), 2);
+            assert_eq!(change.list_options(), vec![2, 3]);
+        }
+
+        #[test]
+        fn test_extends_list_assigned_from_the_previous_step() {
+            // Lists 2 and 3 were tied in the previous step and list 2 got the seat,
+            // so it no longer qualifies and list 3 is selected now
+            let standings = [standing(2, 80), standing(3, 80)];
+            let previous_steps = vec![SeatChangeStep {
+                residual_seat_number: None,
+                standings: vec![],
+                change: SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
+                    selected_list_number: 2,
+                    list_options: vec![2, 3],
+                    list_assigned: vec![2],
+                    remainder_votes: Fraction::ZERO,
+                    drawing_lots: None,
+                }),
+            }];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_largest_remainder(
+                &standings,
+                1,
+                &previous_steps,
+                &[],
+                2,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(change.list_number_assigned(), 3);
+            assert_eq!(change.list_assigned(), vec![2, 3]);
+        }
+
+        #[test]
+        fn test_excludes_lists_below_the_remainder_threshold() {
+            // remainder votes: list 1: 74, list 2: 150-100 = 50
+            // List 1 has the largest remainder (74) but does not meet
+            // the threshold (75% of the quota = 75 votes)
+            let standings = [standing(1, 74), standing(2, 150)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_largest_remainder(
+                &standings,
+                1,
+                &[],
+                &[],
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(change.list_number_assigned(), 2);
+            assert_eq!(change.list_options(), vec![2]);
+        }
+
+        #[test]
+        fn test_excludes_exhausted_lists() {
+            // List 2 has the largest remainder but is exhausted according to exhausted_list_numbers
+            let standings = [standing(1, 150), standing(2, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_largest_remainder(
+                &standings,
+                1,
+                &[],
+                &[2],
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(
+                change,
+                SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
+                    selected_list_number: 1,
+                    list_assigned: vec![1],
+                    list_options: vec![1],
+                    remainder_votes: Fraction::new(50, 1),
+                    drawing_lots: None,
+                })
+            );
+        }
+
+        #[test]
+        fn test_falls_back_to_unique_highest_average_when_no_list_qualifies() {
+            // Both lists already got a largest remainder seat, so the seat is
+            // assigned using the unique highest averages method instead:
+            // next votes per seat: list 1: 150/2 = 75, list 2: 80
+            let standings = [standing(1, 150), standing(2, 80)];
+            let previous_steps = vec![largest_remainder_step(1), largest_remainder_step(2)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_largest_remainder(
+                &standings,
+                1,
+                &previous_steps,
+                &[],
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert!(change.is_changed_by_unique_highest_average_assignment());
+            assert_eq!(change.list_number_assigned(), 2);
+        }
+
+        #[test]
+        fn test_returns_drawing_lots_required_when_tie_exceeds_available_seats() {
+            let standings = [standing(1, 150), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = step_assign_remainder_using_largest_remainder(
+                &standings,
+                1,
+                &[],
+                &[],
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::DrawingLotsRequired(variant)) = result else {
+                panic!("expected DrawingLotsRequired");
+            };
+            assert_eq!(
+                variant,
+                ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                    LargestRemainderResidualSeatDrawingLots {
+                        max_remainder: Fraction::new(80, 1),
+                        residual_seat_numbers: vec![1],
+                        options: vec![2, 3],
+                        // The remainders of all standings, including list 1
+                        list_remainders: vec![
+                            (1, Fraction::new(50, 1)),
+                            (2, Fraction::new(80, 1)),
+                            (3, Fraction::new(80, 1)),
+                        ],
+                    }
+                )
+            );
+        }
+
+        #[test]
+        fn test_assigns_the_seat_to_the_drawn_list() {
+            let standings = [standing(2, 80), standing(3, 80)];
+            let variant = ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                LargestRemainderResidualSeatDrawingLots {
+                    max_remainder: Fraction::new(80, 1),
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_remainders: vec![(2, Fraction::new(80, 1)), (3, Fraction::new(80, 1))],
+                },
+            );
+            let lists_drawn = [ListDrawnMock::new(&variant, 3)];
+
+            let result = step_assign_remainder_using_largest_remainder(
+                &standings,
+                1,
+                &[],
+                &[],
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ResidualSeat::SeatChange(change)) = result else {
+                panic!("expected SeatChange");
+            };
+            assert_eq!(
+                change,
+                SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
+                    selected_list_number: 3,
+                    list_assigned: vec![3],
+                    list_options: vec![2, 3],
+                    remainder_votes: Fraction::new(80, 1),
+                    drawing_lots: Some(variant),
+                })
+            );
         }
     }
 }

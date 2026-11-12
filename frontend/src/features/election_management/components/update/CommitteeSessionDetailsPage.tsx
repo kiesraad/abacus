@@ -159,7 +159,7 @@ export function CommitteeSessionDetailsPage() {
                     id="start_date"
                     name="start_date"
                     label={t("election_management.date")}
-                    hint={t("election_management.date_hint")}
+                    hint={t("election_management.date_hint", { currentYear: new Date().getFullYear() })}
                     fieldWidth="average"
                     error={validationErrors?.start_date}
                     defaultValue={defaultDate}

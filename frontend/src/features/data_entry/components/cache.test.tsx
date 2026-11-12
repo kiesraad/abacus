@@ -62,13 +62,17 @@ describe("Data Entry cache behavior", () => {
     const proxyCertificates = screen.getByRole("textbox", { name: "B Volmachtbewijzen" });
     expect(proxyCertificates).toHaveValue("200");
 
+    const voterCardCount = screen.getByRole("textbox", { name: "C Kiezerspassen" });
+    expect(voterCardCount).toBeDisabled();
+    expect(voterCardCount).toHaveValue("");
+
     const totalAdmittedVoters = screen.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
     expect(totalAdmittedVoters).toHaveValue("600");
 
-    const totalVotesOnParty1 = screen.getByRole("textbox", { name: "E.1 Totaal Lijst 1 - Vurige Vleugels Partij" });
+    const totalVotesOnParty1 = screen.getByRole("textbox", { name: "E.1 Totaal Lijst 1 – Vurige Vleugels Partij" });
     expect(totalVotesOnParty1).toHaveValue("150");
 
-    const totalVotesOnParty2 = screen.getByRole("textbox", { name: "E.2 Totaal Lijst 2 - Wijzen van Water en Wind" });
+    const totalVotesOnParty2 = screen.getByRole("textbox", { name: "E.2 Totaal Lijst 2 – Wijzen van Water en Wind" });
     expect(totalVotesOnParty2).toHaveValue("250");
 
     const totalVotesOnCandidates = screen.getByRole("textbox", { name: "E Totaal stemmen op kandidaten" });

@@ -29,6 +29,15 @@ updates:
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
       - dependency-name: "axum-extra"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+  - package-ecosystem: "rust-toolchain"
+    directories: ["/backend", "backend/fuzz", "backend/apportionment/fuzz"]
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 5
+    groups:
+      rust-toolchain:
+        patterns: ["*"]
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:

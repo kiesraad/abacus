@@ -1,0 +1,86 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        UPDATE committee_sessions\n        SET status = ?\n        WHERE id = ?\n        RETURNING\n            id,\n            number,\n            election_id,\n            status,\n            location,\n            start_date_time\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "number",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "number"
+          }
+        }
+      },
+      {
+        "name": "election_id",
+        "ordinal": 2,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "election_id"
+          }
+        }
+      },
+      {
+        "name": "status",
+        "ordinal": 3,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "name": "location",
+        "ordinal": 4,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "location"
+          }
+        }
+      },
+      {
+        "name": "start_date_time",
+        "ordinal": 5,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "start_date_time"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "11a4440c59697467a023b0bf68b0b471167bb8c5227d5bcb47f51dc01dfb43ba"
+}

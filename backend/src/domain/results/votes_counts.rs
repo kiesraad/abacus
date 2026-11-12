@@ -295,10 +295,14 @@ impl Validate for VotesCounts {
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use test_log::test;
 
     use super::*;
-    use crate::domain::election::{CommitteeCategory::*, PGNumber, tests::election_fixture};
+    use crate::domain::election::{
+        CommitteeCategory::*, ElectionCategory, PGNumber, tests::election_fixture,
+    };
 
     #[test]
     fn test_votes_addition() {
@@ -373,16 +377,16 @@ mod tests {
         };
 
         let result = curr_votes.add(&other);
-        assert!(matches!(
+        assert_matches!(
             result,
             Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-        ));
+        );
 
         let result = other.add(&curr_votes);
-        assert!(matches!(
+        assert_matches!(
             result,
             Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-        ));
+        );
     }
 
     fn validate(
@@ -409,7 +413,7 @@ mod tests {
         };
 
         votes_counts.validate(
-            &election_fixture(committee_category, &[1, 1, 1]),
+            &election_fixture(ElectionCategory::Municipal, committee_category, &[1, 1, 1]),
             &"votes_counts".into(),
         )
     }

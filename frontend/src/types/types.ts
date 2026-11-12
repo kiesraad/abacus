@@ -15,14 +15,17 @@ export interface HeadingSubsection {
 
 export interface MessageSubsection {
   type: "message";
-  variant?: "dimmed";
+  /** "notify" renders the message as an informational alert */
+  variant?: "dimmed" | "notify";
+  /** Title of the alert, only shown for the "notify" variant */
+  title?: string;
   message: string;
 }
 
 export interface RadioSubsectionOption {
-  value: "true" | "false";
+  value: string;
   /** Label for data entry form view */
-  label: string;
+  label: string | ReactElement;
   /** Short label for differences view */
   short_label: string;
   autoFocusInput?: boolean;
@@ -31,8 +34,8 @@ export interface RadioSubsectionOption {
 export interface RadioSubsection {
   type: "radio";
   /** Title to display above the radio buttons */
-  title?: string;
-  /** Description to display above the checkboxes */
+  title?: string | ReactElement;
+  /** Description to display above the radio buttons */
   description?: string;
   /** Short title for differences view */
   short_title: string;
@@ -44,7 +47,7 @@ export interface RadioSubsection {
 export interface CheckboxesSubsectionOption {
   path: ResultsPath;
   /** Label for data entry form view */
-  label: string;
+  label: string | ReactElement;
   /** Short label for differences view */
   short_label: string;
   autoFocusInput?: boolean;
@@ -69,6 +72,7 @@ export interface InputGridSubsectionRow {
   code?: string;
   path: ResultsPath;
   title: string;
+  isDisabled?: boolean;
   isTotal?: boolean;
   isListTotal?: boolean;
   addSeparator?: boolean;
@@ -89,10 +93,20 @@ export type DataEntrySubsection =
   | InputGridSubsection
   | CheckboxesSubsection;
 
+export function isCheckboxesSubsection(subsection: DataEntrySubsection): subsection is CheckboxesSubsection {
+  return subsection.type === "checkboxes";
+}
+
+export interface EqualToCondition {
+  path: ResultsPath;
+  equal_to: string;
+}
+
 export interface DataEntrySection {
   id: FormSectionId;
   title: string;
   short_title: string;
+  disabled_when?: EqualToCondition;
   sectionNumber?: string;
   subsections: DataEntrySubsection[];
 }
@@ -102,7 +116,7 @@ export type DataEntryModel = Results["model"];
 // All models, includes exhaustive check if all models are defined
 export const dataEntryModelValues = (<T extends DataEntryModel[]>(
   models: [Exclude<DataEntryModel, T[number]>] extends [never] ? T : never,
-) => models)(["CSOFirstSession", "CSONextSession", "GSB"]);
+) => models)(["DSOFirstSession", "CSOFirstSession", "DSONextSession", "CSONextSession", "GSB"]);
 
 export type DataEntryStructure = DataEntrySection[];
 

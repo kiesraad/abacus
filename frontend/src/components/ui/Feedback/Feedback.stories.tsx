@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps } from "react";
 import { expect } from "storybook/test";
-import { csbElectionMockData, electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { csbElectionMockData, electionMockData, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { roleValues, type ValidationResultCode } from "@/types/generated/openapi";
 import { Feedback } from "./Feedback";
@@ -16,9 +16,10 @@ const meta = {
       control: { type: "multi-select" },
     },
     election: {
-      options: ["GSB", "CSB"],
+      options: ["GSB DSO", "GSB CSO", "CSB"],
       mapping: {
-        GSB: electionMockData,
+        "GSB CSO": getElectionMockData({ counting_method: "CSO" }).election,
+        "GSB DSO": getElectionMockData({ counting_method: "DSO" }).election,
         CSB: csbElectionMockData,
       },
     },
@@ -53,7 +54,7 @@ export const GSBCoordinator: Story = {
     const titles = await canvas.findAllByRole("heading");
     await expect(titles).toHaveLength(2);
 
-    await expect(titles[0]).toHaveTextContent("A en B tellen niet op tot D");
+    await expect(titles[0]).toHaveTextContent("A, B en C tellen niet op tot D");
     await expect(titles[0]!.nextSibling).toHaveTextContent("F.201");
 
     await expect(titles[1]).toHaveTextContent("De stemmen op lijsten tellen niet op tot E");

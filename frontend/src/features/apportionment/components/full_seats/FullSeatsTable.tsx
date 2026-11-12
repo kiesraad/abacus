@@ -2,18 +2,19 @@ import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import type { DisplayFraction, ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
+import { formatVoteCount } from "@/utils/number";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface FullSeatsTableProps {
-  finalStanding: ListSeatAssignment[];
+  standings: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
   quota: DisplayFraction;
   resultChanges: ResultChange[];
 }
 
-export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultChanges }: FullSeatsTableProps) {
+export function FullSeatsTable({ standings, politicalGroups, quota, resultChanges }: FullSeatsTableProps) {
   return (
     <Table id="full-seats-table" className={cn(cls.table, cls.fullSeatsTable)}>
       <Table.Header>
@@ -28,7 +29,7 @@ export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultCh
         <Table.HeaderCell className="text-align-r">{t("apportionment.full_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((standing: ListSeatAssignment) => {
+        {standings.map((standing: ListSeatAssignment) => {
           const listResultChanges = resultChanges.filter((change) => change.listNumber === standing.list_number);
           return (
             <Table.Row key={standing.list_number}>
@@ -41,7 +42,7 @@ export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultCh
                   false,
                 )}
               </Table.Cell>
-              <Table.NumberCell>{standing.votes_cast}</Table.NumberCell>
+              <Table.NumberCell>{formatVoteCount(standing.votes_cast)}</Table.NumberCell>
               <Table.Cell>:</Table.Cell>
               <Table.DisplayFractionCells>{quota}</Table.DisplayFractionCells>
               <Table.Cell>=</Table.Cell>

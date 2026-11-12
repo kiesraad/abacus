@@ -6,3 +6,4 @@
 /templates/**/*.pdf
 /tmp-pdf-gen
 cobertura.xml
+/backups/

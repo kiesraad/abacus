@@ -35,6 +35,7 @@ use crate::{
     service::{
         CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
         change_committee_session_status, list_polling_stations_for_session,
+        validate_committee_session_is_current_committee_session,
     },
 };
 
@@ -109,22 +110,16 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(committee_session_investigations).authorize(COORDINATOR_GSB))
 }
 
-pub async fn validate_committee_session_is_current_committee_session(
-    conn: &mut SqliteConnection,
-    election_id: ElectionId,
-    committee_session_id: CommitteeSessionId,
-) -> Result<CommitteeSession, APIError> {
-    // Get current committee session and check if the committee session id given
-    // matches the current committee session id, return NOT_FOUND otherwise
-    let current_committee_session = get_election_committee_session(conn, election_id).await?;
-    if committee_session_id != current_committee_session.id {
-        Err(APIError::NotFound(
-            "Committee session is not current committee session".to_string(),
+pub fn verify_committee_session_details_exist(
+    committee_session: &CommitteeSession,
+) -> Result<(), APIError> {
+    if committee_session.start_date_time.is_none() || committee_session.location.is_empty() {
+        return Err(APIError::NotFound(
+            "Committee session is missing start date, start time and location details".into(),
             ErrorReference::EntryNotFound,
-        ))
-    } else {
-        Ok(current_committee_session)
+        ));
     }
+    Ok(())
 }
 
 pub async fn create_committee_session(
@@ -173,6 +168,9 @@ pub async fn committee_session_create(
     let current_committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
     if current_committee_session.status == CommitteeSessionStatus::Completed {
+        verify_committee_session_details_exist(&current_committee_session)
+            .map_err(|_| CommitteeSessionError::InvalidDetails)?;
+
         let next_committee_session = create_committee_session(&mut tx, &audit_service, {
             CommitteeSessionCreateRequest {
                 election_id,
@@ -292,7 +290,7 @@ pub async fn committee_session_update(
         return Err(CommitteeSessionError::InvalidDetails.into());
     }
 
-    let date_time_str = format!("{}T{}", &request.start_date, &request.start_time);
+    let date_time_str = format!("{}T{}", request.start_date, request.start_time);
     let date_time = match NaiveDateTime::parse_from_str(&date_time_str, "%Y-%m-%dT%H:%M") {
         Ok(date) => date,
         Err(_) => {
@@ -408,6 +406,7 @@ pub async fn committee_session_investigations(
 #[cfg(test)]
 mod tests {
     use axum::response::{IntoResponse, Response};
+    use http_body_util::BodyExt;
     use test_log::test;
 
     use super::*;
@@ -415,7 +414,7 @@ mod tests {
         api::tests::{
             assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
         },
-        repository::user_repo::UserId,
+        repository::{committee_session_repo, user_repo::UserId},
     };
 
     async fn call_handlers(
@@ -439,6 +438,26 @@ mod tests {
         results
     }
 
+    async fn status_change(
+        pool: SqlitePool,
+        role: Role,
+        election_id: ElectionId,
+        committee_session_id: CommitteeSessionId,
+        status: CommitteeSessionStatus,
+    ) -> Response {
+        let user = User::test_user(role, UserId::from(1));
+        let audit = AuditService::new(Some(user.clone()), None);
+        committee_session_status_change(
+            user,
+            State(pool),
+            audit,
+            Path((election_id, committee_session_id)),
+            Json(CommitteeSessionStatusChangeRequest { status }),
+        )
+        .await
+        .into_response()
+    }
+
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_committee_category_authorization_err(pool: SqlitePool) {
         let results = call_handlers(pool, Role::CoordinatorCSB).await;
@@ -449,5 +468,67 @@ mod tests {
     async fn test_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers(pool, Role::CoordinatorGSB).await;
         assert_committee_category_authorization_ok(results);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_create_committee_session_without_details_fails(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+
+        committee_session_repo::change_status(
+            &mut conn,
+            CommitteeSessionId::from(6),
+            CommitteeSessionStatus::Completed,
+        )
+        .await
+        .unwrap();
+
+        let response = committee_session_create(
+            user.clone(),
+            State(pool.clone()),
+            AuditService::new(Some(user.clone()), None),
+            Path(ElectionId::from(5)),
+        )
+        .await
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::InvalidData);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_4"))))]
+    async fn test_status_change_complete_without_results_fails_gsb(pool: SqlitePool) {
+        let response = status_change(
+            pool,
+            Role::CoordinatorGSB,
+            ElectionId::from(4),
+            CommitteeSessionId::from(4),
+            CommitteeSessionStatus::Completed,
+        )
+        .await;
+
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::InvalidStateTransition);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
+    async fn test_status_change_completed_without_results_fails_csb(pool: SqlitePool) {
+        let response = status_change(
+            pool,
+            Role::CoordinatorCSB,
+            ElectionId::from(9),
+            CommitteeSessionId::from(901),
+            CommitteeSessionStatus::Completed,
+        )
+        .await;
+
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::InvalidStateTransition);
     }
 }

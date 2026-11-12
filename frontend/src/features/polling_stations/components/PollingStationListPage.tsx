@@ -1,4 +1,4 @@
-import { IconFilePlus, IconPlus } from "@/components/generated/icons";
+import { IconDownload, IconFilePlus, IconPlus } from "@/components/generated/icons";
 import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -9,7 +9,7 @@ import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-
+import { directDownload } from "@/utils/download";
 import { usePollingStationListRequest } from "../hooks/usePollingStationListRequest";
 import { isPollingStationCreateAndUpdateAllowed } from "../utils/checks";
 
@@ -76,13 +76,24 @@ export function PollingStationListPage() {
           </article>
         ) : (
           <article>
-            {createAndUpdateAllowed && (
-              <Toolbar>
-                <Button.Link variant="secondary" size="sm" to="./create">
-                  <IconPlus /> {t("polling_station.create")}
-                </Button.Link>
-              </Toolbar>
-            )}
+            <Toolbar>
+              <Toolbar.Section>
+                {createAndUpdateAllowed && (
+                  <Button.Link variant="secondary" size="sm" to="./create">
+                    <IconPlus /> {t("polling_station.create")}
+                  </Button.Link>
+                )}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    directDownload(`/api/elections/${election.id}/polling_stations/export`);
+                  }}
+                >
+                  <IconDownload /> {t("polling_station.export")}
+                </Button>
+              </Toolbar.Section>
+            </Toolbar>
 
             <Table id="polling_stations">
               <Table.Header>

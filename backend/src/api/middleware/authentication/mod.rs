@@ -5,6 +5,7 @@ pub use role::RouteAuthorization;
 pub mod error;
 mod middleware;
 pub mod password;
+pub mod ratelimit;
 mod role;
 mod session;
 mod session_identifier;
@@ -22,8 +23,8 @@ pub const SECURITY_SCHEME_NAME: &str = "cookie_auth";
 /// Session cookie name
 pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
 
-/// Only send cookies over a secure (https) connection
-pub const SECURE_COOKIES: bool = false;
+/// Only send cookies over a secure (HTTPS) connection when the `tls` feature is enabled
+pub const SECURE_COOKIES: bool = cfg!(feature = "tls");
 
 /// Do not extend session header, only its existence is checked, not the value
 pub const DO_NOT_EXTEND_SESSION_HEADER: &str = "x-do-not-extend-session";
@@ -35,7 +36,7 @@ mod tests {
     use axum::{
         Router,
         body::Body,
-        extract::ConnectInfo,
+        extract::{ConnectInfo, connect_info::MockConnectInfo},
         http::{HeaderValue, Request, StatusCode},
         middleware,
     };
@@ -49,13 +50,13 @@ mod tests {
     use test_log::test;
     use tower::ServiceExt;
 
-    use super::*;
+    use super::{ratelimit::LoginRateLimit, *};
     use crate::{
         AppState, ErrorResponse,
         api::{authentication::*, middleware::airgap::AirgapDetection, user::*},
         domain::role::Role,
         error::ErrorReference,
-        infra::audit_log::LogFilter,
+        infra::{audit_log::LogFilter, backup::BackupConfig},
         repository::{
             session_repo::{self, Session},
             user_repo::{self, User, UserId},
@@ -66,9 +67,12 @@ mod tests {
     };
 
     fn create_app(pool: &SqlitePool) -> Router {
+        let backup_dir = tempfile::tempdir().unwrap();
         let state = AppState {
             pool: pool.clone(),
             airgap_detection: AirgapDetection::nop(),
+            backup_config: BackupConfig::new(backup_dir.path().to_path_buf()),
+            login_ratelimit: LoginRateLimit::with_interval(std::time::Duration::ZERO),
         };
 
         Router::from(router())
@@ -82,6 +86,10 @@ mod tests {
                 inject_user,
             ))
             .with_state(state)
+            .layer(MockConnectInfo(SocketAddr::from((
+                [0, 0, 0, 0],
+                TEST_EPHEMERAL_PORT,
+            ))))
     }
 
     async fn login_as_admin(app: Router) -> HeaderValue {
@@ -105,9 +113,22 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::OK);
-        assert!(response.headers().get("set-cookie").is_some());
 
-        response.headers().get("set-cookie").unwrap().clone()
+        let set_cookie = response.headers().get("set-cookie").unwrap().clone();
+        let value = set_cookie.to_str().unwrap();
+        // Secure flag is set when serving over HTTPS (`tls` feature)
+        #[cfg(feature = "tls")]
+        assert!(
+            value.contains("Secure"),
+            "Set-Cookie missing Secure: {value}"
+        );
+        #[cfg(not(feature = "tls"))]
+        assert!(
+            !value.contains("Secure"),
+            "Set-Cookie unexpectedly Secure: {value}"
+        );
+
+        set_cookie
     }
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
@@ -259,6 +280,59 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    async fn test_user_online_status_before_login(pool: SqlitePool) {
+        let app = create_app(&pool);
+
+        let cookie = login_as_admin(app.clone()).await;
+
+        // Get the a second user that hasn't logged in
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/users/2")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: User = serde_json::from_slice(&body).unwrap();
+        assert!(!result.is_logged_in());
+    }
+
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    async fn test_user_online_status_after_login(pool: SqlitePool) {
+        let app = create_app(&pool);
+
+        let cookie = login_as_admin(app.clone()).await;
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/users/1")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: User = serde_json::from_slice(&body).unwrap();
+
+        assert!(result.is_logged_in());
+    }
+
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_logout(pool: SqlitePool) {
         let app = create_app(&pool);
 
@@ -312,6 +386,91 @@ mod tests {
             response.headers()["clear-site-data"],
             r#""cookies","storage""#
         );
+    }
+
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    async fn test_user_online_status_after_logout(pool: SqlitePool) {
+        let app = create_app(&pool);
+
+        let cookie_admin_1 = login_as_admin(app.clone()).await;
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "admin2".to_string(),
+                            password: "Admin2Password01".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let cookie_admin_2 = response.headers().get("set-cookie").unwrap().clone();
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/users/2")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie_admin_1)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: User = serde_json::from_slice(&body).unwrap();
+
+        // User 2 is currently logged in
+        assert!(result.is_logged_in());
+
+        // Logout user 2
+        let _ = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/logout")
+                    .header(COOKIE, &cookie_admin_2)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/users/2")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie_admin_1)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: User = serde_json::from_slice(&body).unwrap();
+
+        // User 2 is currently logged out
+        assert!(!result.is_logged_in());
     }
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
@@ -397,9 +556,13 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user_repo::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
-            .await
-            .unwrap();
+        user_repo::set_temporary_password(
+            &mut conn,
+            UserId::from(1),
+            &password::hash_test_password("Admin1Password01").await,
+        )
+        .await
+        .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -460,9 +623,13 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user_repo::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
-            .await
-            .unwrap();
+        user_repo::set_temporary_password(
+            &mut conn,
+            UserId::from(1),
+            &password::hash_test_password("Admin1Password01").await,
+        )
+        .await
+        .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -498,9 +665,13 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user_repo::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
-            .await
-            .unwrap();
+        user_repo::set_temporary_password(
+            &mut conn,
+            UserId::from(1),
+            &password::hash_test_password("Admin1Password01").await,
+        )
+        .await
+        .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -627,6 +798,11 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::OK);
         assert_eq!(response.headers().get("set-cookie"), None);
+
+        // remove the previous session before creating a new one for the same user
+        session_repo::delete(&mut conn, session.session_key())
+            .await
+            .unwrap();
 
         // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
         let session = Session::create(

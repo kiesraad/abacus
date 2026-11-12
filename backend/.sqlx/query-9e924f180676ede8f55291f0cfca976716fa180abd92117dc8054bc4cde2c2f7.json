@@ -1,0 +1,86 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            id,\n            number,\n            election_id,\n            status,\n            location,\n            start_date_time\n        FROM (\n            SELECT\n            id,\n            number,\n            election_id,\n            status,\n            location,\n            start_date_time,\n            row_number() over (\n            PARTITION BY election_id\n            ORDER BY number DESC\n            ) AS row_number FROM committee_sessions\n        ) t WHERE t.row_number = 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "number",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "number"
+          }
+        }
+      },
+      {
+        "name": "election_id",
+        "ordinal": 2,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "election_id"
+          }
+        }
+      },
+      {
+        "name": "status",
+        "ordinal": 3,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "name": "location",
+        "ordinal": 4,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "location"
+          }
+        }
+      },
+      {
+        "name": "start_date_time",
+        "ordinal": 5,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "start_date_time"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "9e924f180676ede8f55291f0cfca976716fa180abd92117dc8054bc4cde2c2f7"
+}

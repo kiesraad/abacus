@@ -4,22 +4,85 @@ use std::{
     process,
 };
 
-use abacus::{AppError, create_sqlite_pool, start_server};
+#[cfg(windows)]
+use std::os::windows::io::AsSocket;
+
+use abacus::{AppError, ShutdownSignal, create_sqlite_pool, infra::backup::BackupConfig};
 use clap::Parser;
 use socket2::{Domain, Protocol, Socket, Type};
 use tokio::net::TcpListener;
 use tracing::{error, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 
-/// Get the default port for the server, 8080 in debug builds and 80 for release builds
+/// Default plain HTTP port: 8080 (debug) / 80 (release). With the `tls` feature
+/// this is the redirect/CA download port, without TLS it is the main server port.
+const fn default_http_port() -> u16 {
+    if cfg!(debug_assertions) { 8080 } else { 80 }
+}
+
+/// Default port: with the `tls` feature 8443 (debug) / 443 (release),
+/// without it the plain-HTTP default (8080 debug / 80 release).
 fn get_default_port() -> u16 {
-    #[cfg(debug_assertions)]
-    {
-        8080
+    if cfg!(feature = "tls") {
+        if cfg!(debug_assertions) { 8443 } else { 443 }
+    } else {
+        default_http_port()
     }
-    #[cfg(not(debug_assertions))]
-    {
-        80
+}
+
+/// Bind a dual-stack (IPv4 + IPv6) TCP listener on the given port.
+fn bind_listener(port: u16) -> Result<TcpListener, AppError> {
+    let socket = Socket::new(Domain::IPV6, Type::STREAM, Some(Protocol::TCP))?;
+    socket.set_nonblocking(true)?;
+    socket.set_only_v6(false)?;
+    // On Unix-like OSes, enabling SO_REUSEADDR prevents 'port is in use' errors
+    // when restarting the Abacus server, by allowing the socket to bind to the
+    // port even if it is in the `TIME_WAIT` state.
+    //
+    // However, on Windows, SO_REUSEADDR allows multiple listeners to bind to
+    // the same port, so we leave the option disabled.
+    #[cfg(not(windows))]
+    socket.set_reuse_address(true)?;
+    #[cfg(windows)]
+    windows_socket::set_exclusive_address_use(socket.as_socket())?;
+
+    let address = SocketAddr::from((Ipv6Addr::UNSPECIFIED, port));
+    socket.bind(&address.into()).map_err(|e| match e.kind() {
+        ErrorKind::AddrInUse => AppError::PortAlreadyInUse(port),
+        ErrorKind::PermissionDenied => AppError::PermissionDeniedToBindPort(port),
+        _ => AppError::Io(e),
+    })?;
+    socket.listen(1024)?;
+
+    Ok(TcpListener::from_std(socket.into())?)
+}
+
+/// Start a plain HTTP server on `http_port` that serves the CA certificate and
+/// redirects everything else to HTTPS on `https_port`.
+/// A TCP bind failure is logged, not fatal.
+#[cfg(feature = "tls")]
+fn spawn_plain_http_server(
+    http_port: u16,
+    https_port: u16,
+    ca: std::sync::Arc<abacus::infra::tls::CaCertificate>,
+) {
+    match bind_listener(http_port) {
+        Ok(http_listener) => {
+            tokio::spawn(async move {
+                if let Err(e) = abacus::infra::plain_http::start_plain_http_server(
+                    http_listener,
+                    ca,
+                    https_port,
+                )
+                .await
+                {
+                    tracing::warn!("HTTP redirect server stopped with error: {e}");
+                }
+            });
+        }
+        Err(e) => {
+            tracing::warn!("could not bind port {http_port} for HTTP to HTTPS redirect: {e}");
+        }
     }
 }
 
@@ -34,10 +97,24 @@ struct Args {
     #[arg(short, long, default_value = "db.sqlite", env = "ABACUS_DATABASE")]
     database: String,
 
+    /// Directory for database backups
+    #[arg(long, default_value = "backups", env = "ABACUS_BACKUP_DIR")]
+    backup_dir: std::path::PathBuf,
+
     /// Location of the TLS directory (CA certificate and key), will be created if it doesn't exist
     #[cfg(feature = "tls")]
     #[arg(long, default_value = "tls", env = "ABACUS_TLS_DIR")]
     tls_dir: std::path::PathBuf,
+
+    /// Port for the plain HTTP server that serves the CA certificate and redirects to HTTPS
+    #[cfg(feature = "tls")]
+    #[arg(long, default_value_t = default_http_port(), env = "ABACUS_HTTP_PORT")]
+    http_port: u16,
+
+    /// Create the TLS directory and CA certificate (if missing) and exit without starting the server
+    #[cfg(feature = "tls")]
+    #[arg(long)]
+    init_tls: bool,
 
     /// Seed the database with initial data using the fixtures
     #[cfg(feature = "dev-database")]
@@ -57,33 +134,132 @@ struct Args {
     /// Show version
     #[arg(short = 'V', long)]
     version: bool,
+
+    /// Run as a Windows service
+    #[cfg(windows)]
+    #[arg(long)]
+    service: bool,
+
+    /// Install and start the Windows service
+    #[cfg(windows)]
+    #[arg(long, requires = "service", conflicts_with = "uninstall")]
+    install: bool,
+
+    /// Stop and uninstall the Windows service
+    #[cfg(windows)]
+    #[arg(long, requires = "service", conflicts_with = "install")]
+    uninstall: bool,
 }
 
 /// Main entry point for the application. Sets up the database, and starts the
 /// API server and in-memory file router on port 8080.
-#[tokio::main]
-async fn main() {
-    if let Err(e) = run().await {
+fn main() {
+    if let Err(e) = run() {
         error!("{e}");
         process::exit(1);
     }
 }
 
-async fn run() -> Result<(), AppError> {
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            EnvFilter::builder()
-                .with_default_directive(LevelFilter::INFO.into())
-                .from_env()?,
-        )
-        .init();
+/// Create the CA in `tls_dir` (if missing) and print its location and its
+/// SHA-256 and SHA-1 fingerprints. Used for the `--init-tls` CLI flag.
+#[cfg(feature = "tls")]
+fn init_tls(tls_dir: &std::path::Path) -> Result<(), AppError> {
+    use abacus::infra::tls;
+    let ca = tls::init_ca(tls_dir)?;
+    let tls_dir = std::path::absolute(tls_dir)?;
+    println!(
+        "CA certificate (PEM): {}",
+        tls_dir.join(tls::CA_CERT_PEM).display()
+    );
+    println!(
+        "CA certificate (DER): {}",
+        tls_dir.join(tls::CA_CERT_DER).display()
+    );
+    println!("CA SHA-256 fingerprint: {}", ca.sha256_fingerprint());
+    println!("CA SHA-1 fingerprint:   {}", ca.sha1_fingerprint());
+    Ok(())
+}
 
+/// Run, install or uninstall the Windows service.
+#[cfg(windows)]
+fn run_windows_service(args: &Args) -> Result<(), AppError> {
+    use std::ffi::OsString;
+
+    let result = if args.install {
+        // Get launch arguments by filtering out service-related flags
+        let server_arguments = std::env::args_os().skip(1).filter(|arg| {
+            !matches!(
+                arg.to_str(),
+                Some("--service" | "--install" | "--uninstall")
+            )
+        });
+        let launch_arguments = std::iter::once(OsString::from("--service"))
+            .chain(server_arguments)
+            .collect();
+        abacus_windows_service::install(launch_arguments)
+    } else if args.uninstall {
+        abacus_windows_service::uninstall()
+    } else {
+        // The SCM calls this on a thread it creates itself, without the arguments
+        // of this process, so it parses the command line again
+        abacus_windows_service::run(|shutdown| {
+            run_server(Args::parse(), shutdown)
+                .inspect_err(|e| error!("{e}"))
+                .is_ok()
+        })
+    };
+
+    result.map_err(|e| AppError::WindowsService(e.to_string()))
+}
+
+fn run() -> Result<(), AppError> {
     let args = Args::parse();
+
+    let log = tracing_subscriber::fmt().with_env_filter(
+        EnvFilter::builder()
+            .with_default_directive(LevelFilter::INFO.into())
+            .from_env()?,
+    );
+
+    #[cfg(windows)]
+    if args.service && !args.install && !args.uninstall {
+        // Log to a file, since a running Windows service has no console.
+        let log_file = abacus_windows_service::create_log_file()
+            .map_err(|e| AppError::WindowsService(e.to_string()))?;
+        log.with_writer(std::sync::Mutex::new(log_file))
+            .with_ansi(false)
+            .init();
+
+        return run_windows_service(&args);
+    }
+
+    log.init();
+
     if args.version {
         println!(env!("ABACUS_GIT_VERSION"));
         return Ok(());
     }
 
+    // Create the CA and exit, without touching the database or starting the server.
+    #[cfg(feature = "tls")]
+    if args.init_tls {
+        return init_tls(&args.tls_dir);
+    }
+
+    #[cfg(windows)]
+    if args.service {
+        return run_windows_service(&args);
+    }
+
+    run_server(args, abacus::shutdown_signal())
+}
+
+/// Create a runtime and serve until `shutdown` completes.
+fn run_server(args: Args, shutdown: ShutdownSignal) -> Result<(), AppError> {
+    tokio::runtime::Runtime::new()?.block_on(serve(args, shutdown))
+}
+
+async fn serve(args: Args, shutdown: ShutdownSignal) -> Result<(), AppError> {
     let pool = create_sqlite_pool(
         &args.database,
         #[cfg(feature = "dev-database")]
@@ -93,6 +269,8 @@ async fn run() -> Result<(), AppError> {
     )
     .await?;
 
+    let backup_config = BackupConfig::new(args.backup_dir);
+
     // Enable airgap detection if the feature is enabled or if the command line argument is set.
     #[cfg(feature = "airgap-detection")]
     let enable_airgap_detection = true;
@@ -100,25 +278,79 @@ async fn run() -> Result<(), AppError> {
     #[cfg(not(feature = "airgap-detection"))]
     let enable_airgap_detection = args.airgap_detection;
 
-    let socket = Socket::new(Domain::IPV6, Type::STREAM, Some(Protocol::TCP))?;
-    socket.set_nonblocking(true)?;
-    socket.set_only_v6(false)?;
-    socket.set_reuse_address(true)?;
+    let listener = bind_listener(args.port)?;
 
-    let address = SocketAddr::from((Ipv6Addr::UNSPECIFIED, args.port));
-    socket.bind(&address.into()).map_err(|e| match e.kind() {
-        ErrorKind::AddrInUse => AppError::PortAlreadyInUse(args.port),
-        ErrorKind::PermissionDenied => AppError::PermissionDeniedToBindPort(args.port),
-        _ => AppError::Io(e),
-    })?;
-    socket.listen(1024)?;
-
-    let listener = TcpListener::from_std(socket.into())?;
-
-    // For TLS: load or generate the local CA and create a leaf certificate
-    // Actual HTTPS serving will be implemented in #3411.
+    // When compiled with the `tls` feature the server always serves HTTPS.
     #[cfg(feature = "tls")]
-    abacus::infra::tls::load_or_generate(&args.tls_dir)?;
+    {
+        let certificates = abacus::infra::tls::load_or_generate(&args.tls_dir)?;
+        let tls_config = certificates.server_config()?;
+        let ca = std::sync::Arc::new(certificates.ca);
 
-    start_server(pool, listener, enable_airgap_detection).await
+        spawn_plain_http_server(args.http_port, args.port, ca.clone());
+
+        abacus::start_server_tls(
+            pool,
+            listener,
+            enable_airgap_detection,
+            backup_config,
+            tls_config,
+            ca,
+            shutdown,
+        )
+        .await
+    }
+    #[cfg(not(feature = "tls"))]
+    abacus::start_server(
+        pool,
+        listener,
+        enable_airgap_detection,
+        backup_config,
+        shutdown,
+    )
+    .await
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn cannot_bind_listener_to_port_already_in_use() {
+        let listener = bind_listener(0).unwrap();
+        let port = listener.local_addr().unwrap().port();
+
+        let error = bind_listener(port).unwrap_err();
+        assert!(matches!(error, AppError::PortAlreadyInUse(p) if p == port));
+
+        drop(listener);
+        bind_listener(port).unwrap();
+    }
+
+    #[cfg(windows)]
+    #[tokio::test]
+    async fn exclusive_listener_prevents_takeover() {
+        let listener = bind_listener(0).unwrap();
+        let port = listener.local_addr().unwrap().port();
+
+        use std::net::Ipv4Addr;
+        for address in [
+            SocketAddr::from((Ipv4Addr::LOCALHOST, port)),
+            SocketAddr::from((Ipv6Addr::LOCALHOST, port)),
+            SocketAddr::from((Ipv6Addr::UNSPECIFIED, port)),
+        ] {
+            let domain = if address.is_ipv4() {
+                Domain::IPV4
+            } else {
+                Domain::IPV6
+            };
+            let competitor = Socket::new(domain, Type::STREAM, Some(Protocol::TCP)).unwrap();
+            competitor.set_reuse_address(true).unwrap();
+
+            let error = competitor
+                .bind(&address.into())
+                .expect_err("SO_REUSEADDR must not allow takeover of the Abacus listener");
+            assert_eq!(error.kind(), ErrorKind::PermissionDenied, "{address}");
+        }
+    }
 }

@@ -1,14 +1,20 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    assert_matches,
+    collections::{HashMap, HashSet},
+};
 
 use super::{
     CandidateDrawingLotsVariant, ListVotes, fraction::Fraction, structs::CandidateNominationInput,
 };
 use crate::{
     ApportionmentInput, CandidateVotes, SeatAssignmentDetails,
-    candidate_nomination::{Candidate, ListCandidateNomination, candidate_votes_numbers},
+    candidate_nomination::{
+        Candidate, CandidateRanking, ListCandidateNomination, candidate_votes_numbers,
+    },
     structs::{CandidateDrawn, ListDrawingLotsVariant, ListDrawn},
 };
 
+#[derive(Debug)]
 pub struct ApportionmentInputMock {
     pub number_of_seats: u32,
     pub list_votes: Vec<ListVotesMock>,
@@ -63,20 +69,17 @@ impl ListVotes for ListVotesMock {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct CandidateVotesMock {
-    pub number: u32,
-    pub votes: u32,
-}
+pub struct CandidateVotesMock(pub u32, pub u32);
 
 impl CandidateVotes for CandidateVotesMock {
     type CandidateNumber = u32;
 
     fn number(&self) -> Self::CandidateNumber {
-        self.number
+        self.0
     }
 
     fn votes(&self) -> u32 {
-        self.votes
+        self.1
     }
 }
 
@@ -87,18 +90,25 @@ impl ListVotesMock {
             candidate_votes: candidate_votes
                 .into_iter()
                 .enumerate()
-                .map(|(i, votes)| CandidateVotesMock {
-                    number: u32::try_from(i + 1).unwrap(),
-                    votes,
-                })
+                .map(|(i, votes)| CandidateVotesMock(u32::try_from(i + 1).unwrap(), votes))
                 .collect(),
         }
     }
 }
 
+#[derive(Debug)]
 pub struct ListDrawnMock {
     pub variant: ListDrawingLotsVariant<u32>,
     pub drawn: u32,
+}
+
+impl ListDrawnMock {
+    pub fn new(variant: &ListDrawingLotsVariant<u32>, drawn: u32) -> Self {
+        Self {
+            variant: variant.clone(),
+            drawn,
+        }
+    }
 }
 
 impl ListDrawn<u32> for ListDrawnMock {
@@ -111,9 +121,10 @@ impl ListDrawn<u32> for ListDrawnMock {
     }
 }
 
+#[derive(Debug)]
 pub struct CandidateDrawnMock {
-    variant: CandidateDrawingLotsVariant<u32, u32>,
-    drawn: u32,
+    pub variant: CandidateDrawingLotsVariant<u32, u32>,
+    pub drawn: u32,
 }
 
 impl CandidateDrawn<u32, u32> for CandidateDrawnMock {
@@ -127,11 +138,11 @@ impl CandidateDrawn<u32, u32> for CandidateDrawnMock {
 }
 
 pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentDetails<u32>) -> Vec<u32> {
-    result
-        .final_standing
-        .iter()
-        .map(|p| p.total_seats)
-        .collect::<Vec<_>>()
+    result.standings.iter().map(|p| p.total_seats).collect()
+}
+
+pub fn get_standings_residual_seats(result: &SeatAssignmentDetails<u32>) -> Vec<u32> {
+    result.standings.iter().map(|p| p.residual_seats).collect()
 }
 
 pub fn check_list_candidate_nomination(
@@ -149,10 +160,15 @@ pub fn check_list_candidate_nomination(
         expected_other_nomination
     );
 
-    assert_eq!(
-        nomination.updated_candidate_ranking.to_vec(),
-        expected_updated_ranking
-    );
+    if expected_updated_ranking.is_empty() {
+        assert_matches!(nomination.candidate_ranking, CandidateRanking::Original(_));
+    } else {
+        assert_matches!(nomination.candidate_ranking, CandidateRanking::Updated(_));
+        assert_eq!(
+            nomination.candidate_ranking.as_slice(),
+            expected_updated_ranking
+        );
+    }
 }
 
 pub fn check_chosen_candidates(
@@ -228,7 +244,7 @@ pub fn candidate_nomination_fixture_with_given_number_of_seats(
 pub fn candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
     quota: Fraction,
     seat_assignment_input: &ApportionmentInputMock,
-    total_seats_per_list_number: Vec<(u32, u32)>,
+    total_seats_per_list_number: HashMap<u32, u32>,
 ) -> CandidateNominationInput<'_, ListVotesMock> {
     CandidateNominationInput {
         number_of_seats: seat_assignment_input.number_of_seats,
@@ -325,10 +341,7 @@ pub fn seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_vot
             number: list_number,
             candidate_votes: list_candidate_votes
                 .into_iter()
-                .map(|(number, candidate_votes)| CandidateVotesMock {
-                    number,
-                    votes: candidate_votes,
-                })
+                .map(|(number, candidate_votes)| CandidateVotesMock(number, candidate_votes))
                 .collect(),
         })
     }

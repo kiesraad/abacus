@@ -4,7 +4,11 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import type { Message } from "@/hooks/messages/MessagesContext";
 import { useMessages } from "@/hooks/messages/useMessages";
 
-export function Messages() {
+type MessagesProps = {
+  autoCloseTimeout?: number;
+};
+
+export function Messages({ autoCloseTimeout }: MessagesProps) {
   const { popMessages } = useMessages();
   const messagesRetrieved = useRef(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -22,6 +26,21 @@ export function Messages() {
     });
   }, [popMessages]);
 
+  // Close success alerts after autoCloseTimeout ms if parameter is set
+  useEffect(() => {
+    if (autoCloseTimeout === undefined) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setMessages((messages) => messages.filter((message) => (message.type ?? "success") !== "success"));
+    }, autoCloseTimeout);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [autoCloseTimeout]);
+
   function closeHandler(index: number) {
     return () => {
       setMessages((messages) => messages.filter((_, i) => i !== index));
@@ -34,13 +53,15 @@ export function Messages() {
       {message.title && <strong className="heading-md">{message.title}</strong>}
       {message.text && (
         <p>
-          {message.text.split("\n").map((line, lineIndex) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
-            <Fragment key={lineIndex}>
-              {line}
-              <br />
-            </Fragment>
-          ))}
+          {typeof message.text === "string"
+            ? message.text.split("\n").map((line, lineIndex) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
+                <Fragment key={lineIndex}>
+                  {line}
+                  <br />
+                </Fragment>
+              ))
+            : message.text}
         </p>
       )}
     </Alert>

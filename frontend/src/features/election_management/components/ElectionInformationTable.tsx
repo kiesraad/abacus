@@ -1,6 +1,6 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { CommitteeSession, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import type { CommitteeSession, ElectionWithPoliticalGroups, Role } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/number";
 
@@ -10,6 +10,8 @@ interface ElectionInformationTableProps {
   election: ElectionWithPoliticalGroups;
   committeeSession: CommitteeSession;
   numberOfPollingStations: number;
+  role?: Role;
+  publicKeyRegistered?: boolean;
 }
 
 function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
@@ -27,6 +29,8 @@ export function ElectionInformationTable({
   election,
   committeeSession,
   numberOfPollingStations,
+  role,
+  publicKeyRegistered,
 }: ElectionInformationTableProps) {
   const rowLink =
     committeeSession.number === 1 &&
@@ -50,7 +54,7 @@ export function ElectionInformationTable({
             {t("election_management.electoral_area")}
           </Table.HeaderCell>
           <Table.Cell>
-            {election.domain_id} - {t("municipality")} {election.location}
+            {election.authority_id} - {election.authority_region}
           </Table.Cell>
         </Table.Row>
         <Table.Row>
@@ -77,6 +81,18 @@ export function ElectionInformationTable({
         </Table.Row>
         {election.committee_category === "GSB" && (
           <>
+            {role === "administrator" && (
+              <Table.Row to="certificate">
+                <Table.HeaderCell scope="row" className="normal">
+                  {t("election_certificate.certificate")}
+                </Table.HeaderCell>
+                <Table.Cell className="underlined">
+                  {publicKeyRegistered
+                    ? t("election_certificate.details")
+                    : t("election_certificate.not_yet_registered")}
+                </Table.Cell>
+              </Table.Row>
+            )}
             <Table.Row key={election.id} to="polling-stations">
               <Table.HeaderCell scope="row" className="normal">
                 {t("polling_station.title.plural")}

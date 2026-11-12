@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
+import { CheckHash } from "@/components/check_hash/CheckHash";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { Form } from "@/components/ui/Form/Form";
@@ -11,20 +12,36 @@ import { t, tx } from "@/i18n/translate";
 import type {
   ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
   ElectionDefinitionValidateResponse,
+  NewElection,
 } from "@/types/generated/openapi";
+import { getDistrictNumber } from "@/utils/election";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
-
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import { CheckHash } from "./CheckHash";
+
+function getSubtitle(election: NewElection) {
+  if (election.sub_category === "PS2") {
+    switch (election.committee_category) {
+      case "GSB":
+        if (election.district.district === "Specific") {
+          return `${t("election.district")} ${getDistrictNumber(election.district)} (${election.district.name})`;
+        }
+        break;
+      case "CSB":
+        return t("election.all_districts");
+    }
+  }
+  return undefined;
+}
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UploadCandidatesDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
-  const [error, setError] = useState<ReactNode | undefined>();
+  const [error, setError] = useState<{ title: string; message: ReactNode } | undefined>();
   const [file, setFile] = useState<File | undefined>();
   const createPath: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const { create } = useCrud<ElectionDefinitionValidateResponse>({ createPath });
+  const defaultErrorTitle = t("election.invalid_candidates_definition.title");
 
   // if no election data was stored, navigate back to beginning
   if (!state.electionDefinitionData) {
@@ -35,18 +52,19 @@ export function UploadCandidatesDefinition() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      setFile(currentFile);
       if (await isFileTooLarge(currentFile)) {
-        setError(fileTooLargeError(currentFile));
+        setError({ title: defaultErrorTitle, message: fileTooLargeError(currentFile) });
         return;
       }
 
-      setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
         committee_category: state.committeeCategory,
         candidate_data: data,
         election_hash: state.electionDefinitionHash,
         election_data: state.electionDefinitionData,
+        selected_region: state.gsbSelected,
       });
 
       if (isSuccess(response)) {
@@ -60,13 +78,21 @@ export function UploadCandidatesDefinition() {
       } else if (isError(response)) {
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
-          setError(fileTooLargeError(currentFile));
-        } else {
-          setError(
-            tx("election.invalid_candidates_definition.description", {
+          setError({ title: defaultErrorTitle, message: fileTooLargeError(currentFile) });
+        } else if (response instanceof ApiError && response.reference === "InvalidDistrict") {
+          setError({
+            title: t("election.wrong_candidates_definition.title"),
+            message: tx("election.wrong_candidates_definition.description", {
               file: () => <strong>{currentFile.name}</strong>,
             }),
-          );
+          });
+        } else {
+          setError({
+            title: defaultErrorTitle,
+            message: tx("election.invalid_candidates_definition.description", {
+              file: () => <strong>{currentFile.name}</strong>,
+            }),
+          });
         }
       }
     } else {
@@ -88,37 +114,38 @@ export function UploadCandidatesDefinition() {
         election_hash: state.electionDefinitionHash,
         election_data: state.electionDefinitionData,
         candidate_hash: chunks,
+        selected_region: state.gsbSelected,
       });
       if (isSuccess(response)) {
         dispatch({
           type: "SET_CANDIDATES_DEFINITION_HASH",
           candidateDefinitionHash: chunks,
         });
-        if (state.committeeCategory && state.committeeCategory === "CSB") {
+        if (state.committeeCategory === "CSB") {
           await navigate("/elections/create/check-and-save");
         } else {
           await navigate("/elections/create/polling-stations");
         }
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
-        setError(response.message);
+        setError({ title: defaultErrorTitle, message: response.message });
       }
     }
 
     return (
       <CheckHash
-        date={state.election.election_date}
-        title={t("election.check_eml.list_name", {
-          location: state.election.location,
-          name: state.election.election_id,
-        })}
+        title={`${state.election.election_id.split("_")[0]} ${state.election.domain?.name}`}
+        subtitle={getSubtitle(state.election)}
         header={t("election.check_eml.candidates_title")}
         description={tx("election.check_eml.candidates_description", {
           file: () => {
             return <strong>{state.candidateDefinitionFileName}</strong>;
           },
         })}
+        instructions={t("election.check_eml.check_hash_instructions")}
+        errorTitle={t("election.check_eml.error.title")}
+        errorDescription={t("election.check_eml.error.description")}
         redactedHash={state.candidateDefinitionRedactedHash}
-        error={error}
+        error={error ? error.message : undefined}
         onSubmit={(chunks) => void onSubmit(chunks)}
       />
     );
@@ -130,8 +157,8 @@ export function UploadCandidatesDefinition() {
         <FormLayout>
           <FormLayout.Section>
             {error && (
-              <Alert type="error" title={t("election.invalid_candidates_definition.title")} inline>
-                <p>{error}</p>
+              <Alert type="error" title={error.title} inline>
+                <p>{error.message}</p>
               </Alert>
             )}
 

@@ -1,26 +1,33 @@
-#import "common/style.typ": conf, default_header, document_numbering
+#import "common/style.typ": conf, document_numbering, blank_page_before_signing
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-31-2.json")
+#let input = json("inputs/model-na-31-2-variations/model-na-31-2-GR.json")
 
-#let is_municipality = (municipal, public_body) => if (
-  input.election.category == "Municipal"
-) { municipal } else { public_body }
-
-#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.authority_region, municipal, public_body)
+#let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
+#let district_number = get_district_number(input.election.district)
+#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_id #input.election.authority_region]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
+#let the_location = is_municipality[de gemeente][het openbaar lichaam]
 
-#show: doc => conf(doc, header-right: location_name, footer: [
-  #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
-  #input.hash
-])
+#show: doc => conf(
+  doc,
+  header-right: location_name,
+  footer: [
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
+    #input.hash
+
+    Proces-verbaal van een #location_type \
+    Model Na 31-2 centrale stemopneming (versie 2027)
+  ], margin-bottom: 2.9cm
+)
 
 #set heading(numbering: none)
 
 #title_page(
-  is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
+  is_municipality[#input.election.authority_id #input.election.authority_region][#input.election.authority_region],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
-  [#input.election.name - #format_date(input.election.election_date)],
+  [#get_election_title(input.election), #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst en kandidaat -
     Model Na 31-2
@@ -29,13 +36,13 @@
 
 == Details van het #location_type
 
-#location_name
+#if (district_number != "") { [Kieskring #district_number #sym.arrow.r] } #location_name
 
 #input.committee_session.location #format_date_time(input.committee_session.start_date_time)
 
 == Proces-verbaal
 
-Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
+#is_municipality[Elke gemeente][Elk openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
 
 #emph_block[
   In #this_location is gekozen voor *centrale stemopneming*.
@@ -51,12 +58,14 @@ Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een v
 
 \
 
-- Bijlage 1: Telresultaten van alle stembureaus in #is_municipality[de gemeente][het openbaar lichaam]
+- Bijlage 1: Telresultaten van alle stembureaus in #the_location
 - Bijlage 2: Overzicht van alle bezwaren die op de stembureaus zijn gemaakt
 
 #pagebreak(weak: true)
 
 #show: doc => document_numbering(doc)
+// Max numbering level is 2
+#show heading.where(level: 3): it => [#block(it.body)]
 
 = Verslag van de zitting
 
@@ -68,16 +77,18 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #empty_table(
   columns: (8em, 1fr, 1fr, 1fr, 8em),
-  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig (van - tot)", "Locatie"),
+  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig van - tot", "Locatie"),
   values: ("", "", "", "-", ""),
   rows: 24,
 )
 
 #pagebreak(weak: true)
 
+#show: doc => document_numbering(doc)
+
 == Getelde stembureaus
 
-=== De resultaten van onderstaande stembureaus zijn door het #location_type gecontroleerd en opgeteld tot het totaal van #is_municipality[de gemeente][het openbaar lichaam]. Als er extra onderzoeken hebben plaatsgevonden, dan kan dat in de laatste drie kolommen worden aangegeven.
+=== De resultaten van onderstaande stembureaus zijn door het #location_type gecontroleerd en opgeteld tot het totaal van #the_location. Als er extra onderzoeken hebben plaatsgevonden, dan kan dat in de laatste drie kolommen worden aangegeven.
 
 #light_table(
   columns: (5em, 1fr, 1fr, 6em, 6em, 6em),
@@ -103,9 +114,9 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
             #polling_station.postal_code #polling_station.locality
           ]
         ],
-        align(center, checkbox(checked: input.summary.polling_station_investigations.admitted_voters_recounted.contains(polling_station.number))[]),
-        align(center, checkbox(checked: input.summary.polling_station_investigations.investigated_other_reason.contains(polling_station.number))[]),
-        align(center, checkbox(checked: input.summary.polling_station_investigations.ballots_recounted.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.admitted_voters_recounted.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.investigated_other_reason.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.ballots_recounted.contains(polling_station.number))[]),
       )
     })
     .flatten(),
@@ -148,7 +159,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #pagebreak(weak: true)
 
-= Telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
+= Telresultaten van #the_location
 
 == Aantal kiesgerechtigden
 
@@ -156,22 +167,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Toegelaten kiezers
 
-#if not "voter_card_count" in input.summary.voters_counts [
-  Tel het aantal geldige stempassen en volmachtbewijzen
-
-  #sum(
-    letterbox("A", value: input.summary.voters_counts.poll_card_count)[Stempassen],
-    letterbox(
-      "B",
-      value: input.summary.voters_counts.proxy_certificate_count,
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
-    letterbox(
-      "D",
-      light: false,
-      value: input.summary.voters_counts.total_admitted_voters_count,
-    )[Totaal toegelaten kiezers (A+B)],
-  )
-] else [
+#if not is_local_election(true, false) and "voter_card_count" in input.summary.voters_counts [
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
 
   #sum(
@@ -179,13 +175,28 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
     letterbox(
       "B",
       value: input.summary.voters_counts.proxy_certificate_count,
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    )[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
     letterbox("C", value: input.summary.voters_counts.voter_card_count)[Kiezerspassen],
     letterbox(
       "D",
       light: false,
       value: input.summary.voters_counts.total_admitted_voters_count,
-    )[Totaal toegelaten kiezers (A+B+C)],
+    )[*Totaal toegelaten kiezers (A+B+C)*],
+  )
+] else [
+  Tel het aantal geldige stempassen en volmachtbewijzen
+
+  #sum(
+    letterbox("A", value: input.summary.voters_counts.poll_card_count)[Stempassen],
+    letterbox(
+      "B",
+      value: input.summary.voters_counts.proxy_certificate_count,
+    )[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas)],
+    letterbox(
+      "D",
+      light: false,
+      value: input.summary.voters_counts.total_admitted_voters_count,
+    )[*Totaal toegelaten kiezers (A+B)*],
   )
 ]
 
@@ -229,7 +240,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja, #sym.arrow.r Ga door naar #ref(<monitoring_protocol>)]
+#checkbox(checked: not differences)[Ja]
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
@@ -263,6 +274,8 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 == Stemmen per lijst en per kandidaat
 
+#pagebreak(weak: true)
+
 #for political_group in input.votes_tables {
   votes_table(
     title: [#political_group.number #political_group.name],
@@ -276,41 +289,28 @@ Voer de controle uit volgens de stappen in het controleprotocol.
   )
 }
 
-#pagebreak(weak: true)
-
-#set page(header: "")
-
-#show heading.where(level: 3): it => [#block(it.body)]
-
-=== Deze pagina is expres leeg
-Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
-
-#pagebreak(weak: true)
-
-#set page(header: default_header(none, location_name))
+#blank_page_before_signing(location_name)
 
 = Ondertekening
 
-=== Datum
+Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een #location_type zijn dit er minimaal #is_local_election[3][5].
+
+#signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en #is_municipality[twee][vier] leden van het #location_type
+== Voorzitter en #is_local_election[twee][vier] leden van het #location_type
 
-=== Voorzitter van het #location_type:
+#signing_form_label[Voorzitter van het #location_type:]
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[2][4] leden van het #location_type:
+#signing_form_label[#is_local_election[2][4] leden van het #location_type:]
 
-#stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het #location_type
 
-=== Extra ondertekening: (niet verplicht)
+#signing_form_label[Extra ondertekening:]
 
-#stack(spacing: 0.5em, ..range(0, is_municipality(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
-
-#pagebreak(weak: true)
-
-#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))

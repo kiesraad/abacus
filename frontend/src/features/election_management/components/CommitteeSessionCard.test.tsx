@@ -156,13 +156,18 @@ const testCasesCSB: TestCasesCSB = {
     },
   },
   administrator: {
-    created: {},
-    in_preparation: {},
+    created: {
+      buttonsCurrentSession: ["Publieke sleutels GSB's importeren"],
+    },
+    in_preparation: {
+      buttonsCurrentSession: ["Publieke sleutels GSB's importeren"],
+    },
     data_entry: {
+      buttonsCurrentSession: ["Publieke sleutels GSB's importeren"],
       actionButton: "Bekijk voortgang",
     },
     paused: {
-      buttonsCurrentSession: ["Bekijk voortgang"],
+      buttonsCurrentSession: ["Bekijk voortgang", "Publieke sleutels GSB's importeren"],
     },
     completed: {
       buttonsCurrentSession: ["Invoer bekijken"],
@@ -408,5 +413,21 @@ describe("UI component: CommitteeSessionCard for CSB election", () => {
     await user.click(dataEntryButton);
     expect(statusChange).toHaveBeenCalledWith({ status: "data_entry" });
     expect(navigate).toHaveBeenCalledWith("status");
+  });
+
+  test("Navigate to the sub committee keys overview", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
+
+    render(
+      <CommitteeSessionCard
+        committeeSession={getCSBCommitteeSessionMockData({ status: "in_preparation" })}
+        committeeCategory={csbElectionMockData.committee_category}
+        isCurrentSession={true}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Publieke sleutels GSB's importeren" }));
+    expect(navigate).toHaveBeenCalledWith("sub-committees", {});
   });
 });

@@ -1,5 +1,5 @@
 import { waitFor } from "@testing-library/react";
-import { userEvent } from "@testing-library/user-event/dist/cjs/index.js";
+import { userEvent } from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
@@ -13,7 +13,11 @@ import {
   getCSBElectionMockData,
   getElectionMockData,
 } from "@/testing/api-mocks/ElectionMockData";
-import { getElectionStatusMockData, statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
+import {
+  CSBStatusResponseMock,
+  getElectionStatusMockData,
+  statusResponseMock,
+} from "@/testing/api-mocks/ElectionStatusMockData";
 import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { renderReturningRouter, screen, within } from "@/testing/test-utils";
@@ -44,7 +48,10 @@ async function renderDataEntryHomePage(
   server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
 
   const refetch = vi.fn();
-  vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({ statuses, refetch });
+  vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({
+    statuses: statuses,
+    refetch,
+  });
 
   const router = renderReturningRouter(
     <ElectionProvider electionId={1}>
@@ -89,7 +96,7 @@ describe("DataEntryHomePage", () => {
   test.each(committeeCategoryValues)("Messages are shown (%s)", async (cat: CommitteeCategory) => {
     vi.spyOn(useMessages, "useMessages").mockReturnValue({
       hasMessages: vi.fn(),
-      popMessages: vi.fn(() => [{ title: "Let op: fouten in het proces-verbaal" }] as Message[]),
+      popMessages: vi.fn(() => [{ type: "notify", title: "Let op: fouten in het proces-verbaal" }] as Message[]),
       pushMessage: vi.fn(),
     });
 
@@ -97,6 +104,28 @@ describe("DataEntryHomePage", () => {
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Let op: fouten in het proces-verbaal");
+  });
+
+  test.each(committeeCategoryValues)("Success messages auto close (%s)", async (cat: CommitteeCategory) => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      hasMessages: vi.fn(),
+      popMessages: vi.fn(() => [{ title: "Eerste invoer is opgeslagen" }] as Message[]),
+      pushMessage: vi.fn(),
+    });
+
+    await renderDataEntryHomePage(cat);
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Eerste invoer is opgeslagen");
+
+    vi.advanceTimersByTime(300_000);
+
+    await vi.waitFor(() => {
+      expect(screen.queryAllByRole("alert")).toHaveLength(0);
+    });
+
+    vi.useRealTimers();
   });
 
   test.each(committeeCategoryValues)("Show different title for next entry (%s)", async (cat: CommitteeCategory) => {
@@ -147,14 +176,24 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Show only expanded list for CSB", async () => {
-    await renderDataEntryHomePage("CSB");
+    await renderDataEntryHomePage("CSB", {}, CSBStatusResponseMock);
 
     // Picker and collapsed list not rendered
     expect(screen.queryByLabelText("Voer het nummer in:")).not.toBeInTheDocument();
     expect(screen.queryByTestId("openList")).not.toBeInTheDocument();
 
-    // List is shown
+    // List is shown, sorted alphabetically on name
     expect(await screen.findByRole("heading", { name: "Kies het stembureau" })).toBeVisible();
-    expect(await screen.findByRole("table")).toBeVisible();
+    const table = await screen.findByRole("table");
+    expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Nummer", "Stembureau"],
+      ["0005", "Bloemstede 1e invoer"],
+      ["0006", "Eemstricht 2e invoer"],
+      ["0003", "Eksterlo 1e invoer"],
+      ["0002", "'s-Gravenveen 1e invoer"],
+      ["0004", "Hovenerwoud 1e invoer"],
+      ["0001", "Juinen 1e invoer"],
+    ]);
   });
 });

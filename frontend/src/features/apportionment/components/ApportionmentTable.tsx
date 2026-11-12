@@ -6,11 +6,12 @@ import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import cls from "./Apportionment.module.css";
 
 interface ApportionmentTableProps {
-  finalStanding: ListSeatAssignment[];
+  standings: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
   fullSeats: number;
   residualSeats: number;
-  seats: number;
+  notAssignedSeats: number;
+  withoutLinks: boolean;
 }
 
 function convertZeroToDash(number: number): string {
@@ -21,11 +22,12 @@ function convertZeroToDash(number: number): string {
 }
 
 export function ApportionmentTable({
-  finalStanding,
+  standings,
   politicalGroups,
   fullSeats,
   residualSeats,
-  seats,
+  notAssignedSeats,
+  withoutLinks,
 }: ApportionmentTableProps) {
   return (
     <Table id="apportionment-table" className={cls.table}>
@@ -37,8 +39,22 @@ export function ApportionmentTable({
         <Table.HeaderCell className="text-align-r link-cell-padding">{t("apportionment.total_seats")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((standing: ListSeatAssignment) => (
-          <Table.Row key={standing.list_number} id={`list-${standing.list_number}`} to={`./${standing.list_number}`}>
+        {notAssignedSeats > 0 && (
+          <Table.Row id="not-assigned-seats" to="./details-residual-seats">
+            <Table.Cell></Table.Cell>
+            <Table.Cell className="bold">{t("apportionment.not_yet_assigned")}</Table.Cell>
+            <Table.NumberCell>{convertZeroToDash(0)}</Table.NumberCell>
+            <Table.NumberCell>{notAssignedSeats}</Table.NumberCell>
+            <Table.NumberCell className="bold">{notAssignedSeats}</Table.NumberCell>
+          </Table.Row>
+        )}
+        {standings.map((standing: ListSeatAssignment) => (
+          <Table.Row
+            key={standing.list_number}
+            id={`list-${standing.list_number}`}
+            className={withoutLinks ? cls.rowWithoutLink : undefined}
+            to={!withoutLinks ? `./${standing.list_number}` : undefined}
+          >
             <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
               {standing.list_number}
             </Table.Cell>
@@ -58,7 +74,7 @@ export function ApportionmentTable({
           <Table.Cell className="text-align-r bold">{t("apportionment.total")}</Table.Cell>
           <Table.NumberCell>{fullSeats}</Table.NumberCell>
           <Table.NumberCell>{residualSeats}</Table.NumberCell>
-          <Table.NumberCell className="link-cell-padding">{seats}</Table.NumberCell>
+          <Table.NumberCell className="link-cell-padding">{fullSeats + residualSeats}</Table.NumberCell>
         </Table.TotalRow>
       </Table.Body>
     </Table>

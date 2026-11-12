@@ -7,14 +7,14 @@ import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/Election
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
 
+test.describe.configure({ mode: "default", timeout: 90_000 });
+
 test.describe("authentication", () => {
   test("login happy path", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.username.fill("admin2");
-    await loginPage.password.fill(getTestPassword("admin2"));
-    await loginPage.loginBtn.click();
+    await loginPage.login("admin2", getTestPassword("admin2"));
 
     await page.waitForURL("/elections");
 
@@ -27,9 +27,7 @@ test.describe("authentication", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.username.fill("admin");
-    await loginPage.password.fill("wrong-password");
-    await loginPage.loginBtn.click();
+    await loginPage.login("unknown-user", "wrong-password");
 
     await expect(loginPage.alert).toContainText("De gebruikersnaam of het wachtwoord is onjuist");
   });
@@ -40,9 +38,7 @@ test.describe("authentication", () => {
 
     const loginPage = new LoginPgObj(page);
     await page.goto("/account/login");
-    await loginPage.username.fill(username);
-    await loginPage.password.fill(FIXTURE_TYPIST_TEMP_PASSWORD);
-    await loginPage.loginBtn.click();
+    await loginPage.login(username, FIXTURE_TYPIST_TEMP_PASSWORD);
 
     // Fill out the account setup page
     const password = "Sterk wachtwoord";
@@ -104,9 +100,7 @@ test.describe("navigation and redirects", () => {
 
     const loginPage = new LoginPgObj(page);
     await page.goto("/account/login");
-    await loginPage.username.fill(username);
-    await loginPage.password.fill(FIXTURE_TYPIST_TEMP_PASSWORD);
-    await loginPage.loginBtn.click();
+    await loginPage.login(username, FIXTURE_TYPIST_TEMP_PASSWORD);
 
     const accountSetupPage = new AccountSetupPgObj(page);
     await expect(accountSetupPage.heading).toBeVisible();

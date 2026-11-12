@@ -15,10 +15,10 @@ export function Footnotes({ fullSeatRemovalSteps }: FootnotesProps): ReactElemen
         return (
           // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
           <li key={index} id={`step-${index + 1}-list-exhaustion-information`}>
-            {t("apportionment.list_exhaustion_full_seat_removal", {
+            {t("apportionment.footnotes.list_exhaustion_full_seat_removal", {
               list_retracted_seat: listSeatRemoval.change.list_retracted_seat,
             })}
-            {index === 0 && ` ${t("apportionment.article_p10")}`}
+            {index === 0 && ` ${t("apportionment.footnotes.article_p10")}`}
           </li>
         );
       })}

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { type CommitteeCategory, committeeCategoryValues } from "@/types/generated/openapi";
-import translations from "./locales/nl/nl.ts";
+import translations from "./locales/nl/nl";
 
 describe("feedback translations structure", () => {
   test.each(committeeCategoryValues)("validate feedback_%s.json", (cat: CommitteeCategory) => {
@@ -19,6 +19,20 @@ describe("feedback translations structure", () => {
 
       // Coordinator title is mandatory
       expect(keys).toContain("title");
+
+      // No other keys than below allowed
+      for (const key of keys) {
+        expect(["title", "content", "actions"]).toContain(key);
+      }
+    }
+  });
+
+  test("validate feedback_GSB_DSO.json", () => {
+    const feedback = translations.feedback_GSB_DSO;
+    const feedbackItems = Object.values(feedback);
+
+    for (const entry of feedbackItems) {
+      const keys = Object.keys(entry.coordinator);
 
       // No other keys than below allowed
       for (const key of keys) {

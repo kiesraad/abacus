@@ -131,6 +131,21 @@ describe("PollingStationUpdatePage", () => {
       ).toBeVisible();
     });
 
+    test("Shows the full error message when deleting a polling station fails", async () => {
+      overrideOnce("delete", "/api/elections/1/polling_stations/1", 409, null);
+      const user = userEvent.setup();
+
+      renderPage("coordinator_gsb");
+      await user.click(await screen.findByRole("button", { name: "Stembureau verwijderen" }));
+      const modal = await screen.findByRole("dialog", { name: "Stembureau verwijderen?" });
+      await user.click(within(modal).getByRole("button", { name: "Verwijderen" }));
+
+      expect(await screen.findByText("Stembureau kan niet verwijderd worden")).toBeVisible();
+      expect(screen.queryByRole("dialog", { name: "Stembureau verwijderen?" })).not.toBeInTheDocument();
+      expect(navigate).not.toHaveBeenCalled();
+      expect(pushMessage).not.toHaveBeenCalled();
+    });
+
     test("Returns to list page with a success message when clicking delete polling station", async () => {
       server.use(PollingStationDeleteHandler);
       const user = userEvent.setup();
@@ -195,6 +210,8 @@ describe("PollingStationUpdatePage", () => {
       { status: "second_entry_in_progress", extra_warning: true },
       { status: "definitive", extra_warning: true },
       { status: "entries_different", extra_warning: true },
+      { status: "first_entry_correction", extra_warning: true },
+      { status: "second_entry_correction", extra_warning: true },
     ] satisfies Array<{
       status: DataEntryStatusName;
       extra_warning: boolean;

@@ -16,10 +16,10 @@ import {
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, spyOnHandler, within } from "@/testing/test-utils";
-import type { DataEntryStatusResponse, ErrorResponse } from "@/types/generated/openapi";
+import type { DataEntryStatusResponse } from "@/types/generated/openapi";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
-import { getDefaultDataEntryState, getEmptyDataEntryRequest, getInitialValues } from "../../testing/mock-data";
+import { getCSOInitialValues, getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../../testing/test.utils";
 import type { FormState } from "../../types/types";
 import { DataEntryProvider } from "../DataEntryProvider";
@@ -107,10 +107,10 @@ describe("Test CheckAndSaveForm", () => {
     // check message and navigation for next data entry page
     expect(pushMessage).toHaveBeenCalledWith({
       type: "notify",
-      title: "Let op: verschil met eerste invoer",
+      title: "Let op: verschil met tweede invoer",
       text:
         "Je invoer is opgeslagen. Geef het papieren proces-verbaal terug aan de coördinator,\n" +
-        "en geef aan dat er een verschil is met de eerste invoer.",
+        "en geef aan dat er een verschil is met de tweede invoer.",
     });
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
     expect(router.state.location.hash).toEqual("#next");
@@ -160,7 +160,7 @@ describe("Test CheckAndSaveForm", () => {
   test("Data entry does not show finalise button with errors", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [] },
     });
     renderForm();
@@ -175,7 +175,7 @@ describe("Test CheckAndSaveForm", () => {
   test("Data entry does not show finalise button with unaccepted warnings", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W202] },
     });
     renderForm();
@@ -193,7 +193,7 @@ describe("Test CheckAndSaveForm", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W202] },
     });
     renderForm();
@@ -219,7 +219,7 @@ describe("Test CheckAndSaveForm", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: mockFormState,
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W203] },
     });
     renderForm();
@@ -302,7 +302,7 @@ describe("Test CheckAndSaveForm summary", () => {
   test("Blocking", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W201] },
     });
     renderForm();
@@ -325,7 +325,7 @@ describe("Test CheckAndSaveForm summary", () => {
     formState.sections.voters_votes_counts!.acceptErrorsAndWarnings = true;
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W201] },
     });
     renderForm();
@@ -358,34 +358,5 @@ describe("Test CheckAndSaveForm summary", () => {
     const votersItem = screen.getByTestId("section-status-voters_votes_counts");
     expect(votersItem).toHaveTextContent("Controleer waarschuwingen bij");
     expect(within(votersItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
-  });
-
-  test("Alert when committee session is paused is shown on save and then logs out", async () => {
-    const user = userEvent.setup();
-    overrideOnce("post", "/api/data_entries/1/1/finalise", 409, {
-      error: "Committee session data entry is paused",
-      fatal: true,
-      reference: "CommitteeSessionPaused",
-    } satisfies ErrorResponse);
-
-    const router = renderForm();
-
-    // Wait for the page to be loaded
-    const title = await screen.findByText("Controleren en opslaan");
-    expect(title).toBeInTheDocument();
-
-    const submitButton = screen.getByRole("button", { name: "Opslaan" });
-    await user.click(submitButton);
-
-    const pausedModal = await screen.findByRole("dialog");
-    expect(within(pausedModal).getByRole("heading", { level: 3, name: "Invoer gepauzeerd" })).toBeVisible();
-    expect(within(pausedModal).getByRole("paragraph")).toHaveTextContent(
-      "De coördinator heeft het invoeren van stemmen gepauzeerd. Je kan niet meer verder. [Je laatste wijzigingen worden niet opgeslagen.]",
-    );
-    expect(within(pausedModal).getByRole("link", { name: "Naar startscherm" })).toBeVisible();
-    const logoutButton = within(pausedModal).getByRole("link", { name: "Afmelden" });
-    await user.click(logoutButton);
-
-    expect(router.state.location.pathname).toEqual("/account/logout");
   });
 });

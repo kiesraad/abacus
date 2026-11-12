@@ -21,7 +21,7 @@ pub fn generate_pdf(input: &dyn PdfGenInput) -> Result<PdfGenResult, PdfGenError
     result
 }
 
-fn get_pdf_options() -> PdfOptions<'static> {
+fn get_pdf_options() -> PdfOptions {
     PdfOptions {
         standards: PdfStandards::new(&[PdfStandard::A_2b]).expect("PDF standards should be valid"),
         // https://github.com/typst/typst/blob/96dd67e011bb317cf78683bcf1edfdfca5e7b6b3/crates/typst-cli/src/compile.rs#L280
@@ -36,7 +36,7 @@ fn get_pdf_options() -> PdfOptions<'static> {
 }
 
 /// Convert [`chrono::DateTime`] to [`Datetime`]
-/// From https://github.com/typst/typst/blob/96dd67e011bb317cf78683bcf1edfdfca5e7b6b3/crates/typst-cli/src/compile.rs#L305
+/// From <https://github.com/typst/typst/blob/96dd67e011bb317cf78683bcf1edfdfca5e7b6b3/crates/typst-cli/src/compile.rs#L305>
 fn convert_datetime<Tz: chrono::TimeZone>(date_time: &chrono::DateTime<Tz>) -> Option<Datetime> {
     Datetime::from_ymd_hms(
         date_time.year(),
@@ -48,11 +48,11 @@ fn convert_datetime<Tz: chrono::TimeZone>(date_time: &chrono::DateTime<Tz>) -> O
     )
 }
 
-#[allow(clippy::cognitive_complexity)]
+#[expect(clippy::cognitive_complexity)]
 fn compile_pdf(world: &world::PdfWorld) -> Result<PdfGenResult, PdfGenError> {
     debug!(
         "Starting Typst compilation for {:?}",
-        world.main().vpath().as_rootless_path()
+        world.main().vpath().get_without_slash()
     );
 
     let compile_start = Instant::now();
@@ -95,7 +95,7 @@ fn error_from_typst(typst_errors: EcoVec<SourceDiagnostic>) -> PdfGenError {
                     "Typst error in {:?}: {}",
                     e.span
                         .id()
-                        .map(|id| id.vpath().as_rootless_path().display().to_string())
+                        .map(|id| id.vpath().get_without_slash().to_string())
                         .unwrap_or_default(),
                     e.message
                 )

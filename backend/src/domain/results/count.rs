@@ -36,12 +36,16 @@ impl Validate for Count {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::election::{CommitteeCategory, tests::election_fixture};
+    use crate::domain::election::{CommitteeCategory, ElectionCategory, tests::election_fixture};
+
     #[test]
     fn test_count_err_out_of_range() {
         let count: Count = 1_000_000_000;
 
-        let result = count.validate(&election_fixture(CommitteeCategory::GSB, &[]), &"".into());
+        let result = count.validate(
+            &election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]),
+            &"".into(),
+        );
 
         assert!(result.is_err());
         assert!(result.unwrap_err().message.eq("count out of range"),);

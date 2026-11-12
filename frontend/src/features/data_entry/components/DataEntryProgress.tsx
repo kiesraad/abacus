@@ -22,10 +22,24 @@ export function DataEntryProgress() {
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId ?? null;
 
+  const someCorrectionWarning = Object.values(formState.sections).some((s) => s.correctionWarning !== undefined);
+
   const menuStatusForFormSection = useCallback(
     // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
     (formSection?: FormSection): Exclude<MenuStatus, "active"> => {
       if (!formSection) return "idle";
+
+      if (formSection.isDisabled) {
+        return "empty";
+      }
+
+      if (formSection.correctionWarning) {
+        return "warning";
+      }
+
+      if (someCorrectionWarning) {
+        return "idle";
+      }
 
       if (!formSection.errors.isEmpty()) {
         return "error";
@@ -52,7 +66,7 @@ export function DataEntryProgress() {
 
       return "idle";
     },
-    [formState, results, dataEntryStructure],
+    [formState, results, dataEntryStructure, someCorrectionWarning],
   );
 
   const currentIndex = formState.sections[formState.furthest]?.index || 0;
@@ -70,7 +84,7 @@ export function DataEntryProgress() {
 
       const isActive = sectionId === section.id;
       const canNavigate = !isActive && formSection.index <= currentIndex;
-      const isDisabled = options.disabled ?? formSection.index > currentIndex;
+      const isDisabled = formSection.isDisabled || (options.disabled ?? formSection.index > currentIndex);
 
       return (
         <ProgressList.Item

@@ -17,6 +17,17 @@ interface InvestigationCardProps {
   investigation: PollingStationInvestigationWithStatus;
 }
 
+function EditLink({ investigation }: InvestigationCardProps) {
+  const step = investigation.findings === undefined ? "reason" : "findings";
+
+  return (
+    <Link to={`./${investigation.pollingStation.id}/${step}`}>
+      <Icon size="sm" icon={<IconPencil />} />
+      {t("investigations.edit")}
+    </Link>
+  );
+}
+
 export function InvestigationCard({ investigation }: InvestigationCardProps) {
   const { isCoordinator } = useUserRole();
   const { currentCommitteeSession, election } = useElection();
@@ -42,12 +53,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
       <div className={cls.card_header}>
         <DataEntrySourceNumber size="sm">{investigation.pollingStation.number}</DataEntrySourceNumber>
         <h3>{investigation.pollingStation.name}</h3>
-        {isCoordinator && investigation.findings && (
-          <Link to={`./${investigation.pollingStation.id}/findings`}>
-            <Icon size="sm" icon={<IconPencil />} />
-            {t("investigations.edit")}
-          </Link>
-        )}
+        {isCoordinator && <EditLink investigation={investigation} />}
       </div>
       <h4>{t("investigations.reason_and_assignment.title")}</h4>
       <pre>{investigation.reason}</pre>

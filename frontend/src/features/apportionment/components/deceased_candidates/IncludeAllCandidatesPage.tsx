@@ -9,7 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import type {
   ApportionmentState,
   REGISTER_DECEASED_CANDIDATES_REQUEST_PATH,
@@ -31,13 +31,11 @@ function renderForm(radioError: boolean, handleSubmit: (e: SubmitEvent<HTMLFormE
         <FormLayout.Section>
           <div>
             <h2>{t("apportionment.include_all_candidates.title")}</h2>
-            <p>{tx("apportionment.include_all_candidates.description")}</p>
+            <p>{t("apportionment.include_all_candidates.description")}</p>
           </div>
           <ChoiceList>
             {radioError && (
-              <ChoiceList.Error id="include_all_candidates_error">
-                {t("apportionment.include_all_candidates.mandatory_question")}
-              </ChoiceList.Error>
+              <ChoiceList.Error id="include_all_candidates_error">{t("mandatory_question")}</ChoiceList.Error>
             )}
             <ChoiceList.Radio
               id="no_deceased"
@@ -64,7 +62,7 @@ function renderForm(radioError: boolean, handleSubmit: (e: SubmitEvent<HTMLFormE
 export function IncludeAllCandidatesPage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { state, error, isLoading, refetchState } = useApportionmentContext();
+  const { state, error, isLoading, refetch } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const [radioError, setRadioError] = useState(false);
   const client = useApiClient();
@@ -106,7 +104,7 @@ export function IncludeAllCandidatesPage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path);
 
     if (isSuccess(response)) {
-      void refetchState();
+      void refetch();
     } else {
       setApiError(response);
     }

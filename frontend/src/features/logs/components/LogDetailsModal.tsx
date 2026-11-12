@@ -26,6 +26,10 @@ function formatValue(key: string, value: unknown): string {
     return t("no");
   }
 
+  if (typeof value === "object" && value !== null) {
+    return JSON.stringify(value);
+  }
+
   if (SHOULD_TRANSLATE[key] === undefined) {
     return value?.toString() || "-";
   }

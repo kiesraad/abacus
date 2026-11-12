@@ -44,4 +44,5 @@ pre-commit:
     frontend-lint-eslint:
       root: "frontend/"
       glob: "*.{ts,tsx}"
-      run: pnpm lint:eslint
+      run: pnpm lint:eslint --fix
+      stage_fixed: true

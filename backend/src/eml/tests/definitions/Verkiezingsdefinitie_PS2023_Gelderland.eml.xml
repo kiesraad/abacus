@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EML xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:kr="http://www.kiesraad.nl/extensions" Id="110a" SchemaVersion="5">
+    <TransactionId>1</TransactionId>
+    <IssueDate>2023-02-07</IssueDate>
+    <kr:CreationDateTime>2023-02-07T09:27:30.717</kr:CreationDateTime>
+    <ElectionEvent>
+        <EventIdentifier/>
+        <Election>
+            <ElectionIdentifier Id="PS2023_Gelderland">
+                <ElectionName>Provinciale Staten Gelderland 2023</ElectionName>
+                <ElectionCategory>PS</ElectionCategory>
+                <kr:ElectionSubcategory>PS2</kr:ElectionSubcategory>
+                <kr:ElectionDomain>Gelderland</kr:ElectionDomain>
+                <kr:ElectionDate>2023-03-15</kr:ElectionDate>
+                <kr:NominationDate>2023-01-30</kr:NominationDate>
+            </ElectionIdentifier>
+            <Contest>
+                <ContestIdentifier Id="alle"/>
+                <VotingMethod>SPV</VotingMethod>
+                <MaxVotes></MaxVotes>
+            </Contest>
+            <kr:NumberOfSeats>55</kr:NumberOfSeats>
+            <kr:PreferenceThreshold>25</kr:PreferenceThreshold>
+            <kr:ElectionTree>
+                <kr:Region RegionNumber="6" RegionCategory="PROVINCIE">
+                    <kr:RegionName>Gelderland</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1" RegionCategory="KIESKRING" SuperiorRegionNumber="6" SuperiorRegionCategory="PROVINCIE">
+                    <kr:RegionName>Arnhem</kr:RegionName>
+                    <kr:Committee CommitteeCategory="CSB"/>
+                    <kr:Committee CommitteeCategory="HSB" AcceptCentralSubmissions="true"/>
+                </kr:Region>
+                <kr:Region RegionNumber="2" RegionCategory="KIESKRING" SuperiorRegionNumber="6" SuperiorRegionCategory="PROVINCIE">
+                    <kr:RegionName>Nijmegen</kr:RegionName>
+                    <kr:Committee CommitteeCategory="HSB"/>
+                </kr:Region>
+                <kr:Region RegionNumber="197" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Aalten</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="200" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Apeldoorn</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="202" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Arnhem</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="203" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Barneveld</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="213" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Brummen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="221" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Doesburg</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="222" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Doetinchem</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="226" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Duiven</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="228" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Ede</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="230" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Elburg</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="232" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Epe</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="233" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Ermelo</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="243" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Harderwijk</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="244" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Hattem</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="246" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Heerde</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="262" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Lochem</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="267" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Nijkerk</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="269" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Oldebroek</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="273" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Putten</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="274" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Renkum</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="275" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Rheden</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="277" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Rozendaal</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="279" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Scherpenzeel</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="285" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Voorst</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="289" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Wageningen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="293" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Westervoort</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="294" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Winterswijk</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="299" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Zevenaar</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="301" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Zutphen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="302" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Nunspeet</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1509" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Oude IJsselstreek</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1586" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Oost Gelre</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1705" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Lingewaard</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1734" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Overbetuwe</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1859" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Berkelland</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1876" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Bronckhorst</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1955" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Montferland</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="209" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Beuningen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="214" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Buren</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="216" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Culemborg</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="225" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Druten</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="252" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Heumen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="263" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Maasdriel</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="268" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Nijmegen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="281" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Tiel</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="296" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Wijchen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="297" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Zaltbommel</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="668" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>West Maas en Waal</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1740" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Neder-Betuwe</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1945" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Berg en Dal</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1960" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>West Betuwe</kr:RegionName>
+                </kr:Region>
+            </kr:ElectionTree>
+            <kr:RegisteredParties>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>VVD</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Forum voor Democratie</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>CDA</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>GROENLINKS</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partij van de Arbeid (P.v.d.A.)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>D66</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>ChristenUnie</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>PVV (Partij voor de Vrijheid)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>SP (Socialistische Partij)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Staatkundig Gereformeerde Partij (SGP)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partij voor de Dieren</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>50PLUS</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>ONS Gelderland</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Volt</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>BBB</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Lokale Partijen Gelderland</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>JA21</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Belang van Nederland (BVNL)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+            </kr:RegisteredParties>
+        </Election>
+    </ElectionEvent>
+</EML>

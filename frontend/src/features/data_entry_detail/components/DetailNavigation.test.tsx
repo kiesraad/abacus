@@ -65,8 +65,8 @@ describe("DetailNavigation", () => {
       "Verschillen met stembureau",
       "Aantal kiezers en stemmen",
       "Verschillen D & H",
-      "Lijst 1 - Vurige Vleugels Partij",
-      "Lijst 2 - Wijzen van Water en Wind",
+      "Lijst 1 – Vurige Vleugels Partij",
+      "Lijst 2 – Wijzen van Water en Wind",
     ]);
   });
 
@@ -95,11 +95,11 @@ describe("DetailNavigation", () => {
     expect(within(differencesItem).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
     expect(within(differencesItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
 
-    const politicalGroup1Item = screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ }).closest("li")!;
+    const politicalGroup1Item = screen.getByRole("link", { name: /Lijst 1 – Vurige Vleugels Partij/ }).closest("li")!;
     expect(within(politicalGroup1Item).queryByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
     expect(within(politicalGroup1Item).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
 
-    const politicalGroup2Item = screen.getByRole("link", { name: /Lijst 2 - Wijzen van Water en Wind/ }).closest("li")!;
+    const politicalGroup2Item = screen.getByRole("link", { name: /Lijst 2 – Wijzen van Water en Wind/ }).closest("li")!;
     expect(within(politicalGroup2Item).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
     expect(within(politicalGroup2Item).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
   });

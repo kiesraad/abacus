@@ -5,7 +5,7 @@ export class ApportionmentListDetails {
   readonly alert: Locator;
 
   constructor(protected readonly page: Page) {
-    this.header = page.getByRole("heading", { level: 1, name: /Lijst \d+ - \w+/ });
+    this.header = page.getByRole("heading", { level: 1, name: /Lijst \d+ – \w+/ });
 
     this.alert = page.getByRole("alert");
   }

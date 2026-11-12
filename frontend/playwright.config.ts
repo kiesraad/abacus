@@ -1,10 +1,18 @@
 import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/test";
 
+// With E2E_TLS set, run against an Abacus build with the `tls` feature
+const tls = !!process.env.E2E_TLS;
+const serverUrl = tls ? "https://127.0.0.1:8081" : "http://127.0.0.1:8081";
+const features = tls ? "memory-serve,embed-typst,tls" : "memory-serve,embed-typst";
+
+// Use port 8082 for the plaintext HTTP server when TLS is enabled
+const tlsArgs = tls ? " --http-port 8082" : "";
+
 function returnWebserverCommand(): string {
   // CI: use existing backend build
   if (process.env.CI) {
     const binary = process.platform === "win32" ? "..\\builds\\backend\\abacus.exe" : "../builds/backend/abacus";
-    let argv = `${binary} --port 8081`;
+    let argv = `${binary} --port 8081${tlsArgs}`;
     // Release builds don't have the dev-database feature
     if (!process.env.RELEASE_BUILD) {
       argv += " --reset-database";
@@ -14,11 +22,11 @@ function returnWebserverCommand(): string {
 
   // LOCAL CI: build frontend, then build and run backend with database reset and seed playwright-specific database
   if (process.env.LOCAL_CI) {
-    return `pnpm build && cd ../backend && cargo run --features memory-serve,embed-typst -- --database target/debug/playwright.sqlite --reset-database --port 8081`;
+    return `pnpm build && cd ../backend && cargo run --features ${features} -- --database target/debug/playwright.sqlite --reset-database --port 8081${tlsArgs}`;
   }
 
   // DEV: expects frontend build and playwright-specific database setup/seeding to have been done
-  return `cd ../backend && cargo run --features memory-serve,embed-typst -- --database ../backend/target/debug/playwright.sqlite --port 8081`;
+  return `cd ../backend && cargo run --features ${features} -- --database ../backend/target/debug/playwright.sqlite --port 8081${tlsArgs}`;
 }
 
 function chromiumUseOptions() {
@@ -52,14 +60,17 @@ const config: PlaywrightTestConfig = defineConfig({
   use: {
     trace: "retain-on-first-failure",
     testIdAttribute: "id",
-    baseURL: process.env.DEBUG_DEVELOPMENT ? "http://localhost:3000" : "http://127.0.0.1:8081",
+    baseURL: process.env.DEBUG_DEVELOPMENT ? "http://localhost:3000" : serverUrl,
+    // The browsers and API request contexts do not trust the local CA
+    ignoreHTTPSErrors: tls,
   },
   webServer: process.env.DEBUG_DEVELOPMENT
     ? []
     : [
         {
           command: returnWebserverCommand(),
-          url: "http://127.0.0.1:8081",
+          url: serverUrl,
+          ignoreHTTPSErrors: tls,
           stdout: process.env.LOCAL_CI ? "pipe" : "ignore",
           timeout: 300_000,
         },

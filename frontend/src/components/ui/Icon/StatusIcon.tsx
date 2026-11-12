@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import {
   IconArrowNarrowRight,
   IconCheckmark,
@@ -9,7 +10,7 @@ import {
 import { t } from "@/i18n/translate";
 import type { MenuStatus } from "@/types/ui";
 
-export function StatusIcon({ status }: { status: MenuStatus }) {
+export function StatusIcon({ status }: { status: MenuStatus }): ReactElement | null {
   switch (status) {
     case "active":
       return <IconArrowNarrowRight aria-label={t("you_are_here")} aria-hidden="false" />; // "Actief"
@@ -23,7 +24,7 @@ export function StatusIcon({ status }: { status: MenuStatus }) {
       return <IconEdit aria-label={t("not_yet_finished")} aria-hidden="false" />; // "Niet opgeslagen wijzigingen"
     case "error":
       return <IconError aria-label={t("contains_error")} aria-hidden="false" />; // "Ingevoerd, met openstaande fouten"
-    default:
+    case "idle":
       return null;
   }
 }

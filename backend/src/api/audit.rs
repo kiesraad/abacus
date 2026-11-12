@@ -235,6 +235,27 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_list_paging_no_overflow(pool: SqlitePool) {
+        create_log_entries(pool.clone()).await;
+
+        // (page - 1) * per_page = 9_999_900_000 overflows u32::MAX; must not panic (#3326)
+        let result = get_list(
+            pool.clone(),
+            LogFilterQuery {
+                page: 100_000,
+                per_page: 100_000,
+                level: vec![],
+                event: vec![],
+                user: vec![],
+                since: None,
+            },
+        )
+        .await;
+        assert_eq!(result.events.len(), 0);
+        assert_eq!(result.page, 100_000);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list_filter_event(pool: SqlitePool) {
         create_log_entries(pool.clone()).await;
 

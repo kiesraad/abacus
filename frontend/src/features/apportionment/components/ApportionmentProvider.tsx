@@ -12,8 +12,14 @@ export interface ElectionApportionmentProviderProps {
 }
 
 export function ApportionmentProvider({ children, electionId }: ElectionApportionmentProviderProps) {
-  const { error: apportionmentError, data } = useApportionmentRequest(electionId);
-  const { requestState, refetch } = useApportionmentStateRequest(electionId);
+  const { error: apportionmentError, data, refetch: refetchApportionment } = useApportionmentRequest(electionId);
+  const { requestState, refetch: refetchState } = useApportionmentStateRequest(electionId);
+
+  // Refetch both the apportionment state and result
+  async function refetch(controller?: AbortController) {
+    await Promise.all([refetchApportionment(), refetchState(controller)]);
+  }
+
   let error = apportionmentError;
   let state: ApportionmentState | undefined;
   if (requestState.status === "success") {
@@ -30,12 +36,12 @@ export function ApportionmentProvider({ children, electionId }: ElectionApportio
       value={{
         seatAssignment: data?.seat_assignment,
         candidateNomination: data?.candidate_nomination,
-        electionSummary: data?.election_summary,
+        electionSummary: data?.election_totals,
         warnings: data?.warnings ?? [],
         state,
         error,
         isLoading: requestState.status === "loading",
-        refetchState: refetch,
+        refetch,
       }}
     >
       {children}

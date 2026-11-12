@@ -36,6 +36,19 @@ export default defineConfig(
     ],
     rules: {
       "import-x/namespace": "off",
+      "import-x/extensions": [
+        "error",
+        "never",
+        {
+          pattern: {
+            css: "always",
+            json: "always",
+            webp: "always",
+          },
+          checkTypeImports: true,
+          fix: true,
+        },
+      ],
       "@typescript-eslint/no-unsafe-type-assertion": "error",
       "@typescript-eslint/restrict-template-expressions": [
         "error",
@@ -79,6 +92,13 @@ export default defineConfig(
       parserOptions: {
         projectService: true,
       },
+    },
+  },
+  // Vite's future `configLoader: 'native'` requires file extensions on relative imports in its config files
+  {
+    files: ["*.config.ts"],
+    rules: {
+      "import-x/extensions": "off",
     },
   },
   // Enforce Rules of React for frontend code

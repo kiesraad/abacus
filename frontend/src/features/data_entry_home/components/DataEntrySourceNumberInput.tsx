@@ -5,9 +5,10 @@ import { Badge } from "@/components/ui/Badge/Badge";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { Spinner } from "@/components/ui/Spinner/Spinner";
-import { useUser } from "@/hooks/user/useUser.ts";
+import { useUser } from "@/hooks/user/useUser";
 import { t, tx } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { removeLeadingZeros } from "@/utils/strings";
 import { useSingleCall } from "../hooks/useSingleCall";
 import { type DataEntryStatusWithUserStatus, DataEntryUserStatus } from "../utils/util";
@@ -80,7 +81,8 @@ export function DataEntrySourceNumberInput({
     }
 
     if (currentDataEntry) {
-      const { number: nr, name } = currentDataEntry.statusEntry.source;
+      const name = currentDataEntry.statusEntry.source.name;
+      const nr = getDataEntrySourceNumber(currentDataEntry.statusEntry.source);
 
       switch (currentDataEntry.userStatus) {
         case DataEntryUserStatus.InProgressOtherUser:
@@ -134,7 +136,7 @@ export function DataEntrySourceNumberInput({
         }}
         onKeyDown={(e) => {
           refetch();
-          if (e.shiftKey && e.key === "Enter") {
+          if (e.key === "Enter") {
             handleSubmit();
           }
         }}

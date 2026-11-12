@@ -16,7 +16,7 @@ chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
 [dependencies.abacus]
 path = ".."
 default-features = false
-features = ["pdf-gen-stub"]
+features = []
 
 [[bin]]
 name = "data_entry_status"

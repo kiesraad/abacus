@@ -1,0 +1,32 @@
+name: Release branch checks
+
+# GitHub only runs schedule triggers on the default branch, so this workflow
+# starts the weekly checks on the release branch.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    name: Run ${{ matrix.workflow }} on release-1.2
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    strategy:
+      fail-fast: false
+      matrix:
+        workflow:
+          - weekly-e2e-tests.yml
+          - cargo-deny.yml
+          - pnpm-audit.yml
+    steps:
+      - name: Dispatch workflow
+        run: gh workflow run "$WORKFLOW" --ref release-1.2
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          WORKFLOW: ${{ matrix.workflow }}

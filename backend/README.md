@@ -36,14 +36,6 @@ This will create the database, run the migrations, and seed the database with
 test data. The API server will now be available at http://localhost:8080. For
 more detailed instructions please read the rest of this README.
 
-### Building
-
-First run `sqlx database setup` to create the SQLite database. Then use 
-`cargo build` to build the project.
-
-To make a release build, use `cargo build --release`.
-The built binary will be located in `target/release/`.
-
 ### Running
 
 Use `cargo run` to run the API on port 8080 (http://localhost:8080).
@@ -61,14 +53,12 @@ sqlx database setup
 cargo run --features memory-serve
 ```
 
-By default (for compilation efficiency) Abacus will use Typst from a Rust dylib.
-Rust dylibs are not stable, so should not be used in production. If you want to
-switch to the statically linked Typst (as is done with production builds of
-Abacus) you can simply enable the `embed-typst` feature. This can be combined 
-with the memory-serve feature as well, e.g.:
+PDF generation uses a statically linked Typst, enabled by the `embed-typst` feature. That feature is part of the default
+feature set. If you build with `--no-default-features` you have to enable it explicitly, otherwise `generate_pdf` is
+unimplemented and PDF generation is unavailable. It can be combined with the memory-serve feature, e.g.:
 
 ```shell
-cargo build --features memory-serve,embed-typst
+cargo build --no-default-features --features memory-serve,embed-typst
 ```
 
 ### Linting
@@ -78,6 +68,50 @@ Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the proje
 ### Testing
 
 Use `cargo test` to run the tests. The tests are also run in a GitHub Actions workflow.
+
+### Debugging with gdb/lldb
+
+Debug builds are compiled with [`debug = "line-tables-only"`][debug], which keeps panic backtraces with file and line
+numbers but omits type and variable information. To inspect variables in a debugger:
+
+- **Single command:** `CARGO_PROFILE_DEV_DEBUG=2 cargo build` (or `cargo nextest run`, `cargo run`).
+- **Entire workspace:** create `backend/.cargo/config.toml` (Git ignores the `.cargo` directory):
+
+      [profile.dev]
+      debug = 2
+
+[debug]: https://doc.rust-lang.org/cargo/reference/profiles.html#debug
+
+## Building
+
+First run `sqlx database setup` to create the SQLite database. Then use
+`cargo build` to build the project.
+
+To make a release build, use `cargo build --release`.
+The built binary will be located in `target/release/`.
+
+### Production release build
+
+A production release build for Abacus contains the following features:
+- `memory-serve`
+- `embed-typst`
+- `airgap-detection`
+- `tls`
+
+and does not contain the following (default) features:
+- `openapi`
+- `dev-database`
+
+To build a production release, use:
+
+```shell
+# Build frontend, for memory-serve
+pnpm --dir ../frontend install
+SHOW_DEV_PAGE=false pnpm --dir ../frontend build
+
+# Build backend with the correct features enabled
+SQLX_OFFLINE=true cargo build --locked --release --no-default-features --features memory-serve,embed-typst,airgap-detection,tls
+```
 
 ### Air gap detection
 
@@ -98,13 +132,48 @@ Using a binary:
 ```shell
 abacus --airgap-detection
 ```
-### TLS
 
-In production, Abacus must be built with TLS enabled. To do this, enable the feature `tls`:
+When Abacus starts, it logs a warning if an internet connection attempt times out or fails in an unexpected way.
+These warnings alone do not prevent you from using Abacus. Abacus continues checking for internet access while it
+is running, but does not repeat these warnings. In a future version, air gap detection may prevent you from using
+Abacus when these unexpected connection problems occur.
+
+### TLS (HTTPS)
+
+In production, Abacus must be built with TLS enabled, which makes Abacus serve
+HTTPS only. To do this, enable the `tls` feature:
 
 ```shell
 cargo build --release --features tls
 ```
+
+On startup Abacus loads (or, on first run, generates) a local certificate
+authority under the directory given by `--tls-dir` (defaults to `tls`). A fresh
+server (leaf) certificate is created in memory on every start, signed by the CA
+and covering `localhost`, `abacus.internal`, and all routable LAN addresses.
+
+To trust the server, import the CA into the client trust store: `ca.pem` on
+Linux/macOS/Firefox, `ca.cer` (DER) on Windows. The CA can be downloaded from the
+running server at `/ca.pem` and `/ca.cer`.
+
+Verify that you have the right certificate by comparing its fingerprint. Abacus
+logs both the SHA-256 and SHA-1 fingerprint of the CA on startup. Compare
+against whatever your client shows: browsers and the OpenSSL CLI (`openssl x509
+-in ca.pem -noout -fingerprint -sha256`) show SHA-256, while the Windows
+certificate manager displays the SHA-1 digest as the certificate "thumbprint".
+
+With the `tls` feature enabled, the default port is 8443 in debug builds and 443
+in release builds. Binding to 443 requires elevated privileges (e.g. the
+`CAP_NET_BIND_SERVICE` capability on Linux).
+
+Alongside the HTTPS port, Abacus runs a plain HTTP server that provides the CA
+certificate at `/ca.pem` and `/ca.cer` over plain HTTP (so clients can fetch it
+before trusting the server) and redirects every other request to HTTPS. Its port
+is set by `--http-port` / `ABACUS_HTTP_PORT`, defaulting to 80 in release builds
+and 8080 in debug builds. The CA is served over HTTPS as well. Failing to bind the
+HTTP port (for example without the required privileges) is logged but not fatal.
+
+#### Building with TLS enabled on Windows
 
 On Windows, AWS Libcrypto has some [build requirements](https://aws.github.io/aws-lc-rs/requirements/windows.html):
 - C/C++ Compiler: these build tools have likely been installed during installation of Rust
@@ -151,17 +220,19 @@ The following dependencies (crates) are used:
 - `clap`: library for command-line argument parsing.
 - `cookie`: dependency of axum_extra, for encoding and parsing cookies.
 - `hyper`: fast and correct HTTP implementation.
+- `icu_collator`: locale-aware string comparison
+- `icu_locale_core`: locale definitions for `icu_collator`
 - `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
 - `password_hash`: password hashing interfaces.
-- `quick-xml`: reading and writing EML_NL XML files.
 - `rand`: create a random session key.
 - `serde_json`: JSON support for Serde.
 - `serde`: framework for serializing and deserializing data structures.
 - `sha2`: generating a hash of the EML_NL XML files for inclusion in the PDF.
 - `socket2`: Utilities for creating and using network sockets.
+- `windows_socket`: Local Windows-only helper for exclusive socket binding (`SO_EXCLUSIVEADDRUSE`), using `windows-sys`.
 - `sqlx`: async SQL library featuring compile-time checked queries.
 - `strum`: Converting enums from their string representation and back
-- `tokio-util`: used for download streaming.
+- `tokio-util`: used for download streaming and reading ZIP entries with a size limit.
 - `tokio`: runtime for writing asynchronous applications.
 - `tower-http`: Tower middleware and utilities for HTTP clients and servers.
 - `tower`: a library of modular and reusable components for building robust networking clients and servers.
@@ -173,17 +244,33 @@ The following dependencies (crates) are used:
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 
+The `eml_signature` crate (see [its README](eml_signature/README.md)) additionally uses:
+
+- `aws-lc-rs`: RSA PKCS#1 v1.5 signing and verification.
+- `cms`: CMS `SignedData` types for `.signature` files.
+- `const-oid`: OID constants for reading the certificate subject and key algorithm.
+- `der`: ASN.1 DER primitives and PEM encoding.
+- `rcgen`: RSA key generation and X.509 certificate building (`aws-lc-rs` backend).
+- `x509-cert`: parsing certificates.
+- `zeroize`: wiping private key bytes on drop.
+
 For TLS (HTTPS) support, when the `tls` feature is enabled, the following dependencies are used:
 - `rcgen`: X.509 certificate/DER generation (`aws-lc-rs` backend)
 - `rustls-pki-types`: shared certificate and private-key types, and PEM decoding.
 - `if-addrs`: enumerating LAN IP addresses for the TLS certificate subject.
+- `rustls`: TLS implementation, on the audited `aws-lc-rs` provider.
+- `axum-server`: HTTPS serving for `axum`, with graceful shutdown.
+
+The `windows-service` crate (Windows only, see [Windows service](#windows-service)) additionally uses:
+
+- `windows-service`: install, uninstall and handle a Windows service.
 
 Additionally, the following development dependencies are used:
 
 - `test-log`: show tracing messages while running tests
 - `reqwest`: HTTP client for testing the API.
 - `http-body-util`: trait used to extract a response body in some tests.
-- `tempfile`: to create temporary directories for TLS certificate tests.
+- `tempfile`: to create temporary directories in tests.
 
 ### Database
 
@@ -222,9 +309,9 @@ To update `openapi.json` in the repository, run the command `cargo run --bin gen
 
 ### Test data generation
 
-You can fill the database with test data and (optionally) export the election definition files with `gen-test-gsb-election.rs`.
+You can fill the database with test data and (optionally) export the election definition files with `gen-test-election.rs`.
 
-Run `cargo run --bin gen-test-gsb-election -- --help` to see all command-line options.
+Run `cargo run --bin gen-test-election -- --help` to see all command-line options.
 
 ### Binary usage
 
@@ -232,16 +319,17 @@ The abacus binary supports a few arguments, which can be passed on the command l
 
 ```
 Options:
-  -p, --port <PORT>          Server port, optional [env: ABACUS_PORT=] [default: 8080]
-  -d, --database <DATABASE>  Location of the database file, will be created if it doesn't exist [env: ABACUS_DATABASE=] [default: db.sqlite]
-      --tls-dir <TLS_DIR>    Location of the TLS directory (CA certificate and key), will be created if it doesn't exist [env: ABACUS_TLS_DIR=] [default: tls]
-  -a, --airgap-detection     Enable airgap detection [env: ABACUS_AIRGAP_DETECTION=]
-  -V, --version              Show version
-  -h, --help                 Print help
+  -p, --port <PORT>            Server port, optional [env: ABACUS_PORT=] [default: 8443]
+  -d, --database <DATABASE>    Location of the database file, will be created if it doesn't exist [env: ABACUS_DATABASE=] [default: db.sqlite]
+      --tls-dir <TLS_DIR>      Location of the TLS directory (CA certificate and key), will be created if it doesn't exist [env: ABACUS_TLS_DIR=] [default: tls]
+      --http-port <HTTP_PORT>  Port for the plain HTTP server that serves the CA certificate and redirects to HTTPS [env: ABACUS_HTTP_PORT=] [default: 8080]
+  -a, --airgap-detection       Enable airgap detection [env: ABACUS_AIRGAP_DETECTION=]
+  -V, --version                Show version
+  -h, --help                   Print help
 ```
 
 Note that airgap-detection is forced in our (pre-)releases.
-For release builds the default port number is 80.
+For release builds the default port number is 80, or 443 when TLS is enabled.
 
 A development build also supports the following arguments:
 
@@ -249,3 +337,17 @@ A development build also supports the following arguments:
   -s, --seed-data            Seed the database with initial data using the fixtures [env: ABACUS_SEED_DATA=]
   -r, --reset-database       Reset the database [env: ABACUS_RESET_DATABASE=]
 ```
+
+### Windows service
+
+On Windows, the abacus binary can run as a Windows service. This is implemented in the `windows-service` crate.  
+From an administrator prompt:
+
+```
+abacus.exe --service --install    Install and start the service
+abacus.exe --service --uninstall  Stop and uninstall the service
+```
+
+Any other arguments given to `--service --install` are stored with the service and passed on to the server every time it starts, e.g. `abacus.exe --service --install --port 8443`.
+
+The service runs as `LocalService` and starts automatically when Windows starts. It starts the server in the service process with `%ProgramData%\Abacus` as the current directory. The output is written to `abacus.log` inside the logs directory. If a log file exists when the service starts, it will be renamed with a timestamp suffix. If there is a failure, it writes an `abacus.<timestamp>.crash.log` file. 

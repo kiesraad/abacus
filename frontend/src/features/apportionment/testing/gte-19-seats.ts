@@ -1,422 +1,18 @@
 import type {
+  ApportionmentState,
   CandidateNomination,
   CommitteeSession,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   SeatAssignment,
 } from "@/types/generated/openapi";
-import type { HighestAverageAssignmentStep } from "../utils/steps";
 
-export const steps: HighestAverageAssignmentStep[] = [
-  {
-    residual_seat_number: 1,
-    change: {
-      changed_by: "HighestAverageAssignment",
-      selected_list_number: 5,
-      list_options: [5],
-      list_assigned: [5],
-      list_exhausted: [],
-      votes_per_seat: {
-        integer: 50,
-        numerator: 1,
-        denominator: 2,
-      },
-    },
-    standings: [
-      {
-        list_number: 1,
-        votes_cast: 600,
-        remainder_votes: {
-          integer: 26,
-          numerator: 2,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 50,
-          numerator: 0,
-          denominator: 12,
-        },
-        full_seats: 11,
-        residual_seats: 0,
-      },
-      {
-        list_number: 2,
-        votes_cast: 302,
-        remainder_votes: {
-          integer: 41,
-          numerator: 3,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 50,
-          numerator: 2,
-          denominator: 6,
-        },
-        full_seats: 5,
-        residual_seats: 0,
-      },
-      {
-        list_number: 3,
-        votes_cast: 98,
-        remainder_votes: {
-          integer: 45,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 49,
-          numerator: 0,
-          denominator: 2,
-        },
-        full_seats: 1,
-        residual_seats: 0,
-      },
-      {
-        list_number: 4,
-        votes_cast: 99,
-        remainder_votes: {
-          integer: 46,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 49,
-          numerator: 1,
-          denominator: 2,
-        },
-        full_seats: 1,
-        residual_seats: 0,
-      },
-      {
-        list_number: 5,
-        votes_cast: 101,
-        remainder_votes: {
-          integer: 48,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 50,
-          numerator: 1,
-          denominator: 2,
-        },
-        full_seats: 1,
-        residual_seats: 0,
-      },
-    ],
-  },
-  {
-    residual_seat_number: 2,
-    change: {
-      changed_by: "HighestAverageAssignment",
-      selected_list_number: 2,
-      list_options: [2],
-      list_assigned: [2],
-      list_exhausted: [],
-      votes_per_seat: {
-        integer: 50,
-        numerator: 2,
-        denominator: 6,
-      },
-    },
-    standings: [
-      {
-        list_number: 1,
-        votes_cast: 600,
-        remainder_votes: {
-          integer: 26,
-          numerator: 2,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 50,
-          numerator: 0,
-          denominator: 12,
-        },
-        full_seats: 11,
-        residual_seats: 0,
-      },
-      {
-        list_number: 2,
-        votes_cast: 302,
-        remainder_votes: {
-          integer: 41,
-          numerator: 3,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 50,
-          numerator: 2,
-          denominator: 6,
-        },
-        full_seats: 5,
-        residual_seats: 0,
-      },
-      {
-        list_number: 3,
-        votes_cast: 98,
-        remainder_votes: {
-          integer: 45,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 49,
-          numerator: 0,
-          denominator: 2,
-        },
-        full_seats: 1,
-        residual_seats: 0,
-      },
-      {
-        list_number: 4,
-        votes_cast: 99,
-        remainder_votes: {
-          integer: 46,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 49,
-          numerator: 1,
-          denominator: 2,
-        },
-        full_seats: 1,
-        residual_seats: 0,
-      },
-      {
-        list_number: 5,
-        votes_cast: 101,
-        remainder_votes: {
-          integer: 48,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 33,
-          numerator: 2,
-          denominator: 3,
-        },
-        full_seats: 1,
-        residual_seats: 1,
-      },
-    ],
-  },
-  {
-    residual_seat_number: 3,
-    change: {
-      changed_by: "HighestAverageAssignment",
-      selected_list_number: 1,
-      list_options: [1],
-      list_assigned: [1],
-      list_exhausted: [],
-      votes_per_seat: {
-        integer: 50,
-        numerator: 0,
-        denominator: 12,
-      },
-    },
-    standings: [
-      {
-        list_number: 1,
-        votes_cast: 600,
-        remainder_votes: {
-          integer: 26,
-          numerator: 2,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 50,
-          numerator: 0,
-          denominator: 12,
-        },
-        full_seats: 11,
-        residual_seats: 0,
-      },
-      {
-        list_number: 2,
-        votes_cast: 302,
-        remainder_votes: {
-          integer: 41,
-          numerator: 3,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 43,
-          numerator: 1,
-          denominator: 7,
-        },
-        full_seats: 5,
-        residual_seats: 1,
-      },
-      {
-        list_number: 3,
-        votes_cast: 98,
-        remainder_votes: {
-          integer: 45,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 49,
-          numerator: 0,
-          denominator: 2,
-        },
-        full_seats: 1,
-        residual_seats: 0,
-      },
-      {
-        list_number: 4,
-        votes_cast: 99,
-        remainder_votes: {
-          integer: 46,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 49,
-          numerator: 1,
-          denominator: 2,
-        },
-        full_seats: 1,
-        residual_seats: 0,
-      },
-      {
-        list_number: 5,
-        votes_cast: 101,
-        remainder_votes: {
-          integer: 48,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 33,
-          numerator: 2,
-          denominator: 3,
-        },
-        full_seats: 1,
-        residual_seats: 1,
-      },
-    ],
-  },
-  {
-    residual_seat_number: 4,
-    change: {
-      changed_by: "HighestAverageAssignment",
-      selected_list_number: 4,
-      list_options: [4],
-      list_assigned: [4],
-      list_exhausted: [],
-      votes_per_seat: {
-        integer: 49,
-        numerator: 1,
-        denominator: 2,
-      },
-    },
-    standings: [
-      {
-        list_number: 1,
-        votes_cast: 600,
-        remainder_votes: {
-          integer: 26,
-          numerator: 2,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 46,
-          numerator: 2,
-          denominator: 13,
-        },
-        full_seats: 11,
-        residual_seats: 1,
-      },
-      {
-        list_number: 2,
-        votes_cast: 302,
-        remainder_votes: {
-          integer: 41,
-          numerator: 3,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 43,
-          numerator: 1,
-          denominator: 7,
-        },
-        full_seats: 5,
-        residual_seats: 1,
-      },
-      {
-        list_number: 3,
-        votes_cast: 98,
-        remainder_votes: {
-          integer: 45,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 49,
-          numerator: 0,
-          denominator: 2,
-        },
-        full_seats: 1,
-        residual_seats: 0,
-      },
-      {
-        list_number: 4,
-        votes_cast: 99,
-        remainder_votes: {
-          integer: 46,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 49,
-          numerator: 1,
-          denominator: 2,
-        },
-        full_seats: 1,
-        residual_seats: 0,
-      },
-      {
-        list_number: 5,
-        votes_cast: 101,
-        remainder_votes: {
-          integer: 48,
-          numerator: 19,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 33,
-          numerator: 2,
-          denominator: 3,
-        },
-        full_seats: 1,
-        residual_seats: 1,
-      },
-    ],
-  },
-];
+export const state: ApportionmentState = {
+  type: "Finalised",
+  deceased_candidates: [],
+  lists_drawn: [],
+  candidates_drawn: [],
+};
 
 export const seat_assignment: SeatAssignment = {
   seats: 23,
@@ -427,8 +23,417 @@ export const seat_assignment: SeatAssignment = {
     numerator: 4,
     denominator: 23,
   },
-  steps: steps,
-  final_standing: [
+  steps: [
+    {
+      residual_seat_number: 1,
+      change: {
+        changed_by: "HighestAverageAssignment",
+        selected_list_number: 5,
+        list_options: [5],
+        list_assigned: [5],
+        list_exhausted: [],
+        votes_per_seat: {
+          integer: 50,
+          numerator: 1,
+          denominator: 2,
+        },
+      },
+      standings: [
+        {
+          list_number: 1,
+          votes_cast: 600,
+          remainder_votes: {
+            integer: 26,
+            numerator: 2,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 50,
+            numerator: 0,
+            denominator: 12,
+          },
+          full_seats: 11,
+          residual_seats: 0,
+        },
+        {
+          list_number: 2,
+          votes_cast: 302,
+          remainder_votes: {
+            integer: 41,
+            numerator: 3,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 50,
+            numerator: 2,
+            denominator: 6,
+          },
+          full_seats: 5,
+          residual_seats: 0,
+        },
+        {
+          list_number: 3,
+          votes_cast: 98,
+          remainder_votes: {
+            integer: 45,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 49,
+            numerator: 0,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+        {
+          list_number: 4,
+          votes_cast: 99,
+          remainder_votes: {
+            integer: 46,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 49,
+            numerator: 1,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+        {
+          list_number: 5,
+          votes_cast: 101,
+          remainder_votes: {
+            integer: 48,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 50,
+            numerator: 1,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+      ],
+    },
+    {
+      residual_seat_number: 2,
+      change: {
+        changed_by: "HighestAverageAssignment",
+        selected_list_number: 2,
+        list_options: [2],
+        list_assigned: [2],
+        list_exhausted: [],
+        votes_per_seat: {
+          integer: 50,
+          numerator: 2,
+          denominator: 6,
+        },
+      },
+      standings: [
+        {
+          list_number: 1,
+          votes_cast: 600,
+          remainder_votes: {
+            integer: 26,
+            numerator: 2,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 50,
+            numerator: 0,
+            denominator: 12,
+          },
+          full_seats: 11,
+          residual_seats: 0,
+        },
+        {
+          list_number: 2,
+          votes_cast: 302,
+          remainder_votes: {
+            integer: 41,
+            numerator: 3,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 50,
+            numerator: 2,
+            denominator: 6,
+          },
+          full_seats: 5,
+          residual_seats: 0,
+        },
+        {
+          list_number: 3,
+          votes_cast: 98,
+          remainder_votes: {
+            integer: 45,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 49,
+            numerator: 0,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+        {
+          list_number: 4,
+          votes_cast: 99,
+          remainder_votes: {
+            integer: 46,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 49,
+            numerator: 1,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+        {
+          list_number: 5,
+          votes_cast: 101,
+          remainder_votes: {
+            integer: 48,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 33,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 1,
+          residual_seats: 1,
+        },
+      ],
+    },
+    {
+      residual_seat_number: 3,
+      change: {
+        changed_by: "HighestAverageAssignment",
+        selected_list_number: 1,
+        list_options: [1],
+        list_assigned: [1],
+        list_exhausted: [],
+        votes_per_seat: {
+          integer: 50,
+          numerator: 0,
+          denominator: 12,
+        },
+      },
+      standings: [
+        {
+          list_number: 1,
+          votes_cast: 600,
+          remainder_votes: {
+            integer: 26,
+            numerator: 2,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 50,
+            numerator: 0,
+            denominator: 12,
+          },
+          full_seats: 11,
+          residual_seats: 0,
+        },
+        {
+          list_number: 2,
+          votes_cast: 302,
+          remainder_votes: {
+            integer: 41,
+            numerator: 3,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 43,
+            numerator: 1,
+            denominator: 7,
+          },
+          full_seats: 5,
+          residual_seats: 1,
+        },
+        {
+          list_number: 3,
+          votes_cast: 98,
+          remainder_votes: {
+            integer: 45,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 49,
+            numerator: 0,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+        {
+          list_number: 4,
+          votes_cast: 99,
+          remainder_votes: {
+            integer: 46,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 49,
+            numerator: 1,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+        {
+          list_number: 5,
+          votes_cast: 101,
+          remainder_votes: {
+            integer: 48,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 33,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 1,
+          residual_seats: 1,
+        },
+      ],
+    },
+    {
+      residual_seat_number: 4,
+      change: {
+        changed_by: "HighestAverageAssignment",
+        selected_list_number: 4,
+        list_options: [4],
+        list_assigned: [4],
+        list_exhausted: [],
+        votes_per_seat: {
+          integer: 49,
+          numerator: 1,
+          denominator: 2,
+        },
+      },
+      standings: [
+        {
+          list_number: 1,
+          votes_cast: 600,
+          remainder_votes: {
+            integer: 26,
+            numerator: 2,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 46,
+            numerator: 2,
+            denominator: 13,
+          },
+          full_seats: 11,
+          residual_seats: 1,
+        },
+        {
+          list_number: 2,
+          votes_cast: 302,
+          remainder_votes: {
+            integer: 41,
+            numerator: 3,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 43,
+            numerator: 1,
+            denominator: 7,
+          },
+          full_seats: 5,
+          residual_seats: 1,
+        },
+        {
+          list_number: 3,
+          votes_cast: 98,
+          remainder_votes: {
+            integer: 45,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 49,
+            numerator: 0,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+        {
+          list_number: 4,
+          votes_cast: 99,
+          remainder_votes: {
+            integer: 46,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 49,
+            numerator: 1,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+        {
+          list_number: 5,
+          votes_cast: 101,
+          remainder_votes: {
+            integer: 48,
+            numerator: 19,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 33,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 1,
+          residual_seats: 1,
+        },
+      ],
+    },
+  ],
+  standings: [
     {
       list_number: 1,
       votes_cast: 600,
@@ -1168,8 +1173,8 @@ export const candidate_nomination: CandidateNomination = {
   ],
 };
 
-export const election_summary: ElectionSummary = {
-  number_of_voters: 2000,
+export const election_totals: ElectionTotals = {
+  committee_specific: { committee: "CSB", number_of_voters: 2000 },
   voters_counts: {
     poll_card_count: 1203,
     proxy_certificate_count: 2,
@@ -1197,11 +1202,6 @@ export const election_summary: ElectionSummary = {
       count: 0,
       data_entry_sources: [],
     },
-  },
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    ballots_recounted: [],
-    investigated_other_reason: [],
   },
   political_group_votes: [
     {
@@ -1380,17 +1380,22 @@ export const committee_session: CommitteeSession = {
 
 export const election: ElectionWithPoliticalGroups = {
   id: 2,
-  name: "Test Election >= 19 seats",
-  counting_method: "CSO",
+  name: "Election >= 19 seats",
+  official_name: "Gemeenteraad Juinen 2026",
   committee_category: "CSB",
-  election_id: "TestLocation_2026",
-  location: "Test Location",
-  domain_id: "0000",
+  election_id: "GR2026_Juinen",
+  location: "Juinen",
+  authority_id: "CSB",
+  authority_name: "Juinen",
+  authority_region: "Juinen",
+  district: { district: "None" },
+  domain: { id: "0035", name: "Juinen" },
   category: "Municipal",
+  sub_category: "GR2",
   number_of_seats: 23,
+  number_of_voters: 1,
   election_date: "2026-03-18",
   nomination_date: "2026-02-02",
-  number_of_voters: 1,
   political_groups: [
     {
       number: 1,

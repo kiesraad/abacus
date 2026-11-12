@@ -41,8 +41,11 @@ describe("OverviewPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Verkiezing", "Gebied", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Je kan invoeren"],
-      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", ""],
+      ["Gemeenteraad Heemdamseburg 2026", "Heemdamseburg", "Je kan invoeren"],
+      ["Gemeenteraad Heemdamseburg 2026", "Heemdamseburg", ""],
+      ["Waterschap Rivier en Polder 2027", "Juinen", ""],
+      ["Waterschap Rivier en Polder 2027", "Rivier en Polder", ""],
+      ["Provinciale Staten Oost-Holland 2027", "Juinen", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -65,8 +68,11 @@ describe("OverviewPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Verkiezing", "Type stembureau", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "GSB - Heemdamseburg (0035)", "Invoer bezig — Eerste zitting"],
-      ["Gemeenteraadsverkiezingen 2026", "CSB - Heemdamseburg (0035)", ""],
+      ["Gemeenteraad Heemdamseburg 2026", "GSB - Heemdamseburg (0035)", "Invoer bezig — Eerste zitting"],
+      ["Gemeenteraad Heemdamseburg 2026", "CSB - Heemdamseburg (0035)", ""],
+      ["Waterschap Rivier en Polder 2027", "GSB - Juinen (0037)", ""],
+      ["Waterschap Rivier en Polder 2027", "CSB - Rivier en Polder (10)", ""],
+      ["Provinciale Staten Oost-Holland 2027", "GSB - Juinen (0036)", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -89,8 +95,11 @@ describe("OverviewPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Verkiezing", "Type stembureau", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "GSB - Heemdamseburg (0035)", "Invoer bezig — Eerste zitting"],
-      ["Gemeenteraadsverkiezingen 2026", "CSB - Heemdamseburg (0035)", ""],
+      ["Gemeenteraad Heemdamseburg 2026", "GSB - Heemdamseburg (0035)", "Invoer bezig — Eerste zitting"],
+      ["Gemeenteraad Heemdamseburg 2026", "CSB - Heemdamseburg (0035)", ""],
+      ["Waterschap Rivier en Polder 2027", "GSB - Juinen (0037)", ""],
+      ["Waterschap Rivier en Polder 2027", "CSB - Rivier en Polder (10)", ""],
+      ["Provinciale Staten Oost-Holland 2027", "GSB - Juinen (0036)", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");

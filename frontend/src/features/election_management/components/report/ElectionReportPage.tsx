@@ -11,7 +11,7 @@ import { Icon } from "@/components/ui/Icon/Icon";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
-import { committeeSessionLabel } from "@/utils/committeeSession";
+import { committeeSessionDetailsPresent, committeeSessionLabel } from "@/utils/committeeSession";
 
 import cls from "../ElectionManagement.module.css";
 import { CSBElectionReportSection } from "./CSBElectionReportSection";
@@ -29,7 +29,7 @@ export function ElectionReportPage() {
   }
 
   // Redirect to update details page if committee session details have not been filled in
-  if (committeeSession.location === "" || !committeeSession.start_date_time) {
+  if (!committeeSessionDetailsPresent(committeeSession)) {
     return <Navigate to={`/elections/${election.id}/details#redirect-to-report`} />;
   }
 
@@ -56,7 +56,7 @@ export function ElectionReportPage() {
           <h1>{pageTitle}</h1>
         </section>
       </header>
-      <main className={cls.reportMain}>
+      <main className={cls.backgroundBlue}>
         <article>
           <div>
             <Icon size="lg" color="default" icon={<IconCheckVerified />} />

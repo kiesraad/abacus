@@ -1,9 +1,43 @@
+#let public_bodies = ("Bonaire", "Saba", "Sint Eustatius");
+#let is_municipality = (location, municipal, public_body) => if (
+  location in public_bodies
+) { public_body } else { municipal }
+
+// In the future category == "Island" will also be added
+#let is_local_election = (category, local, other) => if (
+  category == "Municipal"
+) { local } else { other }
+
+#let get_district_number = (district) => if (district.district == "Specific") {
+  if ("number" in district.key) {
+    if (district.roman_numerals) { numbering("I", district.key.number) } else { district.key.number }
+  } else { "" }
+} else { "" }
+
+#let get_election_title = (election) => if (election.category == "Municipal") {
+  [Verkiezing van de leden van de gemeenteraad van #election.authority_region]
+} else if (election.category == "Provincial") {
+  [Verkiezing van de leden van de Provinciale Staten van #election.authority_region]
+} else if (election.category == "WaterAuthority") {
+  let name_parts = election.official_name.split(" ")
+  name_parts.first() = lower(name_parts.first())
+  [Verkiezing van de leden van het #name_parts.join(" ")]
+} else {
+  ""
+}
+
 // A paragraph with a vertical line on the left
 #let emph_block(content) = {
   block(width: 75%, above: 3em, below: 1.5em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), text(
     size: 10pt,
     content,
   ))
+}
+
+// Label on the signing page form (similar to heading 3 with chapter numbering removed)
+#let signing_form_label(content) = {
+  set text(size: 10pt)
+  block(width: 75%, above: 2em, below: 1.5em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), content)
 }
 
 #let paragraph(content) = block(width: 75%, content)
@@ -112,52 +146,86 @@
   ))
 }
 
-/// Display a checkbox, optionally already checked when the `checked` parameter is set to `true`
+/// Display a checkbox, optionally already checked when the `checked` parameter is set to `true`.
+/// Checkboxes with multiline labels are vertically aligned with the first line of the label.
 #let checkbox(checked: none, small: false, content) = {
-  let has_content = content != none and content != ""
-  let size = if checked == true or checked == none and not small { 14pt } else { 10pt }
+  let box_size = if checked == true or (checked == none and not small) { 14pt } else { 10pt }
+  let column_width = 14pt
+  let gutter = 6pt
+
+  let le_box = box(
+    width: box_size,
+    height: box_size,
+    inset: 2.5pt,
+    stroke: if checked == none or checked == true { 0.5pt + black } else {
+      (thickness: 0.4pt, dash: "densely-dotted", cap: "square")
+    },
+    clip: true,
+    fill: if checked == true { black } else { white },
+    if checked == true { checkmark() },
+  )
 
   block(width: 75%,
-    grid(
-      columns: if has_content { (14pt, 6pt, auto) } else { (size) },
-      align: horizon + center,
-      box(
-        width: size,
-        height: size,
-        inset: 2.5pt,
-        stroke: if checked == none or checked == true { 0.5pt + black } else {
-          (thickness: 0.4pt, dash: "densely-dotted", cap: "square")
-        },
-        clip: true,
-        fill: if checked == true { black } else { white },
-        if checked == true { checkmark() },
-      ),
-      if has_content { " " },
-      if has_content { align(left, content) },
-    )
+    layout(block_size => context { // `layout` is needed to give `block` a measurable width
+      let label_width = block_size.width - column_width - gutter
+      let line_height = measure([A]).height
+      let rendered_height = measure(content, width: label_width).height
+      let multiline = rendered_height >= (line_height * 2)
+
+      grid(
+        columns: (column_width, gutter, auto),
+        align: horizon + center,
+        grid.cell(
+          align: if multiline { top + center } else { horizon + center },
+          // From `top` we use half of the difference to move the box up.
+          if multiline { move(dy: (line_height - box_size) / 2, le_box) } else { le_box },
+        ),
+        " ",
+        align(left, content),
+      )
+    })
   )
 }
 
 /// Format a list of items with comma separation, or return - if empty
-#let comma_list(items, empty: "-") = {
+#let comma_list(items, empty: "-", last_separator: none) = {
   if items.len() == 0 {
     return empty
   }
 
-  items.map(str).join(", ")
+  if items.len() == 1 {
+    return str(items.at(0))
+  }
+
+  let result = items.map(str).slice(0, -1).join(", ")
+  result += if last_separator == none { "," } else { " " + last_separator } + " " + str(items.at(-1))
+  result
 }
 
-/// Format a number with thousands separator
-#let fmt-number(
+/// Format a number with thousands separator, return as str
+#let fmt-number-str(
   integer,
   thousands-sep: ".",
-  zero: "-",
+  zero: "0"
 ) = {
   if (integer == 0 or integer == none) {
     return zero
   }
 
-  let formatted = str(integer).clusters().rev().chunks(3).map(c => c.join("")).join(thousands-sep).rev()
+  str(integer).clusters().rev().chunks(3).map(c => c.join("")).join(thousands-sep).rev()
+}
+
+/// Format a number with thousands separator, return as text object
+#let fmt-number(
+  integer,
+  thousands-sep: ".",
+  zero: "-",
+) = {
+  let formatted = fmt-number-str(integer, thousands-sep: thousands-sep, zero: zero)
+
+  if formatted == zero {
+    return zero
+  }
 
   text(
     number-width: "tabular",
@@ -168,6 +236,11 @@
 #let prefilled_number(value, thousands-sep: ".", zero: "0") = {
   prefilled_text(fmt-number(value, thousands-sep: thousands-sep, zero: zero))
 }
+
+/// Lock the height of all letterbox rows. Needed bc > 1 line suffixes (`content`)
+/// would vertically stretch the box. Note: in case of > 2 line suffixes, content
+/// will spill outside the designated area.
+#let letterbox_row_height = 2.70em
 
 #let empty_letterbox(letter, cells: 5, light: true, original_value: none, value: none, bold_top_border: false, wide_cells: false, content) = {
   let bg_grey = luma(213)
@@ -198,6 +271,7 @@
 
   grid(
     inset: 9pt,
+    rows: letterbox_row_height,
     columns: grid_columns,
     align: (center, right),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
@@ -217,7 +291,34 @@
       )
     }),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
-    grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
+    grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: center + horizon, fill: bg, text(fill: fill, weight: "bold", letter)),
+    grid.cell(align: horizon + left, content),
+  )
+}
+
+/// Like empty_letterbox, but replaces the digit entry area (and the original
+/// value area when `with_original: true`) with a single merged cell containing
+/// "Niet invullen".
+#let no_entry_letterbox(letter, cells: 5, with_original: false, content) = {
+  let stroke = 0.5pt + black
+  let no_entry_cell = grid.cell(align: center + horizon, stroke: stroke, [Niet invullen])
+
+  // Note: `wide_cells` is not needed for `no_entry_letterbox` atm.
+  let entry_width = cells * 2em
+  let columns = if with_original {
+    (entry_width, entry_width, 3.5em, 1fr)
+  } else {
+    (entry_width, 3.5em, 1fr)
+  }
+
+  grid(
+    inset: 9pt,
+    rows: letterbox_row_height,
+    columns: columns,
+    align: (center, right),
+    ..cell_if(with_original, no_entry_cell),
+    no_entry_cell,
+    grid.cell(stroke: stroke, align: center + horizon, fill: luma(213), text(weight: "bold", letter)),
     grid.cell(align: horizon + left, content),
   )
 }
@@ -241,6 +342,7 @@
 #let number_box(value: none, content) = {
   grid(
     inset: 9pt,
+    rows: letterbox_row_height,
     columns: (8em, 1fr),
     align: (center, right),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
@@ -333,7 +435,7 @@
 }
 
 #let format_fraction(fraction) = {
-  str(fraction.integer)
+  fmt-number-str(fraction.integer)
   if fraction.numerator > 0 {
     " " + super[#fraction.numerator] + "⁄" + sub[#fraction.denominator]
   }
@@ -356,15 +458,23 @@
     grid.hline(stroke: 2pt),
     v(space),
     text(size: title_size, weight: "semibold", title1),
-    text(size: title_size, weight: "semibold", title2),
+    if title2 != "" {text(size: title_size, weight: "semibold", title2)},
     v(space),
     text(size: subtitle_size, subtitle1),
+    v(space),
     text(size: subtitle_size, subtitle2),
     v(space),
     grid.hline(position: top)
   )
 
   v(space)
+}
+
+// Title layout for an attachment or corrigendum
+#let attachment_or_corrigendum_title(title) = {
+  block(width: 100%, text(size: 20pt, title))
+  v(1em)
+  line(length: 100%)
 }
 
 // Format the name of a candidate
@@ -380,7 +490,7 @@
   }
 
   name += election_candidate.last_name + ", " + election_candidate.initials + " "
-  
+
   if "first_name" in election_candidate and with_first_name {
     name += "(" + election_candidate.first_name + ") "
   }
@@ -539,7 +649,7 @@
   box[
     #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Lijst #title])
     #if explainer_text != none {
-      box(width: 500pt, explainer_text)
+      box(width: 500pt, text(size: 9pt)[#explainer_text])
     }
   ]
 
@@ -634,7 +744,7 @@
           place(top + left, scope: "parent", float: true, box[
             #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Vervolg lijst #title])
             #if explainer_text != none {
-              box(width: 500pt, explainer_text)
+              box(width: 500pt, text(size: 9pt)[#explainer_text])
             }
           ])
         }
@@ -696,7 +806,7 @@
         table.cell(align: right, [#column.list_seat_number]),
         table.cell([#candidate_name(column.candidate)]),
         table.cell([#candidate_location(column.candidate)]),
-        if showVotes { table.cell(align: right, [#column.votes])}
+        if showVotes { table.cell(align: right, fmt-number-str(column.votes))}
         else if showPosition { table.cell(align: right, [#column.candidate.number])},
       )
     }).flatten(),
@@ -709,21 +819,7 @@
   steps,
   list_seat_assignments,
 ) = {
-  let steps_copy = steps
-  let slices = ()
-  if steps_copy.len() > 6 {
-    let slice = ()
-    while steps_copy.len() > 0 {
-      slice.push(steps_copy.remove(0))
-      if slice.len() == 6 {
-        slices.push(slice)
-        slice = ()
-      }
-    }
-    slices.push(slice)
-  } else {
-    slices.push(steps_copy)
-  }
+  let slices = steps.chunks(6)
   for slice in slices {
     table(
       columns: (1fr,) + slice.len() * (6em,) + (6em,),

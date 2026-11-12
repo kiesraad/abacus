@@ -49,26 +49,36 @@ export function InputGridSubsectionComponent({
         title={subsection.headers[2]}
       />
       <InputGrid.Body>
-        {subsection.rows.map((row: InputGridSubsectionRow) => (
-          <InputGridRow
-            key={row.path}
-            field={row.code || ""}
-            id={`data.${row.path}`}
-            title={row.title}
-            previousValue={previousValues?.[row.path]}
-            value={inputValues[row.path] || ""}
-            onChange={(e) => {
-              handleChange(row.path, e.target.value);
-            }}
-            autoFocusInput={row.autoFocusInput}
-            addSeparator={row.addSeparator}
-            isTotal={row.isTotal}
-            isListTotal={row.isListTotal}
-            errorMessageId={row.isListTotal && missingTotalError ? "missing-total-error" : undefined}
-            readOnly={readOnly}
-            {...defaultProps}
-          />
-        ))}
+        {subsection.rows.map((row: InputGridSubsectionRow) => {
+          // If previous values are provided, get the previous value for this path
+          // Unless it is disabled, then set an empty string
+          let previousValue: string | undefined;
+          if (previousValues) {
+            previousValue = row.isDisabled ? "" : previousValues[row.path];
+          }
+
+          return (
+            <InputGridRow
+              key={row.path}
+              field={row.code || ""}
+              id={`data.${row.path}`}
+              title={row.title}
+              isDisabled={row.isDisabled}
+              previousValue={previousValue}
+              value={inputValues[row.path] || ""}
+              onChange={(e) => {
+                handleChange(row.path, e.target.value);
+              }}
+              autoFocusInput={row.autoFocusInput}
+              addSeparator={row.addSeparator}
+              isTotal={row.isTotal}
+              isListTotal={row.isListTotal}
+              errorMessageId={row.isListTotal && missingTotalError ? "missing-total-error" : undefined}
+              readOnly={readOnly}
+              {...defaultProps}
+            />
+          );
+        })}
       </InputGrid.Body>
     </InputGrid>
   );

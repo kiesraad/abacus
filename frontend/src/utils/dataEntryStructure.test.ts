@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import type { Candidate, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import { type Candidate, type ElectionWithPoliticalGroups, electionCategoryValues } from "@/types/generated/openapi";
 import { type DataEntryModel, dataEntryModelValues, type InputGridSubsection } from "@/types/types";
 
 import {
@@ -22,7 +22,7 @@ describe("votersAndVotesSection", () => {
     const inputGrid = votersAndVotesSection.subsections[0] as InputGridSubsection;
     expect(inputGrid.type).toBe("inputGrid");
 
-    expect(inputGrid.rows).toHaveLength(9);
+    expect(inputGrid.rows).toHaveLength(10);
     // Check that it has the basic voter and vote count rows
     expect(inputGrid.rows.some((row) => row.path === "voters_counts.poll_card_count")).toBe(true);
     expect(inputGrid.rows.some((row) => row.path === "votes_counts.total_votes_cast_count")).toBe(true);
@@ -51,17 +51,61 @@ describe("votersAndVotesSection", () => {
     expect(inputGrid.type).toBe("inputGrid");
 
     const codes = inputGrid.rows.map((row) => row.code);
-    expect(codes).toEqual(["A", "B", "D", "E.1", "E.2", "E", "F", "G", "H"]);
+    expect(codes).toEqual(["A", "B", "C", "D", "E.1", "E.2", "E", "F", "G", "H"]);
   });
 });
 
 describe("differencesSection", () => {
   test("should have correct structure", () => {
     expect(createDifferencesSection(model).id).toBe("differences_counts");
-    expect(createDifferencesSection(model).subsections).toHaveLength(3);
-    expect(createDifferencesSection(model).subsections[0]?.type).toBe("checkboxes");
-    expect(createDifferencesSection(model).subsections[1]?.type).toBe("inputGrid");
-    expect(createDifferencesSection(model).subsections[2]?.type).toBe("checkboxes");
+    expect(createDifferencesSection(model).subsections).toHaveLength(4);
+    expect(createDifferencesSection(model).subsections[0]?.type).toBe("message");
+    expect(createDifferencesSection(model).subsections[1]?.type).toBe("checkboxes");
+    expect(createDifferencesSection(model).subsections[2]?.type).toBe("inputGrid");
+    expect(createDifferencesSection(model).subsections[3]?.type).toBe("checkboxes");
+  });
+
+  test.each([
+    "DSONextSession",
+    "CSONextSession",
+  ] as const)("should start with a notice about the checkboxes for %s", (nextSessionModel) => {
+    const subsections = createDifferencesSection(nextSessionModel).subsections;
+    expect(subsections.map((subsection) => subsection.type)).toEqual([
+      "message",
+      "checkboxes",
+      "inputGrid",
+      "checkboxes",
+    ]);
+    expect(subsections[0]).toEqual({
+      type: "message",
+      variant: "notify",
+      title: "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+      message: "Zijn er ook getallen gecorrigeerd? Neem die over in de kolom ‘gecorrigeerd’",
+    });
+  });
+
+  test.each([
+    "DSOFirstSession",
+    "CSOFirstSession",
+  ] as const)("should start with a plain message about the checkboxes for %s", (firstSessionModel) => {
+    const subsections = createDifferencesSection(firstSessionModel).subsections;
+    expect(subsections.map((subsection) => subsection.type)).toEqual([
+      "message",
+      "checkboxes",
+      "inputGrid",
+      "checkboxes",
+    ]);
+    expect(subsections[0]).toEqual({
+      type: "message",
+      message: "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+    });
+  });
+
+  test("should not have a notice about the checkboxes for GSB", () => {
+    const subsections = createDifferencesSection("GSB").subsections;
+    expect(subsections.some((subsection) => subsection.type === "message" && subsection.variant === "notify")).toBe(
+      false,
+    );
   });
 
   test("should have correct section number", () => {
@@ -70,7 +114,7 @@ describe("differencesSection", () => {
   });
 
   test("should have all differences count fields", () => {
-    const inputGrid = createDifferencesSection(model).subsections[1] as InputGridSubsection;
+    const inputGrid = createDifferencesSection(model).subsections[2] as InputGridSubsection;
     expect(inputGrid.type).toBe("inputGrid");
 
     expect(inputGrid.rows.map((row) => row.path)).toEqual([
@@ -80,13 +124,13 @@ describe("differencesSection", () => {
   });
 
   test("should have correct row codes", () => {
-    const differencesSectionInputGrid = createDifferencesSection(model).subsections[1] as InputGridSubsection;
+    const differencesSectionInputGrid = createDifferencesSection(model).subsections[2] as InputGridSubsection;
     expect(differencesSectionInputGrid.type).toBe("inputGrid");
     expect(differencesSectionInputGrid.rows.map((row) => row.code)).toEqual(["I", "J"]);
   });
 
   test("should not have autoFocusInput on first row because it is not the first section", () => {
-    const differencesSectionInputGrid = createDifferencesSection(model).subsections[1] as InputGridSubsection;
+    const differencesSectionInputGrid = createDifferencesSection(model).subsections[2] as InputGridSubsection;
     expect(differencesSectionInputGrid.type).toBe("inputGrid");
     expect(differencesSectionInputGrid.rows[0]!.autoFocusInput).not.toBe(true);
   });
@@ -240,10 +284,13 @@ describe("getDataEntryStructure", () => {
     expect(structure.map((section) => section.id)).toStrictEqual(expectedSectionIds);
   });
 
-  // Snapshot test every model to catch any unintended changes in the structure
-  test.each(dataEntryModelValues)("%s structure snapshot", async (model) => {
-    await expect(getDataEntryStructure(model, electionMockData)).toMatchFileSnapshot(
-      `./__snapshots__/dataEntryStructure.${model}.snap`,
+  // Snapshot test every model and election category to catch any unintended changes in the structure
+  const testCombinations = dataEntryModelValues.flatMap((model) =>
+    electionCategoryValues.map((category) => [model, category] as const),
+  );
+  test.each(testCombinations)("%s %s structure snapshot", async (model, category) => {
+    await expect(getDataEntryStructure(model, { ...electionMockData, category })).toMatchFileSnapshot(
+      `./__snapshots__/dataEntryStructure.${model}.${category}.snap`,
     );
   });
 });

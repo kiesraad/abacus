@@ -31,6 +31,14 @@ export function formatDateFull(date: Date) {
   }).format(date);
 }
 
+export function formatDateFullWithoutWeekday(date: Date) {
+  return new Intl.DateTimeFormat(t("date_locale"), {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 export function formatDateTimeFull(date: Date) {
   return date.toLocaleTimeString(t("date_locale"), {
     hour: "numeric",
@@ -79,6 +87,13 @@ export function formatDateTime(date: Date, relative = true) {
   // More than 6 days ago (or in the future)
   const dateString = date.toLocaleDateString(t("date_locale"), { day: "numeric", month: "short" });
   return `${dateString} om ${timeString}`;
+}
+
+export function formatTime(date: Date) {
+  return date.toLocaleTimeString(t("date_locale"), {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export function formatTimeToGo(seconds: number) {

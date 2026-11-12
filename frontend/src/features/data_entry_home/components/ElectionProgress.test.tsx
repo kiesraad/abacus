@@ -29,4 +29,31 @@ describe("ElectionProgress", () => {
     expect(definitiveBar).toHaveTextContent("1e en 2e invoer klaar");
     expect(definitiveBar).toHaveTextContent("25%");
   });
+
+  test("rounds down the percentages in the progress bar", () => {
+    vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({
+      ...getElectionStatusMockData([
+        { status: "definitive" },
+        { status: "definitive" },
+        { status: "definitive" },
+        { status: "first_entry_finalised" },
+        { status: "first_entry_finalised" },
+        { status: "first_entry_finalised" },
+        { status: "first_entry_in_progress" },
+      ]),
+      refetch: vi.fn(),
+    });
+
+    render(<ElectionProgress />);
+
+    const firstEntryFinishedBar = screen.getByTestId("progressbar-first-entry-finished");
+    expect(firstEntryFinishedBar).toBeInTheDocument();
+    expect(firstEntryFinishedBar).toHaveTextContent("1e invoer klaar");
+    expect(firstEntryFinishedBar).toHaveTextContent("85%");
+
+    const definitiveBar = screen.getByTestId("progressbar-first-and-second-entry-finished");
+    expect(definitiveBar).toBeInTheDocument();
+    expect(definitiveBar).toHaveTextContent("1e en 2e invoer klaar");
+    expect(definitiveBar).toHaveTextContent("42%");
+  });
 });

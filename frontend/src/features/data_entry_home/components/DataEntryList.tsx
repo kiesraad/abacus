@@ -4,6 +4,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import type { ElectionId } from "@/types/generated/openapi";
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { type DataEntryStatusWithUserStatus, getUrlForDataEntry } from "../utils/util";
 
 export interface DataEntryListProps {
@@ -40,7 +41,7 @@ export function DataEntryList({ electionId, dataEntries }: DataEntryListProps) {
                   key={source.number}
                   to={getUrlForDataEntry(electionId, dataEntry.statusEntry)}
                 >
-                  <Table.NumberCell>{source.number}</Table.NumberCell>
+                  <Table.NumberCell>{getDataEntrySourceNumber(source)}</Table.NumberCell>
                   <Table.Cell>
                     <span>{source.name}</span>
                     <Badge type={dataEntry.statusEntry.status} userRole={user.role} showIcon />

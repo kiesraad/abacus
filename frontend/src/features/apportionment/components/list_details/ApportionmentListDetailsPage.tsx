@@ -10,22 +10,38 @@ import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { formatList } from "@/utils/strings";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import {
+  apportionmentCheckStateAndRedirect,
+  getListCandidatesDrawn,
+  type ListCandidateDrawn,
+  renderTitleAndHeader,
+} from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
 import { CandidatesWithSeatTable } from "./CandidatesWithSeatTable";
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
 
+function getListAssignedSeatsText(listTotalSeats: number, listName: string) {
+  return tx(
+    `apportionment.list_assigned_nr_seats.${listTotalSeats === 1 ? "singular" : "plural"}`,
+    {},
+    {
+      list_name: listName,
+      num_seats: listTotalSeats,
+    },
+  );
+}
+
 function renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers: number[]) {
   return (
     <Alert type="notify" small>
       <p>
         {listDeceasedCandidateNumbers.length === 1
-          ? tx("apportionment.list_details_alert.deceased_candidate", undefined, {
+          ? t("apportionment.list_details_alert.deceased_candidate", {
               nr: formatList(listDeceasedCandidateNumbers, t("and")),
             })
-          : tx("apportionment.list_details_alert.deceased_candidates", undefined, {
+          : t("apportionment.list_details_alert.deceased_candidates", {
               nrs: formatList(listDeceasedCandidateNumbers, t("and")),
             })}
         <br />
@@ -35,16 +51,57 @@ function renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers: number[]) {
   );
 }
 
+function renderNotifyDrawingLotsAlert(listCandidatesDrawn: ListCandidateDrawn[]) {
+  return (
+    <div className={cn(cls.smallAlert, "mb-md-lg")}>
+      <Alert type="notify" small>
+        {listCandidatesDrawn.length === 1 ? (
+          <p>
+            {listCandidatesDrawn.map(({ seat_number, candidate, options }) => (
+              <span key={`drawing-lots-assignment-${seat_number}`}>
+                {tx("apportionment.assigned_by_drawing_lots_to_candidate_alert.singular", undefined, {
+                  seat_number: seat_number,
+                  candidate: candidate,
+                  options: formatList(options, t("and")),
+                })}
+              </span>
+            ))}
+          </p>
+        ) : (
+          listCandidatesDrawn.length > 1 && (
+            <>
+              <p>{t("apportionment.assigned_by_drawing_lots_to_candidate_alert.plural.title")}</p>
+              <ul>
+                {listCandidatesDrawn.map(({ seat_number, candidate, options }) => (
+                  <li key={`drawing-lots-assignment-${seat_number}`}>
+                    {tx("apportionment.assigned_by_drawing_lots_to_candidate_alert.plural.assigned_to", undefined, {
+                      seat_number: seat_number,
+                      candidate: candidate,
+                      options: formatList(options, t("and")),
+                    })}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )
+        )}
+      </Alert>
+    </div>
+  );
+}
+
 interface PreferentiallyChosenCandidatesSectionProps {
   preferentialCandidateNomination: CandidateVotes[];
   preferenceThresholdPercentage: number;
   candidates: Candidate[];
+  listCandidatesDrawn: ListCandidateDrawn[] | undefined;
 }
 
 function PreferentiallyChosenCandidatesSection({
   preferentialCandidateNomination,
   preferenceThresholdPercentage,
   candidates,
+  listCandidatesDrawn,
 }: PreferentiallyChosenCandidatesSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
@@ -57,6 +114,9 @@ function PreferentiallyChosenCandidatesSection({
                 percentage: preferenceThresholdPercentage,
               })}
             </span>
+            {listCandidatesDrawn !== undefined &&
+              listCandidatesDrawn.length > 0 &&
+              renderNotifyDrawingLotsAlert(listCandidatesDrawn)}
             <CandidatesWithSeatTable
               id="preferentially-chosen-candidates-table"
               showPosition={false}
@@ -184,6 +244,9 @@ export function ApportionmentListDetailsPage() {
 
   useEffect(() => {
     apportionmentCheckStateAndRedirect(state, election.id, navigate);
+    if (state?.type === "DrawingLots") {
+      void navigate(`/elections/${election.id}/apportionment`);
+    }
   });
 
   const list = election.political_groups.find((group) => group.number === listNumber);
@@ -204,7 +267,7 @@ export function ApportionmentListDetailsPage() {
     return <ApportionmentErrorPage sectionTitle={listName} error={error} />;
   }
   if (seatAssignment && candidateNomination && electionSummary) {
-    const listTotalSeats = seatAssignment.final_standing.find(
+    const listTotalSeats = seatAssignment.standings.find(
       (standing) => standing.list_number === list.number,
     )?.total_seats;
     const candidateVotesList = electionSummary.political_group_votes.find(
@@ -214,7 +277,8 @@ export function ApportionmentListDetailsPage() {
       (lcn) => lcn.list_number === list.number,
     );
 
-    if (listTotalSeats !== undefined && candidateVotesList && listCandidateNomination) {
+    if (listTotalSeats !== undefined && candidateVotesList && listCandidateNomination && state) {
+      const listCandidatesDrawn = getListCandidatesDrawn(state, list);
       const unelectedCandidatesRanking = getUnelectedCandidatesRanking(listCandidateNomination, listTotalSeats, list);
       return (
         <>
@@ -225,19 +289,10 @@ export function ApportionmentListDetailsPage() {
                 <div>
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.assigned_number_of_seats")}</h2>
-                    <span id="text-list-assigned-nr-seats">
-                      {tx(
-                        `apportionment.list_assigned_nr_seats.${listTotalSeats === 1 ? "singular" : "plural"}`,
-                        {},
-                        {
-                          list_name: listName,
-                          num_seats: listTotalSeats,
-                        },
-                      )}
-                    </span>
+                    <span id="text-list-assigned-nr-seats">{getListAssignedSeatsText(listTotalSeats, listName)}</span>
                   </div>
                   {listDeceasedCandidateNumbers.length > 0 && (
-                    <div className={cn("mt-md-lg", cls.deceasedCandidatesAlert)}>
+                    <div className={cn("mt-md-lg", cls.smallAlert)}>
                       {renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers.sort((a, b) => a - b))}
                     </div>
                   )}
@@ -247,6 +302,7 @@ export function ApportionmentListDetailsPage() {
                 preferentialCandidateNomination={listCandidateNomination.preferential_candidate_nomination}
                 preferenceThresholdPercentage={candidateNomination.preference_threshold.percentage}
                 candidates={list.candidates}
+                listCandidatesDrawn={listCandidatesDrawn}
               />
               <OtherChosenCandidatesSection
                 otherCandidateNomination={listCandidateNomination.other_candidate_nomination}

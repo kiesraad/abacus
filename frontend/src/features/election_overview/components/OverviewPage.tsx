@@ -10,33 +10,16 @@ import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
-import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { useLiveData } from "@/hooks/useLiveData";
 import { useUserRole } from "@/hooks/user/useUserRole";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import type { ELECTION_LIST_REQUEST_PATH, Election, ElectionListResponse } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-
+import { AddFirstElection } from "./AddFirstElection";
 import cls from "./OverviewPage.module.css";
-
-function AddFirstElection() {
-  const { isAdministrator } = useUserRole();
-
-  return (
-    <FormLayout>
-      <FormLayout.Section>
-        <h2 className="mb-0">{t("election.no_elections_added")}</h2>
-        <div>{tx("election.add_first_election")}</div>
-      </FormLayout.Section>
-      <FormLayout.Controls>
-        {isAdministrator && <Button.Link to={"./create"}>{t("election.create")}</Button.Link>}
-      </FormLayout.Controls>
-    </FormLayout>
-  );
-}
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function OverviewPage() {
@@ -67,16 +50,27 @@ export function OverviewPage() {
     election: Election;
   }
 
+  function committeeTypeLabel(election: Election): string {
+    const label = `${t(`committee_category.${election.committee_category}.abbreviation`)} - ${election.authority_region}`;
+
+    switch (election.committee_category) {
+      case "GSB":
+        return `${label} (${election.authority_id})`;
+      case "CSB":
+        if (!election.domain) return label;
+        return `${label} (${election.domain.id})`;
+      default:
+        // Exhaustive check
+        return election.committee_category satisfies never;
+    }
+  }
+
   function ElectionRow({ election }: ElectionRowProps): ReactNode {
     function ElectionRowContent() {
       return (
         <>
           <Table.Cell>{election.name}</Table.Cell>
-          <Table.Cell>
-            {isTypist
-              ? election.location
-              : `${t(`committee_category.${election.committee_category}.abbreviation`)} - ${election.location} (${election.domain_id})`}
-          </Table.Cell>
+          <Table.Cell>{isTypist ? election.authority_region : committeeTypeLabel(election)}</Table.Cell>
           <Table.Cell>
             {isTypist ? (
               committeeSessionStatus

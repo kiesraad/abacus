@@ -1,4 +1,4 @@
-import type { Locator, Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 export class LoginPgObj {
   readonly heading: Locator;
@@ -18,6 +18,13 @@ export class LoginPgObj {
   async login(username: string, password: string) {
     await this.username.fill(username);
     await this.password.fill(password);
-    await this.loginBtn.click();
+    // Parallel tests log in from the same IP; retry until another test's successful login releases the rate limit
+    await expect(async () => {
+      const responsePromise = this.page.waitForResponse(
+        (response) => new URL(response.url()).pathname === "/api/login" && response.request().method() === "POST",
+      );
+      await this.loginBtn.click();
+      expect((await responsePromise).status()).not.toBe(429);
+    }).toPass({ intervals: [250], timeout: 60_000 });
   }
 }

@@ -42,7 +42,8 @@ pub(crate) async fn inject_user(
         return request;
     };
 
-    let Ok(Some(session)) = session_repo::get_by_identifier(&mut conn, &session_id).await else {
+    let Ok(Some(session)) = session_repo::get_by_identifier_if_valid(&mut conn, &session_id).await
+    else {
         return request;
     };
 
@@ -65,7 +66,7 @@ pub(crate) async fn inject_user(
 }
 
 /// Middleware to extend the session lifetime
-#[allow(clippy::cognitive_complexity)]
+#[expect(clippy::cognitive_complexity)]
 pub(crate) async fn extend_session(
     State(pool): State<SqlitePool>,
     OriginalUri(uri): OriginalUri,
@@ -266,6 +267,11 @@ mod test {
             session.expires_at().to_rfc3339().as_str(),
             "extend_session should return the current expiration time"
         );
+
+        // remove the previous session before creating a new one for the same user
+        session_repo::delete(&mut conn, session.session_key())
+            .await
+            .unwrap();
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
         let session = Session::create(

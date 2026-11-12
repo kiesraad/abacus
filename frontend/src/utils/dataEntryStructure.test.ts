@@ -64,6 +64,36 @@ describe("differencesSection", () => {
     expect(createDifferencesSection(model).subsections[2]?.type).toBe("checkboxes");
   });
 
+  test.each([
+    "DSONextSession",
+    "CSONextSession",
+  ] as const)("should start with a notice about the checkboxes for %s", (nextSessionModel) => {
+    const subsections = createDifferencesSection(nextSessionModel).subsections;
+    expect(subsections.map((subsection) => subsection.type)).toEqual([
+      "message",
+      "checkboxes",
+      "inputGrid",
+      "checkboxes",
+    ]);
+    expect(subsections[0]).toEqual({
+      type: "message",
+      variant: "notify",
+      title: "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+      message: "Zijn er ook getallen gecorrigeerd? Neem die over in de kolom ‘gecorrigeerd’",
+    });
+  });
+
+  test.each([
+    "DSOFirstSession",
+    "CSOFirstSession",
+    "GSB",
+  ] as const)("should not have a notice about the checkboxes for %s", (otherModel) => {
+    const subsections = createDifferencesSection(otherModel).subsections;
+    expect(subsections.some((subsection) => subsection.type === "message" && subsection.variant === "notify")).toBe(
+      false,
+    );
+  });
+
   test("should have correct section number", () => {
     expect(createDifferencesSection("CSOFirstSession").sectionNumber).toBe("B1-3.3");
     expect(createDifferencesSection("CSONextSession").sectionNumber).toBe("B1-2.3");

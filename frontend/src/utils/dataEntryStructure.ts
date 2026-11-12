@@ -12,6 +12,7 @@ import type {
   DataEntryStructure,
   InputGridSubsection,
   InputGridSubsectionRow,
+  MessageSubsection,
 } from "@/types/types";
 import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
@@ -176,6 +177,24 @@ const createDifferenceAccountedForCheckboxes = (model: ModelForGSB): CheckboxesS
   };
 };
 
+const createCorrigendumNotice = (model: ModelForGSB): MessageSubsection[] => {
+  switch (model) {
+    case "DSOFirstSession":
+    case "CSOFirstSession":
+      return [];
+    case "DSONextSession":
+    case "CSONextSession":
+      return [
+        {
+          type: "message",
+          variant: "notify",
+          title: t("differences_counts.corrigendum_notice.title"),
+          message: t("differences_counts.corrigendum_notice.content"),
+        },
+      ];
+  }
+};
+
 export const createDifferencesSection = (model: DataEntryModel): DataEntrySection => {
   const differencesInputGrid: InputGridSubsection = {
     type: "inputGrid",
@@ -216,6 +235,7 @@ export const createDifferencesSection = (model: DataEntryModel): DataEntrySectio
     short_title: t("differences_counts.short_title"),
     sectionNumber: t(`differences_counts.section_number.${model}`),
     subsections: [
+      ...createCorrigendumNotice(model),
       createCompareVotesCastCheckboxes(model),
       differencesInputGrid,
       createDifferenceAccountedForCheckboxes(model),

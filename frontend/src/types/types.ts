@@ -15,7 +15,10 @@ export interface HeadingSubsection {
 
 export interface MessageSubsection {
   type: "message";
-  variant?: "dimmed";
+  /** "notify" renders the message as an informational alert */
+  variant?: "dimmed" | "notify";
+  /** Title of the alert, only shown for the "notify" variant */
+  title?: string;
   message: string;
 }
 

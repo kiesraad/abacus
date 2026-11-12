@@ -123,8 +123,7 @@ export function PollingStationUpdatePage() {
 
         {error && (
           <Alert type="error" onClose={closeError}>
-            <strong className="heading-md">{error[0]}</strong>
-            <p>{error[1]}</p>
+            <strong className="heading-md">{error}</strong>
           </Alert>
         )}
 

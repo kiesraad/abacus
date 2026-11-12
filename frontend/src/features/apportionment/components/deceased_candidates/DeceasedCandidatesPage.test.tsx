@@ -145,13 +145,13 @@ describe("DeceasedCandidatesPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Overleden kandidaat", "Lijst", "Positie op lijst", ""],
-      ["Oud, L. (Lidewij) †", "Lijst 1 – Political Group A", "1", "Verwijderen"],
+      ["Oud, L. (Lidewij) †", "Lijst 1 – Political Group A", "1", "Ongedaan maken"],
     ]);
 
     // Check if the delete link works
     const rows = within(table).getAllByRole("row");
     if (rows[1]) {
-      const deleteLink = await within(rows[1]).findByRole("button", { name: "Verwijderen" });
+      const deleteLink = await within(rows[1]).findByRole("button", { name: "Ongedaan maken" });
       await user.click(deleteLink);
       expect(deleteDeceasedCandidate).toHaveBeenCalledWith({ pg_number: 1, candidate_number: 1 });
     }
@@ -192,7 +192,7 @@ describe("DeceasedCandidatesPage", () => {
       ["Oud, L. (Lidewij) †", "Lijst 1 – Political Group A", "1"],
     ]);
 
-    expect(screen.queryByRole("button", { name: "+ Kandidaat toevoegen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "+ Nog een overleden kandidaat toevoegen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Naar zetelverdeling" })).not.toBeInTheDocument();
 
     expect(
@@ -235,7 +235,7 @@ describe("DeceasedCandidatesPage", () => {
     ).toBeVisible();
 
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "+ Kandidaat toevoegen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "+ Nog een overleden kandidaat toevoegen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Naar zetelverdeling" })).not.toBeInTheDocument();
 
     expect(
@@ -276,7 +276,7 @@ describe("DeceasedCandidatesPage", () => {
       ["Oud, L. (Lidewij) †", "Lijst 1 – Political Group A", "1"],
     ]);
 
-    expect(screen.queryByRole("button", { name: "+ Kandidaat toevoegen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "+ Nog een overleden kandidaat toevoegen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Naar zetelverdeling" })).not.toBeInTheDocument();
 
     expect(
@@ -311,7 +311,7 @@ describe("DeceasedCandidatesPage", () => {
     ).toBeVisible();
 
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "+ Kandidaat toevoegen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "+ Nog een overleden kandidaat toevoegen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Naar zetelverdeling" })).not.toBeInTheDocument();
 
     expect(
@@ -334,7 +334,7 @@ describe("DeceasedCandidatesPage", () => {
 
     expect(await screen.findByRole("table")).toBeVisible();
 
-    const addDeceasedCandidate = await screen.findByRole("link", { name: "+ Kandidaat toevoegen" });
+    const addDeceasedCandidate = await screen.findByRole("link", { name: "+ Nog een overleden kandidaat toevoegen" });
     expect(addDeceasedCandidate).toBeVisible();
     await user.click(addDeceasedCandidate);
     expect(router.state.location.pathname).toEqual("/elections/3/apportionment/deceased-candidates/add");

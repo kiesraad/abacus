@@ -71,7 +71,7 @@ export function ReadOnlyDataEntryDelete({
 
   return (
     <div>
-      <Button variant="secondary" onClick={toggleModal}>
+      <Button variant="secondary" size="sm" onClick={toggleModal}>
         {t("data_entry_detail.delete")}
       </Button>
 

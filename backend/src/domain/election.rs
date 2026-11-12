@@ -366,7 +366,11 @@ impl ElectionCategory {
     /// i.e. the municipality, province or water authority. Country wide elections
     /// do not have an election domain.
     pub fn has_election_domain(&self) -> bool {
-        true
+        match self {
+            ElectionCategory::Municipal
+            | ElectionCategory::Provincial
+            | ElectionCategory::WaterAuthority => true,
+        }
     }
 
     /// Get the sub category for test elections, only available for tests and test data generation
@@ -715,10 +719,12 @@ pub mod tests {
             authority_region: "Test".to_string(),
             district: CommitteeDistrict::None,
             domain: Some(ElectionDomain {
-                id: if election_category != ElectionCategory::Provincial {
-                    Some("0000".to_string()) // provincial elections do not have a domain id
-                } else {
-                    None
+                id: match election_category {
+                    ElectionCategory::Municipal | ElectionCategory::WaterAuthority => {
+                        Some("0000".to_string())
+                    }
+                    // provincial elections do not have a domain id
+                    ElectionCategory::Provincial => None,
                 },
                 name: "Test".to_string(),
             }),

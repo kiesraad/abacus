@@ -199,7 +199,11 @@ fn random_committee_district(
             roman_numerals: rng.random_bool(0.5),
             frisian_export_allowed: rng.random_bool(0.5),
         }),
-        _ => CommitteeDistrict::None,
+        ElectionSubCategory::AB1
+        | ElectionSubCategory::AB2
+        | ElectionSubCategory::GR1
+        | ElectionSubCategory::GR2
+        | ElectionSubCategory::PS1 => CommitteeDistrict::None,
     }
 }
 

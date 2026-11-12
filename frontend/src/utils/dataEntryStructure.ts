@@ -177,21 +177,22 @@ const createDifferenceAccountedForCheckboxes = (model: ModelForGSB): CheckboxesS
   };
 };
 
-const createCorrigendumNotice = (model: ModelForGSB): MessageSubsection[] => {
+const createDifferencesDescription = (model: ModelForGSB): MessageSubsection => {
   switch (model) {
     case "DSOFirstSession":
     case "CSOFirstSession":
-      return [];
+      return {
+        type: "message",
+        message: t("differences_counts.form_description"),
+      };
     case "DSONextSession":
     case "CSONextSession":
-      return [
-        {
-          type: "message",
-          variant: "notify",
-          title: t("differences_counts.corrigendum_notice.title"),
-          message: t("differences_counts.corrigendum_notice.content"),
-        },
-      ];
+      return {
+        type: "message",
+        variant: "notify",
+        title: t("differences_counts.corrigendum_notice.title"),
+        message: t("differences_counts.corrigendum_notice.content"),
+      };
   }
 };
 
@@ -235,7 +236,7 @@ export const createDifferencesSection = (model: DataEntryModel): DataEntrySectio
     short_title: t("differences_counts.short_title"),
     sectionNumber: t(`differences_counts.section_number.${model}`),
     subsections: [
-      ...createCorrigendumNotice(model),
+      createDifferencesDescription(model),
       createCompareVotesCastCheckboxes(model),
       differencesInputGrid,
       createDifferenceAccountedForCheckboxes(model),

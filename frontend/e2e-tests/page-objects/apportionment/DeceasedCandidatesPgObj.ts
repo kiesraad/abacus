@@ -12,7 +12,7 @@ export class DeceasedCandidates {
 
     this.deceasedCandidates = page.getByTestId("deceased-candidates").locator("tbody").getByRole("row");
 
-    this.addCandidate = page.getByRole("link", { name: "+ Kandidaat toevoegen" });
+    this.addCandidate = page.getByRole("link", { name: "+ Nog een overleden kandidaat toevoegen" });
 
     this.toApportionment = page.getByRole("button", { name: "Naar zetelverdeling" });
 
@@ -25,6 +25,6 @@ export class DeceasedCandidates {
 
   async clickDeleteCandidate(listNumber: number, candidateNumber: number) {
     const row = this.page.getByTestId(`list-${listNumber}-candidate-${candidateNumber}`);
-    await row.getByRole("button", { name: "Verwijderen" }).click();
+    await row.getByRole("button", { name: "Ongedaan maken" }).click();
   }
 }

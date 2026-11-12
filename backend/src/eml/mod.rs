@@ -564,9 +564,10 @@ impl ElectionWithPoliticalGroups {
 
     /// Get the preference threshold for this election, which is used in the EML definition.
     pub fn get_eml_preference_threshold(&self) -> u64 {
-        match self.get_eml_sub_category() {
-            eml_nl::utils::ElectionSubcategory::GR1 => 50,
-            _ => 25,
+        use crate::domain::election::ElectionSubCategory as Domain;
+        match self.sub_category {
+            Domain::GR1 => 50,
+            Domain::GR2 | Domain::PS1 | Domain::PS2 | Domain::AB1 | Domain::AB2 => 25,
         }
     }
 

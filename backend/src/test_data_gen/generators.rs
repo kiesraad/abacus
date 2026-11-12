@@ -409,17 +409,20 @@ fn generate_election(
     let election_id = format!("{category}{year}_{cleaned_up_locality}");
     let mut official_name = format_election_name(rng, args.election_category, &domain.name, year);
     let mut seats_range = args.seats.clone();
-    if args.election_category == ElectionCategory::WaterAuthority {
-        let mut chars = official_name.chars();
-        let lowercased_name = match chars.next() {
-            Some(first) => first.to_lowercase().chain(chars).collect(),
-            None => String::new(),
-        };
-        official_name = format!("Algemeen bestuur van het {}", lowercased_name);
-        // Water Authority number of seats should be >= 19 and <= 30
-        let start = seats_range.0.start.clamp(19, 30);
-        let end = seats_range.0.end.clamp(start + 1, 31);
-        seats_range = RandomRange(start..end);
+    match args.election_category {
+        ElectionCategory::Municipal | ElectionCategory::Provincial => {}
+        ElectionCategory::WaterAuthority => {
+            let mut chars = official_name.chars();
+            let lowercased_name = match chars.next() {
+                Some(first) => first.to_lowercase().chain(chars).collect(),
+                None => String::new(),
+            };
+            official_name = format!("Algemeen bestuur van het {}", lowercased_name);
+            // Water Authority number of seats should be >= 19 and <= 30
+            let start = seats_range.0.start.clamp(19, 30);
+            let end = seats_range.0.end.clamp(start + 1, 31);
+            seats_range = RandomRange(start..end);
+        }
     }
 
     info!("Election has name '{name}'");
@@ -436,7 +439,10 @@ fn generate_election(
         }
     };
 
-    let is_municipal = args.election_category == ElectionCategory::Municipal;
+    let is_municipal = match args.election_category {
+        ElectionCategory::Municipal => true,
+        ElectionCategory::Provincial | ElectionCategory::WaterAuthority => false,
+    };
 
     // only used when we generate for a GSB committee
     let gsb_committee_locality = super::data::locality(rng);

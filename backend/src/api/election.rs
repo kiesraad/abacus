@@ -679,9 +679,12 @@ async fn import_csb_election(
         false,
         Some(&edu.candidate_data),
     )?;
-    // PS CSB support will be implemented later
-    if new_election.category == ElectionCategory::Provincial {
-        return Err(EMLImportError::CommitteeCategoryForElectionCategoryNotSupported.into());
+    match new_election.category {
+        ElectionCategory::Municipal | ElectionCategory::WaterAuthority => {}
+        // PS CSB support will be implemented later
+        ElectionCategory::Provincial => {
+            return Err(EMLImportError::CommitteeCategoryForElectionCategoryNotSupported.into());
+        }
     }
     new_election.committee_category = CommitteeCategory::CSB;
 

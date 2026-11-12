@@ -16,7 +16,7 @@
   "date": "Datum",
   "date_and_time_of_session_start": "Datum en tijdstip aanvang van {sessionLabel}",
   "date_error": "Vul de datum in als: dd-mm-jjjj",
-  "date_hint": "dd-mm-jjjj, bijvoorbeeld 18-03-2026",
+  "date_hint": "dd-mm-jjjj, bijvoorbeeld 18-03-{currentYear}",
   "delete_session": "Zitting verwijderen",
   "delete_session_are_you_sure": "Weet je zeker dat je {sessionLabel} wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
   "delete_investigations_first": "Verwijder eerst onderzoeken",

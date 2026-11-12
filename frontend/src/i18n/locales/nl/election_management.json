@@ -91,9 +91,9 @@
     "if_gsb_correction": "Wil het gemeentelijk stembureau zelf een fout herstellen en is de zitting nog niet afgesloten door de voorzitter? Ga dan verder in de eerste zitting."
   },
   "missing_committee_session_details_modal": {
-    "content": "Voordat je een nieuwe zitting kunt toevoegen, moeten de details van de huidige zitting ingevuld zijn.",
+    "content": "Voordat je een nieuwe zitting kunt openen moeten de details van de vorige zitting nog worden ingevuld.",
     "enter_details_button": "Details invullen",
-    "title": "Vul eerst de details van de zitting in"
+    "title": "Rond eerst vorige zitting af"
   },
   "missing_committee_session_details_corrigendum_modal": {
     "ask_coordinator": "Vraag de coördinator om de details van de zitting in te vullen.",

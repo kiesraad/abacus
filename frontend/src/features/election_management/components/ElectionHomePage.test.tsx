@@ -193,7 +193,7 @@ describe("ElectionHomePage", () => {
 
         const modal = await screen.findByRole("dialog");
         expect(modal).toBeVisible();
-        expect(within(modal).getByText("Vul eerst de details van de zitting in")).toBeVisible();
+        expect(within(modal).getByText("Rond eerst vorige zitting af")).toBeVisible();
 
         const detailButton = within(modal).getByRole("button", { name: "Details invullen" });
         expect(detailButton).toBeVisible();

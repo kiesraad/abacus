@@ -22,6 +22,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:e2e": "cross-env LOCAL_CI=true RUST_LOG=tower_http-warning playwright test",
+    "test:e2e-tls": "cross-env LOCAL_CI=true E2E_TLS=true RUST_LOG=tower_http-warning playwright test",
     "test:e2e-dev": "cross-env RUST_LOG=tower_http-warning playwright test",
     "test:e2e-debug": "cross-env DEBUG_DEVELOPMENT=true playwright test --ui",
     "test:e2e-ui": "cross-env LOCAL_CI=true playwright test --ui",

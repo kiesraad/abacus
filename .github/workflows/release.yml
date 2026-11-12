@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
       - name: Compare versions
         env:
           TAG: ${{ github.ref_name }}
@@ -73,7 +73,7 @@ jobs:
         run: mkdir -p release
       # The Linux tarball, the Windows binary and the unsigned Windows installer
       - name: Download abacus
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v8.0.2
         with:
           pattern: abacus-release-*
           path: release/
@@ -87,7 +87,7 @@ jobs:
         run: sha256sum -b -- * > SHA256SUMS
         working-directory: release
       - name: Release
-        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v2
+        uses: softprops/action-gh-release@v3.0.4
         with:
           body: This is a release of Abacus ${{ github.ref_name }}, commit ${{ github.sha }} on ${{ env.BUILD_DATE }}
           tag_name: ${{ github.ref_name }}
@@ -113,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download abacus
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v8.0.2
         with:
           name: abacus-ubuntu-latest-no-airgap-detection
       - name: Upload binary to test server

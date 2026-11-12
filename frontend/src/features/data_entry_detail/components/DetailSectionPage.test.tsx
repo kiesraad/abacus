@@ -45,6 +45,6 @@ describe("DetailSectionPage", () => {
     ).toBeVisible();
 
     // Verify some expected content is present
-    expect(screen.getByText("A en B tellen niet op tot D")).toBeInTheDocument();
+    expect(screen.getByText("A, B en C tellen niet op tot D")).toBeInTheDocument();
   });
 });

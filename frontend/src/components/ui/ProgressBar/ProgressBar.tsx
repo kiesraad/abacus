@@ -23,6 +23,7 @@ export interface ProgressBarProps {
   showPercentage?: boolean;
 }
 export function ProgressBar({ id, data, title, spacing, showPercentage = false }: ProgressBarProps) {
+  const percentage = !Array.isArray(data) ? Math.min(100, Math.max(0, data.percentage)) : undefined;
   return (
     <div className={cn(cls.progressbarContainer, spacing)} id={`progressbar-${id}`}>
       {title && <span id="progressbar-label">{title}</span>}
@@ -32,22 +33,23 @@ export function ProgressBar({ id, data, title, spacing, showPercentage = false }
             className={cls.progressbarOuter}
             role="progressbar"
             aria-labelledby="progressbar-label"
-            aria-valuenow={data.percentage}
+            aria-valuenow={percentage}
             aria-valuemin={0}
             aria-valuemax={100}
           >
-            <div className={cn(cls.progressbarInner, data.class)} style={{ width: `${data.percentage}%` }} />
+            <div className={cn(cls.progressbarInner, data.class)} style={{ width: `${percentage}%` }} />
           </div>
-          {showPercentage && <aside>{data.percentage}%</aside>}
+          {showPercentage && <aside>{percentage}%</aside>}
         </section>
       ) : (
         <section>
           <div id="multi-outer-bar" className={cls.progressbarOuter} style={{ height: "0.75rem" }}>
             {data.map((bar) => {
+              const percentage = Math.min(100, Math.max(0, bar.percentage));
               return (
                 <div
-                  className={cn(cls.progressbarInner, bar.class, bar.percentage === 0 ? "hidden" : undefined)}
-                  style={{ width: `${bar.percentage}%` }}
+                  className={cn(cls.progressbarInner, bar.class, percentage === 0 ? "hidden" : undefined)}
+                  style={{ width: `${percentage}%` }}
                   key={`inner-bar-${bar.class}`}
                 />
               );

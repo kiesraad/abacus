@@ -5,6 +5,7 @@ import { t } from "@/i18n/translate";
 import {
   convertNLDateToISODate,
   formatDateFull,
+  formatDateFullWithoutWeekday,
   formatDateTime,
   formatDateTimeFull,
   formatDateTimeFullWithoutWeekday,
@@ -74,6 +75,14 @@ describe("DateTime util", () => {
     [new Date("Sat Dec 18 2010 23:27:11 GMT+0100"), /^zaterdag \d+ december 2010$/],
   ])("Format date %s as %s", (input: Date, expected: RegExp) => {
     expect(formatDateFull(input)).toMatch(expected);
+  });
+
+  test.each([
+    [new Date("Fri Oct 17 2008 05:09:20 GMT+0200"), /^\d+ oktober 2008$/],
+    [new Date("Sat Jun 03 2023 14:26:13 GMT+0200"), /^\d+ juni 2023$/],
+    [new Date("Sat Dec 18 2010 23:27:11 GMT+0100"), /^\d+ december 2010$/],
+  ])("Format date %s as %s", (input: Date, expected: RegExp) => {
+    expect(formatDateFullWithoutWeekday(input)).toMatch(expected);
   });
 
   test.each([

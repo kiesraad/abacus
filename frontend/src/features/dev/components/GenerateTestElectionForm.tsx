@@ -8,12 +8,21 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { type CommitteeCategory, committeeCategoryValues } from "@/types/generated/openapi";
+import { t } from "@/i18n/translate";
+import {
+  type CommitteeCategory,
+  committeeCategoryValues,
+  type ElectionCategory,
+  electionCategoryValues,
+  type VoteCountingMethod,
+  voteCountingMethodValues,
+} from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 const RANGE_HINT = "Gebruik notatie zoals 10..50 of 9..=45 of een enkel getal zoals 40";
 
 const RANGE_FIELDS = [
+  { key: "gsbs", label: "Aantal GSB's", placeholder: "5..10" },
   { key: "political_groups", label: "Aantal politieke partijen", placeholder: "20..50" },
   { key: "candidates_per_group", label: "Aantal kandidaten per partij", placeholder: "10..50" },
   { key: "polling_stations", label: "Aantal stembureaus", placeholder: "50..200" },
@@ -36,6 +45,8 @@ type RangeFormState = Record<RangeFieldKey, string>;
 
 interface FormState extends RangeFormState {
   committee_category: CommitteeCategory;
+  counting_method: VoteCountingMethod | null;
+  election_category: ElectionCategory;
   generate_p22_2_variants: boolean;
   generate_drawing_lots: boolean;
   with_data_entry: boolean;
@@ -49,6 +60,8 @@ const INITIAL_RANGE_STATE: RangeFormState = Object.fromEntries(
 const INITIAL_FORM_STATE: FormState = {
   ...INITIAL_RANGE_STATE,
   committee_category: committeeCategoryValues[0],
+  counting_method: voteCountingMethodValues[0],
+  election_category: electionCategoryValues[0],
   generate_p22_2_variants: false,
   generate_drawing_lots: false,
   with_data_entry: true,
@@ -69,18 +82,31 @@ export function GenerateTestElectionForm() {
     setFormState((prev) => ({ ...prev, [name]: checked }));
   };
 
+  const handleRadioChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name } = event.target;
+    const value = event.target.value;
+    setFormState((prev) => ({ ...prev, [name]: value }));
+  };
+
   const submitForm = async (event: SubmitEvent<HTMLFormElement>) => {
     const formData = new StringFormData(event.currentTarget);
     const committee_category =
       formState.generate_p22_2_variants || formState.generate_drawing_lots
         ? "CSB"
         : formData.getString("committee_category");
+    const counting_method = committee_category === "GSB" ? formData.getString("counting_method") : null;
+    const election_category =
+      formState.generate_p22_2_variants || formState.generate_drawing_lots
+        ? "Municipal"
+        : formData.getString("election_category");
 
-    const payload = RANGE_FIELDS.reduce<Record<string, string | boolean>>(
+    const payload = RANGE_FIELDS.reduce<Record<string, string | boolean | null>>(
       (acc, field) =>
         Object.assign(acc, { [field.key]: formState[field.key] ? formState[field.key] : field.placeholder }),
       {
         committee_category,
+        counting_method,
+        election_category,
         generate_p22_2_variants: formState.generate_p22_2_variants,
         generate_drawing_lots: formState.generate_drawing_lots,
         with_data_entry: formState.with_data_entry,
@@ -96,8 +122,7 @@ export function GenerateTestElectionForm() {
         throw response;
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      window.alert(`Failed to submit request: ${errorMessage}`);
+      window.alert(error instanceof Error ? error.message : String(error));
     }
   };
 
@@ -112,20 +137,21 @@ export function GenerateTestElectionForm() {
         <Checkbox
           id="generate-p22-2-variants"
           name="generate_p22_2_variants"
-          label="Genereer meerdere verkiezingen voor P 22-2 varianten (CSB)"
+          label="Genereer meerdere verkiezingen voor P 22-2 varianten (CSB GR)"
           checked={formState.generate_p22_2_variants}
           onChange={handleBooleanChange}
         />
         <Checkbox
           id="generate-drawing-lots"
           name="generate_drawing_lots"
-          label="Genereer meerdere verkiezingen met verschillende vormen van loting"
+          label="Genereer meerdere verkiezingen met verschillende vormen van loting (CSB GR)"
           checked={formState.generate_drawing_lots}
           onChange={handleBooleanChange}
         />
         {formState.generate_p22_2_variants || formState.generate_drawing_lots || (
           <>
             <ChoiceList>
+              <ChoiceList.Legend>{t("election.committee_category.title")}</ChoiceList.Legend>
               {committeeCategoryValues.map((committeeCategory, index) => (
                 <ChoiceList.Radio
                   id={committeeCategory}
@@ -133,11 +159,62 @@ export function GenerateTestElectionForm() {
                   name={"committee_category"}
                   defaultChecked={index === 0}
                   defaultValue={committeeCategory}
-                  label={committeeCategory}
+                  label={t(`committee_category.${committeeCategory}.full`)}
+                  onChange={handleRadioChange}
+                />
+              ))}
+            </ChoiceList>
+            {formState.committee_category === "GSB" && (
+              <ChoiceList>
+                <ChoiceList.Legend>{t("counting_method_type")}</ChoiceList.Legend>
+                {voteCountingMethodValues.map((countingMethod, index) => {
+                  return (
+                    <ChoiceList.Radio
+                      id={countingMethod}
+                      key={countingMethod}
+                      name={"counting_method"}
+                      defaultChecked={index === 0}
+                      defaultValue={countingMethod}
+                      label={`${t(countingMethod)} (${countingMethod})`}
+                      onChange={handleRadioChange}
+                    />
+                  );
+                })}
+              </ChoiceList>
+            )}
+            <ChoiceList>
+              <ChoiceList.Legend>{t("election.election_category.title")}</ChoiceList.Legend>
+              {electionCategoryValues.map((electionCategory, index) => (
+                <ChoiceList.Radio
+                  id={electionCategory}
+                  key={electionCategory}
+                  name={"election_category"}
+                  defaultChecked={index === 0}
+                  defaultValue={electionCategory}
+                  label={t(`election_category.${electionCategory}`)}
+                  onChange={handleRadioChange}
                 />
               ))}
             </ChoiceList>
             {RANGE_FIELDS.map((field) => {
+              // Skip GSB's field when only one GSB is ever generated
+              if (
+                field.key === "gsbs" &&
+                (formState.committee_category === "GSB" || formState.election_category === "Municipal")
+              ) {
+                return null;
+              }
+
+              // Only show polling stations field for GSBs
+              if (field.key === "polling_stations" && formState.committee_category !== "GSB") {
+                return null;
+              }
+
+              let hint = RANGE_HINT;
+              if (field.key === "seats") {
+                hint += ". Voor WS is het aantal zetels beperkt tot 19..=30.";
+              }
+
               const input = (
                 <InputField
                   id={field.key}
@@ -147,7 +224,7 @@ export function GenerateTestElectionForm() {
                   placeholder={field.placeholder}
                   value={formState[field.key]}
                   onChange={updateRangeField(field.key)}
-                  hint={RANGE_HINT}
+                  hint={hint}
                   fieldWidth="full"
                 />
               );

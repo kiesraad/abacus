@@ -1,7 +1,7 @@
 import { type ReactNode, type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { isError } from "@/api/ApiResult";
+import { type AnyApiError, FatalError, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -21,7 +21,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState<AnyApiError | null>(null);
 
   // Handle form submission
   async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
@@ -32,10 +32,15 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
     setLoading(false);
 
     if (isError(result)) {
-      setError(true);
+      setError(result);
     } else {
       void navigator("/elections");
     }
+  }
+
+  // Propagate fatal errors to the error boundary, which will render an error page
+  if (error instanceof FatalError) {
+    throw error;
   }
 
   const link = (content: ReactNode) => (
@@ -63,7 +68,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
           {error ? (
             <FormLayout.Alert>
               <Alert type="error">
-                <strong className="heading-md">{t("error.api_error.InvalidUsernameOrPassword")}</strong>
+                <strong className="heading-md">{t(`error.api_error.${error.reference}`)}</strong>
               </Alert>
             </FormLayout.Alert>
           ) : (

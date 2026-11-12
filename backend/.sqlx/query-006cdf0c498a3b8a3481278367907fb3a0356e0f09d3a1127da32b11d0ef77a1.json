@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT show_reminder FROM signing_keypair WHERE election_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "name": "show_reminder",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "signing_keypair",
+            "name": "show_reminder"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "006cdf0c498a3b8a3481278367907fb3a0356e0f09d3a1127da32b11d0ef77a1"
+}

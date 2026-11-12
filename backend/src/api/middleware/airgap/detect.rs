@@ -1,4 +1,5 @@
 use std::{
+    io::ErrorKind,
     net::{IpAddr, Ipv4Addr, Ipv6Addr},
     sync::{Arc, RwLock, atomic::AtomicBool},
     time::{Duration, Instant},
@@ -89,7 +90,7 @@ impl AirgapDetection {
         airgap_detection
     }
 
-    #[allow(clippy::cognitive_complexity)]
+    #[expect(clippy::cognitive_complexity)]
     async fn log_status_change(&self) {
         let event_result = if self.violation_detected() {
             AirGapViolationDetectedAuditData.as_audit_event()
@@ -119,7 +120,7 @@ impl AirgapDetection {
         };
     }
 
-    #[allow(clippy::cognitive_complexity)]
+    #[expect(clippy::cognitive_complexity)]
     async fn perform_detection(&self) {
         let was_connected = self.violation_detected();
 
@@ -146,6 +147,7 @@ impl AirgapDetection {
 
     /// Detects if the system is in an airgap by attempting to connect to IPv4, IPv6 addresses and performing DNS lookups
     async fn is_connected(&self) -> bool {
+        let first_check = self.get_last_check().is_none();
         let mut set = JoinSet::new();
 
         let all_ip_adresses = IPV4
@@ -165,6 +167,17 @@ impl AirgapDetection {
                     Ok(Ok(_)) => {
                         warn!("TCP connection to IP address {ip} successful");
                         true
+                    }
+                    Ok(Err(error)) if first_check => {
+                        match error.kind() {
+                            ErrorKind::HostUnreachable | ErrorKind::NetworkUnreachable => {}
+                            _ => warn!("TCP connection to IP address {ip} failed: {error}"),
+                        }
+                        false
+                    }
+                    Err(_) if first_check => {
+                        warn!("TCP connection to IP address {ip} timed out");
+                        false
                     }
                     _ => false,
                 }
@@ -240,10 +253,13 @@ mod tests {
     use test_log::test;
     use tokio::net::TcpListener;
     use tower::ServiceExt;
+    use utoipa::openapi::RefOr;
 
     use super::*;
     use crate::{
-        api::middleware::airgap::block_request_on_airgap_violation,
+        api::middleware::{
+            airgap::block_request_on_airgap_violation, authentication::ratelimit::LoginRateLimit,
+        },
         infra::{router, router::openapi_router},
         shutdown_signal,
     };
@@ -400,7 +416,13 @@ mod tests {
         let backup_config =
             crate::infra::backup::BackupConfig::new(backup_dir.path().to_path_buf());
         tokio::spawn(async move {
-            let app = router::create_router(pool, airgap_detection, backup_config).unwrap();
+            let app = router::create_router(
+                pool,
+                airgap_detection,
+                backup_config,
+                LoginRateLimit::default(),
+            )
+            .unwrap();
 
             axum::serve(
                 listener,
@@ -437,6 +459,9 @@ mod tests {
                     // replace path parameters with (dummy) values
                     if let Some(parameters) = operation.parameters.as_ref() {
                         for param in parameters {
+                            let RefOr::T(param) = param else {
+                                panic!("unexpected parameter reference in {path}");
+                            };
                             path = path.replace(&format!("{{{}}}", param.name), "1");
                         }
                     }

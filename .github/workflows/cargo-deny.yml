@@ -1,0 +1,50 @@
+name: Cargo deny advisories
+
+# Checks Cargo dependencies against the RUSTSEC advisory database.
+# Runs on schedule and whenever dependencies are updated.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1"
+  pull_request:
+    paths:
+      - "backend/**/Cargo.toml"
+      - "backend/**/Cargo.lock"
+      - "backend/deny.toml"
+      - ".github/workflows/cargo-deny.yml"
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  BINSTALL_DISABLE_TELEMETRY: "true"
+  BINSTALL_NO_CONFIRM: "true"
+
+concurrency:
+  group: cargo-deny-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  advisories:
+    name: Check advisories
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Setup Rust
+        run: rustup toolchain install
+      - name: Install Binstall
+        uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # main
+      - name: Install cargo-deny
+        run: cargo binstall --locked cargo-deny
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Check advisories (backend workspace)
+        run: cargo deny check advisories
+      - name: Check advisories (fuzz workspace)
+        run: cargo deny --manifest-path fuzz/Cargo.toml --config deny.toml check advisories
+      - name: Check advisories (apportionment fuzz workspace)
+        run: cargo deny --manifest-path apportionment/fuzz/Cargo.toml --config deny.toml check advisories

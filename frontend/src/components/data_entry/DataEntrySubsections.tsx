@@ -43,7 +43,7 @@ export function DataEntrySubsections({
                 subsection={subsection}
                 currentValues={currentValues}
                 setValues={setValues}
-                defaultProps={defaultProps}
+                errorsAndWarnings={defaultProps.errorsAndWarnings}
                 readOnly={readOnly}
               />
             );

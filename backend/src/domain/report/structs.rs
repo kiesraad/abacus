@@ -1,7 +1,10 @@
+use std::collections::HashMap;
+
 use apportionment::ApportionmentDetails;
-use chrono::{DateTime, Datelike, Local, Utc};
+use chrono::{DateTime, Local, Utc};
 use eml_nl::{EMLError, documents::election_count::ElectionCount, io::EMLWrite};
-use pdf_gen::{generate_pdf, zip::slugify_filename};
+use eml_signature::SigningKeyPair;
+use pdf_gen::generate_pdf;
 use serde::Serialize;
 use sqlx::SqliteConnection;
 
@@ -10,24 +13,30 @@ use crate::{
     api::apportionment::{map_candidate_nomination, map_seat_assignment},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
-        data_entry::DataEntrySource,
-        election::{CommitteeCategory, ElectionWithPoliticalGroups},
+        data_entry::{DataEntrySource, DataEntrySourceNumber},
+        election::{
+            CommitteeCategory, ElectionWithPoliticalGroups, InvalidElectionError,
+            VoteCountingMethod,
+        },
         file::{File, FileType},
         investigation::PollingStationInvestigation,
         models::{
-            ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
-            ModelP22_2Input, PdfFileModel, ToPdfFileModel,
+            ModelNa14_2Input, ModelNa31_1Input, ModelNa31_2Input, ModelP2aInput,
+            ModelP22_2Bijlage1Input, ModelP22_2Input, PdfFileModel, ToPdfFileModel,
             apportionment_footnotes::ApportionmentFootnotes,
+            election_totals::ElectionTotalsCSB,
             enriched_candidate_nomination::EnrichedCandidateNomination,
             enriched_seat_assignment::EnrichedSeatAssignment,
             votes_table::{VotesTables, VotesTablesWithPreviousVotes},
         },
         polling_station::PollingStation,
         report::DEFAULT_DATE_TIME_FORMAT,
-        results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
-        summary::{ElectionSummary, ElectionSummaryCSB},
+        results::{
+            Results, VerifyModels, political_group_candidate_votes::PoliticalGroupCandidateVotes,
+        },
+        tabulation::ElectionTotals,
     },
-    eml::EmlHash,
+    eml::{CountResultsData, EmlHash},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
     repository::{
         committee_session_repo::{self, get_previous_session},
@@ -50,15 +59,18 @@ pub struct GeneratedFile {
     pub content: Vec<u8>,
 }
 
-pub struct GsbGeneratedFiles {
+/// Generated GSB results files for a specific committee session
+pub struct GsbGeneratedResultsFiles {
     pub results_eml: GeneratedFile,
+    pub results_eml_signature: GeneratedFile,
     pub results_pdf: GeneratedFile,
-    pub overview_pdf: Option<GeneratedFile>,
     pub results_csv: GeneratedFile,
 }
 
+#[derive(Debug)]
 pub struct GsbFiles {
     pub results_eml: Option<File>,
+    pub results_eml_signature: Option<File>,
     pub results_pdf: Option<File>,
     pub overview_pdf: Option<File>,
     pub results_csv: Option<File>,
@@ -68,6 +80,7 @@ impl GsbFiles {
     pub fn created_at(&self) -> DateTime<Utc> {
         self.results_eml
             .as_ref()
+            .or(self.results_eml_signature.as_ref())
             .or(self.results_pdf.as_ref())
             .or(self.overview_pdf.as_ref())
             .or(self.results_csv.as_ref())
@@ -75,23 +88,24 @@ impl GsbFiles {
             .expect("At least one file should be present")
     }
 
+    /// Results files (signed EML, CSV and results PDF) are only stored for the first committee session, or a next session with corrections.
+    pub fn stores_results(committee_session: &CommitteeSession, corrections: bool) -> bool {
+        !committee_session.is_next_session() || corrections
+    }
+
     pub fn needs_generation(
         &self,
         committee_session: &CommitteeSession,
         corrections: bool,
     ) -> bool {
-        if committee_session.is_next_session() {
-            if corrections {
-                self.results_eml.is_none()
-                    || self.results_pdf.is_none()
-                    || self.overview_pdf.is_none()
-                    || self.results_csv.is_none()
-            } else {
-                self.overview_pdf.is_none()
-            }
-        } else {
-            self.results_eml.is_none() || self.results_pdf.is_none() || self.results_csv.is_none()
-        }
+        let results_missing = self.results_eml.is_none()
+            || self.results_eml_signature.is_none()
+            || self.results_pdf.is_none()
+            || self.results_csv.is_none();
+        let overview_missing = committee_session.is_next_session() && self.overview_pdf.is_none();
+
+        (Self::stores_results(committee_session, corrections) && results_missing)
+            || overview_missing
     }
 }
 
@@ -140,8 +154,9 @@ pub struct ResultsInputData {
     pub polling_stations: Vec<PollingStation>,
     pub investigations: Vec<PollingStationInvestigation>,
     pub results: Vec<(DataEntrySource, Results)>,
-    pub summary: ElectionSummary,
-    pub previous_summary: Option<ElectionSummary>,
+    pub previous_results: HashMap<DataEntrySourceNumber, (DataEntrySource, Results)>,
+    pub totals: ElectionTotals,
+    pub previous_totals: Option<ElectionTotals>,
     pub previous_committee_session: Option<CommitteeSession>,
     pub created_at: DateTime<Local>,
 }
@@ -158,6 +173,7 @@ impl ResultsInputData {
         let investigations = session_pss.investigations();
         let polling_stations = session_pss.into_polling_stations();
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
+        results.verify_models(&election, &committee_session)?;
 
         // get the previous committee session if this is not the first session
         let previous_committee_session = if committee_session.is_next_session() {
@@ -166,28 +182,35 @@ impl ResultsInputData {
             None
         };
 
-        // get the previous results summary from the previous committee session if it exists
-        let previous_summary = if let Some(previous_committee_session) = &previous_committee_session
-        {
-            let previous_results =
-                list_results_for_committee_session(conn, previous_committee_session.id).await?;
-            let previous_summary = ElectionSummary::from_results(&election, &previous_results)?;
-            Some(previous_summary)
-        } else {
-            None
-        };
+        // get the previous results totals from the previous committee session if it exists
+        let (previous_totals, previous_results) =
+            if let Some(previous_committee_session) = &previous_committee_session {
+                let previous_results =
+                    list_results_for_committee_session(conn, previous_committee_session.id).await?;
+                previous_results.verify_models(&election, previous_committee_session)?;
+                let previous_totals = ElectionTotals::tabulate(&election, &previous_results)?;
+                (Some(previous_totals), previous_results)
+            } else {
+                (None, vec![])
+            };
 
-        let summary = ElectionSummary::from_results(&election, &results)?;
+        let previous_results = previous_results
+            .into_iter()
+            .map(|(source, results)| (source.number(), (source, results)))
+            .collect();
+
+        let totals = ElectionTotals::tabulate(&election, &results)?;
 
         Ok(ResultsInputData {
             committee_session,
-            previous_summary,
-            summary,
+            previous_totals,
+            totals,
             created_at,
             election,
             polling_stations,
             investigations,
             results,
+            previous_results,
             previous_committee_session,
         })
     }
@@ -196,69 +219,21 @@ impl ResultsInputData {
         self.election.as_count_eml(
             None,
             &self.committee_session,
-            &self.results,
-            &self.summary,
+            &CountResultsData::from_results_input_data(self),
             self.created_at,
         )
     }
 
-    /// Generates a filename for the given election and file extension
-    /// E.g. "{base}_GR2026_GemeenteNaam.{ext}"
-    fn election_filename(&self, base: &str, ext: &str) -> String {
-        let location_without_whitespace: String =
-            self.election.location.split_whitespace().collect();
-
-        format!(
-            "{base} {}{} {}.{ext}",
-            self.election.category.to_eml_code(),
-            self.election.election_date.year(),
-            location_without_whitespace,
-        )
-    }
-
-    fn csv_filename(&self) -> String {
-        format!(
-            "osv4-3_telling_{}{}_{}.csv",
-            self.election.category.to_eml_code().to_lowercase(),
-            self.election.election_date.year(),
-            self.election
-                .location
-                .split_whitespace()
-                .collect::<String>()
-                .to_lowercase(),
-        )
-    }
-
-    fn generated_file(&self, file_type: FileType, content: Vec<u8>) -> GeneratedFile {
-        GeneratedFile {
+    fn generated_file(
+        &self,
+        file_type: FileType,
+        content: Vec<u8>,
+    ) -> Result<GeneratedFile, InvalidElectionError> {
+        Ok(GeneratedFile {
             file_type,
-            filename: self.filename_for(file_type),
+            filename: file_type.filename(&self.committee_session, &self.election)?,
             content,
-        }
-    }
-
-    fn filename_for(&self, file_type: FileType) -> String {
-        use FileType::*;
-
-        let filename = match file_type {
-            GsbResultsEml => self.election_filename("Telling", "eml.xml"),
-            GsbResultsPdf => {
-                if self.committee_session.is_next_session() {
-                    "Model Na14-2.pdf".to_string()
-                } else {
-                    "Model Na31-2.pdf".to_string()
-                }
-            }
-            GsbOverviewPdf => "Leeg Model P2a.pdf".to_string(),
-            CsbResultsEml => self.election_filename("Resultaat", "eml.xml"),
-            CsbTotalCountsEml => self.election_filename("Totaaltelling", "eml.xml"),
-            CsbResultsPdf => "Model P22-2.pdf".to_string(),
-            CsbAttachmentPdf => "Model P22-2 bijlage.pdf".to_string(),
-            CsbCsvCounts => self.csv_filename(),
-            GsbCsvCounts => self.csv_filename(),
-        };
-
-        slugify_filename(&filename)
+        })
     }
 }
 
@@ -299,7 +274,8 @@ impl ResultsInputCSB {
         let xml_results_bytes = xml_results_string.as_bytes();
         let xml_results_hash: String = EmlHash::from(xml_results_bytes).into();
 
-        let results_eml = data.generated_file(FileType::CsbResultsEml, xml_results_bytes.to_vec());
+        let results_eml =
+            data.generated_file(FileType::CsbResultsEml, xml_results_bytes.to_vec())?;
 
         let xml_counts = data.as_xml()?;
         let xml_counts_string = xml_counts.write_eml_root_str(true, true)?;
@@ -309,28 +285,28 @@ impl ResultsInputCSB {
         let csv_counts = data.generated_file(
             FileType::CsbCsvCounts,
             csv_counts_string.as_bytes().to_vec(),
-        );
+        )?;
 
         let total_counts_eml =
-            data.generated_file(FileType::CsbTotalCountsEml, xml_counts_bytes.to_vec());
+            data.generated_file(FileType::CsbTotalCountsEml, xml_counts_bytes.to_vec())?;
 
         let results_pdf_model = self.get_p22_2_pdf_file(
             apportionment_result,
             xml_results_hash.clone(),
             creation_date_time.clone(),
-            data.filename_for(FileType::CsbResultsPdf),
+            FileType::CsbResultsPdf.filename(&data.committee_session, &data.election)?,
         )?;
         let results_pdf_content = generate_pdf(results_pdf_model).await?.buffer;
-        let results_pdf = data.generated_file(FileType::CsbResultsPdf, results_pdf_content);
+        let results_pdf = data.generated_file(FileType::CsbResultsPdf, results_pdf_content)?;
 
         let attachment_pdf_model = self.get_p22_2_attachment_1_pdf_file(
             xml_results_hash,
             creation_date_time,
-            data.filename_for(FileType::CsbAttachmentPdf),
+            FileType::CsbAttachmentPdf.filename(&data.committee_session, &data.election)?,
         )?;
         let attachment_pdf_content = generate_pdf(attachment_pdf_model).await?.buffer;
         let attachment_pdf =
-            data.generated_file(FileType::CsbAttachmentPdf, attachment_pdf_content);
+            data.generated_file(FileType::CsbAttachmentPdf, attachment_pdf_content)?;
 
         Ok(CsbGeneratedFiles {
             results_eml,
@@ -350,10 +326,13 @@ impl ResultsInputCSB {
     ) -> Result<PdfFileModel, APIError> {
         let data = &self.data;
 
-        let summary = ElectionSummaryCSB::new(&data.summary, &data.election.political_groups);
+        let totals_csb = ElectionTotalsCSB::new(&data.totals, &data.election.political_groups)?;
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
-        let enriched_seat_assignment =
-            EnrichedSeatAssignment::new(data.election.number_of_seats, &summary, &seat_assignment)?;
+        let enriched_seat_assignment = EnrichedSeatAssignment::new(
+            data.election.number_of_seats,
+            &totals_csb,
+            &seat_assignment,
+        )?;
         let candidate_nomination = map_candidate_nomination(
             &apportionment_result.candidate_nomination,
             &data.election.political_groups.clone(),
@@ -365,7 +344,7 @@ impl ResultsInputCSB {
         let pdf_file: PdfFileModel = ModelP22_2Input {
             committee_session: data.committee_session.clone(),
             election: data.election.clone().into(),
-            summary,
+            summary: totals_csb,
             footnotes,
             seat_assignment: enriched_seat_assignment,
             candidate_nomination: enriched_candidate_nomination,
@@ -384,7 +363,7 @@ impl ResultsInputCSB {
     ) -> Result<PdfFileModel, APIError> {
         let data = &self.data;
 
-        let votes_tables = VotesTables::new(&data.election, &data.summary)?;
+        let votes_tables = VotesTables::new(&data.election, &data.totals)?;
         let pdf_file = ModelP22_2Bijlage1Input {
             election: data.election.clone().into(),
             votes_tables,
@@ -417,71 +396,109 @@ impl ResultsInputGSB {
         Ok(Self { data })
     }
 
-    pub async fn generate_gsb_files(&self) -> Result<GsbGeneratedFiles, APIError> {
+    pub async fn generate_gsb_results_files(
+        &self,
+        keypair: &SigningKeyPair,
+    ) -> Result<GsbGeneratedResultsFiles, APIError> {
         let data = &self.data;
-        let creation_date_time = data.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
         let xml = data.as_xml()?;
         let xml_string = xml.write_eml_root_str(true, true)?;
         let xml_bytes = xml_string.as_bytes();
-        let xml_hash = EmlHash::from(xml_bytes).into();
         let csv_string = xml.as_osv4_3_csv(&data.election, true, false)?;
 
-        let results_eml = data.generated_file(FileType::GsbResultsEml, xml_bytes.to_vec());
-        let results_csv = data.generated_file(FileType::GsbCsvCounts, csv_string.into_bytes());
+        let signature = keypair
+            .sign(xml_bytes)
+            .map_err(|e| APIError::DataIntegrityError(e.to_string()))?;
 
-        let overview_pdf = if data.committee_session.is_next_session() {
-            let pdf_model = self.get_p2a_pdf_file(data.filename_for(FileType::GsbOverviewPdf));
-            let content: Vec<u8> = generate_pdf(pdf_model).await?.buffer;
-            Some(data.generated_file(FileType::GsbOverviewPdf, content))
-        } else {
-            None
-        };
+        let results_eml = data.generated_file(FileType::GsbResultsEml, xml_bytes.to_vec())?;
+        let results_eml_signature =
+            data.generated_file(FileType::GsbResultsEmlSignature, signature.to_der())?;
+        let results_csv = data.generated_file(FileType::GsbCsvCounts, csv_string.into_bytes())?;
 
         let results_pdf_file_type = FileType::GsbResultsPdf;
-        let results_pdf_model = if data.committee_session.is_next_session() {
-            let Some(previous_summary) = &data.previous_summary else {
-                return Err(APIError::DataIntegrityError(
-                "Previous summary is required for generating results PDF for next committee sessions"
-                    .to_string(),
-            ));
-            };
-
-            let Some(previous_committee_session) = &data.previous_committee_session else {
-                return Err(APIError::DataIntegrityError(
-                "Previous committee session is required for generating results PDF for next committee sessions"
-                    .to_string(),
-            ));
-            };
-
-            self.get_na14_2_pdf_file(
-                previous_summary,
-                previous_committee_session,
-                xml_hash,
-                creation_date_time,
-                data.filename_for(results_pdf_file_type),
-            )?
-        } else {
-            self.get_na31_2_pdf_file(
-                xml_hash,
-                creation_date_time,
-                data.filename_for(results_pdf_file_type),
-            )?
-        };
+        let results_pdf_model = self.get_results_pdf_model(xml_bytes, results_pdf_file_type)?;
         let results_pdf_content = generate_pdf(results_pdf_model).await?.buffer;
-        let results_pdf = data.generated_file(results_pdf_file_type, results_pdf_content);
+        let results_pdf = data.generated_file(results_pdf_file_type, results_pdf_content)?;
 
-        Ok(GsbGeneratedFiles {
+        Ok(GsbGeneratedResultsFiles {
             results_eml,
+            results_eml_signature,
             results_pdf,
-            overview_pdf,
             results_csv,
         })
     }
 
+    /// Generate the overview PDF (Model P 2a), which only exists for next sessions
+    pub async fn generate_gsb_overview_pdf(&self) -> Result<Option<GeneratedFile>, APIError> {
+        let data = &self.data;
+
+        if !data.committee_session.is_next_session() {
+            return Ok(None);
+        }
+
+        let pdf_model = self.get_p2a_pdf_file(
+            FileType::GsbOverviewPdf.filename(&data.committee_session, &data.election)?,
+        );
+        let content: Vec<u8> = generate_pdf(pdf_model).await?.buffer;
+        Ok(Some(
+            data.generated_file(FileType::GsbOverviewPdf, content)?,
+        ))
+    }
+
+    fn get_results_pdf_model(
+        &self,
+        xml_bytes: &[u8],
+        results_pdf_file_type: FileType,
+    ) -> Result<PdfFileModel, APIError> {
+        let data = &self.data;
+        let creation_date_time = data.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
+        let xml_hash = EmlHash::from(xml_bytes).into();
+
+        if data.committee_session.is_next_session() {
+            let Some(previous_totals) = &data.previous_totals else {
+                return Err(APIError::DataIntegrityError(
+                    "Previous totals are required for generating results PDF for next committee sessions"
+                        .to_string(),
+                ));
+            };
+
+            let Some(previous_committee_session) = &data.previous_committee_session else {
+                return Err(APIError::DataIntegrityError(
+                    "Previous committee session is required for generating results PDF for next committee sessions"
+                        .to_string(),
+                ));
+            };
+
+            Ok(self.get_na14_2_pdf_file(
+                previous_totals,
+                previous_committee_session,
+                xml_hash,
+                creation_date_time,
+                results_pdf_file_type.filename(&data.committee_session, &data.election)?,
+            )?)
+        } else {
+            match self.data.election.counting_method {
+                Some(VoteCountingMethod::CSO) => Ok(self.get_na31_2_pdf_file(
+                    xml_hash,
+                    creation_date_time,
+                    results_pdf_file_type.filename(&data.committee_session, &data.election)?,
+                )?),
+                Some(VoteCountingMethod::DSO) => Ok(self.get_na31_1_pdf_file(
+                    xml_hash,
+                    creation_date_time,
+                    results_pdf_file_type.filename(&data.committee_session, &data.election)?,
+                )?),
+                None => Err(APIError::DataIntegrityError(
+                    "GSB election needs to have a vote counting method".to_string(),
+                )),
+            }
+        }
+    }
+
     fn get_na14_2_pdf_file(
         &self,
-        previous_summary: &ElectionSummary,
+        previous_totals: &ElectionTotals,
         previous_committee_session: &CommitteeSession,
         hash: String,
         creation_date_time: String,
@@ -492,14 +509,36 @@ impl ResultsInputGSB {
         let pdf_file = ModelNa14_2Input {
             votes_tables: VotesTablesWithPreviousVotes::new(
                 &data.election,
-                &data.summary,
-                previous_summary,
+                &data.totals,
+                previous_totals,
             )?,
             committee_session: data.committee_session.clone(),
             election: data.election.clone().into(),
-            summary: data.summary.clone().into(),
-            previous_summary: previous_summary.clone().into(),
+            summary: (&data.totals).into(),
+            previous_summary: previous_totals.into(),
             previous_committee_session: previous_committee_session.clone(),
+            hash,
+            creation_date_time,
+        }
+        .to_pdf_file_model(results_pdf_filename);
+        Ok(pdf_file)
+    }
+
+    fn get_na31_1_pdf_file(
+        &self,
+        hash: String,
+        creation_date_time: String,
+        results_pdf_filename: String,
+    ) -> Result<PdfFileModel, APIError> {
+        let data = &self.data;
+
+        let pdf_file = ModelNa31_1Input {
+            votes_tables: VotesTables::new(&data.election, &data.totals)?,
+            committee_session: data.committee_session.clone(),
+            polling_stations: data.polling_stations.clone(),
+            summary: (&data.totals).into(),
+            polling_station_investigations: data.totals.dso_investigations()?.clone(),
+            election: data.election.clone().into(),
             hash,
             creation_date_time,
         }
@@ -516,10 +555,11 @@ impl ResultsInputGSB {
         let data = &self.data;
 
         let pdf_file = ModelNa31_2Input {
-            votes_tables: VotesTables::new(&data.election, &data.summary)?,
+            votes_tables: VotesTables::new(&data.election, &data.totals)?,
             committee_session: data.committee_session.clone(),
             polling_stations: data.polling_stations.clone(),
-            summary: data.summary.clone().into(),
+            summary: (&data.totals).into(),
+            polling_station_investigations: data.totals.cso_investigations()?.clone(),
             election: data.election.clone().into(),
             hash,
             creation_date_time,

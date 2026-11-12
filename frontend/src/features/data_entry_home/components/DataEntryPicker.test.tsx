@@ -220,6 +220,20 @@ describe("Test DataEntryPicker", () => {
       expect(within(feedback).getByText("aan het zoeken …")).toBeVisible();
     });
 
+    test("Submitting via Enter instead of clicking submit button also works", async () => {
+      const navigate = vi.fn();
+      vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+
+      await renderPicker();
+
+      const user = userEvent.setup();
+      const numberInput = await screen.findByTestId("numberInput");
+      await user.type(numberInput, "33");
+      await user.type(numberInput, "{enter}");
+
+      expect(navigate).toHaveBeenCalledWith("/elections/1/data-entry/1/1");
+    });
+
     test("Selecting data entry for second data entry opens correct page", async () => {
       const navigate = vi.fn();
       vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);

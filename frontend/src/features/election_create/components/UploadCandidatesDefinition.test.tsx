@@ -1,8 +1,14 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
+import {
+  csbElectionMockData,
+  electionImportValidateMockResponse,
+  electionMockData,
+  getNewElectionMockData,
+} from "@/testing/api-mocks/ElectionMockData";
 import { overrideOnce } from "@/testing/server";
-import { render, renderReturningRouter, screen } from "@/testing/test-utils";
-import type { NewElection } from "@/types/generated/openapi";
+import { render, renderReturningRouter, screen, waitFor } from "@/testing/test-utils";
+import type { CommitteeCategory, ElectionCategory } from "@/types/generated/openapi";
 import * as uploadFileSize from "@/utils/uploadFileSize";
 import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
@@ -27,8 +33,7 @@ async function uploadFile(file: File) {
   await user.upload(input, file);
 }
 
-const election = { name: "Naam", location: "Plek" } as NewElection;
-
+const election = getNewElectionMockData();
 const filename = "foo.txt";
 const file = new File(["foo"], filename, { type: "text/plain" });
 
@@ -64,6 +69,28 @@ describe("UploadCandidatesDefinition component", () => {
     expect(dispatch).not.toHaveBeenCalled();
   });
 
+  test("Shows an error when uploading wrong candidates list file for district of GSB", async () => {
+    const state = { election, numberOfVoters: 0, electionDefinitionData: "mocked" };
+    const dispatch = vi.fn();
+    vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+    overrideOnce("post", "/api/elections/import/validate", 400, {
+      error: "EML import error",
+      fatal: false,
+      reference: "InvalidDistrict",
+    });
+
+    await renderPage();
+    await uploadFile(file);
+
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
+    expect(screen.getByRole("alert")).toHaveTextContent("Verkeerde kandidatenlijsten");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Het bestand foo.txt bevat kandidatenlijsten voor een andere kieskring. Kies een bestand met de kandidatenlijsten voor de juiste kieskring.",
+    );
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
   test("Shows error when frontend determines candidates list file is too large", async () => {
     const state = { election, numberOfVoters: 0, electionDefinitionData: "mocked" };
     const dispatch = vi.fn();
@@ -73,13 +100,97 @@ describe("UploadCandidatesDefinition component", () => {
     await renderPage();
     await uploadFile(file);
 
-    expect(screen.getByLabelText("Geen bestand gekozen")).toBeInTheDocument();
-    expect(screen.getAllByText(filename).length).toBe(1);
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     expect(screen.getByRole("alert")).toHaveTextContent("Ongeldige kandidatenlijsten");
     expect(screen.getByRole("alert")).toHaveTextContent(
       `Het bestand ${filename} is te groot. Kies een bestand van maximaal 5 Megabyte`,
     );
     expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  describe("Navigation after submitting the candidates hash", () => {
+    const redactedHash = electionImportValidateMockResponse().hash;
+    const hashInputs = ["zxcv", "gfsd"];
+    const fullHash = redactedHash.chunks.map((chunk, index) =>
+      redactedHash.redacted_indexes.includes(index) ? hashInputs[redactedHash.redacted_indexes.indexOf(index)] : chunk,
+    );
+
+    const hashState = {
+      electionDefinitionData: "mocked",
+      electionDefinitionHash: ["1234"],
+      candidateDefinitionFileName: filename,
+      candidateDefinitionData: "mocked",
+      candidateDefinitionRedactedHash: redactedHash,
+    };
+
+    async function submitHash() {
+      const user = userEvent.setup();
+      expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
+      expect(await screen.findByText("GR2026 Heemdamseburg")).toBeVisible();
+      await user.type(screen.getByRole("textbox", { name: "Controle deel 1" }), "zxcv");
+      await user.type(screen.getByRole("textbox", { name: "Controle deel 2" }), "gfsd");
+      await user.click(screen.getByRole("button", { name: "Volgende" }));
+    }
+
+    test.each<[CommitteeCategory, string]>([
+      ["CSB", "/elections/create/check-and-save"],
+      ["GSB", "/elections/create/polling-stations"],
+    ])("%s", async (committeeCategory, expected) => {
+      const state = {
+        ...hashState,
+        election: { ...election, category: "Municipal" as ElectionCategory },
+        committeeCategory,
+      };
+
+      const dispatch = vi.fn();
+      vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({
+          election: committeeCategory === "CSB" ? csbElectionMockData : electionMockData,
+        }),
+      );
+
+      const router = renderReturningRouter(
+        <ElectionCreateContextProvider>
+          <UploadCandidatesDefinition />
+        </ElectionCreateContextProvider>,
+      );
+      await submitHash();
+
+      await waitFor(() => {
+        expect(dispatch).toHaveBeenCalledWith({
+          type: "SET_CANDIDATES_DEFINITION_HASH",
+          candidateDefinitionHash: fullHash,
+        });
+      });
+      expect(router.state.location.pathname).toEqual(expected);
+    });
+
+    test("Shows an error when the hash is invalid", async () => {
+      const state = { ...hashState, election, committeeCategory: "GSB" as CommitteeCategory };
+      const dispatch = vi.fn();
+      vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+      overrideOnce("post", "/api/elections/import/validate", 400, {
+        error: "Invalid hash",
+        fatal: false,
+        reference: "InvalidHash",
+      });
+
+      const router = renderReturningRouter(
+        <ElectionCreateContextProvider>
+          <UploadCandidatesDefinition />
+        </ElectionCreateContextProvider>,
+      );
+      await submitHash();
+
+      expect(await screen.findByRole("alert")).toHaveTextContent("Onjuiste vingerafdruk");
+      expect(dispatch).not.toHaveBeenCalled();
+      expect(router.state.location.pathname).toEqual("/");
+    });
   });
 
   test("Shows error when backend determines candidates list file is too large", async () => {

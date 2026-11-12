@@ -158,6 +158,18 @@ export interface GET_APPORTIONMENT_STATE_REQUEST_PARAMS {
 }
 export type GET_APPORTIONMENT_STATE_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/state`;
 
+// /api/elections/{election_id}/certificate
+export interface CERTIFICATE_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type CERTIFICATE_REQUEST_PATH = `/api/elections/${ElectionId}/certificate`;
+
+// /api/elections/{election_id}/certificate_details
+export interface CERTIFICATE_DETAILS_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type CERTIFICATE_DETAILS_REQUEST_PATH = `/api/elections/${ElectionId}/certificate_details`;
+
 // /api/elections/{election_id}/committee_sessions
 export interface COMMITTEE_SESSION_CREATE_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -228,11 +240,55 @@ export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/status`;
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
 
+// /api/elections/{election_id}/data_entry/import
+export interface ELECTION_DATA_ENTRY_IMPORT_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DATA_ENTRY_IMPORT_REQUEST_PATH = `/api/elections/${ElectionId}/data_entry/import`;
+
+// /api/elections/{election_id}/data_entry/import/validate
+export interface ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DATA_ENTRY_IMPORT_VALIDATE_REQUEST_PATH =
+  `/api/elections/${ElectionId}/data_entry/import/validate`;
+
+// /api/elections/{election_id}/dismiss_public_key_upload_reminder
+export interface DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PATH =
+  `/api/elections/${ElectionId}/dismiss_public_key_upload_reminder`;
+
+// /api/elections/{election_id}/download_n_10_1
+export interface ELECTION_DOWNLOAD_N_10_1_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DOWNLOAD_N_10_1_REQUEST_PATH = `/api/elections/${ElectionId}/download_n_10_1`;
+
+// /api/elections/{election_id}/download_n_10_1_inlegvel
+export interface ELECTION_DOWNLOAD_N_10_1_INLEGVEL_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DOWNLOAD_N_10_1_INLEGVEL_REQUEST_PATH = `/api/elections/${ElectionId}/download_n_10_1_inlegvel`;
+
 // /api/elections/{election_id}/download_n_10_2
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
   election_id: ElectionId;
 }
 export type ELECTION_DOWNLOAD_N_10_2_REQUEST_PATH = `/api/elections/${ElectionId}/download_n_10_2`;
+
+// /api/elections/{election_id}/download_na_14_1_versie1
+export interface ELECTION_DOWNLOAD_NA_14_1_VERSIE1_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DOWNLOAD_NA_14_1_VERSIE1_REQUEST_PATH = `/api/elections/${ElectionId}/download_na_14_1_versie1`;
+
+// /api/elections/{election_id}/download_na_31_1_inlegvel
+export interface ELECTION_DOWNLOAD_NA_31_1_INLEGVEL_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DOWNLOAD_NA_31_1_INLEGVEL_REQUEST_PATH = `/api/elections/${ElectionId}/download_na_31_1_inlegvel`;
 
 // /api/elections/{election_id}/download_na_31_2_bijlage1
 export interface ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PARAMS {
@@ -256,6 +312,12 @@ export interface POLLING_STATION_CREATE_REQUEST_PARAMS {
 }
 export type POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${ElectionId}/polling_stations`;
 export type POLLING_STATION_CREATE_REQUEST_BODY = PollingStationRequest;
+
+// /api/elections/{election_id}/polling_stations/export
+export interface POLLING_STATION_EXPORT_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type POLLING_STATION_EXPORT_REQUEST_PATH = `/api/elections/${ElectionId}/polling_stations/export`;
 
 // /api/elections/{election_id}/polling_stations/import
 export interface POLLING_STATION_IMPORT_REQUEST_PARAMS {
@@ -295,6 +357,26 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: ElectionId;
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${ElectionId}/status`;
+
+// /api/elections/{election_id}/sub_committee_certificates
+export interface SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH = `/api/elections/${ElectionId}/sub_committee_certificates`;
+export interface SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH = `/api/elections/${ElectionId}/sub_committee_certificates`;
+export type SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY = AddSubCommitteeCertificateRequest;
+
+// /api/elections/{election_id}/sub_committees/{sub_committee_id}/certificates/{public_key_fingerprint}
+export interface SUB_COMMITTEE_CERTIFICATE_DELETE_REQUEST_PARAMS {
+  election_id: ElectionId;
+  sub_committee_id: SubCommitteeId;
+  public_key_fingerprint: string;
+}
+export type SUB_COMMITTEE_CERTIFICATE_DELETE_REQUEST_PATH =
+  `/api/elections/${ElectionId}/sub_committees/${SubCommitteeId}/certificates/${string}`;
 
 // /api/elections/{election_id}/voters
 export interface ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
@@ -403,6 +485,18 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 
 /** TYPES **/
 
+/**
+ * Information about the report ("Over het proces-verbaal")
+ */
+export interface AboutReport {
+  /** Whether the extra page "controles en correcties" is inserted in the report
+("Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?") */
+  checks_and_corrections_present: ChecksAndCorrectionsPresent | null;
+  /** Whether a corrigendum accompanies the report
+("Is er een corrigendum bij het papieren proces-verbaal aanwezig?") */
+  corrigendum_present: CorrigendumPresent | null;
+}
+
 export interface AbsoluteMajorityDrawingLots {
   /** The list where the reassigned residual seat will go to */
   assign_to: PGNumber;
@@ -420,6 +514,23 @@ export interface AccountUpdateRequest {
   fullname?: string;
   password: string;
   username: string;
+}
+
+/**
+ * Request to add a sub committee certificate
+ */
+export interface AddSubCommitteeCertificateRequest {
+  data: string;
+}
+
+/**
+ * The certificate that was added, with the sub committee it was added to
+ */
+export interface AddSubCommitteeCertificateResponse {
+  authority_name: string;
+  certificate: Certificate;
+  expired: boolean;
+  sub_committee_id: SubCommitteeId;
 }
 
 export type ApportionmentState =
@@ -456,6 +567,7 @@ export const auditEventTypeValues = [
   "UserDeleted",
   "ElectionCreated",
   "ElectionUpdated",
+  "PublicKeyUploadReminderDismissed",
   "CommitteeSessionCreated",
   "CommitteeSessionDeleted",
   "CommitteeSessionUpdated",
@@ -471,20 +583,29 @@ export const auditEventTypeValues = [
   "PollingStationUpdated",
   "PollingStationDeleted",
   "PollingStationsImported",
+  "PollingStationsExported",
   "DataEntryStarted",
   "DataEntrySaved",
+  "DataEntryImported",
   "DataEntryResumed",
   "DataEntryDeleted",
+  "DataEntryDiscarded",
+  "DataEntryReset",
   "DataEntryFinalised",
   "DataEntryDiscardedFirst",
   "DataEntryReturnedFirst",
   "DataEntryKeptFirst",
   "DataEntryKeptSecond",
+  "DataEntryKeptFirstReturnedSecond",
+  "DataEntryKeptSecondReturnedFirst",
   "DataEntryDiscardedBoth",
   "AirGapViolationDetected",
   "AirGapViolationResolved",
   "ApplicationStarted",
   "DatabaseBackupCreated",
+  "SigningKeypairCreated",
+  "SubCommitteeCertificateAdded",
+  "SubCommitteeCertificateDeleted",
   "ApiError",
   "ApiWarning",
   "UnknownEvent",
@@ -541,6 +662,29 @@ export interface BasePollingStation {
   postal_code: string;
 }
 
+export interface CSBDataEntryImportRequest {
+  data: string;
+  hash: string[];
+}
+
+export interface CSBDataEntryImportResponse {
+  election_date: string;
+  election_name: string;
+  sub_committee: SubCommitteeFirstSession;
+}
+
+export interface CSBDataEntryImportValidateRequest {
+  data: string;
+  hash?: string[];
+}
+
+export interface CSBDataEntryImportValidateResponse {
+  election_date: string;
+  election_name: string;
+  hash: RedactedEmlHash;
+  sub_committee: SubCommitteeFirstSession;
+}
+
 export interface CSBElectionCreationRequest {
   candidate_data: string;
   candidate_hash: string[];
@@ -573,7 +717,7 @@ export interface CSOFirstSessionResults {
   counting_differences_polling_station: CountingDifferencesPollingStation;
   /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
   differences_counts: DifferencesCounts;
-  /** Extra investigation ("B1-1 Alleen bij extra onderzoek") */
+  /** Extra investigation ("B1-1 Extra onderzoek") */
   extra_investigation: ExtraInvestigation;
   /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
   political_group_votes: PoliticalGroupCandidateVotes[];
@@ -584,21 +728,19 @@ export interface CSOFirstSessionResults {
 }
 
 /**
- * CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
- *
- * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
- * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from
- * [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).
+ * Polling stations where results were investigated by the GSB,
+ * as vectors of polling station numbers
  */
-export interface CSONextSessionResults {
-  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
-  differences_counts: DifferencesCounts;
-  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
-  political_group_votes: PoliticalGroupCandidateVotes[];
-  /** Voters counts ("Aantal toegelaten kiezers") */
-  voters_counts: VotersCounts;
-  /** Votes counts ("Aantal getelde stembiljetten") */
-  votes_counts: VotesCounts;
+export interface CSOInvestigations {
+  /** Admitted voters were recounted
+("Toegelaten kiezers opnieuw vastgesteld?") */
+  admitted_voters_recounted: number[];
+  /** Ballots were (partially) recounted
+("Stembiljetten (deels) herteld?") */
+  ballots_recounted: number[];
+  /** Investigated for other reasons than unexplained difference
+("Onderzocht vanwege andere reden dan onverklaard verschil?") */
+  investigated_other_reason: number[];
 }
 
 /**
@@ -657,6 +799,49 @@ export interface CandidateVotes {
   votes: number;
 }
 
+export interface Certificate {
+  common_name: string;
+  election_identifier: string;
+  not_after: string;
+  not_before: string;
+  organizational_unit: string;
+  public_key: string;
+  public_key_fingerprint: string;
+  signature_algorithm: string;
+}
+
+export interface CertificateDetailsResponse {
+  common_name: string;
+  election_identifier: string;
+  not_after: string;
+  not_before: string;
+  organizational_unit: string;
+  signature_algorithm: string;
+}
+
+/**
+ * Checks and corrections ("Controles en correcties")
+ */
+export interface ChecksAndCorrections {
+  /** Whether investigation at the request of the central electoral committee
+has led to corrected results
+("Op verzoek van het centraal stembureau: Zijn er gecorrigeerde telresultaten?") */
+  corrected_results_csb_request: YesNo;
+  /** Whether the investigation on its own initiative has led to corrected results
+("Op eigen initiatief van het gemeentelijk stembureau: Zijn er gecorrigeerde telresultaten?") */
+  corrected_results_own_initiative: YesNo;
+  /** Why the GSB investigated the counting results on its own initiative
+("Op eigen initiatief van het gemeentelijk stembureau: Waarom heeft het gemeentelijk stembureau
+ de telresultaten onderzocht?") */
+  reason_investigation_own_initiative: ReasonInvestigationOwnInitiative;
+}
+
+/**
+ * Whether the extra page "controles en correcties" is inserted in the report
+ */
+export const checksAndCorrectionsPresentValues = ["PagePresent", "PageMissing"] as const;
+export type ChecksAndCorrectionsPresent = (typeof checksAndCorrectionsPresentValues)[number];
+
 /**
  * Chosen candidate
  */
@@ -678,7 +863,11 @@ export interface ChosenCandidate {
  */
 export interface ClaimDataEntryResponse {
   client_state: unknown;
+  /** Fields for which a warning should be shown that a difference should be corrected */
+  correction_warnings?: string[];
   data: Results;
+  /** Whether the typist is correcting an entry that was completed before */
+  is_correction: boolean;
   previous_results?: CommonPollingStationResults;
   source: DataEntrySource;
   status: DataEntryStatusName;
@@ -690,6 +879,11 @@ export interface ClaimDataEntryResponse {
  */
 export const committeeCategoryValues = ["GSB", "CSB"] as const;
 export type CommitteeCategory = (typeof committeeCategoryValues)[number];
+
+/**
+ * Which district this committee is contained within.
+ */
+export type CommitteeDistrict = { district: "None" } | { district: "All" } | (RegionDetails & { district: "Specific" });
 
 /**
  * Committee session
@@ -728,6 +922,17 @@ export interface CommitteeSessionUpdateRequest {
 }
 
 /**
+ * Committee specific totals, i.e. specific for GSB or CSB.
+ */
+export type CommitteeSpecificTotals =
+  | (GSBTotals & { committee: "GSB" })
+  | {
+      committee: "CSB";
+      /** The number of voters ("Kiesgerechtigden") */
+      number_of_voters: number;
+    };
+
+/**
  * CommonPollingStationResults contains the common fields for polling station results,
  */
 export interface CommonPollingStationResults {
@@ -742,6 +947,12 @@ export interface CommonPollingStationResults {
 }
 
 /**
+ * Whether a corrigendum accompanies the report
+ */
+export const corrigendumPresentValues = ["TwoDocuments", "OneDocument"] as const;
+export type CorrigendumPresent = (typeof corrigendumPresentValues)[number];
+
+/**
  * Counting Differences Polling Station,
  * part of the results ("B1-2 Verschillen met telresultaten van het stembureau")
  */
@@ -749,9 +960,9 @@ export interface CountingDifferencesPollingStation {
   /** Whether there was a difference between the total votes per list as determined by the polling station and by the typist
 ("Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?") */
   difference_ballots_per_list: YesNo;
-  /** Whether there was an unexplained difference between the number of voters and votes
-("Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?") */
-  unexplained_difference_ballots_voters: YesNo;
+  /** Whether the total of admitted voters (D) and the total of votes counted (H) are equal, or the difference was completely accounted for
+("Is in de telresultaten van het stembureau het aantal toegelaten kiezers (D) en het totaal aantal getelde stemmen (H) gelijk OF is er een verschil en is dit verschil volledig verklaard?") */
+  difference_ballots_voters_completely_accounted_for: YesNo;
 }
 
 export interface CreateFirstAdminRequest {
@@ -773,6 +984,43 @@ export interface Credentials {
 }
 
 /**
+ * DSOFirstSessionResults, following the fields in Model N 10-1
+ *
+ * See: Model N 10-1 (Proces-verbaal van een stembureau) from
+ * [kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/n-10-1-pv-sb-dso)
+ */
+export interface DSOFirstSessionResults {
+  /** About report ("Over het proces-verbaal") */
+  about_report: AboutReport;
+  /** Checks and corrections ("Controles en correcties") */
+  checks_and_corrections: ChecksAndCorrections;
+  /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("1. Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("2. Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
+}
+
+/**
+ * Polling stations where results were investigated by the GSB,
+ * as vectors of polling station numbers
+ */
+export interface DSOInvestigations {
+  /** Results were corrected
+("Uitslag gecorrigeerd?") */
+  corrected_results: number[];
+  /** Investigated because of a (suspected) other error
+("Onderzocht vanwege (het vermoeden van) een andere fout?") */
+  other_error: number[];
+  /** Investigated because of an unaccounted-for difference
+("Onderzocht vanwege een onverklaard verschil?") */
+  unaccounted_difference: number[];
+}
+
+/**
  * Request structure for saving data entry
  */
 export interface DataEntry {
@@ -786,8 +1034,10 @@ export interface DataEntry {
 
 export interface DataEntryGetDifferencesResponse {
   first_entry: Results;
-  first_entry_user_id: UserId;
+  first_entry_has_errors: boolean;
+  first_entry_origin: DataEntryOrigin;
   second_entry: Results;
+  second_entry_has_errors: boolean;
   second_entry_user_id: UserId;
   source: DataEntrySource;
 }
@@ -802,6 +1052,8 @@ export interface DataEntryGetResponse {
 
 export type DataEntryId = number;
 
+export type DataEntryOrigin = { type: "Import" } | { type: "Typist"; user_id: UserId };
+
 export type DataEntrySource =
   | (PollingStationForSession & { type: "PollingStation" })
   | (SubCommitteeFirstSession & { type: "SubCommittee" });
@@ -815,6 +1067,8 @@ export const dataEntryStatusNameValues = [
   "first_entry_finalised",
   "second_entry_in_progress",
   "entries_different",
+  "first_entry_correction",
+  "second_entry_correction",
   "definitive",
 ] as const;
 export type DataEntryStatusName = (typeof dataEntryStatusNameValues)[number];
@@ -852,12 +1106,20 @@ export interface DifferencesCounts {
 (B1-3.3.1 "Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)") */
   compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters;
   /** Whether the difference between the total of admitted voters and total of votes cast is explained.
-(B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?") */
+(B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H volledig verklaren?") */
   difference_completely_accounted_for: YesNo;
   /** Number of fewer counted ballots ("Aantal minder getelde stemmen (bereken: D min H)") */
   fewer_ballots_count: number;
   /** Number of more counted ballots ("Aantal méér getelde stemmen (bereken: H min D)") */
   more_ballots_count: number;
+}
+
+/**
+ * Contains the totals of the differences, containing which polling stations had differences.
+ */
+export interface DifferencesTotals {
+  fewer_ballots_count: SumCount;
+  more_ballots_count: SumCount;
 }
 
 /**
@@ -874,27 +1136,58 @@ export type DrawingLotsRequired =
   | (CandidateDrawingLotsVariant & { type: "CandidateDrawingLotsRequired" });
 
 /**
- * Election without political groups
+ * Election without political groups.
+ *
+ * Note: an election within Abacus does not represent the entire election, but
+ * rather a single committee (i.e. stembureau at the CSB, HSB or GSB level)
+ * within the election.
+ *
+ * When access to the political groups and their candidates is required, use
+ * [`ElectionWithPoliticalGroups`] instead. When creating a new election, use
+ * [`NewElection`] instead.
  */
 export interface Election {
+  /** See [`ElectionWithPoliticalGroups::authority_id`] */
+  authority_id: string;
+  /** See [`ElectionWithPoliticalGroups::authority_name`] */
+  authority_name: string;
+  /** See [`ElectionWithPoliticalGroups::authority_region`] */
+  authority_region: string;
+  /** See [`ElectionWithPoliticalGroups::category`] */
   category: ElectionCategory;
+  /** See [`ElectionWithPoliticalGroups::committee_category`] */
   committee_category: CommitteeCategory;
+  /** See [`ElectionWithPoliticalGroups::counting_method`] */
   counting_method?: VoteCountingMethod;
-  domain_id: string;
+  /** See [`ElectionWithPoliticalGroups::district`] */
+  district: CommitteeDistrict;
+  /** See [`ElectionWithPoliticalGroups::domain`] */
+  domain?: ElectionDomain;
+  /** See [`ElectionWithPoliticalGroups::election_date`] */
   election_date: string;
+  /** See [`ElectionWithPoliticalGroups::election_id`] */
   election_id: string;
+  /** See [`ElectionWithPoliticalGroups::id`] */
   id: ElectionId;
+  /** See [`ElectionWithPoliticalGroups::location`] */
   location: string;
+  /** See [`ElectionWithPoliticalGroups::name`] */
   name: string;
+  /** See [`ElectionWithPoliticalGroups::nomination_date`] */
   nomination_date: string;
+  /** See [`ElectionWithPoliticalGroups::number_of_seats`] */
   number_of_seats: number;
+  /** See [`ElectionWithPoliticalGroups::number_of_voters`] */
   number_of_voters: number;
+  /** See [`ElectionWithPoliticalGroups::official_name`] */
+  official_name: string;
+  /** See [`ElectionWithPoliticalGroups::sub_category`] */
   sub_category: ElectionSubCategory;
 }
 
 export interface ElectionApportionmentResponse {
   candidate_nomination: CandidateNomination;
-  election_summary: ElectionSummary;
+  election_totals: ElectionTotals;
   seat_assignment: SeatAssignment;
   warnings: ApportionmentWarning[];
 }
@@ -927,6 +1220,17 @@ export interface ElectionDetailsResponse {
   election: ElectionWithPoliticalGroups;
   investigations: PollingStationInvestigation[];
   polling_stations: PollingStation[];
+  show_keypair_reminder?: KeypairReminder;
+}
+
+/**
+ * Election domain (i.e. the entity at which the election takes place)
+ */
+export interface ElectionDomain {
+  /** Identifier of the domain */
+  id?: string;
+  /** Name of the domain */
+  name: string;
 }
 
 export type ElectionId = number;
@@ -962,22 +1266,22 @@ export interface ElectionStatusResponse {
 export interface ElectionStatusResponseEntry {
   /** Data entry id */
   data_entry_id: DataEntryId;
+  /** Current data entry progress as a percentage (0 to 100) */
+  data_entry_progress?: number;
   /** Whether the finalised first or second data entry has warnings */
   finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
   finished_at?: string;
-  /** First entry progress as a percentage (0 to 100) */
-  first_entry_progress?: number;
-  /** First entry user id */
-  first_entry_user_id?: number;
-  /** Second entry progress as a percentage (0 to 100) */
-  second_entry_progress?: number;
+  /** First entry origin (import or typist user id) */
+  first_entry_origin?: DataEntryOrigin;
   /** Second entry user id */
   second_entry_user_id?: number;
-  /** Data entry source (polling station or sub committee) */
+  /** Data entry source (polling station or subcommittee) */
   source: DataEntrySource;
   /** Data entry status */
   status: DataEntryStatusName;
+  /** Time when the data entry was last updated */
+  updated_at: string;
 }
 
 /**
@@ -987,17 +1291,15 @@ export const electionSubCategoryValues = ["AB1", "AB2", "GR1", "GR2", "PS1", "PS
 export type ElectionSubCategory = (typeof electionSubCategoryValues)[number];
 
 /**
- * Contains a summary of the election results, added up from the votes of all polling stations.
+ * Contains the totals of the election results, added up from the votes of all polling stations.
  */
-export interface ElectionSummary {
+export interface ElectionTotals {
+  /** Totals specific to the committee (GSB or CSB) of the election */
+  committee_specific: CommitteeSpecificTotals;
   /** The differences between voters and votes */
-  differences_counts: SummaryDifferencesCounts;
-  /** The number of voters (i.e. "Kiesgerechtigden") */
-  number_of_voters?: number;
-  /** The summary votes for each political group (and each candidate within) */
+  differences_counts: DifferencesTotals;
+  /** The total votes for each political group (and each candidate within) */
   political_group_votes: PoliticalGroupCandidateVotes[];
-  /** Polling stations where results were investigated by the GSB */
-  polling_station_investigations: PollingStationInvestigations;
   /** The total number of voters */
   voters_counts: VotersCounts;
   /** The total number of votes */
@@ -1005,22 +1307,76 @@ export interface ElectionSummary {
 }
 
 /**
- * Election with political groups
+ * Election with political groups.
+ *
+ * Note: an election within Abacus does not represent the entire election, but
+ * rather a single committee (i.e. stembureau at the CSB, HSB or GSB level)
+ * within the election.
+ *
+ * When you do not need access to political groups and their candidates, you
+ * can use [`Election`] instead. When creating a new election, use
+ * [`NewElection`] instead.
  */
 export interface ElectionWithPoliticalGroups {
+  /** Identifier of the authority/region that this committee is responsible for. */
+  authority_id: string;
+  /** Name of the authority. Note that most of the time this is the same as the
+region name, but specifically for country wide elections the authority
+name may also be "De Kiesraad" instead of the region name of "Nederland". */
+  authority_name: string;
+  /** The name of the region that the committee is responsible for. */
+  authority_region: string;
+  /** The category of the election, as defined by EML_NL election definition.
+Examples include "Municipal" for municipal elections or "WaterAuthority"
+for the water authority elections. */
   category: ElectionCategory;
+  /** The category (e.g. CSB) of the committee that this struct represents */
   committee_category: CommitteeCategory;
+  /** If this is a GSB committee, this is the counting method used for
+vote tabulation. This field is not used for other committee types. */
   counting_method?: VoteCountingMethod;
-  domain_id: string;
+  /** The district that this committee is responsible for. This will be None
+for committees within elections that do not have districts. When an
+election does have districts this will be All for committees that are
+responsible for all districts, or Specific for committees that sit
+within a specific district. */
+  district: CommitteeDistrict;
+  /** An election wide field: for elections that do not concern the entire
+country this field contains the specific domain of that election. For
+example for municipal elections this contains the municipality that the
+election is for. Note that the election domain id is not always available,
+even if a domain is present. For country wide elections this field is None. */
+  domain?: ElectionDomain;
+  /** The date of the election, as defined by the EML_NL election definition.
+Note: this is the date that the election takes/took place, not necessarily
+the date that the committee is in session. */
   election_date: string;
+  /** The election identifier as defined in the EML_NL election definition */
   election_id: string;
+  /** Identifier of the election within Abacus */
   id: ElectionId;
+  /** The location of the committee.
+
+For GSB committees this will be the same as the authority region, but
+for HSBs and CSBs this may also be a specific town or city within the
+authority region. */
   location: string;
+  /** Name of the election, as formatted for display in Abacus. */
   name: string;
+  /** The date when candidate nominations for this election are/were closed. */
   nomination_date: string;
+  /** The number of seats that are to be elected for. For example, this is 150
+for elections for the House of Representatives (Tweede Kamer). */
   number_of_seats: number;
+  /** How many voters are registered for this election. */
   number_of_voters: number;
+  /** Name of the election, as defined in the EML_NL election definition. */
+  official_name: string;
+  /** The political groups and their candidates that are registered for this
+election. */
   political_groups: PoliticalGroup[];
+  /** The sub-category of the election, as defined by the EML_NL election
+definition. */
   sub_category: ElectionSubCategory;
 }
 
@@ -1034,13 +1390,19 @@ export const errorReferenceValues = [
   "ApportionmentNotCompleted",
   "ApportionmentCommitteeSessionNotCompleted",
   "ApportionmentInvalidLotDrawing",
+  "CertificateAlreadyAdded",
+  "CertificateUnknownSubCommittee",
+  "CertificateWrongElection",
   "CommitteeSessionPaused",
   "DatabaseError",
   "DataEntryAlreadyClaimed",
+  "DataEntryAlreadyImported",
   "DataEntryAlreadyFinalised",
-  "DataEntryCannotBeDeleted",
+  "DataEntryCannotBeReset",
   "DataEntryGetNotAllowed",
   "DataEntryNotAllowed",
+  "DataEntryValidationErrors",
+  "ElectionMismatch",
   "EmlImportError",
   "EmlError",
   "EntryNotFound",
@@ -1048,8 +1410,12 @@ export const errorReferenceValues = [
   "Forbidden",
   "InternalServerError",
   "InvalidApportionmentState",
+  "InvalidCertificate",
   "InvalidCommitteeSessionStatus",
+  "InvalidCountType",
   "InvalidData",
+  "InvalidDistrict",
+  "InvalidFullname",
   "InvalidHash",
   "InvalidJson",
   "InvalidPassword",
@@ -1057,11 +1423,13 @@ export const errorReferenceValues = [
   "InvalidDataEntrySource",
   "InvalidSession",
   "InvalidStateTransition",
+  "InvalidUsername",
   "InvalidUsernameOrPassword",
   "InvalidVoteCandidate",
   "InvalidVoteGroup",
   "InvestigationHasDataEntryOrResult",
   "InvestigationRequiresCorrectedResults",
+  "LoginRateLimited",
   "NotInitialised",
   "OwnAccountCannotBeDeleted",
   "PasswordRejectionSameAsOld",
@@ -1069,11 +1437,15 @@ export const errorReferenceValues = [
   "PasswordRejectionTooShort",
   "PdfGenerationError",
   "PollingStationRepeated",
-  "PollingStationValidationErrors",
   "RequestPayloadTooLarge",
+  "SignatureMissing",
+  "SignatureUnknown",
+  "SubCommitteeHasNoCertificates",
   "Unauthorized",
+  "UnknownCommittee",
   "UsernameNotUnique",
   "UserNotFound",
+  "ZipError",
 ] as const;
 export type ErrorReference = (typeof errorReferenceValues)[number];
 
@@ -1087,15 +1459,15 @@ export interface ErrorResponse {
 }
 
 /**
- * Extra investigation, part of the results ("B1-1 Alleen bij extra onderzoek")
+ * Extra investigation, part of the results ("B1-1 Extra onderzoek")
  */
 export interface ExtraInvestigation {
   /** Whether ballots were (partially) recounted following the extra investigation
 ("Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?") */
   ballots_recounted_extra_investigation: YesNo;
-  /** Whether extra investigation was done for another reason than an unexplained difference
-("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?") */
-  extra_investigation_other_reason: YesNo;
+  /** Whether extra investigation was done
+("Heeft het gemeentelijk stembureau extra onderzoek gedaan?") */
+  extra_investigation_done: YesNo;
 }
 
 /**
@@ -1118,6 +1490,7 @@ export interface GSBElectionCreationRequest {
   number_of_voters: number;
   polling_station_data?: string;
   polling_station_file_name?: string;
+  selected_region?: RegionKey;
 }
 
 export interface GSBElectionCreationValidateRequest {
@@ -1129,10 +1502,12 @@ export interface GSBElectionCreationValidateRequest {
   number_of_voters?: number;
   polling_station_data?: string;
   polling_station_file_name?: string;
+  selected_region?: RegionKey;
 }
 
 export interface GSBElectionDefinitionValidateResponse {
   election: NewElection;
+  gsb_list: RegionDetails[];
   hash: RedactedEmlHash;
   number_of_voters: number;
   polling_station_definition_matches_election?: boolean;
@@ -1160,6 +1535,13 @@ export interface GSBResults {
 }
 
 /**
+ * GSB specific totals, depending on the vote counting method (CSO or DSO).
+ */
+export type GSBTotals =
+  | (CSOInvestigations & { counting_method: "CSO" })
+  | (DSOInvestigations & { counting_method: "DSO" });
+
+/**
  * Abacus API and asset server
  */
 export interface GenerateElectionArgs {
@@ -1168,14 +1550,20 @@ export interface GenerateElectionArgs {
   candidates_per_group: RandomRange;
   /** GSB or CSB */
   committee_category: CommitteeCategory;
+  /** CSO or DSO */
+  counting_method?: VoteCountingMethod;
   /** Custom election name */
   custom_name?: string;
+  /** Municipal, Provincial or WaterAuthority */
+  election_category: ElectionCategory;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
   /** Generate multiple elections, each resulting in drawing lots */
   generate_drawing_lots: boolean;
   /** Generate multiple elections, each resulting in a different P 22-2 variant */
   generate_p22_2_variants: boolean;
+  /** Amount of GSBs */
+  gsbs: RandomRange;
   political_group_distribution_slope: RandomRange;
   /** Number of political groups to create */
   political_groups: RandomRange;
@@ -1234,6 +1622,9 @@ export type InvestigationStatus =
   | { state: InvestigationInProgress; status: "InProgress" }
   | { state: InvestigationConcludedWithoutNewResults; status: "ConcludedWithoutNewResults" }
   | { state: InvestigationConcludedWithNewResults; status: "ConcludedWithNewResults" };
+
+export const keypairReminderValues = ["Dismissable", "NonDismissable"] as const;
+export type KeypairReminder = (typeof keypairReminderValues)[number];
 
 export interface LargestRemainderAssignedSeat {
   drawing_lots?: ListDrawingLotsVariant;
@@ -1319,21 +1710,76 @@ export interface LoginResponse {
 }
 
 /**
- * Election request
+ * Struct for creating a new election in Abacus.
+ *
+ * This struct does not contain the internal Abacus election id, as that is
+ * generated by Abacus when creating a new election.
+ *
+ * Note: an election within Abacus does not represent the entire election, but
+ * rather a single committee (i.e. stembureau at the CSB, HSB or GSB level)
+ * within the election.
+ *
+ * Please take a look at [`ElectionWithPoliticalGroups`] for the full election
+ * representation, or [`Election`] for the election representation without
+ * political groups and their candidates.
  */
 export interface NewElection {
+  /** See [`ElectionWithPoliticalGroups::authority_id`] */
+  authority_id: string;
+  /** See [`ElectionWithPoliticalGroups::authority_name`] */
+  authority_name: string;
+  /** See [`ElectionWithPoliticalGroups::authority_region`] */
+  authority_region: string;
+  /** See [`ElectionWithPoliticalGroups::category`] */
   category: ElectionCategory;
+  /** See [`ElectionWithPoliticalGroups::committee_category`] */
   committee_category: CommitteeCategory;
+  /** See [`ElectionWithPoliticalGroups::counting_method`] */
   counting_method?: VoteCountingMethod;
-  domain_id: string;
+  /** See [`ElectionWithPoliticalGroups::district`] */
+  district: CommitteeDistrict;
+  /** See [`ElectionWithPoliticalGroups::domain`] */
+  domain?: ElectionDomain;
+  /** See [`ElectionWithPoliticalGroups::election_date`] */
   election_date: string;
+  /** See [`ElectionWithPoliticalGroups::election_id`] */
   election_id: string;
+  /** See [`ElectionWithPoliticalGroups::location`] */
   location: string;
+  /** See [`ElectionWithPoliticalGroups::name`] */
   name: string;
+  /** See [`ElectionWithPoliticalGroups::nomination_date`] */
   nomination_date: string;
+  /** See [`ElectionWithPoliticalGroups::number_of_seats`] */
   number_of_seats: number;
+  /** See [`ElectionWithPoliticalGroups::number_of_voters`] */
   number_of_voters: number;
+  /** See [`ElectionWithPoliticalGroups::official_name`] */
+  official_name: string;
+  /** See [`ElectionWithPoliticalGroups::political_groups`] */
+  political_groups: RegisteredPoliticalGroup[];
+  /** See [`ElectionWithPoliticalGroups::sub_category`] */
   sub_category: ElectionSubCategory;
+}
+
+/**
+ * NextSessionResults, following the fields in Model Na 14-2 Bijlage 1/Na 14-1 versie 2.
+ *
+ * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
+ * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from
+ * <https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso)>.
+ * See also "Model Na 14-1 (Corrigendum bij het proces-verbaal van een stembureau)"
+ * <https://www.kiesraad.nl/documenten/2025/11/27/model-na-14-1>.
+ */
+export interface NextSessionResults {
+  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
 }
 
 export type PGNumber = number;
@@ -1426,22 +1872,6 @@ export interface PollingStationInvestigationUpdateRequest {
 }
 
 /**
- * Polling stations where results were investigated by the GSB,
- * as vectors of polling station numbers
- */
-export interface PollingStationInvestigations {
-  /** Admitted voters were recounted
-("Toegelaten kiezers opnieuw vastgesteld?") */
-  admitted_voters_recounted: number[];
-  /** Ballots were (partially) recounted
-("Stembiljetten (deels) herteld?") */
-  ballots_recounted: number[];
-  /** Investigated for other reasons than unexplained difference
-("Onderzocht vanwege andere reden dan onverklaard verschil?") */
-  investigated_other_reason: number[];
-}
-
-/**
  * Polling station list response
  */
 export interface PollingStationListResponse {
@@ -1471,15 +1901,16 @@ export interface PollingStationRequest {
   postal_code: string;
 }
 
-export interface PollingStationRequestListResponse {
-  polling_stations: PollingStationRequest[];
-}
-
 /**
  * Type of Polling station
  */
 export const pollingStationTypeValues = ["FixedLocation", "Special", "Mobile"] as const;
 export type PollingStationType = (typeof pollingStationTypeValues)[number];
+
+export interface PollingStationValidateImportResponse {
+  polling_station_definition_matches_election: boolean;
+  polling_stations: PollingStationRequest[];
+}
 
 export interface PollingStationsRequest {
   file_name: string;
@@ -1493,9 +1924,21 @@ export interface PreferenceThreshold {
 
 export type ProcessApportionmentResponse =
   | (ElectionApportionmentResponse & { status: "Finalised" })
-  | { election_summary: ElectionSummary; seat_assignment: SeatAssignment; status: "DrawingLotsRequired" };
+  | { election_totals: ElectionTotals; seat_assignment: SeatAssignment; status: "DrawingLotsRequired" };
 
 export type RandomRange = string;
+
+/**
+ * Reason for investigation on own initiative
+ */
+export interface ReasonInvestigationOwnInitiative {
+  /** Because of a (suspected) other error
+("Vanwege (het vermoeden van) een andere fout") */
+  other_error: boolean;
+  /** Because of an unaccounted-for difference
+("Vanwege een onverklaard verschil") */
+  unaccounted_difference: boolean;
+}
 
 export interface RedactedEmlHash {
   /** Array holding the hash chunks as text */
@@ -1504,10 +1947,61 @@ export interface RedactedEmlHash {
   redacted_indexes: number[];
 }
 
+/**
+ * Category of a region, as defined by EML-NL
+ */
+export const regionCategoryValues = [
+  "State",
+  "WaterAuthority",
+  "Province",
+  "ElectoralDistrict",
+  "Municipality",
+  "PollingStation",
+] as const;
+export type RegionCategory = (typeof regionCategoryValues)[number];
+
+/**
+ * Identifies a specific region from the election tree for usage within Abacus.
+ */
+export interface RegionDetails {
+  /** Whether this region allows Frisian export. */
+  frisian_export_allowed: boolean;
+  /** Key of the region (combination of category and id) */
+  key: RegionKey;
+  /** Name of the region */
+  name: string;
+  /** Whether this region uses roman numerals for its contest id. */
+  roman_numerals: boolean;
+}
+
+/**
+ * Identifies a specific region from the election tree for usage within Abacus.
+ */
+export interface RegionKey {
+  /** Category of the region, as defined by EML_NL */
+  category: RegionCategory;
+  /** Identifier of the region, if it has one. */
+  number?: number;
+}
+
+/**
+ * Political group and its candidates (with registered name as imported from the EML)
+ */
+export interface RegisteredPoliticalGroup {
+  /** List of candidates of the political group */
+  candidates: Candidate[];
+  /** Political group number */
+  number: number;
+  /** Registered political group name as imported from the candidates list EML (230) */
+  registered_name: string;
+}
+
 export const resolveDifferencesActionValues = [
-  "keep_first_entry",
-  "keep_second_entry",
-  "discard_both_entries",
+  "keep_first_and_discard_second",
+  "keep_first_and_correct_second",
+  "keep_second_and_discard_first",
+  "keep_second_and_correct_first",
+  "discard_both",
 ] as const;
 export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[number];
 
@@ -1521,8 +2015,10 @@ export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
  * election committee category and whether this is the first or any subsequent data entry session.
  */
 export type Results =
+  | (DSOFirstSessionResults & { model: "DSOFirstSession" })
+  | (NextSessionResults & { model: "DSONextSession" })
   | (CSOFirstSessionResults & { model: "CSOFirstSession" })
-  | (CSONextSessionResults & { model: "CSONextSession" })
+  | (NextSessionResults & { model: "CSONextSession" })
   | (GSBResults & { model: "GSB" });
 
 export const roleValues = ["administrator", "coordinator_gsb", "coordinator_csb", "typist_gsb", "typist_csb"] as const;
@@ -1562,7 +2058,10 @@ export interface SeatChangeStep {
  * of the election, committee session and data entry.
  */
 export interface SubCommittee {
+  authority_id: string;
+  authority_name: string;
   category: CommitteeCategory;
+  certificates: Certificate[];
   id: SubCommitteeId;
   name: string;
   number: number;
@@ -1571,28 +2070,25 @@ export interface SubCommittee {
 /**
  * Sub electoral committee in a first committee session.
  */
-export type SubCommitteeFirstSession = SubCommittee & {
+export interface SubCommitteeFirstSession {
+  authority_id: string;
+  authority_name: string;
   committee_session_id: CommitteeSessionId;
   data_entry_id: DataEntryId;
-};
+  id: SubCommitteeId;
+  name: string;
+  number: number;
+}
 
 export type SubCommitteeId = number;
 
 /**
- * Contains a summary count, containing both the count and a list of polling
+ * Contains a sum count, containing both the count and a list of polling
  * stations that contributed to it.
  */
 export interface SumCount {
   count: number;
   data_entry_sources: DataEntrySourceNumber[];
-}
-
-/**
- * Contains a summary of the differences, containing which polling stations had differences.
- */
-export interface SummaryDifferencesCounts {
-  fewer_ballots_count: SumCount;
-  more_ballots_count: SumCount;
 }
 
 export interface UpdateUserRequest {
@@ -1629,8 +2125,17 @@ export interface ValidationResult {
 export const validationResultCodeValues = [
   "F101",
   "F102",
+  "F103",
+  "F104",
   "F111",
   "F112",
+  "F121",
+  "F122",
+  "F131",
+  "F132",
+  "F133",
+  "F134",
+  "F135",
   "F201",
   "F202",
   "F203",
@@ -1645,11 +2150,14 @@ export const validationResultCodeValues = [
   "F308",
   "F309",
   "F310",
+  "F311",
   "F312",
+  "F313",
   "F401",
   "F402",
   "F403",
   "W001",
+  "W002",
   "W201",
   "W202",
   "W203",

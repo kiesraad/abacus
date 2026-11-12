@@ -16,8 +16,10 @@ env:
   TZ: "Europe/Amsterdam"
 
 jobs:
-  backend:
+  backend-coverage:
     name: Backend coverage
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,34 +28,10 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
       BINSTALL_DISABLE_TELEMETRY: "true"
+      BINSTALL_NO_CONFIRM: "true"
       # Branch coverage requires Rust nightly: https://github.com/taiki-e/cargo-llvm-cov/issues/8
       RUSTUP_TOOLCHAIN: nightly-2026-07-10
     steps:
-      # Free up runner disk space, so that our job has enough space to run
-      # https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
-      - name: Free up runner disk space
-        working-directory: /
-        run: >
-          df -h
-          &&
-          echo "Freeing up disk space..."
-          &&
-          sudo rm -rf
-          /opt/az
-          /opt/google
-          /opt/hostedtoolcache
-          /opt/microsoft
-          /usr/lib/google-cloud-sdk
-          /usr/lib/jvm
-          /usr/local/.ghcup
-          /usr/local/julia*
-          /usr/local/lib/android
-          /usr/local/share/chromium
-          /usr/local/share/powershell
-          /usr/share/dotnet
-          /usr/share/swift
-          &&
-          df -h
       - name: Checkout
         uses: actions/checkout@v7.0.1
         with:
@@ -62,20 +40,26 @@ jobs:
         shell: bash
         run: rustup toolchain install "$RUSTUP_TOOLCHAIN"
       - name: Cargo cache
-        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@ead08b90bd7b2e6d81963fb9cf0b7239f66d5db4 # main
+        uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # main
       - name: Install cargo-llvm-cov
-        run: cargo binstall cargo-llvm-cov
+        run: cargo binstall --locked cargo-llvm-cov
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Install Nextest
-        run: cargo binstall cargo-nextest
+        run: cargo binstall --locked cargo-nextest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Symlink sqlx test directory to /dev/shm
+        run: mkdir -p target /dev/shm/sqlx && rm -rf target/sqlx && ln -s /dev/shm/sqlx target/sqlx
       - name: Run tests with coverage
         run: cargo llvm-cov nextest --workspace --branch --profile ci --features embed-typst,airgap-detection --cobertura --output-path ./target/llvm-cov-target/codecov.json
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Backend Nextest Coverage
@@ -85,7 +69,7 @@ jobs:
       - name: Report disk space
         run: df -h
 
-  frontend:
+  frontend-coverage:
     name: Frontend coverage
     runs-on: ubuntu-latest
     defaults:
@@ -97,7 +81,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup Node
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           package-manager-cache: false
@@ -117,7 +101,7 @@ jobs:
         env:
           CHROMIUM_CHANNEL: chrome
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Frontend Vitest Coverage

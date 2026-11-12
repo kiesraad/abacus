@@ -1,17 +1,17 @@
-use sqlx::{SqliteConnection, query, query_as, types::Json};
+use sqlx::{SqliteConnection, query, query_as, query_scalar, types::Json};
 
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::{DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource},
-        election::CommitteeCategory,
-        sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeNumber},
+        sub_committee::{
+            Certificate, NewSubCommittee, SubCommittee, SubCommitteeFirstSession, SubCommitteeId,
+        },
     },
     repository::common::{SubCommitteeRow, SubCommitteeRowLike},
 };
 
-/// List all sub electoral committees for a committee session
-async fn list(
+async fn list_rows(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<SubCommitteeRow>, sqlx::Error> {
@@ -24,7 +24,10 @@ async fn list(
             data_entry_id AS "data_entry_id!: _",
             number,
             name,
-            category
+            category,
+            authority_id,
+            authority_name,
+            certificates
         FROM sub_committees
         WHERE committee_session_id = $1
         "#,
@@ -34,12 +37,24 @@ async fn list(
     .await
 }
 
+/// List all sub electoral committees for a committee session
+pub async fn list(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<SubCommittee>, sqlx::Error> {
+    Ok(list_rows(conn, committee_session_id)
+        .await?
+        .into_iter()
+        .map(SubCommitteeRow::into_sub_committee)
+        .collect())
+}
+
 /// List all sub electoral committees for a first committee session
 pub async fn list_first_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<SubCommitteeFirstSession>, sqlx::Error> {
-    Ok(list(conn, committee_session_id)
+    Ok(list_rows(conn, committee_session_id)
         .await?
         .into_iter()
         .map(SubCommitteeRow::into_sub_committee_first_session)
@@ -51,9 +66,7 @@ pub async fn create(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
     data_entry_id: DataEntryId,
-    number: SubCommitteeNumber,
-    name: &str,
-    category: CommitteeCategory,
+    subcommittee: NewSubCommittee,
 ) -> Result<SubCommitteeFirstSession, sqlx::Error> {
     query_as!(
         SubCommitteeRow,
@@ -63,28 +76,74 @@ pub async fn create(
             data_entry_id,
             number,
             name,
-            category
-        ) VALUES (?, ?, ?, ?, ?)
+            category,
+            authority_id,
+            authority_name
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
         RETURNING
             id AS "id!: _",
             committee_session_id,
             data_entry_id AS "data_entry_id!: _",
             number,
             name,
-            category
+            category,
+            authority_id,
+            authority_name,
+            certificates
         "#,
         committee_session_id,
         data_entry_id,
-        number,
-        name,
-        category,
+        subcommittee.number,
+        subcommittee.name,
+        subcommittee.category,
+        subcommittee.authority_id,
+        subcommittee.authority_name
     )
     .fetch_one(conn)
     .await
     .map(SubCommitteeRow::into_sub_committee_first_session)
 }
 
-/// List all sub committees for a first committee session with their data entry status.
+/// Replace the certificates of a sub electoral committee
+pub async fn update_certificates(
+    conn: &mut SqliteConnection,
+    sub_committee_id: SubCommitteeId,
+    certificates: &[Certificate],
+) -> Result<(), sqlx::Error> {
+    let certificates = Json(certificates);
+    query!(
+        r#"
+        UPDATE sub_committees
+        SET certificates = ?
+        WHERE id = ?
+        "#,
+        certificates,
+        sub_committee_id
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
+/// Get all certificates for a sub electoral committee
+pub async fn get_certificates(
+    conn: &mut SqliteConnection,
+    sub_committee_id: SubCommitteeId,
+) -> Result<Vec<Certificate>, sqlx::Error> {
+    let certificates = query_scalar!(
+        r#"
+        SELECT certificates
+        FROM sub_committees
+        WHERE id = ?
+        "#,
+        sub_committee_id
+    )
+    .fetch_one(conn)
+    .await?;
+    Ok(certificates.0)
+}
+
+/// List all subcommittees for a first committee session with their data entry status.
 pub async fn list_first_session_with_status(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
@@ -97,7 +156,11 @@ pub async fn list_first_session_with_status(
             sc.number,
             sc.name,
             sc.category,
-            de.state AS "state!: Json<DataEntryStatus>"
+            sc.authority_id,
+            sc.authority_name,
+            sc.certificates,
+            de.state AS "state!: Json<DataEntryStatus>",
+            de.updated_at
         FROM sub_committees AS sc
         JOIN data_entries AS de ON de.id = sc.data_entry_id
         WHERE sc.committee_session_id = $1
@@ -109,14 +172,14 @@ pub async fn list_first_session_with_status(
         source: DataEntrySource::SubCommittee(SubCommitteeFirstSession {
             committee_session_id,
             data_entry_id: row.data_entry_id,
-            sub_committee: SubCommittee {
-                id: row.id,
-                number: row.number,
-                name: row.name,
-                category: row.category,
-            },
+            id: row.id,
+            number: row.number,
+            name: row.name,
+            authority_id: row.authority_id,
+            authority_name: row.authority_name,
         }),
         status: row.state.0,
+        updated_at: row.updated_at,
     })
     .fetch_all(conn)
     .await

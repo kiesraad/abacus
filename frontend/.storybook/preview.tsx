@@ -9,12 +9,16 @@ import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { UsersProviderContext } from "@/hooks/user/UsersProviderContext";
 import { t } from "@/i18n/translate";
 import "@/styles/index.css";
-import { electionDetailsMockResponse, mockInvestigations } from "@/testing/api-mocks/ElectionMockData";
+import {
+  electionDetailsMockResponse,
+  getElectionMockData,
+  mockInvestigations,
+} from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { matchers } from "@/testing/matchers";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import type { Role } from "@/types/generated/openapi";
+import type { Role, VoteCountingMethod } from "@/types/generated/openapi";
 
 sb.mock("react-router", { spy: true });
 
@@ -32,8 +36,10 @@ const preview: Preview = {
     },
     backgrounds: {
       options: {
-        dark: { name: "Dark", value: "#333" },
-        light: { name: "Light", value: "#f9fafb" },
+        light: { name: "gray-50", value: "#f9fafb" },
+        red: { name: "red-100", value: "#fbe9ed" },
+        green: { name: "green-100", value: "#e7f3ee" },
+        blue: { name: "blue-100", value: "#e7eef9" },
       },
     },
   },
@@ -55,6 +61,7 @@ const preview: Preview = {
       const needsElection = (parameters.needsElection as boolean) || false;
       const needsElectionStatus = (parameters.needsElectionStatus as boolean) || false;
       const committeeSessionNumber = (parameters.committeeSessionNumber as number) || 1;
+      const countingMethod = parameters.countingMethod ? (parameters.countingMethod as VoteCountingMethod) : "CSO";
 
       let component = <Story />;
 
@@ -76,7 +83,7 @@ const preview: Preview = {
         component = (
           <ElectionProviderContext.Provider
             value={{
-              election: electionDetailsMockResponse.election,
+              election: getElectionMockData({ counting_method: countingMethod }).election,
               pollingStations: electionDetailsMockResponse.polling_stations,
               currentCommitteeSession: {
                 ...electionDetailsMockResponse.current_committee_session,

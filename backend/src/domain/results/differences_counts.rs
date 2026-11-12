@@ -24,7 +24,7 @@ pub struct DifferencesCounts {
     #[schema(value_type = u32)]
     pub fewer_ballots_count: Count,
     /// Whether the difference between the total of admitted voters and total of votes cast is explained.
-    /// (B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?")
+    /// (B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H volledig verklaren?")
     pub difference_completely_accounted_for: YesNo,
 }
 
@@ -281,6 +281,17 @@ impl DifferencesCounts {
                 context: None,
             });
         }
+
+        if (total_voters_count == total_votes_count) && !accounted_for.is_empty() {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    path.field("difference_completely_accounted_for")
+                        .to_string(),
+                ],
+                code: ValidationResultCode::F313,
+                context: None,
+            });
+        }
     }
 }
 
@@ -355,7 +366,7 @@ mod tests {
         election::PGNumber,
         results::{
             Results, cso_first_session_results::CSOFirstSessionResults,
-            cso_next_session_results::CSONextSessionResults,
+            next_session_results::NextSessionResults,
             political_group_candidate_votes::PoliticalGroupCandidateVotes,
             political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
             votes_counts::VotesCounts,
@@ -375,7 +386,7 @@ mod tests {
                 },
                 more_ballots_count: 0,
                 fewer_ballots_count: 0,
-                difference_completely_accounted_for: YesNo::yes(),
+                difference_completely_accounted_for: YesNo::default(),
             }
         }
     }
@@ -729,7 +740,7 @@ mod tests {
     #[test]
     fn test_not_equal_political_group_votes_differences() {
         let mut different_fields = vec![];
-        let first_entry = Results::CSONextSession(CSONextSessionResults {
+        let first_entry = Results::CSONextSession(NextSessionResults {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
@@ -816,7 +827,6 @@ mod tests {
         let mut data = DifferencesCounts::zero();
         data.compare_votes_cast_admitted_voters
             .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
 
         let validation_results = validate(&data, 105, 105)?;
 
@@ -893,7 +903,6 @@ mod tests {
         let mut data = DifferencesCounts::zero();
         data.compare_votes_cast_admitted_voters
             .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
 
         let validation_results = validate(&data, 105, 105)?;
 
@@ -956,7 +965,6 @@ mod tests {
 
         data.compare_votes_cast_admitted_voters
             .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
 
         let validation_results = validate(&data, 103, 103)?;
 
@@ -1219,6 +1227,46 @@ mod tests {
             let result = validate(&data, voters, votes)?;
             let has_f310 = result.errors.iter().any(|e| e == &f310);
             assert_eq!(has_f310, expect_f310, "Failed: {description}");
+        }
+
+        Ok(())
+    }
+
+    /// GSB CSO, GSB DSO | F.313: (Als D = H) Verklaring voor verschil 'ja' en/of 'nee' aangevinkt
+    #[test]
+    fn test_f313() -> Result<(), DataError> {
+        let f313 = ValidationResult {
+            code: ValidationResultCode::F313,
+            fields: vec!["differences_counts.difference_completely_accounted_for".into()],
+            context: None,
+        };
+
+        // (description, H=votes, D=voters, accounted_for, expect_f313)
+        let cases = vec![
+            ("H = D, yes", 52, 52, YesNo::yes(), true),
+            ("H = D, no", 52, 52, YesNo::no(), true),
+            ("H = D, empty", 52, 52, YesNo::default(), false),
+            ("H = D, both", 52, 52, YesNo::both(), true),
+            ("H > D, yes", 72, 52, YesNo::yes(), false),
+            ("H > D, no", 72, 52, YesNo::no(), false),
+            ("H > D, empty", 72, 52, YesNo::default(), false),
+            ("H > D, both", 72, 52, YesNo::both(), false),
+            ("H < D, yes", 52, 72, YesNo::yes(), false),
+            ("H < D, no", 52, 72, YesNo::no(), false),
+            ("H < D, empty", 52, 72, YesNo::default(), false),
+            ("H < D, both", 52, 72, YesNo::both(), false),
+        ];
+
+        for (description, votes, voters, accounted_for, expect_f313) in cases {
+            let mut data = DifferencesCounts::zero();
+            data.difference_completely_accounted_for = accounted_for;
+
+            let result = validate(&data, voters, votes)?;
+            assert_eq!(
+                result.errors.contains(&f313),
+                expect_f313,
+                "Failed: {description}"
+            );
         }
 
         Ok(())

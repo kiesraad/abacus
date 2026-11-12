@@ -4,9 +4,9 @@ We use [cargo-fuzz](https://rust-fuzz.github.io/book/cargo-fuzz.html) for fuzzin
 
 ## Data entry status fuzz test
 
-The `data_entry_status` fuzz test tests that the data entry system matches the state machine described in the [docs](https://github.com/kiesraad/abacus/blob/main/documentatie/flowcharts/data-entry-state.md). The fuzzer checks that all possible transitions change the state as expected, or give the expected error.
+The `data_entry_status` fuzz test tests that the data entry system matches the state machine described in the [docs](https://github.com/kiesraad/abacus/blob/main/documentatie/state-machines/data-entry-state.md). The fuzzer checks that all possible transitions change the state as expected, or give the expected error.
 
-This fuzz test covers all possible states and all possible `DataEntryTransitionError` errors, except for the `FirstEntryAlreadyClaimed`, `ValidatorError` and `ValidationError` errors. The `FirstEntryAlreadyClaimed` error is not triggered by the fuzzer for simplicity, but this error is explicitly tested by the `first_entry_in_progress_claim_first_entry_other_user_error` unit test. The `ValidatorError` and `ValidationError` errors are not triggered by the fuzzer because the fuzzer does not test the API directly. Instead, the fuzzer only tests the internal functions to focus on verifying the data entry state machine. This fuzz test can be seen as a more complete extension of the unit tests that test individual transitions, which shows that no unexpected errors or transition can happen.
+This fuzz test covers all possible states, including the `FirstEntryCorrection` and `SecondEntryCorrection` states with their claim, save, finalise and discard transitions, and all possible `DataEntryTransitionError` errors except for the `ValidatorError` and `ValidationError` errors. The `ValidatorError` and `ValidationError` errors are not triggered by the fuzzer because the fuzzer does not test the API directly. Instead, the fuzzer only tests the internal functions to focus on verifying the data entry state machine. This fuzz test can be seen as a more complete extension of the unit tests that test individual transitions, which shows that no unexpected errors or transition can happen.
 
 To run the fuzzer, first install cargo-fuzz if you haven't already:
 
@@ -33,6 +33,16 @@ Here, `NEW` indicates that a new code path has been triggered, and `REDUCE` indi
 
 Fuzzers never give hard guarantees on the correctness of software, but they are quite good at finding bugs.
 If the fuzzer has found a problem, it will exit and print the error. The error message will contain which unexpected transition took place. If after a few minutes the fuzzer stops finding new paths and has not found any problems we can be fairly certain the data entry system matches the state machine described in the fuzz test. Terminate the process manually when you feel like this is the case.
+
+### Fuzzing in CI
+
+The fuzzers do not run on pull requests. The `build-lint-test.yml` workflow only checks that the fuzz targets compile
+and lint (using Clippy). The fuzzers themselves run nightly using the `fuzz.yml` workflow. Every fuzz target gets its
+own matrix job and ten minutes of fuzzing. Each job caches its own corpus between runs, so each run continues from the
+coverage reached before rather than starting from scratch (unless the job cache is removed).
+
+When a target fails, its crashing input is uploaded as the `fuzz-artifacts-<target>` artifact. To reproduce the crash,
+download it into `artifacts/<target>/` and reproduce with `cargo fuzz run <target> <path to input>`.
 
 ### Checking the fuzz test coverage
 
@@ -67,4 +77,4 @@ $(rustc +nightly --print sysroot)/lib/rustlib/$(rustc +nightly --print host-tupl
  -ignore-filename-regex="\.cargo|\.rustup|fuzz_target|\/rustc"
 ```
 
-Now you can open the generated `/tmp/coverage/index.html` in your browser to view which parts of Abacus were covered by the fuzzer. The coverage of the `src/data_entry/status.rs` is mainly relevant for this fuzz test, there you can see which error cases have and which have not been covered.
+Now you can open the generated `/tmp/coverage/index.html` in your browser to view which parts of Abacus were covered by the fuzzer. The coverage of the `src/domain/data_entry.rs` is mainly relevant for this fuzz test, there you can see which error cases have and which have not been covered.

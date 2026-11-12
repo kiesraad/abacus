@@ -6,12 +6,13 @@ use utoipa::{PartialSchema, ToSchema};
 
 mod api;
 mod data;
+mod error;
 mod generators;
 
 pub use api::router;
 pub use generators::create_test_election;
 
-use crate::domain::election::CommitteeCategory;
+use crate::domain::election::{CommitteeCategory, ElectionCategory, VoteCountingMethod};
 
 #[derive(Clone, Debug)]
 pub struct RandomRange(pub Range<u32>);
@@ -26,6 +27,14 @@ pub struct GenerateElectionArgs {
 
     /// GSB or CSB
     pub committee_category: CommitteeCategory,
+
+    /// CSO or DSO
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub counting_method: Option<VoteCountingMethod>,
+
+    /// Municipal, Provincial or WaterAuthority
+    pub election_category: ElectionCategory,
 
     /// Number of political groups to create
     pub political_groups: RandomRange,
@@ -62,6 +71,9 @@ pub struct GenerateElectionArgs {
 
     pub candidate_distribution_slope: RandomRange,
     pub political_group_distribution_slope: RandomRange,
+
+    /// Amount of GSBs
+    pub gsbs: RandomRange,
 }
 
 impl<'de> Deserialize<'de> for RandomRange {

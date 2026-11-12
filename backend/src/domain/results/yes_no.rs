@@ -4,7 +4,7 @@ use utoipa::ToSchema;
 use crate::domain::{compare::Compare, field_path::FieldPath};
 
 /// Yes/No response structure for boolean questions with separate yes and no fields.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct YesNo {
     yes: bool,

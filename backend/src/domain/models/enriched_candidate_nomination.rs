@@ -128,7 +128,10 @@ mod tests {
     use crate::{
         api::apportionment::{ApportionmentInputData, map_candidate_nomination},
         domain::{
-            election::{CommitteeCategory, tests::election_fixture_with_given_number_of_seats},
+            election::{
+                CommitteeCategory, ElectionCategory,
+                tests::election_fixture_with_given_number_of_seats,
+            },
             models::enriched_candidate_nomination::EnrichedCandidateNomination,
             results::political_group_candidate_votes::create_political_group_candidate_votes,
         },
@@ -144,6 +147,7 @@ mod tests {
             vec![266, 187],
         ];
         let election = election_fixture_with_given_number_of_seats(
+            ElectionCategory::Municipal,
             CommitteeCategory::CSB,
             &candidate_votes
                 .iter()

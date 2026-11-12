@@ -1,7 +1,7 @@
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import { defineConfig, mergeConfig } from "vite";
 
-import viteConfig from "./vite-prod.config";
+import viteConfig from "./vite-prod.config.ts";
 
 export default defineConfig((configEnv) =>
   mergeConfig(

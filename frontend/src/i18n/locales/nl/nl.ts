@@ -1,17 +1,23 @@
+import about_report from "./about_report.json";
 import account from "./account.json";
 import apportionment from "./apportionment.json";
 import backups from "./backups.json";
 import candidate from "./candidate.json";
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
+import check_hash from "./check_hash.json";
+import checks_and_corrections from "./checks_and_corrections.json";
 import committee_category from "./committee_category.json";
 import committee_session_status from "./committee_session_status.json";
 import counting_differences_polling_station from "./counting_differences_polling_station.json";
 import data_entry from "./data_entry.json";
 import data_entry_detail from "./data_entry_detail.json";
 import data_entry_home from "./data_entry_home.json";
+import data_entry_import from "./data_entry_import.json";
 import differences_counts from "./differences_counts.json";
 import election from "./election.json";
+import election_category from "./election_category.json";
+import election_certificate from "./election_certificate.json";
 import election_management from "./election_management.json";
 import election_report from "./election_report.json";
 import election_status from "./election_status.json";
@@ -20,6 +26,7 @@ import extra_investigation from "./extra_investigation.json";
 import feedback from "./feedback.json";
 import feedback_CSB from "./feedback_CSB.json";
 import feedback_GSB from "./feedback_GSB.json";
+import feedback_GSB_DSO from "./feedback_GSB_DSO.json";
 import form_errors from "./form_errors.json";
 import generic from "./generic.json";
 import initialise from "./initialise.json";
@@ -31,23 +38,30 @@ import privacy_statement from "./privacy_statement.json";
 import resolve_differences from "./resolve_differences.json";
 import results from "./results.json";
 import status from "./status.json";
+import sub_committee_keys from "./sub_committee_keys.json";
 import users from "./users.json";
 import voters_votes_counts from "./voters_votes_counts.json";
 
 const nl = {
   ...generic,
+  about_report,
   account,
   apportionment,
   candidate,
   candidates_votes,
   check_and_save,
+  check_hash,
+  checks_and_corrections,
   committee_category,
   committee_session_status,
   counting_differences_polling_station,
   data_entry,
   data_entry_detail,
+  data_entry_import,
   differences_counts,
   election,
+  election_category,
+  election_certificate,
   election_management,
   extra_investigation,
   election_report,
@@ -56,6 +70,7 @@ const nl = {
   feedback,
   feedback_CSB,
   feedback_GSB,
+  feedback_GSB_DSO,
   form_errors,
   initialise,
   investigations,
@@ -67,6 +82,7 @@ const nl = {
   privacy_statement,
   resolve_differences,
   status,
+  sub_committee_keys,
   users,
   backups,
   voters_votes_counts,

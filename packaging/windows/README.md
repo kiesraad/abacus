@@ -1,5 +1,9 @@
 # Windows installer
 
+The weekly end-to-end tests workflow compiles this installer on every run and publishes it as
+the `abacus-windows-installer-weekly` artifact. That build is not signed, so it is only
+suitable for testing. Follow the steps below to build a signed installer.
+
 Follow the next steps to compile the installer:
 
 1. Download and install [Inno Setup 6.7](https://jrsoftware.org/). Use this version to get the same result.

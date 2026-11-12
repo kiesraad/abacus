@@ -62,6 +62,34 @@ describe("LoginForm", () => {
     });
   });
 
+  test("Rate limit message is shown when there were too many login attempts", async () => {
+    render(<LoginForm />);
+
+    overrideOnce("post", loginUrl, 429, {
+      error: "Too many login attempts",
+      fatal: false,
+      reference: "LoginRateLimited",
+    });
+
+    const user = userEvent.setup();
+
+    await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "Invoerder01");
+    await user.type(screen.getByLabelText("Wachtwoord"), "Wachtwoord");
+    await user.click(screen.getByRole("button", { name: "Inloggen" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent(
+      "Te veel inlogpogingen. Wacht even voordat je opnieuw probeert in te loggen.",
+    );
+    expect(screen.queryByText("De gebruikersnaam of het wachtwoord is onjuist")).not.toBeInTheDocument();
+    expect(navigate).not.toHaveBeenCalled();
+
+    server.use(LoginHandler);
+    await user.click(screen.getByRole("button", { name: "Inloggen" }));
+
+    expect(navigate).toHaveBeenCalledWith("/elections");
+  });
+
   test("Navigate to account setup when password has to be changed", async () => {
     render(<LoginForm />);
 

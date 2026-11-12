@@ -7,8 +7,6 @@ export class ElectionsOverviewPgObj {
   readonly create: Locator;
   readonly elections: Locator;
   readonly alertAccountSetup: Locator;
-  readonly alertGSBElectionCreated: Locator;
-  readonly alertCSBElectionCreated: Locator;
 
   constructor(protected readonly page: Page) {
     this.main = page.getByRole("main");
@@ -18,8 +16,6 @@ export class ElectionsOverviewPgObj {
     this.elections = page.getByTestId("overview").locator("tbody").getByRole("row");
 
     this.alertAccountSetup = page.getByRole("alert").filter({ hasText: "Je account is ingesteld" });
-    this.alertGSBElectionCreated = page.getByRole("alert").filter({ hasText: /^Verkiezing GSB [\w|\s]+ toegevoegd$/ });
-    this.alertCSBElectionCreated = page.getByRole("alert").filter({ hasText: /^Verkiezing CSB [\w|\s]+ toegevoegd$/ });
   }
 
   findElectionRowById(electionId: number) {

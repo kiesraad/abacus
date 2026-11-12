@@ -8,6 +8,7 @@ import {
   getValueAtPath,
   mapResultsToSectionValues,
   mapSectionValues,
+  resetValueAtPath,
   setValueAtPath,
   stringRepresentsInteger,
 } from "./dataEntryMapping";
@@ -15,27 +16,27 @@ import { createDifferencesSection, createVotersAndVotesSection } from "./dataEnt
 
 // Helper function to create a checkbox section for testing
 const createCheckboxesSection = (): DataEntrySection => {
-  // Use TypeScript `as` for testing
   return {
-    id: "test",
-    title: "test",
-    short_title: "test",
+    id: "checkboxes_section",
+    title: "Checkboxes Section",
+    short_title: "Checkboxes",
     subsections: [
       {
         type: "checkboxes",
-        short_title: "test",
-        error_path: "test",
+        title: "Field",
+        short_title: "Field",
+        error_path: "checkbox_struct.field",
         error_message: "error",
         options: [
           {
-            path: "test.yes",
-            label: "yes",
-            short_label: "yes",
+            path: "checkbox_struct.field.option_a",
+            label: "Option A",
+            short_label: "A",
           },
           {
-            path: "test.no",
-            label: "no",
-            short_label: "no",
+            path: "checkbox_struct.field.option_b",
+            label: "Option B",
+            short_label: "B",
           },
         ],
       },
@@ -46,24 +47,25 @@ const createCheckboxesSection = (): DataEntrySection => {
 // Helper function to create a radio section for testing
 const createRadioSection = (): DataEntrySection => {
   return {
-    id: "test",
-    title: "test",
-    short_title: "test",
+    id: "radio_section",
+    title: "Radio Section",
+    short_title: "Radio",
     subsections: [
       {
         type: "radio",
-        short_title: "test",
+        title: "Field",
+        short_title: "Field",
         error: "error",
-        path: "test",
+        path: "radio_struct.field",
         options: [
           {
-            value: "true",
-            label: "yes",
+            value: "OptionA",
+            label: "A",
             short_label: "yes",
           },
           {
-            value: "false",
-            label: "no",
+            value: "OptionB",
+            label: "B",
             short_label: "no",
           },
         ],
@@ -72,49 +74,59 @@ const createRadioSection = (): DataEntrySection => {
   };
 };
 
+const createInputGridSection = (): DataEntrySection => {
+  return {
+    id: "input_grid_section",
+    title: "Input Grid Section",
+    short_title: "Input Grid",
+    subsections: [
+      {
+        type: "inputGrid",
+        headers: ["field", "counted_number", "description"],
+        rows: [
+          { code: "A", path: "numbers_struct.row_a", title: "Row A" },
+          { code: "B", path: "numbers_struct.row_b", title: "Row B" },
+        ],
+      },
+    ],
+  };
+};
+
 describe("mapSectionValues", () => {
   test.each([
-    { input: "true", expected: true, description: "true" },
-    { input: "false", expected: false, description: "false" },
-    { input: "", expected: undefined, description: "empty" },
+    { input: "OptionA", expected: "OptionA", description: "true" },
+    { input: "", expected: null, description: "empty" },
   ])("should handle radio $description", ({ input, expected }) => {
     const radioSection = createRadioSection();
-    const current = { test: null };
-    const formValues = { test: input };
+    const current = { radio_struct: { field: null } };
+    const formValues = { "radio_struct.field": input };
 
     const result = mapSectionValues(current, formValues, radioSection);
 
-    expect(result.test).toBe(expected);
+    expect(result.radio_struct.field).toBe(expected);
   });
 
-  test("should use section info to distinguish radio vs inputGrid fields", () => {
+  test("should use field info to distinguish radio vs inputGrid fields", () => {
     const current = {
-      test: null,
-      test2: null,
+      radio_struct: { field: null },
+      numbers_struct: { row_a: null },
     };
     const formValues = {
-      test: "true", // Radio field - should become boolean
-      test2: "456", // InputGrid field - should be deformatted to number
+      "radio_struct.field": "", // Radio field - should become null
+      "numbers_struct.row_a": "456", // InputGrid field - should be deformatted to number
     };
 
     const testSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Test Section",
       short_title: "Test",
-      subsections: [
-        ...createRadioSection().subsections,
-        {
-          type: "inputGrid",
-          headers: ["field", "counted_number", "description"],
-          rows: [{ code: "A", path: "test2", title: "Test Title" }],
-        },
-      ],
+      subsections: [...createRadioSection().subsections, ...createInputGridSection().subsections],
     };
 
     const result = mapSectionValues(current, formValues, testSection);
 
-    expect(result.test).toBe(true); // Radio test field becomes boolean
-    expect(result.test2).toBe(456); // InputGrid field gets deformatted to number
+    expect(result.radio_struct.field).toBe(null); // Radio test field becomes null
+    expect(result.numbers_struct.row_a).toBe(456); // InputGrid field gets deformatted to number
   });
 
   test("should handle numbers correctly when section info is provided", () => {
@@ -392,15 +404,15 @@ describe("mapSectionValues", () => {
   });
 
   test("should handle checkboxes subsection", () => {
-    const current = { test: { yes: null, no: null } };
+    const current = { checkbox_struct: { field: { option_a: false, option_b: false } } };
     const formValues = {
-      "test.yes": "true",
-      "test.no": "false",
+      "checkbox_struct.field.option_a": "true",
+      "checkbox_struct.field.option_b": "false",
     };
 
     const result = mapSectionValues(current, formValues, createCheckboxesSection());
-    expect(result.test.yes).toBe(true);
-    expect(result.test.no).toBe(false);
+    expect(result.checkbox_struct.field.option_a).toBe(true);
+    expect(result.checkbox_struct.field.option_b).toBe(false);
   });
 });
 
@@ -652,9 +664,12 @@ describe("mapResultsToSectionValues", () => {
 
   test("should handle mixed subsections components", () => {
     const results = {
-      test: true,
-      voters_counts: {
-        poll_card_count: 100,
+      radio_struct: {
+        field: "OptionA",
+      },
+      numbers_struct: {
+        row_a: 100,
+        row_b: 0,
       },
     };
 
@@ -666,43 +681,40 @@ describe("mapResultsToSectionValues", () => {
         { type: "message", message: "description" },
         ...createRadioSection().subsections,
         { type: "heading", title: "description" },
-        {
-          type: "inputGrid",
-          headers: ["field", "counted_number", "description"],
-          rows: [{ path: "voters_counts.poll_card_count", title: "Test Title" }],
-        },
+        ...createInputGridSection().subsections,
       ],
     };
 
     const formValues = mapResultsToSectionValues(mixedSection, results);
 
-    expect(Object.keys(formValues).length).toBe(2);
-    expect(formValues.test).toBe("true");
-    expect(formValues["voters_counts.poll_card_count"]).toBe("100");
+    expect(Object.keys(formValues).length).toBe(3);
+    expect(formValues["radio_struct.field"]).toBe("OptionA");
+    expect(formValues["numbers_struct.row_a"]).toBe("100");
+    expect(formValues["numbers_struct.row_b"]).toBe("");
   });
 
   test("should extract checkboxes boolean values to string form", () => {
     const checkboxesSection = createCheckboxesSection();
     // Test with both true values
-    const results = { test: { yes: true, no: true } };
+    const results = { checkbox_struct: { field: { option_a: true, option_b: true } } };
 
     let formValues = mapResultsToSectionValues(checkboxesSection, results);
-    expect(formValues["test.yes"]).toBe("true");
-    expect(formValues["test.no"]).toBe("true");
+    expect(formValues["checkbox_struct.field.option_a"]).toBe("true");
+    expect(formValues["checkbox_struct.field.option_b"]).toBe("true");
 
     // Test with both false values
-    results.test = { yes: false, no: false };
+    results.checkbox_struct.field = { option_a: false, option_b: false };
 
     formValues = mapResultsToSectionValues(checkboxesSection, results);
-    expect(formValues["test.yes"]).toBe("false");
-    expect(formValues["test.no"]).toBe("false");
+    expect(formValues["checkbox_struct.field.option_a"]).toBe("false");
+    expect(formValues["checkbox_struct.field.option_b"]).toBe("false");
 
     // Test with mixed values
-    results.test = { yes: true, no: false };
+    results.checkbox_struct.field = { option_a: true, option_b: false };
 
     formValues = mapResultsToSectionValues(checkboxesSection, results);
-    expect(formValues["test.yes"]).toBe("true");
-    expect(formValues["test.no"]).toBe("false");
+    expect(formValues["checkbox_struct.field.option_a"]).toBe("true");
+    expect(formValues["checkbox_struct.field.option_b"]).toBe("false");
   });
 });
 
@@ -806,7 +818,7 @@ describe("setValueAtPath", () => {
       expected: 1500,
     },
     {
-      path: "extra_investigation.extra_investigation_other_reason.yes",
+      path: "extra_investigation.extra_investigation_done.yes",
       value: "true",
       type: "boolean",
       expected: true,
@@ -851,5 +863,66 @@ describe("setValueAtPath", () => {
 
       expect(e).toBeInstanceOf(Error);
     }
+  });
+});
+
+test("resetValueAtPath", () => {
+  const mixedSection: DataEntrySection = {
+    id: "mixed_section",
+    title: "Mixed Section",
+    short_title: "Mixed",
+    subsections: [
+      ...createInputGridSection().subsections,
+      { type: "message", message: "Please select things" },
+      ...createCheckboxesSection().subsections,
+      ...createRadioSection().subsections,
+    ],
+  };
+
+  const data = {
+    numbers_struct: { row_a: 10, row_b: 20 },
+    checkbox_struct: { field: { option_a: true, option_b: false } },
+    radio_struct: { field: "OptionA" },
+  };
+
+  resetValueAtPath(mixedSection, undefined, data, "data.numbers_struct.row_b");
+  resetValueAtPath(mixedSection, undefined, data, "data.checkbox_struct.field");
+  resetValueAtPath(mixedSection, undefined, data, "data.radio_struct.field");
+
+  expect(data).toStrictEqual({
+    numbers_struct: { row_a: 10, row_b: 0 },
+    checkbox_struct: { field: { option_a: false, option_b: false } },
+    radio_struct: { field: null },
+  });
+});
+
+test("resetValueAtPath with previousResults", () => {
+  const mixedSection: DataEntrySection = {
+    id: "mixed_section",
+    title: "Mixed Section",
+    short_title: "Mixed",
+    subsections: [
+      ...createInputGridSection().subsections,
+      { type: "message", message: "Please select things" },
+      ...createCheckboxesSection().subsections,
+    ],
+  };
+
+  const previousResults = {
+    numbers_struct: { row_a: 12, row_b: 18 },
+    checkbox_struct: { field: { option_a: false, option_b: true } },
+  };
+
+  const data = {
+    numbers_struct: { row_a: 10, row_b: 20 },
+    checkbox_struct: { field: { option_a: true, option_b: false } },
+  };
+
+  resetValueAtPath(mixedSection, previousResults, data, "data.numbers_struct.row_b");
+  resetValueAtPath(mixedSection, previousResults, data, "data.checkbox_struct.field");
+
+  expect(data).toStrictEqual({
+    numbers_struct: { row_a: 10, row_b: 18 },
+    checkbox_struct: { field: { option_a: false, option_b: false } },
   });
 });

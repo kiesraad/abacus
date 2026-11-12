@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 
 import { generate } from "../../scripts/openapi/generator";
 
-const FRONTEND_ROOT = path.join(__dirname, "../..");
+const FRONTEND_ROOT = path.join(import.meta.dirname, "../..");
 const BACKEND_ROOT = path.join(FRONTEND_ROOT, "..", "backend");
 
 const OPEN_API_JSON_PATH = `${BACKEND_ROOT}/openapi.json`;

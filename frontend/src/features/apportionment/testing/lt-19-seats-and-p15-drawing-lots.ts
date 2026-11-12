@@ -3,7 +3,7 @@ import type {
   CandidateDrawingLotsVariant,
   CandidateNomination,
   CommitteeSession,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   SeatAssignment,
 } from "@/types/generated/openapi";
@@ -440,7 +440,7 @@ export const candidate_nomination: CandidateNomination = {
       initials: "A.I.",
       last_name_prefix: "van",
       last_name: "Bekking",
-      locality: "'s Gravenveen",
+      locality: "'s-Gravenveen",
       gender: "X",
       list_number: 4,
       list_name: "GROEP 11",
@@ -583,7 +583,7 @@ export const candidate_nomination: CandidateNomination = {
       initials: "R.",
       first_name: "Ruth",
       last_name: "Wolfswinkel",
-      locality: "'s Gravenveen",
+      locality: "'s-Gravenveen",
       gender: "X",
       list_number: 5,
       list_name: "GROEP 12",
@@ -854,7 +854,7 @@ export const candidate_nomination: CandidateNomination = {
           initials: "R.",
           first_name: "Ruth",
           last_name: "Wolfswinkel",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -903,7 +903,8 @@ export const candidate_nomination: CandidateNomination = {
   ],
 };
 
-export const election_summary: ElectionSummary = {
+export const election_totals: ElectionTotals = {
+  committee_specific: { committee: "CSB", number_of_voters: 11158 },
   voters_counts: {
     poll_card_count: 8900,
     proxy_certificate_count: 0,
@@ -1099,12 +1100,6 @@ export const election_summary: ElectionSummary = {
       ],
     },
   ],
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    investigated_other_reason: [],
-    ballots_recounted: [],
-  },
-  number_of_voters: 11158,
 };
 
 export const committee_session: CommitteeSession = {
@@ -1119,10 +1114,15 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 11,
   name: "Election < 19 seats & Drawing lots, Candidate",
+  official_name: "Gemeenteraad Juinen 2026",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",
-  domain_id: "0035",
+  authority_id: "CSB",
+  authority_name: "Juinen",
+  authority_region: "Juinen",
+  district: { district: "None" },
+  domain: { id: "0035", name: "Juinen" },
   category: "Municipal",
   sub_category: "GR1",
   number_of_seats: 15,
@@ -1315,7 +1315,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "A.I.",
           last_name_prefix: "van",
           last_name: "Bekking",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {
@@ -1365,7 +1365,7 @@ export const election: ElectionWithPoliticalGroups = {
           initials: "R.",
           first_name: "Ruth",
           last_name: "Wolfswinkel",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "X",
         },
         {

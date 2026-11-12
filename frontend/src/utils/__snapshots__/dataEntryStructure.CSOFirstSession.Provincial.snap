@@ -10,22 +10,22 @@
       },
       {
         "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
-        "error_path": "extra_investigation.extra_investigation_other_reason",
+        "error_path": "extra_investigation.extra_investigation_done",
         "options": [
           {
             "autoFocusInput": true,
             "label": "Ja",
-            "path": "extra_investigation.extra_investigation_other_reason.yes",
+            "path": "extra_investigation.extra_investigation_done.yes",
             "short_label": "Ja",
           },
           {
             "label": "Nee",
-            "path": "extra_investigation.extra_investigation_other_reason.no",
+            "path": "extra_investigation.extra_investigation_done.no",
             "short_label": "Nee",
           },
         ],
         "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?",
-        "title": "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
+        "title": "Heeft het gemeentelijk stembureau extra onderzoek gedaan?",
         "type": "checkboxes",
       },
       {
@@ -48,7 +48,7 @@
         "type": "checkboxes",
       },
     ],
-    "title": "Alleen bij extra onderzoek",
+    "title": "Extra onderzoek",
   },
   {
     "id": "counting_differences_polling_station",
@@ -65,22 +65,22 @@
       },
       {
         "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
-        "error_path": "counting_differences_polling_station.unexplained_difference_ballots_voters",
+        "error_path": "counting_differences_polling_station.difference_ballots_voters_completely_accounted_for",
         "options": [
           {
             "autoFocusInput": true,
             "label": "Ja",
-            "path": "counting_differences_polling_station.unexplained_difference_ballots_voters.yes",
+            "path": "counting_differences_polling_station.difference_ballots_voters_completely_accounted_for.yes",
             "short_label": "Ja",
           },
           {
             "label": "Nee",
-            "path": "counting_differences_polling_station.unexplained_difference_ballots_voters.no",
+            "path": "counting_differences_polling_station.difference_ballots_voters_completely_accounted_for.no",
             "short_label": "Nee",
           },
         ],
-        "short_title": "Verschil tussen getelde stembiljetten en toegelaten kiezers?",
-        "title": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?",
+        "short_title": "Zijn D en H gelijk of is het verschil volledig verklaard?",
+        "title": "Is in de telresultaten van het stembureau het aantal toegelaten kiezers (D) en het totaal aantal getelde stemmen (H) gelijk OF is er een verschil en is dit verschil volledig verklaard?",
         "type": "checkboxes",
       },
       {
@@ -198,17 +198,56 @@
         "options": [
           {
             "autoFocusInput": true,
-            "label": "D en H zijn gelijk",
+            "label": <React.Fragment>
+              <React.Fragment>
+                D en H zijn 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    gelijk
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+            </React.Fragment>,
             "path": "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
             "short_label": "D en H zijn gelijk",
           },
           {
-            "label": "H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
+            "label": <React.Fragment>
+              <React.Fragment>
+                H is 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    groter
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+              <React.Fragment>
+                 dan D (meer uitgebrachte stemmen dan toegelaten kiezers)
+              </React.Fragment>
+            </React.Fragment>,
             "path": "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
             "short_label": "H is groter dan D",
           },
           {
-            "label": "H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
+            "label": <React.Fragment>
+              <React.Fragment>
+                H is 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    kleiner
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+              <React.Fragment>
+                 dan D (minder uitgebrachte stemmen dan toegelaten kiezers)
+              </React.Fragment>
+            </React.Fragment>,
             "path": "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
             "short_label": "H is kleiner dan D",
           },
@@ -273,7 +312,7 @@
             </React.Fragment>
           </strong>
           <React.Fragment>
-             Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H 
+             Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H 
           </React.Fragment>
           <strong>
             <React.Fragment>

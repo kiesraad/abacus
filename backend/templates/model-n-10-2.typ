@@ -1,28 +1,27 @@
-#import "common/style.typ": conf, default_header, document_numbering
+#import "common/style.typ": conf, document_numbering, blank_page_before_signing
 #import "common/scripts.typ": *
-#let input = json("inputs/model-n-10-2.json")
+#let input = json("inputs/model-n-10-2-variations/model-n-10-2-GR.json")
 
-#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.authority_region, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
-
-#let is_mobile = "polling_station_type" in input.polling_station and input.polling_station.polling_station_type == "Mobile"
-
-#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let district_number = get_district_number(input.election.district)
+#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_id #input.election.authority_region]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 #let location = is_municipality[gemeente][openbaar lichaam]
+#let is_mobile = "polling_station_type" in input.polling_station and input.polling_station.polling_station_type == "Mobile"
 
 #let header-right = [Stembureau #input.polling_station.number]
 
 #show: doc => conf(doc, header-right: header-right, footer: [Proces-verbaal van een stembureau \
-  Model N 10-2 centrale stemopneming])
+  Model N 10-2 centrale stemopneming (versie 2027)])
 
 #set heading(numbering: none)
 
 #title_page(
-  [#input.election.location Stembureau #input.polling_station.number #input.polling_station.name],
+  [#input.election.authority_region Stembureau #input.polling_station.number #input.polling_station.name],
   "",
-  [#input.election.name - #format_date(input.election.election_date)],
+  [#get_election_title(input.election), #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst –
     Model N 10-2
@@ -31,7 +30,7 @@
 
 == Details van het #if is_mobile { "mobiele stembureau" } else { "stembureau" }
 
-#location_name #sym.arrow.r Stembureau #input.polling_station.number
+#if (district_number != "") { [Kieskring #district_number #sym.arrow.r] } #location_name #sym.arrow.r Stembureau #input.polling_station.number
 
 #v(0.5em)
 
@@ -43,7 +42,7 @@
 #input.polling_station.address \
 #input.polling_station.postal_code #input.polling_station.locality
 
-// *Op deze locatie waren meerdere stembureaus>*
+// *Op deze locatie waren meerdere stembureaus*
 
 == Proces-verbaal
 
@@ -62,6 +61,8 @@ Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin 
 #pagebreak(weak: true)
 
 #show: doc => document_numbering(doc)
+// Max numbering level is 2
+#show heading.where(level: 3): it => [#block(it.body)]
 
 = Verslag van de zitting
 
@@ -73,14 +74,16 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid o
 
 #empty_table(
   columns: (8em, 1fr, 1fr, 1fr, 7em, 7em),
-  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig (van - tot)", "Aanwezig bij stemmen", "Aanwezig bij tellen"),
+  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig van - tot", "Aanwezig bij stemmen", "Aanwezig bij tellen"),
   values: ("", "", "", "-", checkbox(small: true)[], checkbox(small: true)[]),
-  rows: 22,
+  rows: 21,
 )
+
+#show: doc => document_numbering(doc)
 
 == Tijdens het stemmen
 
-=== Schrijf *alle bezwaren van aanwezigen tijdens het stemmen* op.
+=== Schrijf alle *bezwaren van aanwezigen tijdens het stemmen* op.
 
 Bijvoorbeeld over toegankelijkheid, niet toegelaten worden of het stemgeheim.
 
@@ -90,7 +93,7 @@ Schrijf geen namen of andere persoonsgegevens op. Schrijf alle bezwaren op, ook 
   columns: (7em, 1fr, 1fr),
   headers: ("Tijdstip", "Bezwaar", "Reactie stembureau"),
   values: ("", "", ""),
-  rows: 24,
+  rows: 27,
 )
 
 #pagebreak(weak: true)
@@ -125,7 +128,7 @@ Denk aan stembureauleden die te laat waren, niet werkende techniek of stembussen
 
 #empty_table(
   columns: (8em, 10em, 1fr),
-  headers: ("Datum", "Tijd (van - tot)", "Locatie (als anders dan stembureau)"),
+  headers: ("Datum", "Tijd van - tot", "Locatie (als anders dan stembureau)"),
   values: ("", "", ""),
   rows: 1,
 )
@@ -163,11 +166,12 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
   #sum(
     empty_letterbox("A")[Stempassen],
-    empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas)],
+    no_entry_letterbox("C")[Kiezerspassen (niet van toepassing bij gemeente- en eilandraadsverkiezingen)],
     empty_letterbox(
       "D",
       light: false,
-    )[Totaal toegelaten kiezers (A+B)],
+    )[*Totaal toegelaten kiezers (A+B)*],
   )
 ][
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
@@ -176,12 +180,12 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
     empty_letterbox("A")[Stempassen],
     empty_letterbox(
       "B",
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas of kiezerspas)],
+    )[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
     empty_letterbox("C")[Kiezerspassen],
     empty_letterbox(
       "D",
       light: false,
-    )[Totaal toegelaten kiezers (A+B+C)],
+    )[*Totaal toegelaten kiezers (A+B+C)*],
   )
 ]
 
@@ -217,9 +221,9 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
 
-#checkbox[D en H zijn gelijk #sym.arrow.r *Ga door naar #ref(<signing>)*]
+#checkbox[D en H zijn *gelijk* #sym.arrow.r *Ga door naar #ref(<signing>)*]
 
-#checkbox[H is groter is dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
+#checkbox[H is *groter* dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 
 #box(inset: (left: 3em, bottom: 1em), empty_letterbox(
   "I",
@@ -227,7 +231,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
   light: false,
 )[Aantal méér getelde stemmen (bereken: H _min_ D)])
 
-#checkbox[H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)]
+#checkbox[H is *kleiner* dan D (minder uitgebrachte stemmen dan toegelaten kiezers)]
 
 #box(inset: (left: 3em, bottom: 1em), empty_letterbox(
   "J",
@@ -240,41 +244,28 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 #checkbox[Ja]
 #checkbox[Nee, er is een onverklaard verschil]
 
-#pagebreak(weak: true)
-
-#set page(header: "")
-
-#show heading.where(level: 3): it => [#block(it.body)]
-
-=== Deze pagina is expres leeg
-Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
-
-#pagebreak(weak: true)
-
-#set page(header: default_header(none, header-right))
+#blank_page_before_signing(header-right)
 
 = Ondertekening <signing>
 
-=== Datum
+#block(width: 100%, [Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een stembureau zijn dit er minimaal 3.])
+
+#signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en twee leden van het stembureau
+== Voorzitter en twee leden van het stembureau
 
-=== Voorzitter van het stembureau:
+#signing_form_label[Voorzitter van het stembureau:]
 
 #textbox[Naam:][Handtekening:]
 
-=== 2 leden van het stembureau:
+#signing_form_label[2 leden van het stembureau:]
 
 #stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
-=== Extra ondertekening: (niet verplicht)
+#signing_form_label[Extra ondertekening:]
 
 #stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
-
-#pagebreak(weak: true)
-
-#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))

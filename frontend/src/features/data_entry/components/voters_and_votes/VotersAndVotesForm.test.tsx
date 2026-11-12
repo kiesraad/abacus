@@ -20,6 +20,7 @@ import { getTypistUser } from "@/testing/user-mock-data";
 import type { DATA_ENTRY_SAVE_REQUEST_BODY, Results } from "@/types/generated/openapi";
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
+  expectFieldsToBeDisabled,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
@@ -48,6 +49,7 @@ function renderForm() {
 const votersFieldIds = {
   pollCardCount: "data.voters_counts.poll_card_count",
   proxyCertificateCount: "data.voters_counts.proxy_certificate_count",
+  voterCardCount: "data.voters_counts.voter_card_count",
   totalAdmittedVotersCount: "data.voters_counts.total_admitted_voters_count",
 };
 
@@ -266,16 +268,7 @@ describe("Test VotersAndVotesForm", () => {
       await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: [
-                "data.voters_counts.total_admitted_voters_count",
-                "data.voters_counts.poll_card_count",
-                "data.voters_counts.proxy_certificate_count",
-              ],
-              code: "F201",
-            },
-          ],
+          errors: [validationResultMockData.F201],
           warnings: [],
         },
       });
@@ -303,16 +296,7 @@ describe("Test VotersAndVotesForm", () => {
       await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: [
-                "data.voters_counts.total_admitted_voters_count",
-                "data.voters_counts.poll_card_count",
-                "data.voters_counts.proxy_certificate_count",
-              ],
-              code: "F201",
-            },
-          ],
+          errors: [validationResultMockData.F201],
           warnings: [],
         },
       });
@@ -342,6 +326,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -381,8 +366,10 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.politicalGroup2TotalVotes,
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -418,6 +405,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.politicalGroup1TotalVotes,
         votesFieldIds.politicalGroup2TotalVotes,
@@ -425,6 +413,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -508,6 +497,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.politicalGroup1TotalVotes,
         votesFieldIds.politicalGroup2TotalVotes,
@@ -515,6 +505,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -550,6 +541,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.politicalGroup1TotalVotes,
         votesFieldIds.politicalGroup2TotalVotes,
@@ -557,6 +549,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.blankVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -589,12 +582,14 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votesFieldIds.politicalGroup1TotalVotes,
         votesFieldIds.politicalGroup2TotalVotes,
         votesFieldIds.totalVotesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -627,6 +622,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.politicalGroup1TotalVotes,
         votesFieldIds.politicalGroup2TotalVotes,
@@ -634,6 +630,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -717,12 +714,7 @@ describe("Test VotersAndVotesForm", () => {
     test("Both errors and warning feedback should be shown", async () => {
       overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.votes_counts.blank_votes_count"],
-              code: "F201",
-            },
-          ],
+          errors: [validationResultMockData.F201],
           warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
         },
       });

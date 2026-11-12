@@ -9,6 +9,11 @@
 'election_date' = "chrono::NaiveDate"
 'nomination_date' = "chrono::NaiveDate"
 'political_groups' = "sqlx::types::Json<Vec<crate::domain::election::RegisteredPoliticalGroup>>"
+'domain' = "crate::domain::election::ElectionDomain"
+'district' = "crate::domain::election::CommitteeDistrict"
+'authority_id' = "String"
+'authority_name' = "String"
+'authority_region' = "String"
 
 [macros.table-overrides.'polling_stations']
 'id' = "crate::domain::polling_station::PollingStationId"
@@ -69,7 +74,11 @@
 'data_entry_id' = "crate::domain::data_entry::DataEntryId"
 'number' = "crate::domain::sub_committee::SubCommitteeNumber"
 'category' = "crate::domain::election::CommitteeCategory"
+'certificates' = "sqlx::types::Json<Vec<crate::domain::sub_committee::Certificate>>"
 
 [macros.table-overrides.'apportionment']
 'committee_session_id' = "crate::domain::committee_session::CommitteeSessionId"
 'state' = "sqlx::types::Json<crate::domain::apportionment_state::ApportionmentState>"
+
+[macros.table-overrides.'signing_keypair']
+'show_reminder' = "bool"

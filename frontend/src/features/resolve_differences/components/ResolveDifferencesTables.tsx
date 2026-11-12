@@ -1,5 +1,4 @@
 import { t } from "@/i18n/translate";
-import type { ResolveDifferencesAction } from "@/types/generated/openapi";
 import type {
   DataEntryResults,
   DataEntrySection,
@@ -9,20 +8,21 @@ import type {
 } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 
+import type { CorrectEntry } from "../utils/differences";
 import { DifferencesTable } from "./DifferencesTable";
 
 export interface ResolveDifferencesTablesProps {
   first: DataEntryResults;
   second: DataEntryResults;
   structure: DataEntryStructure;
-  action?: ResolveDifferencesAction;
+  correctEntry?: CorrectEntry;
 }
 
-export function ResolveDifferencesTables({ first, second, action, structure }: ResolveDifferencesTablesProps) {
+export function ResolveDifferencesTables({ first, second, correctEntry, structure }: ResolveDifferencesTablesProps) {
   return (
     <>
       {structure.map((section) => (
-        <SectionTable key={section.id} section={section} first={first} second={second} action={action} />
+        <SectionTable key={section.id} section={section} first={first} second={second} correctEntry={correctEntry} />
       ))}
     </>
   );
@@ -32,11 +32,11 @@ interface SectionTableProps {
   section: DataEntrySection;
   first: DataEntryResults;
   second: DataEntryResults;
-  action?: ResolveDifferencesAction;
+  correctEntry?: CorrectEntry;
 }
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
-function SectionTable({ section, first, second, action }: SectionTableProps) {
+function SectionTable({ section, first, second, correctEntry }: SectionTableProps) {
   const titleFromHeading = section.subsections.find((s) => s.type === "heading")?.title;
   const title = `${t("resolve_differences.section")}: ${titleFromHeading ?? section.title}`;
 
@@ -83,7 +83,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
                   title={title}
                   headers={headers}
                   rows={[row]}
-                  action={action}
+                  correctEntry={correctEntry}
                 />
               );
             }
@@ -121,7 +121,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
                     title={title}
                     headers={headers}
                     rows={checkboxRows}
-                    action={action}
+                    correctEntry={correctEntry}
                   />
                 );
               }
@@ -148,7 +148,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
                   title={title}
                   headers={headers}
                   rows={rows}
-                  action={action}
+                  correctEntry={correctEntry}
                 />
               );
             }

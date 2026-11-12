@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EML xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:kr="http://www.kiesraad.nl/extensions" Id="110a" SchemaVersion="5">
+    <TransactionId>1</TransactionId>
+    <IssueDate>2023-02-03</IssueDate>
+    <kr:CreationDateTime>2023-02-03T17:46:24.541</kr:CreationDateTime>
+    <ElectionEvent>
+        <EventIdentifier/>
+        <Election>
+            <ElectionIdentifier Id="PS2023_Drenthe">
+                <ElectionName>Provinciale Staten Drenthe 2023</ElectionName>
+                <ElectionCategory>PS</ElectionCategory>
+                <kr:ElectionSubcategory>PS1</kr:ElectionSubcategory>
+                <kr:ElectionDomain>Drenthe</kr:ElectionDomain>
+                <kr:ElectionDate>2023-03-15</kr:ElectionDate>
+                <kr:NominationDate>2023-01-30</kr:NominationDate>
+            </ElectionIdentifier>
+            <Contest>
+                <ContestIdentifier Id="geen"/>
+                <VotingMethod>SPV</VotingMethod>
+                <MaxVotes></MaxVotes>
+            </Contest>
+            <kr:NumberOfSeats>43</kr:NumberOfSeats>
+            <kr:PreferenceThreshold>25</kr:PreferenceThreshold>
+            <kr:ElectionTree>
+                <kr:Region RegionNumber="3" RegionCategory="PROVINCIE">
+                    <kr:RegionName>Drenthe</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1" RegionCategory="KIESKRING" SuperiorRegionNumber="3" SuperiorRegionCategory="PROVINCIE">
+                    <kr:RegionName>Assen</kr:RegionName>
+                    <kr:Committee CommitteeCategory="CSB"/>
+                    <kr:Committee CommitteeCategory="HSB"/>
+                </kr:Region>
+                <kr:Region RegionNumber="106" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Assen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="109" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Coevorden</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="114" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Emmen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="118" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Hoogeveen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="119" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Meppel</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1680" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Aa en Hunze</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1681" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Borger-Odoorn</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1690" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>De Wolden</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1699" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Noordenveld</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1701" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Westerveld</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1730" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Tynaarlo</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1731" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Midden-Drenthe</kr:RegionName>
+                </kr:Region>
+            </kr:ElectionTree>
+            <kr:RegisteredParties>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partij van de Arbeid (P.v.d.A.)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Forum voor Democratie</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>VVD</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>CDA</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>GROENLINKS</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>PVV (Partij voor de Vrijheid)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>ChristenUnie</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>SP (Socialistische Partij)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>D66</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Sterk Lokaal Drenthe</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>50PLUS</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partij voor de Dieren</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Volt</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>JEZUS LEEFT</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>JA21</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Staatkundig Gereformeerde Partij (SGP)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Alliantie</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Belang van Nederland (BVNL)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>BBB</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+            </kr:RegisteredParties>
+        </Election>
+    </ElectionEvent>
+</EML>

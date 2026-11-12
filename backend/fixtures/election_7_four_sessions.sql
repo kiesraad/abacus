@@ -1,5 +1,5 @@
-INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '0000', 'Municipal', 'GR2', 23, 15000, '2026-03-18', '2026-02-02',
+INSERT INTO elections (id, name, official_name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+VALUES (7, 'Gemeenteraad Grote Stad 2026 >= 19 seats', 'Gemeenteraad Grote Stad 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '0099', 'Grote Stad', 'Grote Stad', '{"district":"None"}', '{"id":"0099","name":"Grote Stad"}', 'Municipal', 'GR2', 23, 15000, '2026-03-18', '2026-02-02',
         '[
           {
             "number": 1,
@@ -9,14 +9,14 @@ VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote
                 "number": 1,
                 "initials": "A.",
                 "last_name": "A-Een",
-                "locality": "Test",
+                "locality": "Grote Stad",
                 "gender": "X"
               },
               {
                 "number": 2,
-                "initials": "B.",
+                "initials": "A.",
                 "last_name": "A-Twee",
-                "locality": "Test",
+                "locality": "Grote Stad",
                 "gender": "Male"
               }
             ]
@@ -29,14 +29,14 @@ VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote
                 "number": 1,
                 "initials": "B.",
                 "last_name": "B-Een",
-                "locality": "Test",
+                "locality": "Grote Stad",
                 "gender": "Female"
               },
               {
                 "number": 2,
                 "initials": "B.",
                 "last_name": "B-Twee",
-                "locality": "Test",
+                "locality": "Grote Stad",
                 "gender": "X"
               }
             ]
@@ -53,16 +53,16 @@ VALUES (701, 1, 7, 'completed', 'Grote Stad', '2026-03-19 09:15:00'),
 INSERT INTO
     data_entries (id, state, updated_at)
 VALUES (701,
-        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T09:15:31.223365436Z","finalised_with_warnings":false,"results":{"model":"CSOFirstSession","extra_investigation":{"extra_investigation_other_reason":{"yes":false,"no":false},"ballots_recounted_extra_investigation":{"yes":false,"no":false}},"counting_differences_polling_station":{"unexplained_difference_ballots_voters":{"yes":false,"no":true},"difference_ballots_per_list":{"yes":false,"no":true}},"voters_counts":{"poll_card_count":296,"proxy_certificate_count":1,"total_admitted_voters_count":297},"votes_counts":{"political_group_total_votes":[{"number":1,"total":200},{"number":2,"total":92}],"total_votes_candidates_count":292,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":297},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":200,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50}]},{"number":2,"total":92,"candidate_votes":[{"number":1,"votes":80},{"number":2,"votes":12}]}]}}}',
+        '{"status":"Definitive","state":{"first_entry_origin":{"type":"Typist","user_id":5},"second_entry_user_id":6,"finished_at":"2026-03-19T09:15:31.223365436Z","finalised_with_warnings":false,"results":{"model":"CSOFirstSession","extra_investigation":{"extra_investigation_done":{"yes":false,"no":true},"ballots_recounted_extra_investigation":{"yes":false,"no":false}},"counting_differences_polling_station":{"difference_ballots_voters_completely_accounted_for":{"yes":true,"no":false},"difference_ballots_per_list":{"yes":false,"no":true}},"voters_counts":{"poll_card_count":296,"proxy_certificate_count":1,"total_admitted_voters_count":297},"votes_counts":{"political_group_total_votes":[{"number":1,"total":200},{"number":2,"total":92}],"total_votes_candidates_count":292,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":297},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":200,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50}]},{"number":2,"total":92,"candidate_votes":[{"number":1,"votes":80},{"number":2,"votes":12}]}]}}}',
         '2026-03-19 09:15:31'),
        (702,
-        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T09:45:31.223365436Z","finalised_with_warnings":false,"results":{"model":"CSOFirstSession","extra_investigation":{"extra_investigation_other_reason":{"yes":false,"no":false},"ballots_recounted_extra_investigation":{"yes":false,"no":false}},"counting_differences_polling_station":{"unexplained_difference_ballots_voters":{"yes":false,"no":true},"difference_ballots_per_list":{"yes":false,"no":true}},"voters_counts":{"poll_card_count":295,"proxy_certificate_count":2,"total_admitted_voters_count":297},"votes_counts":{"political_group_total_votes":[{"number":1,"total":200},{"number":2,"total":92}],"total_votes_candidates_count":292,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":297},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":200,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50}]},{"number":2,"total":92,"candidate_votes":[{"number":1,"votes":80},{"number":2,"votes":12}]}]}}}',
+        '{"status":"Definitive","state":{"first_entry_origin":{"type":"Typist","user_id":5},"second_entry_user_id":6,"finished_at":"2026-03-19T09:45:31.223365436Z","finalised_with_warnings":false,"results":{"model":"CSOFirstSession","extra_investigation":{"extra_investigation_done":{"yes":false,"no":true},"ballots_recounted_extra_investigation":{"yes":false,"no":false}},"counting_differences_polling_station":{"difference_ballots_voters_completely_accounted_for":{"yes":true,"no":false},"difference_ballots_per_list":{"yes":false,"no":true}},"voters_counts":{"poll_card_count":295,"proxy_certificate_count":2,"total_admitted_voters_count":297},"votes_counts":{"political_group_total_votes":[{"number":1,"total":200},{"number":2,"total":92}],"total_votes_candidates_count":292,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":297},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":200,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50}]},{"number":2,"total":92,"candidate_votes":[{"number":1,"votes":80},{"number":2,"votes":12}]}]}}}',
         '2026-03-19 09:45:31'),
        (703,
-        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T17:15:31.223365436Z","finalised_with_warnings":false,"results":{"model":"CSONextSession","voters_counts":{"poll_card_count":294,"proxy_certificate_count":3,"total_admitted_voters_count":297},"votes_counts":{"political_group_total_votes":[{"number":1,"total":200},{"number":2,"total":92}],"total_votes_candidates_count":292,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":297},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":200,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50}]},{"number":2,"total":92,"candidate_votes":[{"number":1,"votes":80},{"number":2,"votes":12}]}]}}}',
+        '{"status":"Definitive","state":{"first_entry_origin":{"type":"Typist","user_id":5},"second_entry_user_id":6,"finished_at":"2026-03-19T17:15:31.223365436Z","finalised_with_warnings":false,"results":{"model":"CSONextSession","voters_counts":{"poll_card_count":294,"proxy_certificate_count":3,"total_admitted_voters_count":297},"votes_counts":{"political_group_total_votes":[{"number":1,"total":200},{"number":2,"total":92}],"total_votes_candidates_count":292,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":297},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":200,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50}]},{"number":2,"total":92,"candidate_votes":[{"number":1,"votes":80},{"number":2,"votes":12}]}]}}}',
         '2026-03-19 17:15:31'),
        (704,
-        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T23:45:31.223365436Z","finalised_with_warnings":false,"results":{"model":"CSONextSession","voters_counts":{"poll_card_count":293,"proxy_certificate_count":4,"total_admitted_voters_count":297},"votes_counts":{"political_group_total_votes":[{"number":1,"total":200},{"number":2,"total":92}],"total_votes_candidates_count":292,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":297},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":200,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50}]},{"number":2,"total":92,"candidate_votes":[{"number":1,"votes":80},{"number":2,"votes":12}]}]}}}',
+        '{"status":"Definitive","state":{"first_entry_origin":{"type":"Typist","user_id":5},"second_entry_user_id":6,"finished_at":"2026-03-19T23:45:31.223365436Z","finalised_with_warnings":false,"results":{"model":"CSONextSession","voters_counts":{"poll_card_count":293,"proxy_certificate_count":4,"total_admitted_voters_count":297},"votes_counts":{"political_group_total_votes":[{"number":1,"total":200},{"number":2,"total":92}],"total_votes_candidates_count":292,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":297},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":200,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50}]},{"number":2,"total":92,"candidate_votes":[{"number":1,"votes":80},{"number":2,"votes":12}]}]}}}',
         '2026-03-19 23:45:31');
 
 INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type,

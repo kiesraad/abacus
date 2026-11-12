@@ -133,7 +133,7 @@ const LOCALITIES: &[&str] = &[
     "Heemdamseburg",
     "Juinen",
     "Middelgein",
-    "'s Gravenveen",
+    "'s-Gravenveen",
     "Sluisdam",
     "Hovenerwoud",
     "Bloemstede",
@@ -147,6 +147,45 @@ const LOCALITIES: &[&str] = &[
 /// Generate a random locality, using the random number generator given
 pub fn locality(rng: &mut impl rand::RngExt) -> &'static str {
     LOCALITIES.choose(rng).expect("Missing test data")
+}
+
+const PROVINCES: &[&str] = &[
+    "Oost-Holland",
+    "Westmark",
+    "Middenland",
+    "Eikenwoud",
+    "Zuiderwaard",
+    "Bloemmark",
+    "Duinrand",
+    "Kleipolder",
+    "Stormwaard",
+    "Klompenwaard",
+    "Maaszoom",
+];
+
+/// Generate a random province, using the random number generator given
+pub fn province(rng: &mut impl rand::RngExt) -> &'static str {
+    PROVINCES.choose(rng).expect("Missing test data")
+}
+
+const WATER_AUTHORITIES: &[&str] = &[
+    "Groot Heemland",
+    "Vliet en Veenstreek",
+    "Sluisland",
+    "Hoogwaard en Delta",
+    "Duin en Diep",
+    "De Kleiwaarden",
+    "Rivier en Polder",
+    "Waterkring",
+    "Noorderwater",
+    "De Oude Beek",
+    "Hollands Middenwater",
+    "Rijn en Zand",
+];
+
+/// Generate a random water authority, using the random number generator given
+pub fn water_authority(rng: &mut impl rand::RngExt) -> &'static str {
+    WATER_AUTHORITIES.choose(rng).expect("Missing test data")
 }
 
 const STREETNAMES: &[&str] = &[

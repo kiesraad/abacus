@@ -11,11 +11,9 @@
 - Voor informatie over het installeren, starten en gebruiken van Abacus ga je naar de website [Abacus Documentatie](https://kiesraad.github.io/abacus-documentatie/). Hier vind je niet alleen alle beschikbare gebruikersdocumentatie, maar bieden we ook uitleg over het verkiezingsproces.
 - Alle documentatie met betrekking tot de ontwikkeling van Abacus vind je op de [Hoofdpagina voor documentatie](https://github.com/kiesraad/abacus-documentatie/blob/main/README.md) in deze repository. Hier staat documentatie over de functionaliteit, de softwarearchitectuur, ons ontwikkelproces en specifieke facetten van het verkiezingsproces.
 
-### Versie 1.0 voor gemeenteraadsverkiezingen 2026 (GR26)
+### Releases en prereleases
 
-Voor de gemeenteraadsverkiezingen 2026 (GR26) wordt Abacus 1.0 gebruikt, te vinden in de branch [`release-1.0-GR26`](https://github.com/kiesraad/abacus/tree/release-1.0-GR26).
-
-De functionele eisen en wensen voor versie 1.0 zijn te vinden via [Functionaliteit van Abacus: eisen en wensen](https://github.com/kiesraad/abacus/blob/release-1.0-GR26/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md).
+Voor elke verkiezing stelt de Kiesraad een aparte versie van Abacus beschikbaar. De broncode, de uitgevoerde toetsen en de applicatie zelf worden volgens de termijnen in de [verkiezingskalender](https://www.kiesraad.nl/actueel/agenda) gepubliceerd. Op de [pagina met alle releases](https://github.com/kiesraad/abacus/releases) zijn ook prereleases te vinden die voor test- en onderzoeksdoeleinden worden gebruikt. Bij elke officiële versie horen releasenotes met een vrijgaveadvies.
 
 ### Projectstructuur
 
@@ -25,17 +23,15 @@ De functionele eisen en wensen voor versie 1.0 zijn te vinden via [Functionalite
 
 ## Wat is Abacus?
 
-De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) en zal ingezet worden bij alle verkiezingen in Nederland.
+De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) en zal uiteindelijk ingezet worden bij alle verkiezingen in Nederland.
 
 Voor meer context over het gebruik van Abacus lees je [Het verkiezingsproces en Abacus](https://kiesraad.github.io/abacus-documentatie/verkiezingsproces/). Je kunt hiervoor ook kijken naar de presentatie [Abacus: Software for Secure and Transparent Voting Results](https://youtu.be/qhYd_LNS2nQ) die we in november 2024 hebben gegeven op WICCON (in het Engels).
 
-Abacus is werk in uitvoering! Dit betekent dat de functionaliteit stapsgewijs wordt gebouwd. Kijk bij [Functionaliteit van Abacus: eisen en wensen](https://github.com/kiesraad/abacus-documentatie/blob/main/functionaliteit/functionaliteit-eisen-en-wensen.md) om te zien welke mijlpalen we hebben gesteld. 
-
-OSV2020 is de huidige software die bij verkiezingen wordt gebruikt. Het ontwikkelteam werkt nu aan een versie van Abacus die geschikt is voor toepassing bij de verkiezingen voor de Gemeenteraad. Abacus kan worden ingezet als het af is, aan alle eisen voldoet en de Kiesraad besloten heeft over de toepassing. 
+Abacus is werk in uitvoering! Dit betekent dat de functionaliteit stapsgewijs wordt gebouwd. Abacus kan bij een verkiezing worden ingezet als de benodigde functionaliteit af is, aan alle eisen voldoet en de Kiesraad besloten heeft over de toepassing. 
 
 ### Techniek
 
-De eerste versie van Abacus wordt voor de gemeenteraadsverkiezingen gebouwd als een stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in de programmeertaal Rust, de frontend in TypeScript/React.
+Abacus wordt beschikbaar gesteld als stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. De backend is geschreven in de programmeertaal Rust, de frontend in TypeScript/React.
 
 Een [overzicht van de architectuur](https://github.com/kiesraad/abacus-documentatie/blob/main/softwarearchitectuur/Overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, TypeScript en React](https://github.com/kiesraad/abacus-documentatie/blob/main/softwarearchitectuur/overwegingen-talen-en-frameworks.md).
 
@@ -64,7 +60,7 @@ De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonder
 
 De software wordt ontworpen en gebouwd door de Kiesraad zelf, in nauwe samenspraak met gebruikers, met name mensen bij gemeenten, waterschappen en de Caribische openbare lichamen. Het team werkt in deze repository aan de software, dus wat je hier ziet is in ontwikkeling. De software staat figuurlijk in de steigers, we werken er dagelijks aan.
 
-Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de module van OSV2020 voor de uitslagvaststelling en zetelverdeling bij gemeenteraadsverkiezingen. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen. De software wordt pas in productie genomen als deze aan alle eisen voldoet.
+Abacus vervangt OSV2020 stapsgewijs. Abacus 1.0.1 verving tijdens de gemeenteraadsverkiezingen in 2026 in 14 gemeenten de module _OSV2020-U voor het GSB_. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen (HSB, CSB) en verkiezingen.
 
 De uitgangspunten bij het ontwerp en de bouw van Abacus zijn gebruiksvriendelijkheid en eenvoud, naast de waarden integriteit, transparantie en controleerbaarheid. De software dient voor het correct invoeren van de resultaten van de stembureaus volgens het vier-ogenprincipe, voor het maken van de optelling van alle ingevoerde stembureaus en het opstellen van het proces-verbaal met de resultaten.
 

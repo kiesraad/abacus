@@ -3,8 +3,13 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use serde::Serialize;
+use axum_extra::response::Attachment;
+use chrono::Local;
+use eml_nl::io::EMLWrite;
+use pdf_gen::zip::zip_single_file;
+use serde::{Deserialize, Serialize};
 use sqlx::{Connection, SqliteConnection, SqlitePool};
+use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -18,11 +23,11 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::DataEntryId,
-        election::{CommitteeCategory, ElectionId},
+        election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
+        filename::{format_datetime, slugify},
         polling_station::{
             PollingStationFileRequest, PollingStationId, PollingStationListResponse,
-            PollingStationRequest, PollingStationRequestListResponse, PollingStationResponse,
-            PollingStationsRequest,
+            PollingStationRequest, PollingStationResponse, PollingStationsRequest,
         },
         role::Role,
     },
@@ -77,8 +82,10 @@ impl From<PollingStationResponse> for PollingStationAuditData {
 
 #[derive(Serialize)]
 pub struct PollingStationImportAuditData {
-    pub import_election_id: ElectionId,
-    pub import_file_name: String,
+    pub election_election_id: String,
+    pub polling_station_election_id: String,
+    pub file_name: String,
+    pub file_hash: String,
     pub import_number_of_polling_stations: u64,
 }
 
@@ -109,6 +116,20 @@ impl AsAuditEvent for PollingStationsImportedAuditData {
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
+#[derive(Serialize)]
+struct PollingStationsExportedAuditData {
+    pub election_id: ElectionId,
+    pub election_name: String,
+    pub session_id: CommitteeSessionId,
+    pub session_number: u32,
+    pub file_name: String,
+    pub number_of_polling_stations: usize,
+}
+impl AsAuditEvent for PollingStationsExportedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationsExported;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
@@ -123,6 +144,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_delete).authorize(ADMIN_GSB_COORDINATOR))
         .routes(routes!(polling_station_validate_import).authorize(ADMIN_GSB_COORDINATOR))
         .routes(routes!(polling_station_import).authorize(ADMIN_GSB_COORDINATOR))
+        .routes(routes!(polling_station_export).authorize(ADMIN_GSB_COORDINATOR))
 }
 
 pub fn authorize_user_and_gsb_election(
@@ -388,21 +410,24 @@ async fn polling_station_delete(
 
     let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
 
-    delete_data_entry_for_polling_station(
-        &mut tx,
-        &audit_service,
-        &committee_session,
-        polling_station.id(),
-    )
-    .await?;
-
-    delete_investigation_for_polling_station(
-        &mut tx,
-        &audit_service,
-        &committee_session,
-        polling_station.id(),
-    )
-    .await?;
+    if committee_session.is_next_session() {
+        // Also deletes the data entry, which belongs to the investigation
+        delete_investigation_for_polling_station(
+            &mut tx,
+            &audit_service,
+            &committee_session,
+            polling_station.id(),
+        )
+        .await?;
+    } else {
+        delete_data_entry_for_polling_station(
+            &mut tx,
+            &audit_service,
+            &committee_session,
+            polling_station.id(),
+        )
+        .await?;
+    }
 
     delete(&mut tx, election_id, polling_station_id).await?;
 
@@ -437,13 +462,19 @@ async fn polling_station_delete(
     Ok(StatusCode::NO_CONTENT)
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct PollingStationValidateImportResponse {
+    pub polling_stations: Vec<PollingStationRequest>,
+    pub polling_station_definition_matches_election: bool,
+}
+
 /// Validate a file with Polling Stations
 #[utoipa::path(
     post,
     path = "/api/elections/{election_id}/polling_stations/validate-import",
     request_body = PollingStationFileRequest,
     responses(
-        (status = 200, description = "Polling stations validated", body = PollingStationRequestListResponse),
+        (status = 200, description = "Polling stations validated", body = PollingStationValidateImportResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
@@ -458,16 +489,21 @@ async fn polling_station_validate_import(
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     Json(polling_station_request): Json<PollingStationFileRequest>,
-) -> Result<(StatusCode, Json<PollingStationRequestListResponse>), APIError> {
+) -> Result<(StatusCode, Json<PollingStationValidateImportResponse>), APIError> {
     let mut conn = pool.acquire().await?;
 
     let election = election_repo::get(&mut conn, election_id).await?;
     authorize_user_and_gsb_election(&user, election.committee_category)?;
 
+    let (election_identifier, polling_stations) =
+        polling_stations_from_eml_str(&polling_station_request.data)?;
+
     Ok((
         StatusCode::OK,
-        Json(PollingStationRequestListResponse {
-            polling_stations: polling_stations_from_eml_str(&polling_station_request.data)?,
+        Json(PollingStationValidateImportResponse {
+            polling_stations,
+            polling_station_definition_matches_election: election_identifier
+                .matches_election(&election),
         }),
     ))
 }
@@ -475,18 +511,20 @@ async fn polling_station_validate_import(
 pub async fn create_imported_polling_stations(
     conn: &mut SqliteConnection,
     audit_service: AuditService,
-    election_id: ElectionId,
+    election: &ElectionWithPoliticalGroups,
     polling_stations_request: PollingStationsRequest,
 ) -> Result<Vec<PollingStationResponse>, APIError> {
     let mut tx = conn.begin().await?;
 
-    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
-    let polling_stations =
+    let committee_session = get_election_committee_session(&mut tx, election.id).await?;
+    let (ps_election_identifier, polling_stations) =
         polling_stations_from_eml_str(&polling_stations_request.polling_stations)?;
-    let file_hash = EmlHash::from(polling_stations_request.polling_stations.as_bytes()).chunks;
+    let file_hash = EmlHash::from(polling_stations_request.polling_stations.as_bytes())
+        .chunks
+        .join(" ");
 
     // Create new polling stations
-    let ps_ids = create_many(&mut tx, election_id, polling_stations).await?;
+    let ps_ids = create_many(&mut tx, election.id, polling_stations).await?;
     let mut polling_station_list: Vec<_> = Vec::with_capacity(ps_ids.len());
     for id in ps_ids {
         if !committee_session.is_next_session() {
@@ -500,15 +538,18 @@ pub async fn create_imported_polling_stations(
         .log(
             &mut tx,
             &PollingStationsImportedAuditData(PollingStationImportAuditData {
-                import_election_id: election_id,
-                import_file_name: polling_stations_request.file_name,
+                election_election_id: election.election_id.clone(),
+                polling_station_election_id: ps_election_identifier.election_id.clone(),
+                file_name: polling_stations_request.file_name,
+                file_hash,
                 import_number_of_polling_stations: u64::try_from(polling_station_list.len())
                     .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
             }),
-            Some(format!(
-                "Polling stations file hash: {}",
-                file_hash.join(" ")
-            )),
+            if ps_election_identifier.matches_election(election) {
+                None
+            } else {
+                Some("Imported polling stations did not match election".to_string())
+            },
         )
         .await?;
 
@@ -527,7 +568,7 @@ pub async fn create_imported_polling_stations(
 
     Ok(polling_station_list
         .into_iter()
-        .map(|ps| ps.into_response(election_id))
+        .map(|ps| ps.into_response(election.id))
         .collect())
 }
 
@@ -568,7 +609,7 @@ async fn polling_station_import(
     let polling_stations = create_imported_polling_stations(
         &mut tx,
         audit_service,
-        election_id,
+        &election,
         polling_stations_request,
     )
     .await?;
@@ -580,13 +621,88 @@ async fn polling_station_import(
     ))
 }
 
+/// Export Polling Stations for the requested election (most recent committee session)
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/polling_stations/export",
+    responses(
+        (
+            status = 200,
+            description = "List of polling stations (EML in ZIP)",
+            content_type = "application/zip",
+            headers(
+                ("Content-Disposition", description = "attachment; filename=\"filename.zip\"")
+            )
+        ),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+    ),
+)]
+async fn polling_station_export(
+    user: User,
+    State(pool): State<SqlitePool>,
+    Path(election_id): Path<ElectionId>,
+    audit_service: AuditService,
+) -> Result<Attachment<Vec<u8>>, APIError> {
+    let mut conn = pool.acquire().await?;
+
+    let election = election_repo::get(&mut conn, election_id).await?;
+    authorize_user_and_gsb_election(&user, election.committee_category)?;
+
+    let committee_session = get_election_committee_session(&mut conn, election_id).await?;
+    let polling_stations =
+        polling_station_repo::list_polling_stations(&mut conn, committee_session.id).await?;
+
+    let eml = election.as_polling_stations_eml(&polling_stations, None, None)?;
+    let xml = eml.write_eml_root_str(true, true)?;
+    let eml_file_name = format!(
+        "Stembureaus_{}_{}.eml.xml",
+        election.election_id,
+        slugify(&election.authority_region)
+    );
+
+    let zip = zip_single_file(&eml_file_name, xml.as_bytes()).await?;
+    let zip_file_name = format!(
+        "abacus-exporteren_stemgebieden-{}-eml_110b_stembureaus-{}.zip",
+        slugify(&election.official_name).to_lowercase(),
+        format_datetime(Local::now()),
+    );
+
+    audit_service
+        .log(
+            &mut conn,
+            &PollingStationsExportedAuditData {
+                election_id,
+                election_name: election.name,
+                session_id: committee_session.id,
+                session_number: committee_session.number,
+                file_name: zip_file_name.clone(),
+                number_of_polling_stations: polling_stations.len(),
+            },
+            None,
+        )
+        .await?;
+
+    Ok(Attachment::new(zip)
+        .filename(&zip_file_name)
+        .content_type("application/zip"))
+}
+
 #[cfg(test)]
 mod tests {
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
     use super::*;
-    use crate::domain::{election::ElectionId, polling_station::PollingStationId};
+    use crate::domain::{
+        election::ElectionId,
+        polling_station::{PollingStationId, PollingStationRequest},
+    };
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
@@ -726,8 +842,195 @@ VALUES
         assert!(result.is_err());
     }
 
-    mod authorization {
+    #[expect(clippy::bool_assert_comparison)]
+    mod import {
+        use axum::response::IntoResponse;
+        use http_body_util::BodyExt;
+        use serde_json::json;
+        use test_log::test;
+
         use super::*;
+        use crate::{
+            domain::{
+                committee_session::CommitteeSessionCreateRequest,
+                election::tests::new_election_fixture,
+            },
+            infra::audit_log::assert_last_event,
+            repository::{committee_session_repo, user_repo::UserId},
+        };
+
+        const POLLING_STATIONS_EML: &str = include_str!("../eml/tests/eml110b_test.eml.xml");
+
+        async fn create_election_with_committee_session_in_preparation(
+            conn: &mut SqliteConnection,
+            election_id: &str,
+            election_date: &str,
+        ) -> Result<ElectionWithPoliticalGroups, sqlx::Error> {
+            let election = election_repo::create(
+                conn,
+                new_election_fixture()
+                    .with_election_id(election_id)
+                    .with_election_date(election_date),
+            )
+            .await?;
+
+            let session = committee_session_repo::create(
+                conn,
+                CommitteeSessionCreateRequest {
+                    number: 1,
+                    election_id: election.id,
+                },
+            )
+            .await?;
+
+            committee_session_repo::change_status(
+                conn,
+                session.id,
+                CommitteeSessionStatus::InPreparation,
+            )
+            .await?;
+
+            Ok(election)
+        }
+
+        async fn validate_import(
+            pool: &SqlitePool,
+            election_id: ElectionId,
+            request: PollingStationFileRequest,
+        ) -> PollingStationValidateImportResponse {
+            let response = polling_station_validate_import(
+                User::test_user(Role::CoordinatorGSB, UserId::from(1)),
+                State(pool.clone()),
+                Path(election_id),
+                Json(request),
+            )
+            .await
+            .into_response();
+
+            let status = response.status();
+            let body = response.into_body().collect().await.unwrap().to_bytes();
+            assert_eq!(status, StatusCode::OK, "{:?}", body);
+
+            serde_json::from_slice(&body).unwrap()
+        }
+
+        async fn import(
+            pool: &SqlitePool,
+            election_id: ElectionId,
+            request: PollingStationsRequest,
+        ) -> PollingStationListResponse {
+            let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+            let response = polling_station_import(
+                user.clone(),
+                State(pool.clone()),
+                Path(election_id),
+                AuditService::new(Some(user), None),
+                Json(request),
+            )
+            .await
+            .into_response();
+
+            let status = response.status();
+            let body = response.into_body().collect().await.unwrap().to_bytes();
+            assert_eq!(status, StatusCode::OK, "{:?}", body);
+
+            serde_json::from_slice(&body).unwrap()
+        }
+
+        #[test(sqlx::test)]
+        async fn test_import_ok(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+
+            let election = create_election_with_committee_session_in_preparation(
+                &mut conn,
+                "GR2022_Test",
+                "2022-03-16",
+            )
+            .await
+            .unwrap();
+
+            // Validate import
+            let request = PollingStationFileRequest {
+                data: POLLING_STATIONS_EML.into(),
+            };
+
+            let response = validate_import(&pool, election.id, request).await;
+            assert_eq!(response.polling_stations.len(), 20);
+            assert_eq!(response.polling_station_definition_matches_election, true);
+
+            // Import
+            let request = PollingStationsRequest {
+                file_name: "eml110b_test.eml.xml".to_string(),
+                polling_stations: POLLING_STATIONS_EML.into(),
+            };
+
+            let response = import(&pool, election.id, request).await;
+            assert_eq!(response.polling_stations.len(), 20);
+
+            assert_last_event(
+                &mut conn,
+                AuditEventType::PollingStationsImported,
+                AuditEventLevel::Success,
+                json!({
+                    "election_election_id": "GR2022_Test",
+                    "polling_station_election_id": "GR2022_Test",
+                    "file_name": "eml110b_test.eml.xml",
+                    "file_hash": EmlHash::from(POLLING_STATIONS_EML.as_bytes()).chunks.join(" "),
+                    "import_number_of_polling_stations": 20,
+                }),
+                None,
+            )
+            .await;
+        }
+
+        #[test(sqlx::test)]
+        async fn test_import_does_not_match_election(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+
+            let election = create_election_with_committee_session_in_preparation(
+                &mut conn,
+                "PS2022_AnotherElection",
+                "2022-03-16",
+            )
+            .await
+            .unwrap();
+
+            // Validate import
+            let request = PollingStationFileRequest {
+                data: POLLING_STATIONS_EML.into(),
+            };
+
+            let response = validate_import(&pool, election.id, request).await;
+            assert_eq!(response.polling_stations.len(), 20);
+            assert_eq!(response.polling_station_definition_matches_election, false);
+
+            // Import
+            let request = PollingStationsRequest {
+                file_name: "eml110b_test.eml.xml".to_string(),
+                polling_stations: POLLING_STATIONS_EML.into(),
+            };
+
+            let response = import(&pool, election.id, request).await;
+            assert_eq!(response.polling_stations.len(), 20);
+
+            assert_last_event(
+                &mut conn,
+                AuditEventType::PollingStationsImported,
+                AuditEventLevel::Success,
+                json!({
+                    "election_election_id": "PS2022_AnotherElection",
+                    "polling_station_election_id": "GR2022_Test",
+                    "file_name": "eml110b_test.eml.xml",
+                    "file_hash": EmlHash::from(POLLING_STATIONS_EML.as_bytes()).chunks.join(" "),
+                    "import_number_of_polling_stations": 20,
+                }),
+                Some("Imported polling stations did not match election"),
+            )
+            .await;
+        }
+    }
+
+    mod authorization {
         use axum::{
             Json,
             extract::{Path, State},
@@ -735,6 +1038,7 @@ VALUES
         };
         use test_log::test;
 
+        use super::*;
         use crate::{
             api::tests::{
                 assert_committee_category_authorization_err,
@@ -771,6 +1075,7 @@ VALUES
                 ("create", polling_station_create(user.clone(), State(pool.clone()), Path(election_id), audit.clone(), polling_station_request.clone()).await.into_response()),
                 ("import", polling_station_import(user.clone(), State(pool.clone()), Path(import_election_id), audit.clone(), Json(PollingStationsRequest { file_name: "test.xml".into(), polling_stations: "<xml/>".into() })).await.into_response()),
                 ("validate_import", polling_station_validate_import(user.clone(), State(pool.clone()), Path(import_election_id), Json(PollingStationFileRequest { data: "<xml/>".into() })).await.into_response()),
+                ("export", polling_station_export(user.clone(), State(pool.clone()), Path(election_id), audit.clone()).await.into_response()),
                 ("get", polling_station_get(user.clone(), State(pool.clone()), Path((election_id, polling_station_id))).await.into_response()),
                 ("update", polling_station_update(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, polling_station_id)), polling_station_request.clone()).await.into_response()),
                 ("delete", polling_station_delete(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, polling_station_id))).await.into_response()),

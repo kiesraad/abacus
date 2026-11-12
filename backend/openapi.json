@@ -7,7 +7,7 @@
       "name": "EUPL-1.2",
       "identifier": "EUPL-1.2"
     },
-    "version": "1.1.0"
+    "version": "1.3.0"
   },
   "paths": {
     "/api/account": {
@@ -76,6 +76,16 @@
           },
           "400": {
             "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fullname",
             "content": {
               "application/json": {
                 "schema": {
@@ -759,7 +769,7 @@
         ]
       },
       "delete": {
-        "summary": "Discard an in-progress (not finalised) data entry (typist_csb, typist_gsb)",
+        "summary": "Discard an in-progress data entry or a correction. Discarding a\ncorrection finalises the other entry as the first entry. (typist_csb, typist_gsb)",
         "operationId": "data_entry_discard",
         "parameters": [
           {
@@ -2233,6 +2243,142 @@
         ]
       }
     },
+    "/api/elections/{election_id}/certificate": {
+      "get": {
+        "summary": "Download the election certificate (administrator)",
+        "operationId": "certificate",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Election certificate",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.crt\""
+              }
+            },
+            "content": {
+              "application/x-pem-file": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/certificate_details": {
+      "get": {
+        "summary": "Get the election certificate details (administrator)",
+        "operationId": "certificate_details",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Election certificate details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateDetailsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/committee_sessions": {
       "post": {
         "summary": "Create a new [CommitteeSession]. (coordinator_gsb)",
@@ -3084,6 +3230,479 @@
         ]
       }
     },
+    "/api/elections/{election_id}/data_entry/import": {
+      "post": {
+        "summary": "Imports uploaded data entry results (coordinator_csb)",
+        "operationId": "election_data_entry_import",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CSBDataEntryImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Election count imported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CSBDataEntryImportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Import not possible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/data_entry/import/validate": {
+      "post": {
+        "summary": "Validates uploaded data entry results (coordinator_csb)",
+        "operationId": "election_data_entry_import_validate",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CSBDataEntryImportValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Election count validated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CSBDataEntryImportValidateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Import not possible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/dismiss_public_key_upload_reminder": {
+      "put": {
+        "summary": "administrator",
+        "operationId": "dismiss_public_key_upload_reminder",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Public key upload reminder dismissed"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/download_n_10_1": {
+      "get": {
+        "summary": "administrator, coordinator_gsb",
+        "operationId": "election_download_n_10_1",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ZIP",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.zip\""
+              }
+            },
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/download_n_10_1_inlegvel": {
+      "get": {
+        "summary": "administrator, coordinator_gsb",
+        "operationId": "election_download_n_10_1_inlegvel",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ZIP",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.zip\""
+              }
+            },
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/download_n_10_2": {
       "get": {
         "summary": "administrator, coordinator_gsb",
@@ -3112,6 +3731,188 @@
             },
             "content": {
               "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/download_na_14_1_versie1": {
+      "get": {
+        "summary": "administrator, coordinator_gsb",
+        "operationId": "election_download_na_14_1_versie1",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ZIP",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.zip\""
+              }
+            },
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/download_na_31_1_inlegvel": {
+      "get": {
+        "summary": "administrator, coordinator_gsb",
+        "operationId": "election_download_na_31_1_inlegvel",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.pdf\""
+              }
+            },
+            "content": {
+              "application/pdf": {}
             }
           },
           "401": {
@@ -3520,6 +4321,87 @@
         ]
       }
     },
+    "/api/elections/{election_id}/polling_stations/export": {
+      "get": {
+        "summary": "Export Polling Stations for the requested election (most recent committee session) (administrator, coordinator_gsb)",
+        "operationId": "polling_station_export",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of polling stations (EML in ZIP)",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.zip\""
+              }
+            },
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/polling_stations/import": {
       "post": {
         "summary": "Import file with Polling Stations (administrator, coordinator_gsb)",
@@ -3638,7 +4520,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PollingStationRequestListResponse"
+                  "$ref": "#/components/schemas/PollingStationValidateImportResponse"
                 }
               }
             }
@@ -4022,6 +4904,289 @@
         ]
       }
     },
+    "/api/elections/{election_id}/sub_committee_certificates": {
+      "get": {
+        "summary": "Get all the subcommittee certificates for an election (administrator)",
+        "operationId": "sub_committee_certificates",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Election certificate details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubCommittee"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "summary": "Validate a certificate and add it to the sub committee it belongs to (administrator)",
+        "operationId": "sub_committee_certificate_add",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddSubCommitteeCertificateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Certificate added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddSubCommitteeCertificateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid certificate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Public key already added or committee session completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Certificate is for another election or an unknown sub committee",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/sub_committees/{sub_committee_id}/certificates/{public_key_fingerprint}": {
+      "delete": {
+        "summary": "Delete a sub committee certificate by its public key fingerprint (administrator)",
+        "operationId": "sub_committee_certificate_delete",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          },
+          {
+            "name": "sub_committee_id",
+            "in": "path",
+            "description": "Sub committee database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SubCommitteeId"
+            }
+          },
+          {
+            "name": "public_key_fingerprint",
+            "in": "path",
+            "description": "Lowercase hex SHA-256 of the certificate's SubjectPublicKeyInfo DER, as in the list response",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Certificate deleted"
+          },
+          "400": {
+            "description": "Invalid path parameter"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election, sub committee or certificate not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Committee session completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/voters": {
       "put": {
         "summary": "Change the number of voters of an [Election]. (administrator, coordinator_gsb)",
@@ -4228,6 +5393,16 @@
           },
           "409": {
             "description": "Conflict (username already exists)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid username or fullname",
             "content": {
               "application/json": {
                 "schema": {
@@ -4512,6 +5687,16 @@
           },
           "403": {
             "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many login attempts from this source IP, try again later",
             "content": {
               "application/json": {
                 "schema": {
@@ -5120,6 +6305,16 @@
               }
             }
           },
+          "422": {
+            "description": "Invalid username or fullname",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -5294,6 +6489,16 @@
               }
             }
           },
+          "422": {
+            "description": "Invalid fullname",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -5388,6 +6593,39 @@
   },
   "components": {
     "schemas": {
+      "AboutReport": {
+        "type": "object",
+        "description": "Information about the report (\"Over het proces-verbaal\")",
+        "required": [
+          "corrigendum_present",
+          "checks_and_corrections_present"
+        ],
+        "properties": {
+          "checks_and_corrections_present": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ChecksAndCorrectionsPresent",
+                "description": "Whether the extra page \"controles en correcties\" is inserted in the report\n(\"Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?\")"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "corrigendum_present": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CorrigendumPresent",
+                "description": "Whether a corrigendum accompanies the report\n(\"Is er een corrigendum bij het papieren proces-verbaal aanwezig?\")"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "AbsoluteMajorityDrawingLots": {
         "type": "object",
         "required": [
@@ -5444,6 +6682,43 @@
           }
         },
         "additionalProperties": false
+      },
+      "AddSubCommitteeCertificateRequest": {
+        "type": "object",
+        "description": "Request to add a sub committee certificate",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AddSubCommitteeCertificateResponse": {
+        "type": "object",
+        "description": "The certificate that was added, with the sub committee it was added to",
+        "required": [
+          "sub_committee_id",
+          "authority_name",
+          "certificate",
+          "expired"
+        ],
+        "properties": {
+          "authority_name": {
+            "type": "string"
+          },
+          "certificate": {
+            "$ref": "#/components/schemas/Certificate"
+          },
+          "expired": {
+            "type": "boolean"
+          },
+          "sub_committee_id": {
+            "$ref": "#/components/schemas/SubCommitteeId"
+          }
+        }
       },
       "ApportionmentState": {
         "oneOf": [
@@ -5587,6 +6862,7 @@
           "UserDeleted",
           "ElectionCreated",
           "ElectionUpdated",
+          "PublicKeyUploadReminderDismissed",
           "CommitteeSessionCreated",
           "CommitteeSessionDeleted",
           "CommitteeSessionUpdated",
@@ -5602,20 +6878,29 @@
           "PollingStationUpdated",
           "PollingStationDeleted",
           "PollingStationsImported",
+          "PollingStationsExported",
           "DataEntryStarted",
           "DataEntrySaved",
+          "DataEntryImported",
           "DataEntryResumed",
           "DataEntryDeleted",
+          "DataEntryDiscarded",
+          "DataEntryReset",
           "DataEntryFinalised",
           "DataEntryDiscardedFirst",
           "DataEntryReturnedFirst",
           "DataEntryKeptFirst",
           "DataEntryKeptSecond",
+          "DataEntryKeptFirstReturnedSecond",
+          "DataEntryKeptSecondReturnedFirst",
           "DataEntryDiscardedBoth",
           "AirGapViolationDetected",
           "AirGapViolationResolved",
           "ApplicationStarted",
           "DatabaseBackupCreated",
+          "SigningKeypairCreated",
+          "SubCommitteeCertificateAdded",
+          "SubCommitteeCertificateDeleted",
           "ApiError",
           "ApiWarning",
           "UnknownEvent"
@@ -5787,6 +7072,89 @@
         },
         "additionalProperties": false
       },
+      "CSBDataEntryImportRequest": {
+        "type": "object",
+        "required": [
+          "hash",
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string",
+            "format": "binary"
+          },
+          "hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CSBDataEntryImportResponse": {
+        "type": "object",
+        "required": [
+          "election_name",
+          "election_date",
+          "sub_committee"
+        ],
+        "properties": {
+          "election_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "election_name": {
+            "type": "string"
+          },
+          "sub_committee": {
+            "$ref": "#/components/schemas/SubCommitteeFirstSession"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBDataEntryImportValidateRequest": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "string",
+            "format": "binary"
+          },
+          "hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CSBDataEntryImportValidateResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "election_name",
+          "election_date",
+          "sub_committee"
+        ],
+        "properties": {
+          "election_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "election_name": {
+            "type": "string"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/RedactedEmlHash"
+          },
+          "sub_committee": {
+            "$ref": "#/components/schemas/SubCommitteeFirstSession"
+          }
+        },
+        "additionalProperties": false
+      },
       "CSBElectionCreationRequest": {
         "type": "object",
         "required": [
@@ -5882,7 +7250,7 @@
           },
           "extra_investigation": {
             "$ref": "#/components/schemas/ExtraInvestigation",
-            "description": "Extra investigation (\"B1-1 Alleen bij extra onderzoek\")"
+            "description": "Extra investigation (\"B1-1 Extra onderzoek\")"
           },
           "political_group_votes": {
             "type": "array",
@@ -5902,34 +7270,41 @@
         },
         "additionalProperties": false
       },
-      "CSONextSessionResults": {
+      "CSOInvestigations": {
         "type": "object",
-        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from\n[Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).",
+        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
         "required": [
-          "voters_counts",
-          "votes_counts",
-          "differences_counts",
-          "political_group_votes"
+          "admitted_voters_recounted",
+          "investigated_other_reason",
+          "ballots_recounted"
         ],
         "properties": {
-          "differences_counts": {
-            "$ref": "#/components/schemas/DifferencesCounts",
-            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
-          },
-          "political_group_votes": {
+          "admitted_voters_recounted": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
             },
-            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
+            "description": "Admitted voters were recounted\n(\"Toegelaten kiezers opnieuw vastgesteld?\")"
           },
-          "voters_counts": {
-            "$ref": "#/components/schemas/VotersCounts",
-            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
+          "ballots_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Ballots were (partially) recounted\n(\"Stembiljetten (deels) herteld?\")"
           },
-          "votes_counts": {
-            "$ref": "#/components/schemas/VotesCounts",
-            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
+          "investigated_other_reason": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Investigated for other reasons than unexplained difference\n(\"Onderzocht vanwege andere reden dan onverklaard verschil?\")"
           }
         },
         "additionalProperties": false
@@ -6094,6 +7469,113 @@
         },
         "additionalProperties": false
       },
+      "Certificate": {
+        "type": "object",
+        "required": [
+          "election_identifier",
+          "organizational_unit",
+          "common_name",
+          "not_before",
+          "not_after",
+          "signature_algorithm",
+          "public_key",
+          "public_key_fingerprint"
+        ],
+        "properties": {
+          "common_name": {
+            "type": "string"
+          },
+          "election_identifier": {
+            "type": "string"
+          },
+          "not_after": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "not_before": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organizational_unit": {
+            "type": "string"
+          },
+          "public_key": {
+            "type": "string"
+          },
+          "public_key_fingerprint": {
+            "type": "string"
+          },
+          "signature_algorithm": {
+            "type": "string"
+          }
+        }
+      },
+      "CertificateDetailsResponse": {
+        "type": "object",
+        "required": [
+          "election_identifier",
+          "organizational_unit",
+          "common_name",
+          "not_before",
+          "not_after",
+          "signature_algorithm"
+        ],
+        "properties": {
+          "common_name": {
+            "type": "string"
+          },
+          "election_identifier": {
+            "type": "string"
+          },
+          "not_after": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "not_before": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organizational_unit": {
+            "type": "string"
+          },
+          "signature_algorithm": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChecksAndCorrections": {
+        "type": "object",
+        "description": "Checks and corrections (\"Controles en correcties\")",
+        "required": [
+          "reason_investigation_own_initiative",
+          "corrected_results_own_initiative",
+          "corrected_results_csb_request"
+        ],
+        "properties": {
+          "corrected_results_csb_request": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether investigation at the request of the central electoral committee\nhas led to corrected results\n(\"Op verzoek van het centraal stembureau: Zijn er gecorrigeerde telresultaten?\")"
+          },
+          "corrected_results_own_initiative": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether the investigation on its own initiative has led to corrected results\n(\"Op eigen initiatief van het gemeentelijk stembureau: Zijn er gecorrigeerde telresultaten?\")"
+          },
+          "reason_investigation_own_initiative": {
+            "$ref": "#/components/schemas/ReasonInvestigationOwnInitiative",
+            "description": "Why the GSB investigated the counting results on its own initiative\n(\"Op eigen initiatief van het gemeentelijk stembureau: Waarom heeft het gemeentelijk stembureau\n de telresultaten onderzocht?\")"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChecksAndCorrectionsPresent": {
+        "type": "string",
+        "description": "Whether the extra page \"controles en correcties\" is inserted in the report",
+        "enum": [
+          "PagePresent",
+          "PageMissing"
+        ]
+      },
       "ChosenCandidate": {
         "type": "object",
         "description": "Chosen candidate",
@@ -6149,14 +7631,26 @@
           "client_state",
           "validation_results",
           "source",
-          "status"
+          "status",
+          "is_correction"
         ],
         "properties": {
           "client_state": {
             "type": "object"
           },
+          "correction_warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fields for which a warning should be shown that a difference should be corrected"
+          },
           "data": {
             "$ref": "#/components/schemas/Results"
+          },
+          "is_correction": {
+            "type": "boolean",
+            "description": "Whether the typist is correcting an entry that was completed before"
           },
           "previous_results": {
             "$ref": "#/components/schemas/CommonPollingStationResults"
@@ -6180,6 +7674,64 @@
           "GSB",
           "CSB"
         ]
+      },
+      "CommitteeDistrict": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "The election has no districts",
+            "required": [
+              "district"
+            ],
+            "properties": {
+              "district": {
+                "type": "string",
+                "enum": [
+                  "None"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "This committee operates over all districts",
+            "required": [
+              "district"
+            ],
+            "properties": {
+              "district": {
+                "type": "string",
+                "enum": [
+                  "All"
+                ]
+              }
+            }
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RegionDetails",
+                "description": "This committee operates within a specific district"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "district"
+                ],
+                "properties": {
+                  "district": {
+                    "type": "string",
+                    "enum": [
+                      "Specific"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "This committee operates within a specific district"
+          }
+        ],
+        "description": "Which district this committee is contained within."
       },
       "CommitteeSession": {
         "type": "object",
@@ -6266,6 +7818,56 @@
         },
         "additionalProperties": false
       },
+      "CommitteeSpecificTotals": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GSBTotals",
+                "description": "Totals specific to a municipal electoral committee (gemeentelijk stembureau, GSB)"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "committee"
+                ],
+                "properties": {
+                  "committee": {
+                    "type": "string",
+                    "enum": [
+                      "GSB"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Totals specific to a municipal electoral committee (gemeentelijk stembureau, GSB)"
+          },
+          {
+            "type": "object",
+            "description": "Totals specific to a central electoral committee (centraal stembureau, CSB)",
+            "required": [
+              "number_of_voters",
+              "committee"
+            ],
+            "properties": {
+              "committee": {
+                "type": "string",
+                "enum": [
+                  "CSB"
+                ]
+              },
+              "number_of_voters": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The number of voters (\"Kiesgerechtigden\")",
+                "minimum": 0
+              }
+            }
+          }
+        ],
+        "description": "Committee specific totals, i.e. specific for GSB or CSB."
+      },
       "CommonPollingStationResults": {
         "type": "object",
         "description": "CommonPollingStationResults contains the common fields for polling station results,",
@@ -6298,11 +7900,19 @@
         },
         "additionalProperties": false
       },
+      "CorrigendumPresent": {
+        "type": "string",
+        "description": "Whether a corrigendum accompanies the report",
+        "enum": [
+          "TwoDocuments",
+          "OneDocument"
+        ]
+      },
       "CountingDifferencesPollingStation": {
         "type": "object",
         "description": "Counting Differences Polling Station,\npart of the results (\"B1-2 Verschillen met telresultaten van het stembureau\")",
         "required": [
-          "unexplained_difference_ballots_voters",
+          "difference_ballots_voters_completely_accounted_for",
           "difference_ballots_per_list"
         ],
         "properties": {
@@ -6310,9 +7920,9 @@
             "$ref": "#/components/schemas/YesNo",
             "description": "Whether there was a difference between the total votes per list as determined by the polling station and by the typist\n(\"Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?\")"
           },
-          "unexplained_difference_ballots_voters": {
+          "difference_ballots_voters_completely_accounted_for": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether there was an unexplained difference between the number of voters and votes\n(\"Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?\")"
+            "description": "Whether the total of admitted voters (D) and the total of votes counted (H) are equal, or the difference was completely accounted for\n(\"Is in de telresultaten van het stembureau het aantal toegelaten kiezers (D) en het totaal aantal getelde stemmen (H) gelijk OF is er een verschil en is dit verschil volledig verklaard?\")"
           }
         },
         "additionalProperties": false
@@ -6376,6 +7986,86 @@
         },
         "additionalProperties": false
       },
+      "DSOFirstSessionResults": {
+        "type": "object",
+        "description": "DSOFirstSessionResults, following the fields in Model N 10-1\n\nSee: Model N 10-1 (Proces-verbaal van een stembureau) from\n[kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/n-10-1-pv-sb-dso)",
+        "required": [
+          "about_report",
+          "checks_and_corrections",
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "about_report": {
+            "$ref": "#/components/schemas/AboutReport",
+            "description": "About report (\"Over het proces-verbaal\")"
+          },
+          "checks_and_corrections": {
+            "$ref": "#/components/schemas/ChecksAndCorrections",
+            "description": "Checks and corrections (\"Controles en correcties\")"
+          },
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (5. \"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"1. Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
+          }
+        }
+      },
+      "DSOInvestigations": {
+        "type": "object",
+        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
+        "required": [
+          "unaccounted_difference",
+          "other_error",
+          "corrected_results"
+        ],
+        "properties": {
+          "corrected_results": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Results were corrected\n(\"Uitslag gecorrigeerd?\")"
+          },
+          "other_error": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Investigated because of a (suspected) other error\n(\"Onderzocht vanwege (het vermoeden van) een andere fout?\")"
+          },
+          "unaccounted_difference": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Investigated because of an unaccounted-for difference\n(\"Onderzocht vanwege een onverklaard verschil?\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "DataEntry": {
         "type": "object",
         "description": "Request structure for saving data entry",
@@ -6406,21 +8096,29 @@
       "DataEntryGetDifferencesResponse": {
         "type": "object",
         "required": [
-          "first_entry_user_id",
+          "first_entry_origin",
           "first_entry",
+          "first_entry_has_errors",
           "second_entry_user_id",
           "second_entry",
+          "second_entry_has_errors",
           "source"
         ],
         "properties": {
           "first_entry": {
             "$ref": "#/components/schemas/Results"
           },
-          "first_entry_user_id": {
-            "$ref": "#/components/schemas/UserId"
+          "first_entry_has_errors": {
+            "type": "boolean"
+          },
+          "first_entry_origin": {
+            "$ref": "#/components/schemas/DataEntryOrigin"
           },
           "second_entry": {
             "$ref": "#/components/schemas/Results"
+          },
+          "second_entry_has_errors": {
+            "type": "boolean"
           },
           "second_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
@@ -6462,6 +8160,42 @@
         "type": "integer",
         "format": "int32",
         "minimum": 0
+      },
+      "DataEntryOrigin": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Import"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "user_id",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Typist"
+                ]
+              },
+              "user_id": {
+                "$ref": "#/components/schemas/UserId"
+              }
+            }
+          }
+        ]
       },
       "DataEntrySource": {
         "oneOf": [
@@ -6558,6 +8292,8 @@
           "first_entry_finalised",
           "second_entry_in_progress",
           "entries_different",
+          "first_entry_correction",
+          "second_entry_correction",
           "definitive"
         ]
       },
@@ -6628,7 +8364,7 @@
           },
           "difference_completely_accounted_for": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether the difference between the total of admitted voters and total of votes cast is explained.\n(B1-3.3.2 \"Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?\")"
+            "description": "Whether the difference between the total of admitted voters and total of votes cast is explained.\n(B1-3.3.2 \"Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H volledig verklaren?\")"
           },
           "fewer_ballots_count": {
             "type": "integer",
@@ -6641,6 +8377,23 @@
             "format": "int32",
             "description": "Number of more counted ballots (\"Aantal méér getelde stemmen (bereken: H min D)\")",
             "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "DifferencesTotals": {
+        "type": "object",
+        "description": "Contains the totals of the differences, containing which polling stations had differences.",
+        "required": [
+          "more_ballots_count",
+          "fewer_ballots_count"
+        ],
+        "properties": {
+          "fewer_ballots_count": {
+            "$ref": "#/components/schemas/SumCount"
+          },
+          "more_ballots_count": {
+            "$ref": "#/components/schemas/SumCount"
           }
         },
         "additionalProperties": false
@@ -6719,14 +8472,18 @@
       },
       "Election": {
         "type": "object",
-        "description": "Election without political groups",
+        "description": "Election without political groups.\n\nNote: an election within Abacus does not represent the entire election, but\nrather a single committee (i.e. stembureau at the CSB, HSB or GSB level)\nwithin the election.\n\nWhen access to the political groups and their candidates is required, use\n[`ElectionWithPoliticalGroups`] instead. When creating a new election, use\n[`NewElection`] instead.",
         "required": [
           "id",
           "name",
+          "official_name",
           "committee_category",
           "election_id",
           "location",
-          "domain_id",
+          "authority_id",
+          "authority_name",
+          "authority_region",
+          "district",
           "category",
           "sub_category",
           "number_of_seats",
@@ -6735,50 +8492,83 @@
           "nomination_date"
         ],
         "properties": {
+          "authority_id": {
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_id`]"
+          },
+          "authority_name": {
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_name`]"
+          },
+          "authority_region": {
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_region`]"
+          },
           "category": {
-            "$ref": "#/components/schemas/ElectionCategory"
+            "$ref": "#/components/schemas/ElectionCategory",
+            "description": "See [`ElectionWithPoliticalGroups::category`]"
           },
           "committee_category": {
-            "$ref": "#/components/schemas/CommitteeCategory"
+            "$ref": "#/components/schemas/CommitteeCategory",
+            "description": "See [`ElectionWithPoliticalGroups::committee_category`]"
           },
           "counting_method": {
-            "$ref": "#/components/schemas/VoteCountingMethod"
+            "$ref": "#/components/schemas/VoteCountingMethod",
+            "description": "See [`ElectionWithPoliticalGroups::counting_method`]"
           },
-          "domain_id": {
-            "type": "string"
+          "district": {
+            "$ref": "#/components/schemas/CommitteeDistrict",
+            "description": "See [`ElectionWithPoliticalGroups::district`]"
+          },
+          "domain": {
+            "$ref": "#/components/schemas/ElectionDomain",
+            "description": "See [`ElectionWithPoliticalGroups::domain`]"
           },
           "election_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "See [`ElectionWithPoliticalGroups::election_date`]"
           },
           "election_id": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::election_id`]"
           },
           "id": {
-            "$ref": "#/components/schemas/ElectionId"
+            "$ref": "#/components/schemas/ElectionId",
+            "description": "See [`ElectionWithPoliticalGroups::id`]"
           },
           "location": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::location`]"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::name`]"
           },
           "nomination_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "See [`ElectionWithPoliticalGroups::nomination_date`]"
           },
           "number_of_seats": {
             "type": "integer",
             "format": "int32",
+            "description": "See [`ElectionWithPoliticalGroups::number_of_seats`]",
             "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
             "format": "int32",
+            "description": "See [`ElectionWithPoliticalGroups::number_of_voters`]",
             "minimum": 0
           },
+          "official_name": {
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::official_name`]"
+          },
           "sub_category": {
-            "$ref": "#/components/schemas/ElectionSubCategory"
+            "$ref": "#/components/schemas/ElectionSubCategory",
+            "description": "See [`ElectionWithPoliticalGroups::sub_category`]"
           }
         },
         "additionalProperties": false
@@ -6788,15 +8578,15 @@
         "required": [
           "seat_assignment",
           "candidate_nomination",
-          "election_summary",
+          "election_totals",
           "warnings"
         ],
         "properties": {
           "candidate_nomination": {
             "$ref": "#/components/schemas/CandidateNomination"
           },
-          "election_summary": {
-            "$ref": "#/components/schemas/ElectionSummary"
+          "election_totals": {
+            "$ref": "#/components/schemas/ElectionTotals"
           },
           "seat_assignment": {
             "$ref": "#/components/schemas/SeatAssignment"
@@ -6990,9 +8780,29 @@
             "items": {
               "$ref": "#/components/schemas/PollingStation"
             }
+          },
+          "show_keypair_reminder": {
+            "$ref": "#/components/schemas/KeypairReminder"
           }
         },
         "additionalProperties": false
+      },
+      "ElectionDomain": {
+        "type": "object",
+        "description": "Election domain (i.e. the entity at which the election takes place)",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifier of the domain"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the domain"
+          }
+        }
       },
       "ElectionId": {
         "type": "integer",
@@ -7059,12 +8869,19 @@
         "required": [
           "data_entry_id",
           "source",
-          "status"
+          "status",
+          "updated_at"
         ],
         "properties": {
           "data_entry_id": {
             "$ref": "#/components/schemas/DataEntryId",
             "description": "Data entry id"
+          },
+          "data_entry_progress": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Current data entry progress as a percentage (0 to 100)",
+            "minimum": 0
           },
           "finalised_with_warnings": {
             "type": "boolean",
@@ -7074,23 +8891,9 @@
             "type": "string",
             "description": "Time when the data entry was finalised"
           },
-          "first_entry_progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "First entry progress as a percentage (0 to 100)",
-            "minimum": 0
-          },
-          "first_entry_user_id": {
-            "type": "integer",
-            "format": "int32",
-            "description": "First entry user id",
-            "minimum": 0
-          },
-          "second_entry_progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Second entry progress as a percentage (0 to 100)",
-            "minimum": 0
+          "first_entry_origin": {
+            "$ref": "#/components/schemas/DataEntryOrigin",
+            "description": "First entry origin (import or typist user id)"
           },
           "second_entry_user_id": {
             "type": "integer",
@@ -7100,11 +8903,16 @@
           },
           "source": {
             "$ref": "#/components/schemas/DataEntrySource",
-            "description": "Data entry source (polling station or sub committee)"
+            "description": "Data entry source (polling station or subcommittee)"
           },
           "status": {
             "$ref": "#/components/schemas/DataEntryStatusName",
             "description": "Data entry status"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Time when the data entry was last updated"
           }
         },
         "additionalProperties": false
@@ -7121,37 +8929,31 @@
           "PS2"
         ]
       },
-      "ElectionSummary": {
+      "ElectionTotals": {
         "type": "object",
-        "description": "Contains a summary of the election results, added up from the votes of all polling stations.",
+        "description": "Contains the totals of the election results, added up from the votes of all polling stations.",
         "required": [
           "voters_counts",
           "votes_counts",
           "differences_counts",
           "political_group_votes",
-          "polling_station_investigations"
+          "committee_specific"
         ],
         "properties": {
-          "differences_counts": {
-            "$ref": "#/components/schemas/SummaryDifferencesCounts",
-            "description": "The differences between voters and votes"
+          "committee_specific": {
+            "$ref": "#/components/schemas/CommitteeSpecificTotals",
+            "description": "Totals specific to the committee (GSB or CSB) of the election"
           },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The number of voters (i.e. \"Kiesgerechtigden\")",
-            "minimum": 0
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesTotals",
+            "description": "The differences between voters and votes"
           },
           "political_group_votes": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
             },
-            "description": "The summary votes for each political group (and each candidate within)"
-          },
-          "polling_station_investigations": {
-            "$ref": "#/components/schemas/PollingStationInvestigations",
-            "description": "Polling stations where results were investigated by the GSB"
+            "description": "The total votes for each political group (and each candidate within)"
           },
           "voters_counts": {
             "$ref": "#/components/schemas/VotersCounts",
@@ -7166,14 +8968,18 @@
       },
       "ElectionWithPoliticalGroups": {
         "type": "object",
-        "description": "Election with political groups",
+        "description": "Election with political groups.\n\nNote: an election within Abacus does not represent the entire election, but\nrather a single committee (i.e. stembureau at the CSB, HSB or GSB level)\nwithin the election.\n\nWhen you do not need access to political groups and their candidates, you\ncan use [`Election`] instead. When creating a new election, use\n[`NewElection`] instead.",
         "required": [
           "id",
           "name",
+          "official_name",
           "committee_category",
           "election_id",
           "location",
-          "domain_id",
+          "authority_id",
+          "authority_name",
+          "authority_region",
+          "district",
           "category",
           "sub_category",
           "number_of_seats",
@@ -7183,56 +8989,90 @@
           "political_groups"
         ],
         "properties": {
+          "authority_id": {
+            "type": "string",
+            "description": "Identifier of the authority/region that this committee is responsible for."
+          },
+          "authority_name": {
+            "type": "string",
+            "description": "Name of the authority. Note that most of the time this is the same as the\nregion name, but specifically for country wide elections the authority\nname may also be \"De Kiesraad\" instead of the region name of \"Nederland\"."
+          },
+          "authority_region": {
+            "type": "string",
+            "description": "The name of the region that the committee is responsible for."
+          },
           "category": {
-            "$ref": "#/components/schemas/ElectionCategory"
+            "$ref": "#/components/schemas/ElectionCategory",
+            "description": "The category of the election, as defined by EML_NL election definition.\nExamples include \"Municipal\" for municipal elections or \"WaterAuthority\"\nfor the water authority elections."
           },
           "committee_category": {
-            "$ref": "#/components/schemas/CommitteeCategory"
+            "$ref": "#/components/schemas/CommitteeCategory",
+            "description": "The category (e.g. CSB) of the committee that this struct represents"
           },
           "counting_method": {
-            "$ref": "#/components/schemas/VoteCountingMethod"
+            "$ref": "#/components/schemas/VoteCountingMethod",
+            "description": "If this is a GSB committee, this is the counting method used for\nvote tabulation. This field is not used for other committee types."
           },
-          "domain_id": {
-            "type": "string"
+          "district": {
+            "$ref": "#/components/schemas/CommitteeDistrict",
+            "description": "The district that this committee is responsible for. This will be None\nfor committees within elections that do not have districts. When an\nelection does have districts this will be All for committees that are\nresponsible for all districts, or Specific for committees that sit\nwithin a specific district."
+          },
+          "domain": {
+            "$ref": "#/components/schemas/ElectionDomain",
+            "description": "An election wide field: for elections that do not concern the entire\ncountry this field contains the specific domain of that election. For\nexample for municipal elections this contains the municipality that the\nelection is for. Note that the election domain id is not always available,\neven if a domain is present. For country wide elections this field is None."
           },
           "election_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "The date of the election, as defined by the EML_NL election definition.\nNote: this is the date that the election takes/took place, not necessarily\nthe date that the committee is in session."
           },
           "election_id": {
-            "type": "string"
+            "type": "string",
+            "description": "The election identifier as defined in the EML_NL election definition"
           },
           "id": {
-            "$ref": "#/components/schemas/ElectionId"
+            "$ref": "#/components/schemas/ElectionId",
+            "description": "Identifier of the election within Abacus"
           },
           "location": {
-            "type": "string"
+            "type": "string",
+            "description": "The location of the committee.\n\nFor GSB committees this will be the same as the authority region, but\nfor HSBs and CSBs this may also be a specific town or city within the\nauthority region."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Name of the election, as formatted for display in Abacus."
           },
           "nomination_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "The date when candidate nominations for this election are/were closed."
           },
           "number_of_seats": {
             "type": "integer",
             "format": "int32",
+            "description": "The number of seats that are to be elected for. For example, this is 150\nfor elections for the House of Representatives (Tweede Kamer).",
             "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
             "format": "int32",
+            "description": "How many voters are registered for this election.",
             "minimum": 0
+          },
+          "official_name": {
+            "type": "string",
+            "description": "Name of the election, as defined in the EML_NL election definition."
           },
           "political_groups": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
-            }
+            },
+            "description": "The political groups and their candidates that are registered for this\nelection."
           },
           "sub_category": {
-            "$ref": "#/components/schemas/ElectionSubCategory"
+            "$ref": "#/components/schemas/ElectionSubCategory",
+            "description": "The sub-category of the election, as defined by the EML_NL election\ndefinition."
           }
         },
         "additionalProperties": false
@@ -7247,13 +9087,19 @@
           "ApportionmentNotCompleted",
           "ApportionmentCommitteeSessionNotCompleted",
           "ApportionmentInvalidLotDrawing",
+          "CertificateAlreadyAdded",
+          "CertificateUnknownSubCommittee",
+          "CertificateWrongElection",
           "CommitteeSessionPaused",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
+          "DataEntryAlreadyImported",
           "DataEntryAlreadyFinalised",
-          "DataEntryCannotBeDeleted",
+          "DataEntryCannotBeReset",
           "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
+          "DataEntryValidationErrors",
+          "ElectionMismatch",
           "EmlImportError",
           "EmlError",
           "EntryNotFound",
@@ -7261,8 +9107,12 @@
           "Forbidden",
           "InternalServerError",
           "InvalidApportionmentState",
+          "InvalidCertificate",
           "InvalidCommitteeSessionStatus",
+          "InvalidCountType",
           "InvalidData",
+          "InvalidDistrict",
+          "InvalidFullname",
           "InvalidHash",
           "InvalidJson",
           "InvalidPassword",
@@ -7270,11 +9120,13 @@
           "InvalidDataEntrySource",
           "InvalidSession",
           "InvalidStateTransition",
+          "InvalidUsername",
           "InvalidUsernameOrPassword",
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
           "InvestigationHasDataEntryOrResult",
           "InvestigationRequiresCorrectedResults",
+          "LoginRateLimited",
           "NotInitialised",
           "OwnAccountCannotBeDeleted",
           "PasswordRejectionSameAsOld",
@@ -7282,11 +9134,15 @@
           "PasswordRejectionTooShort",
           "PdfGenerationError",
           "PollingStationRepeated",
-          "PollingStationValidationErrors",
           "RequestPayloadTooLarge",
+          "SignatureMissing",
+          "SignatureUnknown",
+          "SubCommitteeHasNoCertificates",
           "Unauthorized",
+          "UnknownCommittee",
           "UsernameNotUnique",
-          "UserNotFound"
+          "UserNotFound",
+          "ZipError"
         ]
       },
       "ErrorResponse": {
@@ -7312,9 +9168,9 @@
       },
       "ExtraInvestigation": {
         "type": "object",
-        "description": "Extra investigation, part of the results (\"B1-1 Alleen bij extra onderzoek\")",
+        "description": "Extra investigation, part of the results (\"B1-1 Extra onderzoek\")",
         "required": [
-          "extra_investigation_other_reason",
+          "extra_investigation_done",
           "ballots_recounted_extra_investigation"
         ],
         "properties": {
@@ -7322,9 +9178,9 @@
             "$ref": "#/components/schemas/YesNo",
             "description": "Whether ballots were (partially) recounted following the extra investigation\n(\"Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?\")"
           },
-          "extra_investigation_other_reason": {
+          "extra_investigation_done": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether extra investigation was done for another reason than an unexplained difference\n(\"Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?\")"
+            "description": "Whether extra investigation was done\n(\"Heeft het gemeentelijk stembureau extra onderzoek gedaan?\")"
           }
         },
         "additionalProperties": false
@@ -7394,6 +9250,9 @@
           },
           "polling_station_file_name": {
             "type": "string"
+          },
+          "selected_region": {
+            "$ref": "#/components/schemas/RegionKey"
           }
         },
         "additionalProperties": false
@@ -7435,6 +9294,9 @@
           },
           "polling_station_file_name": {
             "type": "string"
+          },
+          "selected_region": {
+            "$ref": "#/components/schemas/RegionKey"
           }
         },
         "additionalProperties": false
@@ -7444,11 +9306,18 @@
         "required": [
           "hash",
           "election",
-          "number_of_voters"
+          "number_of_voters",
+          "gsb_list"
         ],
         "properties": {
           "election": {
             "$ref": "#/components/schemas/NewElection"
+          },
+          "gsb_list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegionDetails"
+            }
           },
           "hash": {
             "$ref": "#/components/schemas/RedactedEmlHash"
@@ -7509,11 +9378,63 @@
         },
         "additionalProperties": false
       },
+      "GSBTotals": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSOInvestigations",
+                "description": "Totals specific to centrally counted (centrale stemopneming, CSO) results"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "counting_method"
+                ],
+                "properties": {
+                  "counting_method": {
+                    "type": "string",
+                    "enum": [
+                      "CSO"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Totals specific to centrally counted (centrale stemopneming, CSO) results"
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DSOInvestigations",
+                "description": "Totals specific to decentrally counted (decentrale stemopneming, DSO) results"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "counting_method"
+                ],
+                "properties": {
+                  "counting_method": {
+                    "type": "string",
+                    "enum": [
+                      "DSO"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Totals specific to decentrally counted (decentrale stemopneming, DSO) results"
+          }
+        ],
+        "description": "GSB specific totals, depending on the vote counting method (CSO or DSO)."
+      },
       "GenerateElectionArgs": {
         "type": "object",
         "description": "Abacus API and asset server",
         "required": [
           "committee_category",
+          "election_category",
           "political_groups",
           "candidates_per_group",
           "polling_stations",
@@ -7526,7 +9447,8 @@
           "second_data_entry",
           "turnout",
           "candidate_distribution_slope",
-          "political_group_distribution_slope"
+          "political_group_distribution_slope",
+          "gsbs"
         ],
         "properties": {
           "candidate_distribution_slope": {
@@ -7540,9 +9462,17 @@
             "$ref": "#/components/schemas/CommitteeCategory",
             "description": "GSB or CSB"
           },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod",
+            "description": "CSO or DSO"
+          },
           "custom_name": {
             "type": "string",
             "description": "Custom election name"
+          },
+          "election_category": {
+            "$ref": "#/components/schemas/ElectionCategory",
+            "description": "Municipal, Provincial or WaterAuthority"
           },
           "first_data_entry": {
             "$ref": "#/components/schemas/RandomRange",
@@ -7555,6 +9485,10 @@
           "generate_p22_2_variants": {
             "type": "boolean",
             "description": "Generate multiple elections, each resulting in a different P 22-2 variant"
+          },
+          "gsbs": {
+            "$ref": "#/components/schemas/RandomRange",
+            "description": "Amount of GSBs"
           },
           "political_group_distribution_slope": {
             "$ref": "#/components/schemas/RandomRange"
@@ -7778,6 +9712,13 @@
               }
             }
           }
+        ]
+      },
+      "KeypairReminder": {
+        "type": "string",
+        "enum": [
+          "Dismissable",
+          "NonDismissable"
         ]
       },
       "LargestRemainderAssignedSeat": {
@@ -8160,62 +10101,138 @@
       },
       "NewElection": {
         "type": "object",
-        "description": "Election request",
+        "description": "Struct for creating a new election in Abacus.\n\nThis struct does not contain the internal Abacus election id, as that is\ngenerated by Abacus when creating a new election.\n\nNote: an election within Abacus does not represent the entire election, but\nrather a single committee (i.e. stembureau at the CSB, HSB or GSB level)\nwithin the election.\n\nPlease take a look at [`ElectionWithPoliticalGroups`] for the full election\nrepresentation, or [`Election`] for the election representation without\npolitical groups and their candidates.",
         "required": [
           "name",
+          "official_name",
           "committee_category",
           "election_id",
           "location",
-          "domain_id",
+          "authority_id",
+          "authority_name",
+          "authority_region",
+          "district",
           "category",
           "sub_category",
           "number_of_seats",
           "number_of_voters",
           "election_date",
-          "nomination_date"
+          "nomination_date",
+          "political_groups"
         ],
         "properties": {
+          "authority_id": {
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_id`]"
+          },
+          "authority_name": {
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_name`]"
+          },
+          "authority_region": {
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_region`]"
+          },
           "category": {
-            "$ref": "#/components/schemas/ElectionCategory"
+            "$ref": "#/components/schemas/ElectionCategory",
+            "description": "See [`ElectionWithPoliticalGroups::category`]"
           },
           "committee_category": {
-            "$ref": "#/components/schemas/CommitteeCategory"
+            "$ref": "#/components/schemas/CommitteeCategory",
+            "description": "See [`ElectionWithPoliticalGroups::committee_category`]"
           },
           "counting_method": {
-            "$ref": "#/components/schemas/VoteCountingMethod"
+            "$ref": "#/components/schemas/VoteCountingMethod",
+            "description": "See [`ElectionWithPoliticalGroups::counting_method`]"
           },
-          "domain_id": {
-            "type": "string"
+          "district": {
+            "$ref": "#/components/schemas/CommitteeDistrict",
+            "description": "See [`ElectionWithPoliticalGroups::district`]"
+          },
+          "domain": {
+            "$ref": "#/components/schemas/ElectionDomain",
+            "description": "See [`ElectionWithPoliticalGroups::domain`]"
           },
           "election_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "See [`ElectionWithPoliticalGroups::election_date`]"
           },
           "election_id": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::election_id`]"
           },
           "location": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::location`]"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::name`]"
           },
           "nomination_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "See [`ElectionWithPoliticalGroups::nomination_date`]"
           },
           "number_of_seats": {
             "type": "integer",
             "format": "int32",
+            "description": "See [`ElectionWithPoliticalGroups::number_of_seats`]",
             "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
             "format": "int32",
+            "description": "See [`ElectionWithPoliticalGroups::number_of_voters`]",
             "minimum": 0
           },
+          "official_name": {
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::official_name`]"
+          },
+          "political_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegisteredPoliticalGroup"
+            },
+            "description": "See [`ElectionWithPoliticalGroups::political_groups`]"
+          },
           "sub_category": {
-            "$ref": "#/components/schemas/ElectionSubCategory"
+            "$ref": "#/components/schemas/ElectionSubCategory",
+            "description": "See [`ElectionWithPoliticalGroups::sub_category`]"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NextSessionResults": {
+        "type": "object",
+        "description": "NextSessionResults, following the fields in Model Na 14-2 Bijlage 1/Na 14-1 versie 2.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from\n<https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso)>.\nSee also \"Model Na 14-1 (Corrigendum bij het proces-verbaal van een stembureau)\"\n<https://www.kiesraad.nl/documenten/2025/11/27/model-na-14-1>.",
+        "required": [
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
           }
         },
         "additionalProperties": false
@@ -8518,45 +10535,6 @@
         },
         "additionalProperties": false
       },
-      "PollingStationInvestigations": {
-        "type": "object",
-        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
-        "required": [
-          "admitted_voters_recounted",
-          "investigated_other_reason",
-          "ballots_recounted"
-        ],
-        "properties": {
-          "admitted_voters_recounted": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Admitted voters were recounted\n(\"Toegelaten kiezers opnieuw vastgesteld?\")"
-          },
-          "ballots_recounted": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Ballots were (partially) recounted\n(\"Stembiljetten (deels) herteld?\")"
-          },
-          "investigated_other_reason": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Investigated for other reasons than unexplained difference\n(\"Onderzocht vanwege andere reden dan onverklaard verschil?\")"
-          }
-        },
-        "additionalProperties": false
-      },
       "PollingStationListResponse": {
         "type": "object",
         "description": "Polling station list response",
@@ -8636,20 +10614,6 @@
         },
         "additionalProperties": false
       },
-      "PollingStationRequestListResponse": {
-        "type": "object",
-        "required": [
-          "polling_stations"
-        ],
-        "properties": {
-          "polling_stations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PollingStationRequest"
-            }
-          }
-        }
-      },
       "PollingStationType": {
         "type": "string",
         "description": "Type of Polling station",
@@ -8658,6 +10622,24 @@
           "Special",
           "Mobile"
         ]
+      },
+      "PollingStationValidateImportResponse": {
+        "type": "object",
+        "required": [
+          "polling_stations",
+          "polling_station_definition_matches_election"
+        ],
+        "properties": {
+          "polling_station_definition_matches_election": {
+            "type": "boolean"
+          },
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationRequest"
+            }
+          }
+        }
       },
       "PollingStationsRequest": {
         "type": "object",
@@ -8717,13 +10699,13 @@
           {
             "type": "object",
             "required": [
-              "election_summary",
+              "election_totals",
               "seat_assignment",
               "status"
             ],
             "properties": {
-              "election_summary": {
-                "$ref": "#/components/schemas/ElectionSummary"
+              "election_totals": {
+                "$ref": "#/components/schemas/ElectionTotals"
               },
               "seat_assignment": {
                 "$ref": "#/components/schemas/SeatAssignment"
@@ -8740,6 +10722,25 @@
       },
       "RandomRange": {
         "type": "string"
+      },
+      "ReasonInvestigationOwnInitiative": {
+        "type": "object",
+        "description": "Reason for investigation on own initiative",
+        "required": [
+          "unaccounted_difference",
+          "other_error"
+        ],
+        "properties": {
+          "other_error": {
+            "type": "boolean",
+            "description": "Because of a (suspected) other error\n(\"Vanwege (het vermoeden van) een andere fout\")"
+          },
+          "unaccounted_difference": {
+            "type": "boolean",
+            "description": "Because of an unaccounted-for difference\n(\"Vanwege een onverklaard verschil\")"
+          }
+        },
+        "additionalProperties": false
       },
       "RedactedEmlHash": {
         "type": "object",
@@ -8765,12 +10766,102 @@
           }
         }
       },
+      "RegionCategory": {
+        "type": "string",
+        "description": "Category of a region, as defined by EML-NL",
+        "enum": [
+          "State",
+          "WaterAuthority",
+          "Province",
+          "ElectoralDistrict",
+          "Municipality",
+          "PollingStation"
+        ]
+      },
+      "RegionDetails": {
+        "type": "object",
+        "description": "Identifies a specific region from the election tree for usage within Abacus.",
+        "required": [
+          "name",
+          "key",
+          "roman_numerals",
+          "frisian_export_allowed"
+        ],
+        "properties": {
+          "frisian_export_allowed": {
+            "type": "boolean",
+            "description": "Whether this region allows Frisian export."
+          },
+          "key": {
+            "$ref": "#/components/schemas/RegionKey",
+            "description": "Key of the region (combination of category and id)"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the region"
+          },
+          "roman_numerals": {
+            "type": "boolean",
+            "description": "Whether this region uses roman numerals for its contest id."
+          }
+        }
+      },
+      "RegionKey": {
+        "type": "object",
+        "description": "Identifies a specific region from the election tree for usage within Abacus.",
+        "required": [
+          "category"
+        ],
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/RegionCategory",
+            "description": "Category of the region, as defined by EML_NL"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Identifier of the region, if it has one.",
+            "minimum": 0
+          }
+        }
+      },
+      "RegisteredPoliticalGroup": {
+        "type": "object",
+        "description": "Political group and its candidates (with registered name as imported from the EML)",
+        "required": [
+          "number",
+          "registered_name",
+          "candidates"
+        ],
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "description": "List of candidates of the political group"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number",
+            "minimum": 0
+          },
+          "registered_name": {
+            "type": "string",
+            "description": "Registered political group name as imported from the candidates list EML (230)"
+          }
+        },
+        "additionalProperties": false
+      },
       "ResolveDifferencesAction": {
         "type": "string",
         "enum": [
-          "keep_first_entry",
-          "keep_second_entry",
-          "discard_both_entries"
+          "keep_first_and_discard_second",
+          "keep_first_and_correct_second",
+          "keep_second_and_discard_first",
+          "keep_second_and_correct_first",
+          "discard_both"
         ]
       },
       "ResolveErrorsAction": {
@@ -8782,6 +10873,52 @@
       },
       "Results": {
         "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DSOFirstSessionResults",
+                "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1 and possibly in combination with the values from Model Na 14-1 versie 1."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "DSOFirstSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1 and possibly in combination with the values from Model Na 14-1 versie 1."
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NextSessionResults",
+                "description": "Results for decentrally counted (DSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-1 versie 2."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "DSONextSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for decentrally counted (DSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-1 versie 2."
+          },
           {
             "allOf": [
               {
@@ -8808,7 +10945,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CSONextSessionResults",
+                "$ref": "#/components/schemas/NextSessionResults",
                 "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
               },
               {
@@ -9059,11 +11196,26 @@
           "id",
           "number",
           "name",
-          "category"
+          "category",
+          "authority_id",
+          "authority_name",
+          "certificates"
         ],
         "properties": {
+          "authority_id": {
+            "type": "string"
+          },
+          "authority_name": {
+            "type": "string"
+          },
           "category": {
             "$ref": "#/components/schemas/CommitteeCategory"
+          },
+          "certificates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Certificate"
+            }
           },
           "id": {
             "$ref": "#/components/schemas/SubCommitteeId"
@@ -9080,27 +11232,42 @@
         "additionalProperties": false
       },
       "SubCommitteeFirstSession": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/SubCommittee"
-          },
-          {
-            "type": "object",
-            "required": [
-              "committee_session_id",
-              "data_entry_id"
-            ],
-            "properties": {
-              "committee_session_id": {
-                "$ref": "#/components/schemas/CommitteeSessionId"
-              },
-              "data_entry_id": {
-                "$ref": "#/components/schemas/DataEntryId"
-              }
-            }
-          }
+        "type": "object",
+        "description": "Sub electoral committee in a first committee session.",
+        "required": [
+          "committee_session_id",
+          "id",
+          "number",
+          "name",
+          "authority_id",
+          "authority_name",
+          "data_entry_id"
         ],
-        "description": "Sub electoral committee in a first committee session."
+        "properties": {
+          "authority_id": {
+            "type": "string"
+          },
+          "authority_name": {
+            "type": "string"
+          },
+          "committee_session_id": {
+            "$ref": "#/components/schemas/CommitteeSessionId"
+          },
+          "data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/SubCommitteeId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
       },
       "SubCommitteeId": {
         "type": "integer",
@@ -9109,7 +11276,7 @@
       },
       "SumCount": {
         "type": "object",
-        "description": "Contains a summary count, containing both the count and a list of polling\nstations that contributed to it.",
+        "description": "Contains a sum count, containing both the count and a list of polling\nstations that contributed to it.",
         "required": [
           "count",
           "data_entry_sources"
@@ -9125,23 +11292,6 @@
             "items": {
               "$ref": "#/components/schemas/DataEntrySourceNumber"
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "SummaryDifferencesCounts": {
-        "type": "object",
-        "description": "Contains a summary of the differences, containing which polling stations had differences.",
-        "required": [
-          "more_ballots_count",
-          "fewer_ballots_count"
-        ],
-        "properties": {
-          "fewer_ballots_count": {
-            "$ref": "#/components/schemas/SumCount"
-          },
-          "more_ballots_count": {
-            "$ref": "#/components/schemas/SumCount"
           }
         },
         "additionalProperties": false
@@ -9243,8 +11393,17 @@
         "enum": [
           "F101",
           "F102",
+          "F103",
+          "F104",
           "F111",
           "F112",
+          "F121",
+          "F122",
+          "F131",
+          "F132",
+          "F133",
+          "F134",
+          "F135",
           "F201",
           "F202",
           "F203",
@@ -9259,11 +11418,14 @@
           "F308",
           "F309",
           "F310",
+          "F311",
           "F312",
+          "F313",
           "F401",
           "F402",
           "F403",
           "W001",
+          "W002",
           "W201",
           "W202",
           "W203",

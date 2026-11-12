@@ -81,8 +81,8 @@ impl AuditLogEvent {
         &self.event_level
     }
 
-    pub fn message(&self) -> Option<&String> {
-        self.message.as_ref()
+    pub fn message(&self) -> Option<&str> {
+        self.message.as_deref()
     }
 
     pub fn user_id(&self) -> Option<UserId> {
@@ -233,12 +233,14 @@ pub async fn assert_last_event(
     event_type: AuditEventType,
     event_level: AuditEventLevel,
     event: serde_json::Value,
+    message: Option<&str>,
 ) -> () {
     let events = list_all(conn).await.expect("should be able to list events");
     let last_event = events.last().expect("should have at least one event");
     assert_eq!(*last_event.event_name(), event_type);
     assert_eq!(*last_event.event_level(), event_level);
     assert_eq!(*last_event.event(), event);
+    assert_eq!(last_event.message(), message);
 }
 
 #[cfg(test)]

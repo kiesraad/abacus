@@ -11,11 +11,14 @@ import { NavBarMenuButton } from "./NavBarMenu";
 
 type NavBarLinksProps = { location: { pathname: string } };
 
+const DATA_ENTRY_IMPORT_PATH = /^\/elections\/\d+\/data-entry\/import$/;
+
 function ElectionBreadcrumb({ election }: { election: Election }) {
   return (
     <>
       <span className="bold">
-        {election.committee_category} {election.domain_id} {election.location}
+        {election.committee_category === "GSB" && election.committee_category} {election.authority_id}{" "}
+        {election.authority_region}
       </span>
       <span>&mdash;</span>
       <span>{election.name}</span>
@@ -52,12 +55,23 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
     return null;
   }
 
+  // Pages accessed from the election status page need a breadcrumb back to the election status page.
+  const linksBackToStatus =
+    /^\/elections\/\d+\/status\/\d+\/(resolve-differences|detail(\/\w+)?)$/.test(location.pathname) ||
+    DATA_ENTRY_IMPORT_PATH.test(location.pathname);
+
   return (
     <>
       <NavBarMenuButton />
       <Link to={`/elections/${election.id}`}>
         <ElectionBreadcrumb election={election} />
       </Link>
+      {location.pathname.match(/^\/elections\/\d+\/sub-committees\/\d+\/?$/) && (
+        <>
+          <IconChevronRight />
+          <Link to={`/elections/${election.id}/sub-committees`}>{t("sub_committee_keys.title")}</Link>
+        </>
+      )}
       {location.pathname.match(/^\/elections\/\d+\/polling-stations\/(create|\d+\/update)$/) && (
         <>
           <IconChevronRight />
@@ -72,7 +86,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
           <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
         </>
       )}
-      {location.pathname.match(/^\/elections\/\d+\/status\/\d+\/(resolve-differences|detail(\/\w+)?)$/) && (
+      {linksBackToStatus && (
         <>
           <IconChevronRight />
           <Link to={`/elections/${election.id}/status`}>
@@ -115,7 +129,12 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
     return <TopLevelManagementLinks />;
   }
 
-  if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {
+  if (
+    location.pathname.match(/^\/elections\/\d+\/data-entry/) &&
+    // Exception under /data-entry: only accessible for a coordinator, so it should
+    // get ElectionManagementLinks instead of DataEntryLinks.
+    !DATA_ENTRY_IMPORT_PATH.test(location.pathname)
+  ) {
     return <DataEntryLinks location={location} />;
   }
 

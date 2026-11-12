@@ -6,10 +6,12 @@ import { Badge, type BadgeProps, type BadgeType } from "./Badge";
 const expectedBadgeLabel: Record<BadgeType, string> = {
   empty: "1e invoer",
   first_entry_in_progress: "1e invoer",
+  first_entry_correction: "1e invoer",
   first_entry_has_errors: "1e invoer",
   first_entry_finalised: "1e invoer",
   first_entry_finalised_for_typist: "2e invoer",
   second_entry_in_progress: "2e invoer",
+  second_entry_correction: "2e invoer",
   entries_different: "2e invoer",
   definitive: "Definitief",
 };
@@ -43,7 +45,12 @@ export const Badges: StoryObj = {
       return within(badge).queryByRole("img", { hidden: true }) !== null;
     });
 
-    await expect(badgesWithIcons).toEqual(["first_entry_in_progress", "second_entry_in_progress"]);
+    await expect(badgesWithIcons).toEqual([
+      "first_entry_in_progress",
+      "first_entry_correction",
+      "second_entry_in_progress",
+      "second_entry_correction",
+    ]);
   },
 };
 

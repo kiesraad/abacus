@@ -2,7 +2,7 @@ import type {
   ApportionmentState,
   CandidateNomination,
   CommitteeSession,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   SeatAssignment,
 } from "@/types/generated/openapi";
@@ -478,7 +478,7 @@ export const candidate_nomination: CandidateNomination = {
       first_name: "Christina",
       last_name_prefix: "de",
       last_name: "Vegt",
-      locality: "'s Gravenveen",
+      locality: "'s-Gravenveen",
       gender: "Female",
       list_number: 4,
       list_name: "Political Group D",
@@ -635,7 +635,8 @@ export const candidate_nomination: CandidateNomination = {
   ],
 };
 
-export const election_summary: ElectionSummary = {
+export const election_totals: ElectionTotals = {
+  committee_specific: { committee: "CSB", number_of_voters: 8634 },
   voters_counts: {
     poll_card_count: 8000,
     proxy_certificate_count: 0,
@@ -807,12 +808,6 @@ export const election_summary: ElectionSummary = {
       ],
     },
   ],
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    investigated_other_reason: [],
-    ballots_recounted: [],
-  },
-  number_of_voters: 8634,
 };
 
 export const committee_session: CommitteeSession = {
@@ -827,10 +822,15 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 15,
   name: "Election >= 19 seats with full seat removal",
+  official_name: "Gemeenteraad Juinen 2026",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",
-  domain_id: "0035",
+  authority_id: "CSB",
+  authority_name: "Juinen",
+  authority_region: "Juinen",
+  district: { district: "None" },
+  domain: { id: "0035", name: "Juinen" },
   category: "Municipal",
   sub_category: "GR2",
   number_of_seats: 20,
@@ -1005,7 +1005,7 @@ export const election: ElectionWithPoliticalGroups = {
           first_name: "Christina",
           last_name_prefix: "de",
           last_name: "Vegt",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {

@@ -12,6 +12,7 @@ import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import { KeyboardKey } from "@/types/ui";
 import { cn } from "@/utils/classnames";
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { parseIntUserInput } from "@/utils/strings";
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import { type DataEntryStatusWithUserStatus, DataEntryUserStatus, getUrlForDataEntry } from "../utils/util";
@@ -84,7 +85,7 @@ export function DataEntryPicker({ dataEntryWithStatus }: DataEntryPickerProps) {
     if (alertMessage) {
       setAlert(
         t(alertMessage, {
-          nr: currentDataEntry.statusEntry.source.number,
+          nr: getDataEntrySourceNumber(currentDataEntry.statusEntry.source),
           name: currentDataEntry.statusEntry.source.name,
         }),
       );

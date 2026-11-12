@@ -1,0 +1,230 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT\n            id,\n            name,\n            official_name,\n            committee_category,\n            counting_method,\n            election_id,\n            location,\n            authority_id,\n            authority_name,\n            authority_region,\n            district,\n            domain,\n            category,\n            sub_category,\n            number_of_seats,\n            number_of_voters,\n            election_date,\n            nomination_date\n        FROM elections\n        WHERE ($1 IS NULL OR committee_category = $1)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "name": "official_name",
+        "ordinal": 2,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "official_name"
+          }
+        }
+      },
+      {
+        "name": "committee_category",
+        "ordinal": 3,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "committee_category"
+          }
+        }
+      },
+      {
+        "name": "counting_method",
+        "ordinal": 4,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "counting_method"
+          }
+        }
+      },
+      {
+        "name": "election_id",
+        "ordinal": 5,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "election_id"
+          }
+        }
+      },
+      {
+        "name": "location",
+        "ordinal": 6,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "location"
+          }
+        }
+      },
+      {
+        "name": "authority_id",
+        "ordinal": 7,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "authority_id"
+          }
+        }
+      },
+      {
+        "name": "authority_name",
+        "ordinal": 8,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "authority_name"
+          }
+        }
+      },
+      {
+        "name": "authority_region",
+        "ordinal": 9,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "authority_region"
+          }
+        }
+      },
+      {
+        "name": "district",
+        "ordinal": 10,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "district"
+          }
+        }
+      },
+      {
+        "name": "domain",
+        "ordinal": 11,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "domain"
+          }
+        }
+      },
+      {
+        "name": "category",
+        "ordinal": 12,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "category"
+          }
+        }
+      },
+      {
+        "name": "sub_category",
+        "ordinal": 13,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "sub_category"
+          }
+        }
+      },
+      {
+        "name": "number_of_seats",
+        "ordinal": 14,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "number_of_seats"
+          }
+        }
+      },
+      {
+        "name": "number_of_voters",
+        "ordinal": 15,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "number_of_voters"
+          }
+        }
+      },
+      {
+        "name": "election_date",
+        "ordinal": 16,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "election_date"
+          }
+        }
+      },
+      {
+        "name": "nomination_date",
+        "ordinal": 17,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "nomination_date"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "ad57b9278e88738ca33ec89dc54e65889196b3985b3a12e5264551eaa2ddc655"
+}

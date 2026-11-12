@@ -1,0 +1,48 @@
+name: pnpm audit advisories
+
+# Checks frontend dependencies against the GitHub advisory database.
+# Runs on schedule and whenever dependencies are updated.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1"
+  pull_request:
+    paths:
+      - "frontend/package.json"
+      - "frontend/pnpm-lock.yaml"
+      - "frontend/pnpm-workspace.yaml"
+      - ".github/workflows/pnpm-audit.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pnpm-audit-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  advisories:
+    name: Check advisories
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Setup Node
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install pnpm
+        run: >
+          npm install --global corepack@latest &&
+          corepack enable &&
+          corepack prepare pnpm@latest-11 --activate
+      # Production dependencies are checked separately, so that a failure
+      # shows whether shipped code or only development tooling is affected.
+      - name: Check advisories (production dependencies)
+        run: pnpm audit --prod
+      - name: Check advisories (all dependencies)
+        if: ${{ !cancelled() }}
+        run: pnpm audit

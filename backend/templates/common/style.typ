@@ -1,3 +1,5 @@
+#import "scripts.typ": emph_block
+
 // Get the chapter defined in the current page or the last defined chapter
 #let current_chapter() = {
   let chapters = query(heading.where(level: 1))
@@ -44,7 +46,11 @@
     return "Deel 1 - Gecorrigeerde telresultaten"
   }
 
-  if chapter_string.starts-with("Telresultaten van") {
+  if chapter_string.starts-with("Onderzoek naar telresultaten") {
+    return "Deel 1 - Verschillen met telresultaten stembureau"
+  }
+
+  if chapter_string.starts-with("Gecorrigeerde telresultaten") or chapter_string.starts-with("Telresultaten"){
     return "Deel 2 - Telresultaten"
   }
 
@@ -83,6 +89,7 @@
     margin: (x: 1.5cm, top: 2.0cm, bottom: margin-bottom),
     numbering: (current, total) => [Pagina #current van #total],
     header: default_header(header-left, header-right),
+    footer-descent: 0.45cm,
     footer: context (
       grid(
         columns: (1fr, auto),
@@ -112,7 +119,8 @@
 
 // Document header numbering
 #let document_numbering(doc) = [
-  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: "")
+  // Note: `supplement: none` removes the default "Hoofdstuk" prefix (`supplement: ""` will render an empty space)
+  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: none)
   #show heading.where(level: 1): set heading(numbering: "Deel 1.1 -", supplement: "Deel")
   #show heading.where(level: 3): it => [
     #block(
@@ -129,7 +137,8 @@
 
 // Attachment header numbering
 #let attachment_numbering(doc, prefix) = [
-  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: "")
+  // Note: `supplement: none` removes the default "Hoofdstuk" prefix (`supplement: ""` will render an empty space)
+  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: none)
 
   #show heading: it => {
     if it.level >= 4 {
@@ -151,3 +160,53 @@
 
   #doc
 ]
+
+// Corrigendum header numbering
+#let corrigendum_numbering(doc) = [
+  // Note: `supplement: none` removes the default "Hoofdstuk" prefix (`supplement: ""` will render an empty space)
+  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: none)
+
+  #show heading: it => {
+    if it.level >= 4 {
+      block(it.body)
+    } else if it.level == 1 {
+      if it.body == [Ondertekening] {
+        [Deel #counter(heading).display(it.numbering) - #it.body]
+      } else {
+        [#counter(heading).display(it.numbering). #it.body]
+      }
+    } else if it.level == 2 {
+      [#counter(heading).display(it.numbering) #it.body]
+    }
+  }
+
+  #show heading.where(level: 3): it => [
+    #block(
+      stroke: (left: 1pt),
+      outset: (left: 6pt, top: 3pt, bottom: 3pt),
+    )[
+      *#counter(heading).display(it.numbering)*
+      #it.body
+    ]
+  ]
+
+  #doc
+]
+
+// Intentionally blank page before the signature page. Header shows the next level-1 chapter.
+#let blank_page_before_signing(header-right, extra-header-left: "") = {
+  pagebreak(weak: true)
+
+  set page(header: context default_header(
+    if extra-header-left != "" {
+      [#query(heading.where(level: 1).after(here())).at(0, default: none) \ #extra-header-left]
+    } else {
+      query(heading.where(level: 1).after(here())).at(0, default: none)
+    }, header-right,
+  ))
+
+  emph_block[Deze pagina is expres leeg]
+  [Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.]
+
+  pagebreak(weak: true)
+}

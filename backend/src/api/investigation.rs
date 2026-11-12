@@ -13,30 +13,41 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
-        data_entry::delete_data_entry_for_polling_station,
+        committee_session::verify_committee_session_details_exist,
+        data_entry::{delete_data_entry, delete_data_entry_for_polling_station},
         middleware::authentication::RouteAuthorization,
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
-        election::ElectionWithPoliticalGroups,
+        data_entry::DataEntryStatus,
+        election::{ElectionWithPoliticalGroups, VoteCountingMethod},
         investigation::{
             InvestigationStatus, InvestigationTransitionError, PollingStationInvestigation,
             PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
             PollingStationInvestigationUpdateRequest,
         },
         models::{
-            ModelNa14_2Bijlage1Input, ToPdfFileModel, votes_table::VotesTablesWithOnlyPreviousVotes,
+            ModelNa14_1Versie2Input, ModelNa14_2Bijlage1Input, ToPdfFileModel,
+            votes_table::VotesTablesWithOnlyPreviousVotes,
         },
-        polling_station::{PollingStation, PollingStationId},
-        results::{PollingStationResults, cso_first_session_results::CSOFirstSessionResults},
+        polling_station::{
+            PollingStation, PollingStationForSession, PollingStationId, PollingStationNumber,
+        },
+        results::{
+            PollingStationResults, common_polling_station_results::CommonPollingStationResults,
+            cso_first_session_results::CSOFirstSessionResults,
+            dso_first_session_results::DSOFirstSessionResults,
+        },
         role::Role,
     },
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
-        committee_session_repo, data_entry_repo::previous_results_for_polling_station,
-        election_repo, investigation_repo, polling_station_repo, user_repo::User,
+        committee_session_repo,
+        data_entry_repo::{self, previous_results_for_polling_station},
+        election_repo, investigation_repo, polling_station_repo,
+        user_repo::User,
     },
     service::change_committee_session_status,
 };
@@ -106,29 +117,43 @@ async fn validate_and_get_committee_session(
     Ok(committee_session)
 }
 
+/// Delete the investigation and its linked data entry.
+/// Returns `false` if the polling station has no investigation.
 pub async fn delete_investigation_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     committee_session: &CommitteeSession,
     polling_station_id: PollingStationId,
-) -> Result<(), APIError> {
-    if let Some(old_status) = investigation_repo::delete(conn, polling_station_id).await? {
-        let investigation = PollingStationInvestigation::from((polling_station_id, &old_status));
-        audit_service
-            .log(conn, &InvestigationDeletedAuditData(investigation), None)
-            .await?;
+) -> Result<bool, APIError> {
+    let Some(old_status) = investigation_repo::get(conn, polling_station_id).await? else {
+        return Ok(false);
+    };
+    let investigation = PollingStationInvestigation::from((polling_station_id, &old_status));
 
-        if committee_session.status == CommitteeSessionStatus::Completed {
-            change_committee_session_status(
-                conn,
-                committee_session.id,
-                CommitteeSessionStatus::DataEntry,
-                audit_service.clone(),
-            )
-            .await?;
+    // Use the linked ID instead of the status, so this also removes a data entry
+    // that an earlier deleted investigation left behind
+    match polling_station_repo::get_data_entry_id(conn, polling_station_id).await {
+        Ok(data_entry_id) => {
+            delete_data_entry(conn, audit_service, polling_station_id, data_entry_id).await?
         }
+        Err(sqlx::Error::RowNotFound) => {}
+        Err(err) => return Err(err.into()),
     }
-    Ok(())
+    investigation_repo::delete(conn, polling_station_id).await?;
+    audit_service
+        .log(conn, &InvestigationDeletedAuditData(investigation), None)
+        .await?;
+
+    if committee_session.status == CommitteeSessionStatus::Completed {
+        change_committee_session_status(
+            conn,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntry,
+            audit_service.clone(),
+        )
+        .await?;
+    }
+    Ok(true)
 }
 
 impl From<InvestigationTransitionError> for APIError {
@@ -401,9 +426,38 @@ async fn apply_update(
     }
 }
 
+/// Delete the data entry linked to the polling station, if any.
+/// Requires `accept_data_entry_deletion` unless the data entry is still empty.
+async fn delete_linked_data_entry(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    committee_session: &CommitteeSession,
+    polling_station_id: PollingStationId,
+    accept_data_entry_deletion: Option<bool>,
+) -> Result<(), APIError> {
+    let ps = polling_station_repo::get(conn, polling_station_id).await?;
+    let Some(data_entry_id) = ps.data_entry_id() else {
+        return Ok(());
+    };
+    let status = data_entry_repo::get_status(conn, data_entry_id).await?;
+    if status != DataEntryStatus::Empty && accept_data_entry_deletion != Some(true) {
+        return Err(APIError::Conflict(
+            "Investigation has data entries or results".into(),
+            ErrorReference::InvestigationHasDataEntryOrResult,
+        ));
+    }
+    delete_data_entry_for_polling_station(
+        conn,
+        audit_service,
+        committee_session,
+        polling_station_id,
+    )
+    .await
+}
+
 /// Reopen a concluded investigation back to InProgress
 ///
-/// Deletes linked data entries if present (requires `accept_data_entry_deletion`).
+/// Deletes linked data entries if present (see [`delete_linked_data_entry`]).
 async fn reopen_investigation(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
@@ -412,23 +466,14 @@ async fn reopen_investigation(
     current: InvestigationStatus,
     request: &PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
-    let ps = polling_station_repo::get(conn, polling_station_id).await?;
-    if ps.data_entry_id().is_some() {
-        if request.accept_data_entry_deletion == Some(true) {
-            delete_data_entry_for_polling_station(
-                conn,
-                audit_service,
-                committee_session,
-                polling_station_id,
-            )
-            .await?;
-        } else {
-            return Err(APIError::Conflict(
-                "Investigation has data entries or results".into(),
-                ErrorReference::InvestigationHasDataEntryOrResult,
-            ));
-        }
-    }
+    delete_linked_data_entry(
+        conn,
+        audit_service,
+        committee_session,
+        polling_station_id,
+        request.accept_data_entry_deletion,
+    )
+    .await?;
     let mut status = current.reopen()?;
     status.update_in_progress(request.reason.clone())?;
     Ok(status)
@@ -443,25 +488,17 @@ async fn switch_to_without_new_results(
     current: InvestigationStatus,
     request: PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
-    let ps = polling_station_repo::get(conn, polling_station_id).await?;
-    if ps.data_entry_id().is_some() {
-        if request.accept_data_entry_deletion == Some(true) {
-            delete_data_entry_for_polling_station(
-                conn,
-                audit_service,
-                committee_session,
-                polling_station_id,
-            )
-            .await?;
-        } else {
-            return Err(APIError::Conflict(
-                "Investigation has data entries or results".into(),
-                ErrorReference::InvestigationHasDataEntryOrResult,
-            ));
-        }
-    }
-
     let ps = polling_station_repo::get_next_session(conn, polling_station_id).await?;
+
+    delete_linked_data_entry(
+        conn,
+        audit_service,
+        committee_session,
+        polling_station_id,
+        request.accept_data_entry_deletion,
+    )
+    .await?;
+
     let findings = request.findings.unwrap_or_default();
     let status = current.switch_to_without_new_results(
         request.reason,
@@ -520,7 +557,7 @@ async fn polling_station_investigation_update(
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let ps = polling_station_repo::get_next_session(&mut tx, polling_station_id).await?;
-    if ps.is_new_polling_station() && request.corrected_results != Some(true) {
+    if ps.is_new_polling_station() && request.corrected_results == Some(false) {
         return Err(APIError::Conflict(
             "Investigation requires corrected results, because it is not part of a previous session".into(),
             ErrorReference::InvestigationRequiresCorrectedResults,
@@ -601,39 +638,19 @@ async fn polling_station_investigation_delete(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    // Delete investigation (returns old status, or None if none existed)
-    let old_status = investigation_repo::delete(&mut tx, polling_station_id)
-        .await?
-        .ok_or_else(|| {
-            APIError::NotFound(
-                "Investigation not found".into(),
-                ErrorReference::EntryNotFound,
-            )
-        })?;
-
-    let investigation = PollingStationInvestigation::from((polling_station_id, &old_status));
-    audit_service
-        .log(&mut tx, &InvestigationDeletedAuditData(investigation), None)
-        .await?;
-
-    if committee_session.status == CommitteeSessionStatus::Completed {
-        change_committee_session_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntry,
-            audit_service.clone(),
-        )
-        .await?;
-    }
-
-    // Delete potential data entry linked to the polling station
-    delete_data_entry_for_polling_station(
+    if !delete_investigation_for_polling_station(
         &mut tx,
         &audit_service,
         &committee_session,
         polling_station_id,
     )
-    .await?;
+    .await?
+    {
+        return Err(APIError::NotFound(
+            "Investigation not found".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
 
     // Change committee session status if last investigation is deleted
     if !investigation_repo::has_investigations_for_committee_session(&mut tx, committee_session.id)
@@ -651,6 +668,56 @@ async fn polling_station_investigation_delete(
     tx.commit().await?;
 
     Ok(StatusCode::NO_CONTENT)
+}
+
+async fn get_previous_results(
+    conn: &mut SqliteConnection,
+    ps: &PollingStationForSession,
+    election: &ElectionWithPoliticalGroups,
+) -> Result<CommonPollingStationResults, APIError> {
+    match ps.prev_data_entry_id() {
+        Some(_) => match previous_results_for_polling_station(conn, ps.id()).await {
+            Ok(results) => Ok(results),
+            Err(_) => Err(APIError::NotFound(
+                "Previous results not found for the current polling station".to_string(),
+                ErrorReference::EntryNotFound,
+            )),
+        },
+        None => match election.counting_method {
+            Some(VoteCountingMethod::CSO) => {
+                Ok(CSOFirstSessionResults::empty(election).as_common())
+            }
+            Some(VoteCountingMethod::DSO) => {
+                Ok(DSOFirstSessionResults::empty(election).as_common())
+            }
+            None => Err(APIError::DataIntegrityError(
+                "GSB election needs to have a vote counting method".to_string(),
+            )),
+        },
+    }
+}
+
+fn get_corrigendum_file_name(
+    election: &ElectionWithPoliticalGroups,
+    polling_station_number: PollingStationNumber,
+) -> Result<String, APIError> {
+    match election.counting_method {
+        Some(VoteCountingMethod::CSO) => Ok(format!(
+            "Model_Na14-2_{}{}_Stembureau_{}_Bijlage_1.pdf",
+            election.category.to_eml_code(),
+            election.election_date.year(),
+            polling_station_number
+        )),
+        Some(VoteCountingMethod::DSO) => Ok(format!(
+            "Model_Na14-1_versie_2_{}{}_Stembureau_{}.pdf",
+            election.category.to_eml_code(),
+            election.election_date.year(),
+            polling_station_number
+        )),
+        None => Err(APIError::DataIntegrityError(
+            "GSB election needs to have a vote counting method".to_string(),
+        )),
+    }
 }
 
 /// Download a corrigendum for a polling station
@@ -698,44 +765,45 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let investigation = PollingStationInvestigation::from((polling_station_id, &status));
 
     let ps = polling_station_repo::get(&mut conn, polling_station_id).await?;
-    let session = committee_session_repo::get(&mut conn, ps.committee_session_id()).await?;
+    let committee_session =
+        committee_session_repo::get(&mut conn, ps.committee_session_id()).await?;
     let election: ElectionWithPoliticalGroups =
-        election_repo::get(&mut conn, session.election_id).await?;
+        election_repo::get(&mut conn, committee_session.election_id).await?;
+    if election.counting_method == Some(VoteCountingMethod::DSO) {
+        verify_committee_session_details_exist(&committee_session)?;
+    }
 
-    let previous_results = match ps.prev_data_entry_id() {
-        Some(_) => {
-            match previous_results_for_polling_station(&mut conn, polling_station_id).await {
-                Ok(results) => results,
-                Err(_) => {
-                    return Err(APIError::NotFound(
-                        "Previous results not found for the current polling station".to_string(),
-                        ErrorReference::EntryNotFound,
-                    ));
-                }
-            }
-        }
-        None => CSOFirstSessionResults::empty(&election).as_common(),
-    };
+    let previous_results = get_previous_results(&mut conn, &ps, &election).await?;
 
     let polling_station: PollingStation = ps.into_polling_station();
 
-    let name = format!(
-        "Model_Na14-2_{}{}_Stembureau_{}_Bijlage_1.pdf",
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        polling_station.number
-    );
-
     let votes_tables = VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)?;
 
-    let input = ModelNa14_2Bijlage1Input {
-        votes_tables,
-        election: election.into(),
-        polling_station,
-        previous_results: previous_results.into(),
-        investigation,
-    }
-    .to_pdf_file_model(name.clone());
+    let name = get_corrigendum_file_name(&election, polling_station.number)?;
+    let input = match election.counting_method {
+        Some(VoteCountingMethod::CSO) => ModelNa14_2Bijlage1Input {
+            votes_tables,
+            election: election.into(),
+            polling_station,
+            previous_results: previous_results.into(),
+            investigation,
+        }
+        .to_pdf_file_model(name.clone()),
+        Some(VoteCountingMethod::DSO) => ModelNa14_1Versie2Input {
+            committee_session,
+            votes_tables,
+            election: election.into(),
+            polling_station,
+            previous_results: previous_results.into(),
+            investigation,
+        }
+        .to_pdf_file_model(name.clone()),
+        None => {
+            return Err(APIError::DataIntegrityError(
+                "GSB election needs to have a vote counting method".to_string(),
+            ));
+        }
+    };
 
     let content = generate_pdf(input).await?;
 
@@ -751,8 +819,53 @@ mod tests {
 
     use super::*;
     use crate::{
-        domain::polling_station::PollingStationId, repository::polling_station_repo::exists,
+        domain::{data_entry::DataEntryId, polling_station::PollingStationId},
+        infra::audit_log::list_event_names,
+        repository::{polling_station_repo::exists, user_repo::UserId},
     };
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_delete_investigation_deletes_linked_data_entry(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let audit_service = AuditService::new(
+            Some(User::test_user(Role::CoordinatorGSB, UserId::from(1))),
+            None,
+        );
+        let polling_station_id = PollingStationId::from(5211);
+        let committee_session = validate_and_get_committee_session(&mut conn, polling_station_id)
+            .await
+            .unwrap();
+
+        assert!(
+            delete_investigation_for_polling_station(
+                &mut conn,
+                &audit_service,
+                &committee_session,
+                polling_station_id,
+            )
+            .await
+            .unwrap()
+        );
+
+        assert!(
+            investigation_repo::get(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+                .is_none()
+        );
+        assert!(matches!(
+            polling_station_repo::get_data_entry_id(&mut conn, polling_station_id).await,
+            Err(sqlx::Error::RowNotFound)
+        ));
+        assert!(matches!(
+            data_entry_repo::get(&mut conn, DataEntryId::from(502)).await,
+            Err(sqlx::Error::RowNotFound)
+        ));
+        assert_eq!(
+            list_event_names(&mut conn).await.unwrap(),
+            ["DataEntryDeleted", "InvestigationDeleted"]
+        );
+    }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_validation_ok(pool: SqlitePool) {
@@ -761,7 +874,7 @@ mod tests {
         let polling_station_id = PollingStationId::from(741); // session 4 (last)
         assert!(exists(&mut conn, polling_station_id).await.unwrap());
 
-        let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
+        let res = validate_and_get_committee_session(&mut conn, polling_station_id).await;
 
         let committee_session = res.unwrap();
         assert_eq!(committee_session.number, 4);
@@ -774,7 +887,7 @@ mod tests {
         let polling_station_id = PollingStationId::from(731); // session 3 (out of 4)
         assert!(exists(&mut conn, polling_station_id).await.unwrap());
 
-        let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
+        let res = validate_and_get_committee_session(&mut conn, polling_station_id).await;
 
         assert!(res.is_err());
     }
@@ -786,7 +899,7 @@ mod tests {
         let polling_station_id = PollingStationId::from(211); // part of first and only session
         assert!(exists(&mut conn, polling_station_id).await.unwrap());
 
-        let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
+        let res = validate_and_get_committee_session(&mut conn, polling_station_id).await;
 
         assert!(res.is_err());
     }
@@ -797,6 +910,7 @@ mod tests {
             extract::State,
             response::{IntoResponse, Response},
         };
+        use http_body_util::BodyExt;
         use test_log::test;
 
         use super::*;
@@ -811,10 +925,10 @@ mod tests {
         async fn call_handlers(
             pool: SqlitePool,
             coordinator_role: Role,
+            polling_station_id: PollingStationId,
         ) -> Vec<(&'static str, Response)> {
             let user = User::test_user(coordinator_role, UserId::from(1));
             let audit = AuditService::new(Some(user.clone()), None);
-            let polling_station_id = PollingStationId::from(741);
 
             #[rustfmt::skip]
             let results = vec![
@@ -831,8 +945,9 @@ mod tests {
             path = "../../fixtures",
             scripts("election_7_four_sessions")
         )))]
-        async fn test_committee_category_authorization_err(pool: SqlitePool) {
-            let results = call_handlers(pool, Role::CoordinatorCSB).await;
+        async fn test_cso_committee_category_authorization_err(pool: SqlitePool) {
+            let results =
+                call_handlers(pool, Role::CoordinatorCSB, PollingStationId::from(741)).await;
             assert_committee_category_authorization_err(results).await;
         }
 
@@ -840,9 +955,67 @@ mod tests {
             path = "../../fixtures",
             scripts("election_7_four_sessions")
         )))]
-        async fn test_committee_category_authorization_ok(pool: SqlitePool) {
-            let results = call_handlers(pool, Role::CoordinatorGSB).await;
+        async fn test_cso_committee_category_authorization_ok(pool: SqlitePool) {
+            let results =
+                call_handlers(pool, Role::CoordinatorGSB, PollingStationId::from(741)).await;
             assert_committee_category_authorization_ok(results);
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_12_dso_with_results")
+        )))]
+        async fn test_dso_committee_category_authorization_err(pool: SqlitePool) {
+            let results =
+                call_handlers(pool, Role::CoordinatorCSB, PollingStationId::from(1229)).await;
+            assert_committee_category_authorization_err(results).await;
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_12_dso_with_results")
+        )))]
+        async fn test_dso_committee_category_authorization_ok(pool: SqlitePool) {
+            let results =
+                call_handlers(pool, Role::CoordinatorGSB, PollingStationId::from(1229)).await;
+            assert_committee_category_authorization_ok(results);
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_12_dso_with_results")
+        )))]
+        async fn polling_station_investigation_download_corrigendum_pdf_dso_missing_details_err(
+            pool: SqlitePool,
+        ) {
+            let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+            let response = polling_station_investigation_download_corrigendum_pdf(
+                user.clone(),
+                State(pool.clone()),
+                CurrentSessionPollingStationId(PollingStationId::from(12211)),
+            )
+            .await
+            .into_response();
+            let status = response.status();
+            assert_eq!(
+                status,
+                StatusCode::NOT_FOUND,
+                "handler 'polling_station_investigation_download_corrigendum_pdf'"
+            );
+
+            let body = response.into_body().collect().await.unwrap().to_bytes();
+            let error: ErrorResponse = serde_json::from_slice(&body).unwrap();
+            assert_eq!(
+                error.reference,
+                ErrorReference::EntryNotFound,
+                "handler 'polling_station_investigation_download_corrigendum_pdf'"
+            );
+            let expected_error =
+                "Committee session is missing start date, start time and location details";
+            assert!(
+                error.error.contains(expected_error),
+                "handler 'polling_station_investigation_download_corrigendum_pdf'"
+            );
         }
     }
 }

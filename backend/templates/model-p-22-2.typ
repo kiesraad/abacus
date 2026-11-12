@@ -1,31 +1,31 @@
-#import "common/style.typ": conf, default_header, document_numbering
+#import "common/style.typ": conf, document_numbering, blank_page_before_signing
 #import "common/scripts.typ": *
-#let input = json("inputs/model-p-22-2.json")
+#let input = json("inputs/model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json")
 
-#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
-#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = [centraal stembureau]
 #let subcommittee_type = [gemeentelijk stembureau]
 #let LARGE_COUNCIL_THRESHOLD = 19
 
+#let header-right = [Centraal stembureau #input.election.location]
+
 #show: doc => conf(
-  doc, 
-  header-right: [Centraal stembureau #input.election.location], 
+  doc,
+  header-right: header-right,
   footer: [
-    Proces-verbaal van het #location_type\
-    Model P 22-2
-    
-    Datum: #input.creation_date_time - SHA-256-Hashcode: \
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
     #input.hash
-  ], margin-bottom: 3.2cm
+
+    Proces-verbaal van het #location_type \
+    Model P 22-2 (versie 2027)
+  ], margin-bottom: 2.9cm
 )
 
 #set heading(numbering: none)
 
 #title_page(
-  is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
+  [#input.election.authority_id #input.election.authority_region],
   [Centraal Stembureau],
-  [#input.election.name - #format_date(input.election.election_date)],
+  [#get_election_title(input.election), #format_date(input.election.election_date)],
   [
     Verslag, uitslag en zetelverdeling – Model P 22-2
   ],
@@ -55,7 +55,7 @@ Het #location_type maakt bij een verkiezing een verslag van de controlewerkzaamh
 #pagebreak(weak: true)
 
 #show: doc => document_numbering(doc)
-
+// Max numbering level is 2
 #show heading.where(level: 3): it => [#block(it.body)]
 
 = Verslag van de zitting
@@ -75,13 +75,21 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #pagebreak(weak: true)
 
-== Verslag van controlewerkzaamheden
+== Meldingen van belangstellenden
 
-=== Zijn er controlewerkzaamheden uitgevoerd vanwege telverschillen of andere mogelijke fouten?
+=== Hebben belangstellenden meldingen van mogelijke fouten in de processen-verbaal van stembureaus gedaan bij het #location_type?
 
 #checkbox()[Nee]
 
-#checkbox()[Ja, *#sym.arrow.r Zie bijlage 2*]
+#checkbox()[Ja #sym.arrow.r *Zie bijlage 2*]
+
+== Verslag van controlewerkzaamheden
+
+=== Heeft het #location_type bij de controlewerkzaamheden telverschillen of andere mogelijke fouten geconstateerd?
+
+#checkbox()[Nee]
+
+#checkbox()[Ja #sym.arrow.r *Zie bijlage 3*]
 
 == Bezwaren
 
@@ -89,7 +97,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #checkbox()[Geen bezwaren ingebracht]
 
-#checkbox()[Bezwaren ingebracht. Deze staan in bijlage 3 bij dit proces-verbaal. De reactie van het #location_type staat daar ook bij.]
+#checkbox()[Bezwaren ingebracht. Deze staan in bijlage 4 bij dit proces-verbaal. De reactie van het #location_type staat daar ook bij.]
 
 #pagebreak(weak: true)
 
@@ -174,10 +182,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #pagebreak(weak: true)
 
-#show heading.where(level: 3): it => [
-  #text(weight: "bold", counter(heading).display(it.numbering))
-  #it.body
-]
+#show: doc => document_numbering(doc)
 
 == Verschillen tussen aantal kiezers en uitgebrachte stemmen
 
@@ -243,7 +248,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   table.header(
     table.cell(header_text([Lijst])),
     table.cell(align: right, header_text([Aantal stemmen])),
-    table.cell(stroke: none, align: center, header_text([÷ Kiesdeler])),
+    table.cell(stroke: none, align: center, header_text([÷ Kiesdeler =])),
     table.cell(stroke: none, align: right, header_text([Volle zetels])),
   ),
   table.hline(stroke: 1pt + black),
@@ -288,7 +293,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 #let initial_highest_average_steps = if input.seat_assignment.keys().contains("initial_highest_average_steps") { input.seat_assignment.initial_highest_average_steps } else { () };
 #if input.seat_assignment.initial_total_residual_seats > 0 [
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
-    - Het #location_type berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
+    - Het #location_type berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het ‘overschot’ aan stemmen voor die lijst.
     - Het #location_type verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
     - Als er daarna nog restzetels over zijn, verdeelt het #location_type die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
     - Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
@@ -296,7 +301,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     #pagebreak(weak: true)
 
     #let pgs_meeting_threshold = input.seat_assignment.list_seat_assignment.filter(
-    (list_seat_assignment) => 
+    (list_seat_assignment) =>
     list_seat_assignment.keys().contains("largest_remainder"));
     #table(
       columns: (1fr, 10em, 8em, 10em),
@@ -313,7 +318,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
         table.cell(align: right, header_text([Aantal restzetels])),
       ),
       table.hline(stroke: 1pt + black),
-      ..pgs_meeting_threshold.map((list_seat_assignment) => 
+      ..pgs_meeting_threshold.map((list_seat_assignment) =>
         (
           table.cell(format_political_group_name(list_seat_assignment.number, list_seat_assignment.name, with_prefix: "only_list_number")),
           table.cell(align: right, [#list_seat_assignment.initial_full_seats]),
@@ -329,17 +334,17 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     - De eerste restzetel gaat naar de lijst met het grootste gemiddelde per zetel. Voor deze lijst wordt opnieuw berekend wat het gemiddelde nu is, uitgaande van het aantal volle zetels, de toegewezen restzetel en weer één extra zetel.
     - Als er nog een restzetel te verdelen is, wordt deze toegewezen aan de lijst met nu het grootste gemiddelde.
     - Het #location_type herhaalt de procedure totdat alle restzetels verdeeld zijn.
-  
+
     Als meerdere lijsten gelijke gemiddelden hebben en er niet voldoende restzetels zijn voor toekenning ervan aan die lijsten, wordt geloot welke lijst de restzetel krijgt.
 
     #pagebreak(weak: true)
-  
+
     #highest_averages_table(initial_highest_average_steps, input.seat_assignment.list_seat_assignment)
   ]
 
   #v(15pt)
   #let footnotes = if input.keys().contains("footnotes") { input.footnotes } else { () }
-  
+
   #if footnotes.len() > 0 {
     let drawn_lots = if footnotes.keys().contains("drawn_lots") { footnotes.drawn_lots } else { () };
     let absolute_majority = if footnotes.keys().contains("absolute_majority") { footnotes.absolute_majority } else { none };
@@ -356,20 +361,20 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       [+ #format_political_group_name(absolute_majority.number, absolute_majority.name, with_prefix: "with_list_prefix") heeft meer dan de helft van de stemmen behaald en heeft daardoor een volstrekte meerderheid. Omdat de lijst op basis van de zetelverdeling niet meer dan de helft van de zetels heeft gekregen, heeft de lijst via de restzetelverdeling een extra (rest)zetel gekregen.]
     }
     for exhausted_list in exhausted_lists {
-      [+ #format_political_group_name(exhausted_list.number, exhausted_list.name, with_prefix: "with_list_prefix") heeft niet voldoende kandidaten beschikbaar om de haar toegewezen zetels te bezetten. De 'overtollige' zetels gaan over op andere lijsten door toepassing van het systeem van de grootste #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD { [overschotten en/of gemiddelden] } else { [gemiddelden] }.]
+      [+ #format_political_group_name(exhausted_list.number, exhausted_list.name, with_prefix: "with_list_prefix") heeft niet voldoende kandidaten beschikbaar om de haar toegewezen zetels te bezetten. De ‘overtollige’ zetels gaan over op andere lijsten door toepassing van het systeem van de grootste #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD { [overschotten en/of gemiddelden] } else { [gemiddelden] }.]
     }
   }
-  
+
   #let list_seat_assignment_with_unique_highest_average = input.seat_assignment.list_seat_assignment.filter(
-    (list_seat_assignment) => 
+    (list_seat_assignment) =>
     list_seat_assignment.keys().contains("unique_highest_average"))
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD and list_seat_assignment_with_unique_highest_average.len() > 0 [
     #pagebreak(weak: true)
-    
-    === Verdeling van de restzetels 
-    
-    De resterende restzetels zijn verdeeld via het systeem van de grootste gemiddelden. De lijst die na toewijzing van een restzetel het hoogste gemiddeld aantal stemmen per zetel zou hebben, krijgt een restzetel. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
-    
+
+    === Verdeling van de restzetels
+
+    Als na bovenstaande verdeling volgens het systeem van grootste overschotten nog restzetels overblijven, worden deze resterende restzetels verdeeld via het systeem van de grootste gemiddelden. De lijst die na toewijzing van een restzetel het hoogste gemiddeld aantal stemmen per zetel zou hebben, krijgt een restzetel. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
+
     #table(
       columns: (1fr, 9em, 13em, 8em),
       stroke: (x, y) => (
@@ -395,7 +400,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       ).flatten(),
       table.hline(stroke: 1pt + black),
     )
-    
+
     #if initial_highest_average_steps.len() > 0 [
       #v(8pt)
       #if initial_highest_average_steps.len() == 1 {
@@ -429,7 +434,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
     ..([Lijst], [Toegewezen zetels]).enumerate().map(((idx, h)) => table.cell(stroke: none, align: bottom + if idx == 0 { left } else { right }, header_text(h))),
   ),
   table.hline(stroke: 1pt + black),
-  
+
   ..for list_candidate_nomination in input.candidate_nomination.list_candidate_nomination.sorted(key: lcn => lcn.list_seats, by: (l, r) => l >= r) {
     (
       table.cell(list_candidate_nomination.list_name),
@@ -446,17 +451,17 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 #for list_candidate_nomination in input.candidate_nomination.list_candidate_nomination.filter((lcn) => lcn.list_seats > 0) {  list_heading_text(format_political_group_name(list_candidate_nomination.list_number, list_candidate_nomination.list_name, with_prefix: "with_list_prefix"))
   v(4pt)
   [Aantal zetels: #list_candidate_nomination.list_seats]
-  
+
   emph_block[*Met voorkeursstemmen gekozen kandidaten*]
 
   if list_candidate_nomination.preferential_nomination_columns.len() > 0 {
     [
-      Het overzicht met de stemmen per kandidaat is te vinden in bijlage 1 bij dit proces-verbaal. 
+      Het overzicht met de stemmen per kandidaat is te vinden in bijlage 1 bij dit proces-verbaal.
       Deze kandidaten hebben als gevolg van het aantal voorkeursstemmen direct een zetel gekregen.
     ]
     v(4pt)
     [Deze kandidaten hebben meer dan #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [50%] else [25%] van de kiesdeler gehaald.]
-  
+
     candidates_with_seat_table(false, true, list_candidate_nomination.preferential_nomination_columns)
   } else {
     [Er is geen enkele kandidaat met voorkeursstemmen gekozen.]
@@ -464,7 +469,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
   emph_block[*Kandidaten die gekozen zijn vanwege hun positie op de lijst*]
   if list_candidate_nomination.other_nomination_columns.len() > 0 {
-    [Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel, maar hebben een zetel toegewezen vanwege hun positie op de lijst.]
+    [Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel, maar hebben een zetel toegewezen gekregen vanwege hun positie op de lijst.]
 
     candidates_with_seat_table(true, false, list_candidate_nomination.other_nomination_columns)
   } else {
@@ -493,7 +498,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
       table.hline(stroke: 1pt + black),
       ..unelected_candidates_ranking.enumerate().map(((idx, unelected_candidate)) => {
         (
-          table.cell(align: right, str(idx + 1)),
+          table.cell(align: right, str(list_candidate_nomination.list_seats + idx + 1)),
           table.cell([#candidate_name(unelected_candidate)]),
           table.cell([#candidate_location(unelected_candidate)]),
           table.cell(align: right, [#unelected_candidate.number]),
@@ -504,7 +509,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
   } else {
     [Geen enkele kandidaat is niet gekozen.]
   }
-  
+
   pagebreak(weak: true)
 }
 
@@ -544,10 +549,10 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
 #empty_lines(5)
 
-=== Is voor de invoer gebruik gemaakt van de bestanden die zijn uitgewisseld via het platform 'Teluitslagen'?
+=== Is voor de invoer gebruik gemaakt van de bestanden die zijn uitgewisseld via het platform ‘Teluitslagen’?
 
 #checkbox()[Ja]
-#checkbox()[Nee, de resultaten van de papieren processen-verbaal twee keer handmatig ingevoerd in de uitslagensoftware]
+#checkbox()[Nee, de resultaten van de papieren processen-verbaal zijn twee keer handmatig ingevoerd in de uitslagensoftware]
 
 === Heeft het #subcommittee_type verschillen geconstateerd bij de uitvoering van het controleprotocol?
 
@@ -556,33 +561,22 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
 #empty_lines(6)
 
-#pagebreak(weak: true)
-
-#set page(header: "")
-
-#show heading.where(level: 3): it => [#block(it.body)]
-
-=== Deze pagina is expres leeg
-Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
-
-#pagebreak(weak: true)
-
-#set page(header: default_header(none, [Centraal stembureau #input.election.location]))
+#blank_page_before_signing(header-right)
 
 = Ondertekening
 
-=== Datum
+#signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-=== Voorzitter van het #location_type:
+#signing_form_label[Voorzitter van het #location_type:]
 
 #textbox[Naam:][Handtekening:]
 
-=== Plaatsvervangend voorzitter van het #location_type:
+#signing_form_label[Plaatsvervangend voorzitter van het #location_type:]
 
 #textbox[Naam:][Handtekening:]
 
-=== De andere leden van het #location_type:
+#signing_form_label[De andere leden van het #location_type:]
 
 #stack(spacing: 0.5em, ..range(0, 5).map(_ => textbox[Naam:][Handtekening:]))

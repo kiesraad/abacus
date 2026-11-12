@@ -1,0 +1,68 @@
+{
+  "abort": "Importeren afbreken",
+  "button_title": "Tellingsbestand GSB importeren",
+  "import_for_entry": "Importeer tellingsbestand voor {entry}",
+  "instructions": "<p>Je hebt van het centraal stembureau instructies gekregen waarmee je het EML-tellingsbestand (510b) van het gemeentelijk stembureau kunt downloaden. Zet het bestand op deze computer en importeer het.</p><p><strong>Let op:</strong> Upload het volledige ZIP-bestand. Dit bevat het EML-bestand met telresultaten, en de digitale handtekening.</p>",
+  "title": "Importeer tellingsbestand",
+  "file_error": {
+    "invalid_510b": {
+      "title": "Geen tellingsbestand EML 510b",
+      "description": "Het bestand dat je probeert te importeren is geen geldige EML 510b met telresultaten. Probeer een ander bestand."
+    },
+    "file_too_large": {
+      "title": "Het bestand is te groot",
+      "description": "Het ZIP-bestand of het EML-bestand is te groot om verwerkt te worden. Probeer een ander bestand."
+    },
+    "invalid_zip": {
+      "title": "Geen geldig ZIP-bestand",
+      "description": "Het ZIP-bestand kan niet gelezen worden of de inhoud is niet correct. Probeer een ander bestand."
+    },
+    "data_entry_already_imported": {
+      "title": "Telresultaten GSB al geïmporteerd",
+      "description": "Je hebt de telresultaten van dit GSB al geïmporteerd. Wil je de eerder geïmporteerde telresultaten vervangen? Verwijder dan eerst de geïmporteerde resultaten."
+    },
+    "data_entry_already_started": {
+      "title": "GSB al ingevoerd",
+      "description": "Er zijn al telresultaten van dit GSB ingevoerd. Wil je de ingevoerde telresultaten vervangen? Verwijder dan eerst de ingevoerde resultaten."
+    },
+    "election_mismatch": {
+      "title": "Tellingsbestand hoort niet bij dit CSB",
+      "description": "Dit tellingsbestand is afkomstig van een GSB dat niet bij dit CSB hoort, of van een andere verkiezing dan {electionName}."
+    },
+    "contains_errors": {
+      "title": "Tellingsbestand bevat fouten",
+      "description": "Dit tellingsbestand bevat fouten en kan daarom niet geïmporteerd worden. Voer dit stembureau twee keer handmatig in."
+    },
+    "signature_missing": {
+      "title": "Digitale handtekening ontbreekt",
+      "description": "De digitale handtekening (.signature-bestand) ontbreekt. De herkomst van het bestand kan niet gecontroleerd worden.<ul><li>Upload het ZIP-bestand met daarin de EML 510b én de bijbehorende digitale handtekening (.signature).</li><li>Blijft de fout? Dan kan je het digitale bestand niet gebruiken. Laat het papieren proces-verbaal 2× invoeren in Abacus.</li></ul>"
+    },
+    "signature_unknown": {
+      "title": "Onbekende digitale handtekening",
+      "description": "De handtekening van het digitale bestand komt niet overeen met de publieke sleutel van het GSB. Blijft de fout en vertrouw je het papieren proces-verbaal? Laat het papieren proces-verbaal dan 2× invoeren in Abacus."
+    },
+    "no_certificates": {
+      "title": "Geen publieke sleutel om handtekening te controleren",
+      "description": "De geldigheid van dit tellingsbestand kan daardoor niet worden gecontroleerd.<ul><li>Controleer bij de beheerder of de publieke sleutel van dit GSB is geïmporteerd.</li><li>Blijft de fout en vertrouw je het papieren proces-verbaal? Laat het papieren proces-verbaal dan 2× invoeren in Abacus.</li></ul>"
+    },
+    "unknown": {
+      "title": "Importeren niet gelukt",
+      "description": "Probeer een ander bestand of neem contact op."
+    }
+  },
+  "hash_check": {
+    "description": "Het bestand <file>filename</file> bevat de volgende telresultaten:",
+    "instructions": "Controleer de volledige digitale vingerafdruk met de code op het proces-verbaal (Na 31-1, Na 31-2 of Na 14-2) van het GSB van de gemeente {authorityName}. Vul ter controle de twee afgeschermde delen hieronder in. Ga alleen verder als alle delen overeenkomen.",
+    "signature": "Bestand is afkomstig van GSB {number} {name}",
+    "title": "Controleer tellingsbestand",
+    "error": {
+      "description": "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
+      "title": "Onjuiste vingerafdruk"
+    }
+  },
+  "check_and_save": {
+    "description": "Je gaat de volgende telresultaten importeren:",
+    "title": "Controleren en opslaan"
+  },
+  "success": "Tellingsbestand GSB {fileAuthorityName} geïmporteerd"
+}

@@ -1,7 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { describe, expect, test, vi } from "vitest";
-import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { getNewElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { overrideOnce } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 import type { ElectionDefinitionValidateResponse, NewElection, PollingStationRequest } from "@/types/generated/openapi";
@@ -65,6 +65,7 @@ function electionValidateResponse(
       redacted_indexes: [2, 9],
     },
     election,
+    gsb_list: [],
     polling_stations,
     number_of_voters: 0,
     polling_station_definition_matches_election: matching_election,
@@ -75,7 +76,7 @@ describe("UploadElectionDefinition component", () => {
   test("Navigates to the next page when providing correct hash", async () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext");
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(getNewElectionMockData()));
     const user = userEvent.setup();
 
     await renderPage();
@@ -90,14 +91,14 @@ describe("UploadElectionDefinition component", () => {
     const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
     await user.type(inputPart2, "gfsd");
 
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(getNewElectionMockData()));
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     expect(navigate).toHaveBeenCalledWith("/elections/create/committee-category");
   });
 
   test("Shows an error when providing incorrect hash", async () => {
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(getNewElectionMockData()));
     const user = userEvent.setup();
 
     await renderPage();
@@ -119,7 +120,7 @@ describe("UploadElectionDefinition component", () => {
     });
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Controle digitale vingerafdruk niet gelukt");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Onjuiste vingerafdruk");
   });
 
   test("Shows an error when uploading invalid file", async () => {
@@ -153,8 +154,8 @@ describe("UploadElectionDefinition component", () => {
     await renderPage();
     await uploadFile(file);
 
-    expect(screen.getByLabelText("Geen bestand gekozen")).toBeInTheDocument();
-    expect(screen.getAllByText(filename).length).toBe(1);
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     expect(screen.getByRole("alert")).toHaveTextContent("Ongeldige verkiezingsdefinitie");
     expect(screen.getByRole("alert")).toHaveTextContent(
       `Het bestand ${filename} is te groot. Kies een bestand van maximaal 5 Megabyte`,

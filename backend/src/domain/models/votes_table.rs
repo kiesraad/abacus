@@ -9,13 +9,12 @@ use crate::domain::{
         common_polling_station_results::CommonPollingStationResults, count::Count,
         political_group_candidate_votes::PoliticalGroupCandidateVotes,
     },
-    summary::ElectionSummary,
+    tabulation::ElectionTotals,
 };
 
 const DEFAULT_CANDIDATES_PER_COLUMN: [usize; 4] = [25, 25, 15, 15];
-const JUSTIFIED_CANDIDATES_PER_COLUMN: [usize; 4] = [20, 20, 20, 20];
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CandidatesTables(Vec<VotesTable>);
 
 impl CandidatesTables {
@@ -36,17 +35,15 @@ pub struct VotesTables(Vec<VotesTable>);
 impl VotesTables {
     pub fn new(
         election: &ElectionWithPoliticalGroups,
-        summary: &ElectionSummary,
+        totals: &ElectionTotals,
     ) -> Result<Self, ModelsError> {
         Ok(VotesTables(
             election
                 .political_groups
                 .iter()
                 .map(|group| {
-                    let candidate_votes = get_votes_for_political_party(
-                        group.number,
-                        &summary.political_group_votes,
-                    )?;
+                    let candidate_votes =
+                        get_votes_for_political_party(group.number, &totals.political_group_votes)?;
                     VotesTable::new(
                         group,
                         Some(candidate_votes),
@@ -65,27 +62,25 @@ pub struct VotesTablesWithPreviousVotes(Vec<VotesTable>);
 impl VotesTablesWithPreviousVotes {
     pub fn new(
         election: &ElectionWithPoliticalGroups,
-        summary: &ElectionSummary,
-        previous_summary: &ElectionSummary,
+        totals: &ElectionTotals,
+        previous_totals: &ElectionTotals,
     ) -> Result<Self, ModelsError> {
         Ok(VotesTablesWithPreviousVotes(
             election
                 .political_groups
                 .iter()
                 .map(|group| {
-                    let candidate_votes = get_votes_for_political_party(
-                        group.number,
-                        &summary.political_group_votes,
-                    )?;
+                    let candidate_votes =
+                        get_votes_for_political_party(group.number, &totals.political_group_votes)?;
                     let previous_candidate_votes = get_votes_for_political_party(
                         group.number,
-                        &previous_summary.political_group_votes,
+                        &previous_totals.political_group_votes,
                     )?;
                     VotesTable::new(
                         group,
                         Some(candidate_votes),
                         Some(previous_candidate_votes),
-                        JUSTIFIED_CANDIDATES_PER_COLUMN,
+                        DEFAULT_CANDIDATES_PER_COLUMN,
                     )
                 })
                 .collect::<Result<Vec<_>, _>>()?,
@@ -130,7 +125,7 @@ fn get_votes_for_political_party(
         .iter()
         .find(|pg_votes| pg_votes.number == political_group_number)
         .ok_or(ModelsError::DataIntegrityError(format!(
-            "No votes found for political group number {political_group_number} in summary",
+            "No votes found for political group number {political_group_number} in totals",
         )))
 }
 
@@ -156,7 +151,7 @@ fn get_votes_for_candidate(
     Ok(Some(candidate_vote.votes))
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct VotesTable {
     /// Political group number
     number: PGNumber,
@@ -283,7 +278,7 @@ impl VotesTable {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct VotesTableColumn {
     /// Sum of votes in this column
     column_total: Option<Count>,
@@ -293,7 +288,7 @@ pub struct VotesTableColumn {
     votes: Vec<CandidateVotes>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CandidateVotes {
     /// Candidate information
     candidate: Candidate,
@@ -311,8 +306,8 @@ mod tests {
     use super::*;
     use crate::domain::{
         election::{
-            CommitteeCategory, ElectionCategory, ElectionId, ElectionSubCategory,
-            VoteCountingMethod,
+            CommitteeCategory, CommitteeDistrict, ElectionCategory, ElectionDomain, ElectionId,
+            ElectionSubCategory, VoteCountingMethod,
         },
         results::political_group_candidate_votes::CandidateVotes,
     };
@@ -345,12 +340,20 @@ mod tests {
     fn sample_election(group: PoliticalGroup) -> ElectionWithPoliticalGroups {
         ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
-            name: "Test election".to_string(),
+            name: "Gemeenteraad Test Location 2025".to_string(),
+            official_name: "Gemeenteraad Test Location 2025".to_string(),
             committee_category: CommitteeCategory::GSB,
             counting_method: Some(VoteCountingMethod::CSO),
-            election_id: "Test_2025".to_string(),
-            location: "Test locatie".to_string(),
-            domain_id: "0000".to_string(),
+            election_id: "GR2025_TestLocation".to_string(),
+            location: "Test Location".to_string(),
+            authority_id: "0000".to_string(),
+            authority_name: "Test".to_string(),
+            authority_region: "Test".to_string(),
+            district: CommitteeDistrict::None,
+            domain: Some(ElectionDomain {
+                id: Some("0000".to_string()),
+                name: "Test".to_string(),
+            }),
             category: ElectionCategory::Municipal,
             sub_category: ElectionSubCategory::GR1,
             number_of_seats: 1,
@@ -380,18 +383,18 @@ mod tests {
     }
 
     #[test]
-    fn votes_tables_fails_when_group_missing_in_summary() {
+    fn votes_tables_fails_when_group_missing_in_totals() {
         let group = sample_group(1, &[1]);
         let election = sample_election(group);
-        let summary = ElectionSummary::zero();
+        let totals = ElectionTotals::zero(&election);
 
-        let err = VotesTables::new(&election, &summary).unwrap_err();
+        let err = VotesTables::new(&election, &totals).unwrap_err();
 
         match err {
             ModelsError::DataIntegrityError(message) => {
                 assert_eq!(
                     message,
-                    "No votes found for political group number 1 in summary"
+                    "No votes found for political group number 1 in totals"
                 );
             }
         }

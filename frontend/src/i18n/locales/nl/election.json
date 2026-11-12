@@ -1,6 +1,4 @@
 {
-  "add": "Toevoegen: {name}",
-  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresultaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van het centraal stembureau)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
   "abort": {
     "action": "Afbreken",
     "description": "<p>De verkiezing wordt pas opgeslagen als je alle stappen doorlopen hebt. Weet je zeker dat je het aanmaken van de verkiezing wilt afbreken?</p>",
@@ -8,30 +6,36 @@
     "keep_input": "Annuleren",
     "title": "Niet opgeslagen wijzigingen"
   },
+  "add": "Toevoegen: {name}",
+  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresultaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van het centraal stembureau)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente (voor GSB)</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
+  "all_districts": "Alle kieskringen",
   "check_and_save": {
     "description": "Je gaat de volgende verkiezing toevoegen:",
     "title": "Controleren en opslaan"
   },
   "check_eml": {
-    "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de volgende kandidaten:",
+    "candidates_description": "Het bestand <file>filename</file> bevat de kandidaten voor onderstaand kiesgebied:",
     "candidates_title": "Controleer kandidatenlijsten",
-    "check_hash": {
-      "description": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
-      "hint": "Vul 4 karakters in",
-      "label": "Controle deel {stub}"
-    },
-    "election_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende verkiezing:",
+    "check_hash_instructions": "Controleer de volledige digitale vingerafdruk met de code die je van het centraal stembureau hebt ontvangen. Vul ter controle de twee afgeschermde delen hieronder in. Ga alleen verder als alle delen overeenkomen.",
+    "election_description": "Het bestand <file>filename</file> bevat de instellingen voor de volgende verkiezing:",
     "election_title": "Controleer verkiezingsdefinitie",
     "error": {
-      "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
-      "title": "Controle digitale vingerafdruk niet gelukt"
+      "description": "De ingevoerde vingerafdruk klopt niet. Controleer de vingerafdruk en probeer het opnieuw.",
+      "title": "Onjuiste vingerafdruk"
     },
-    "list_name": "{location}, kandidatenlijsten {name}",
     "polling_station_title": "Controleer stembureaus"
+  },
+  "committee_category": {
+    "choose": "Kies het type stembureau",
+    "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
+    "title": "Type stembureau"
   },
   "configuration_not_finished": "De configuratie van Abacus is nog niet afgerond.",
   "create": "Verkiezing toevoegen",
-  "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
+  "district": "Kieskring",
+  "election_category": {
+    "title": "Type verkiezing"
+  },
   "import_candidates_eml": "Importeer kandidatenlijsten",
   "import_election_eml": "Importeer verkiezingsdefinitie",
   "import_polling_station_eml": "Importeer stembureaus gemeente {location}",
@@ -48,15 +52,11 @@
     "title": "Ongeldig stembureaubestand"
   },
   "invalid_committee_category": "Ongeldig type stembureau",
+  "location": "Gebied",
+  "manage": "Verkiezingen beheren",
   "message": {
     "election_created": "Verkiezing {committee_category} {name} toegevoegd"
   },
-  "polling_station_definition_does_not_match_election": {
-    "title": "Afwijkende verkiezing",
-    "description": "Het bestand <file>filename</file> bevat stembureaus voor een andere verkiezing. Controleer voor je verder gaat of de stembureaus juist zijn."
-  },
-  "location": "Gebied",
-  "manage": "Verkiezingen beheren",
   "no_elections_added": "Nog geen verkiezingen ingesteld",
   "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",
   "number_of_voters": {
@@ -64,14 +64,23 @@
     "hint": "Ingelezen uit bestand met stembureaus"
   },
   "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
+  "political_groups_added": "{num_groups} lijsten en {num_candidates} kandidaten",
+  "polling_station_definition_does_not_match_election": {
+    "description": "Het bestand <file>filename</file> bevat stembureaus voor een andere verkiezing. Controleer voor je verder gaat of de stembureaus juist zijn.",
+    "title": "Afwijkende verkiezing"
+  },
   "polling_stations": {
-    "added": "{num} stembureaus toegevoegd",
+    "added": "{num} stembureaus",
     "check": {
-      "description": "Het bestand <file>filename</file> is geïmporteerd en bevat onderstaande stembureaus. Zie je een verschil met de vooraf gepubliceerde lijst? Je kan na het toevoegen van deze verkiezing stembureaus toevoegen, verwijderen of aanpassen.",
+      "description": "Het bestand <file>filename</file> bevat onderstaande stembureaus. Zie je een verschil met de vooraf gepubliceerde lijst? Je kan na het toevoegen van deze verkiezing stembureaus toevoegen, verwijderen of aanpassen.",
       "title": "Controleer stembureaus"
     },
     "show_all": "Toon alle {num} stembureaus",
     "skip_step": "Stap overslaan en stembureaus later toevoegen"
+  },
+  "select_gsb": {
+    "error": "Gemeentelijk stembureau kan niet worden geselecteerd",
+    "title": "Selecteer het gemeentelijk stembureau"
   },
   "singular": "verkiezing",
   "start_when_count_list_received": "Zodra je een proces-verbaal van een stembureau hebt gekregen kan je beginnen met invoeren.",
@@ -87,18 +96,16 @@
   "use_instructions_to_import_eml": "Je hebt van het centraal stembureau instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
   "use_instructions_to_import_polling_stations_eml": "Importeer het bestand met stembureaus. Heb je geen bestand met stembureaus? Je kan ze later nog handmatig invoeren. Sla deze stap dan over.",
   "voting_method_type": {
-    "cso": "Centrale stemopneming (CSO)",
-    "cso_description": "Op de verkiezingsdag wordt het aantal stemmen per lijst geteld. De stemmen op kandidaten worden door het gemeentelijke stembureau geteld.",
+    "CSO": "Centrale stemopneming (CSO)",
+    "CSO_description": "Op de verkiezingsdag wordt het aantal stemmen per lijst geteld. De stemmen op kandidaten worden door het gemeentelijke stembureau geteld.",
     "description": "Hoe worden stemmen voor de {election} in de gemeente {location} geteld? Het type stemopneming wordt bepaald door het college van burgemeester en wethouders (B&W) van de gemeente.",
-    "dso": "Decentrale stemopneming (DSO)",
-    "dso_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
-    "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
+    "DSO": "Decentrale stemopneming (DSO)",
+    "DSO_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
     "title": "Type stemopneming in"
   },
-  "committee_category": {
-    "title": "Type stembureau",
-    "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
-    "choose": "Kies het type stembureau"
+  "wrong_candidates_definition": {
+    "description": "Het bestand <file>filename</file> bevat kandidatenlijsten voor een andere kieskring. Kies een bestand met de kandidatenlijsten voor de juiste kieskring.",
+    "title": "Verkeerde kandidatenlijsten"
   },
   "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."
 }

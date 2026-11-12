@@ -1,24 +1,34 @@
 import { describe, expect, test } from "vitest";
 
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import type { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
-import type { DataEntrySection } from "@/types/types";
+import type { DataEntryResults, DataEntrySection } from "@/types/types";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import {
+  getCSOInitialValues,
   getDefaultDataEntryState,
   getDefaultDataEntryStructure,
   getDefaultFormSection,
-  getInitialValues,
+  getDSOInitialValues,
 } from "../testing/mock-data";
-import type { FormState } from "../types/types";
+import type { DataEntryStateLoaded, FormState } from "../types/types";
 import {
+  addCorrectionWarnings,
   addValidationResultsToFormState,
   calculateDataEntryProgress,
   formSectionComplete,
   getNextSectionID,
   isFormSectionEmpty,
+  isSectionDisabled,
+  resetDisabledSectionValues,
+  resetFieldValues,
   resetFormSectionState,
+  setIsSavedBeforeFurthestSection,
+  updateDisabledSections,
+  updateFormStateAfterSubmit,
 } from "./dataEntryUtils";
 
 describe("formSectionComplete", () => {
@@ -27,6 +37,7 @@ describe("formSectionComplete", () => {
       formSectionComplete({
         index: 0,
         id: "voters_votes_counts",
+        isDisabled: false,
         isSaved: false,
         acceptErrorsAndWarnings: false,
         errors: new ValidationResultSet(),
@@ -40,6 +51,7 @@ describe("formSectionComplete", () => {
       formSectionComplete({
         index: 0,
         id: "voters_votes_counts",
+        isDisabled: false,
         isSaved: true,
         acceptErrorsAndWarnings: false,
         errors: new ValidationResultSet(),
@@ -72,6 +84,156 @@ describe("getNextSectionID", () => {
 
     expect(nextSection).toBe("differences_counts");
   });
+
+  test("should skip disabled sections", () => {
+    const formState = getDefaultDataEntryState().formState;
+    formState.sections.voters_votes_counts!.isSaved = true;
+    formState.sections.voters_votes_counts!.isSubmitted = true;
+    formState.sections.differences_counts!.isDisabled = true;
+
+    const nextSection = getNextSectionID(formState, "voters_votes_counts");
+
+    expect(nextSection).toBe("political_group_votes_1");
+  });
+});
+
+describe("isSectionDisabled", () => {
+  const section: DataEntrySection = {
+    id: "checks_and_corrections",
+    title: "Checks and corrections",
+    short_title: "Checks and corrections",
+    disabled_when: {
+      path: "about_report.checks_and_corrections_present",
+      equal_to: "PageMissing",
+    },
+    subsections: [],
+  };
+
+  test("section without disabled_when is never disabled", () => {
+    const sectionWithoutDisabledWhen: DataEntrySection = {
+      ...section,
+      disabled_when: undefined,
+    };
+
+    expect(
+      isSectionDisabled(sectionWithoutDisabledWhen, {
+        about_report: { checks_and_corrections_present: "PageMissing" },
+      }),
+    ).toBe(false);
+  });
+
+  test("section is disabled when value at path matches", () => {
+    expect(
+      isSectionDisabled(section, {
+        about_report: { checks_and_corrections_present: "PageMissing" },
+      }),
+    ).toBe(true);
+  });
+
+  test("section is not disabled when value at path does not match", () => {
+    expect(
+      isSectionDisabled(section, {
+        about_report: { checks_and_corrections_present: "PagePresent" },
+      }),
+    ).toBe(false);
+    expect(
+      isSectionDisabled(section, {
+        about_report: { checks_and_corrections_present: "" },
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("updateDisabledSections", () => {
+  const disabledWhenSection: DataEntrySection = {
+    id: "checks_and_corrections",
+    title: "Controles en correcties",
+    short_title: "Controles en correcties",
+    disabled_when: {
+      path: "about_report.checks_and_corrections_present",
+      equal_to: "PageMissing",
+    },
+    subsections: [],
+  };
+
+  function getDSOState(): DataEntryStateLoaded {
+    const state = getDefaultDataEntryState("DSOFirstSession");
+    state.dataEntryStructure = state.dataEntryStructure.map((section) =>
+      section.id === "checks_and_corrections" ? disabledWhenSection : section,
+    );
+    return state;
+  }
+
+  test("disables sections when disabled_when matches and re-enables them when it no longer does", () => {
+    const { formState, dataEntryStructure } = getDSOState();
+
+    updateDisabledSections(formState, dataEntryStructure, {
+      about_report: { checks_and_corrections_present: "PageMissing" },
+    });
+    expect(formState.sections.checks_and_corrections!.isDisabled).toBe(true);
+    expect(formState.sections.voters_votes_counts!.isDisabled).toBe(false);
+
+    updateDisabledSections(formState, dataEntryStructure, {
+      about_report: { checks_and_corrections_present: "PagePresent" },
+    });
+    expect(formState.sections.checks_and_corrections!.isDisabled).toBe(false);
+    expect(formState.sections.voters_votes_counts!.isDisabled).toBe(false);
+  });
+
+  test("updates furthest to the next enabled section when the furthest section is disabled", () => {
+    const { formState, dataEntryStructure } = getDSOState();
+    formState.furthest = "checks_and_corrections";
+
+    updateDisabledSections(formState, dataEntryStructure, {
+      about_report: { checks_and_corrections_present: "PageMissing" },
+    });
+
+    expect(formState.furthest).toBe("voters_votes_counts");
+  });
+
+  test("reset hasChanges for disabled sections", () => {
+    const { formState, dataEntryStructure } = getDSOState();
+    formState.sections.checks_and_corrections!.hasChanges = true;
+
+    updateDisabledSections(formState, dataEntryStructure, {
+      about_report: { checks_and_corrections_present: "PageMissing" },
+    });
+
+    expect(formState.sections.checks_and_corrections!.isDisabled).toBeTruthy();
+    expect(formState.sections.checks_and_corrections!.hasChanges).toBeFalsy();
+  });
+});
+
+describe("resetDisabledSectionValues", () => {
+  const dataEntryStructure = getDataEntryStructure("DSOFirstSession", electionMockData);
+
+  test("resets the values of a disabled section", () => {
+    const results = getDSOInitialValues();
+    results.about_report.checks_and_corrections_present = "PageMissing";
+    results.checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference = true;
+    results.checks_and_corrections.corrected_results_own_initiative.yes = true;
+    results.checks_and_corrections.corrected_results_csb_request.no = true;
+    results.voters_counts.poll_card_count = 10;
+
+    resetDisabledSectionValues(dataEntryStructure, results);
+
+    expect(results.checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference).toBe(false);
+    expect(results.checks_and_corrections.corrected_results_own_initiative.yes).toBe(false);
+    expect(results.checks_and_corrections.corrected_results_csb_request.no).toBe(false);
+    // other sections are untouched
+    expect(results.about_report.checks_and_corrections_present).toBe("PageMissing");
+    expect(results.voters_counts.poll_card_count).toBe(10);
+  });
+
+  test("does not reset values when the section is not disabled", () => {
+    const results = getDSOInitialValues();
+    results.about_report.checks_and_corrections_present = "PagePresent";
+    results.checks_and_corrections.corrected_results_own_initiative.yes = true;
+
+    resetDisabledSectionValues(dataEntryStructure, results);
+
+    expect(results.checks_and_corrections.corrected_results_own_initiative.yes).toBe(true);
+  });
 });
 
 describe("isFormSectionEmpty", () => {
@@ -79,14 +241,14 @@ describe("isFormSectionEmpty", () => {
 
   test("political group form is empty", () => {
     const section = getDefaultFormSection("political_group_votes_1", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeTruthy();
   });
 
   test("political group form: total is not empty", () => {
     const section = getDefaultFormSection("political_group_votes_1", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
     values.political_group_votes[0]!.total = 100;
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeFalsy();
@@ -94,7 +256,7 @@ describe("isFormSectionEmpty", () => {
 
   test("political group form: candidate votes is not empty", () => {
     const section = getDefaultFormSection("political_group_votes_1", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
     values.political_group_votes[0]!.candidate_votes[0]!.votes = 100;
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeFalsy();
@@ -102,14 +264,14 @@ describe("isFormSectionEmpty", () => {
 
   test("voters and votes form is empty", () => {
     const section = getDefaultFormSection("voters_votes_counts", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeTruthy();
   });
 
   test("voters and votes form: votes is not empty", () => {
     const section = getDefaultFormSection("voters_votes_counts", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
     values.votes_counts.invalid_votes_count = 3;
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeFalsy();
@@ -117,7 +279,7 @@ describe("isFormSectionEmpty", () => {
 
   test("voters and votes form: voters is not empty", () => {
     const section = getDefaultFormSection("voters_votes_counts", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
     values.voters_counts.total_admitted_voters_count = 6;
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeFalsy();
@@ -125,14 +287,14 @@ describe("isFormSectionEmpty", () => {
 
   test("differences form is empty", () => {
     const section = getDefaultFormSection("differences_counts", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeTruthy();
   });
 
   test("differences form is not empty", () => {
     const section = getDefaultFormSection("differences_counts", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
     values.differences_counts.more_ballots_count = 5;
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeFalsy();
@@ -140,7 +302,7 @@ describe("isFormSectionEmpty", () => {
 
   test("section not in data entry structure is considered empty", () => {
     const section = getDefaultFormSection("unknown_section", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeTruthy();
   });
@@ -152,21 +314,17 @@ describe("isFormSectionEmpty", () => {
       short_title: "Boolean Test",
       subsections: [
         {
-          type: "radio",
-          short_title: "Radio Test",
-          error: "Radio error",
-          path: "test.radio_field",
-          options: [
-            { value: "true", label: "Yes", short_label: "Yes" },
-            { value: "false", label: "No", short_label: "No" },
-          ],
-        },
-        {
           type: "checkboxes",
           short_title: "Checkbox Test",
           error_path: "test.checkbox_error",
           error_message: "Checkbox error",
-          options: [{ path: "test.checkbox_field", label: "Checkbox", short_label: "Checkbox" }],
+          options: [
+            {
+              path: "test.checkbox_field",
+              label: "Checkbox",
+              short_label: "Checkbox",
+            },
+          ],
         },
       ],
     };
@@ -175,9 +333,8 @@ describe("isFormSectionEmpty", () => {
 
     // Test with false values - should be considered empty
     const valuesWithFalse = {
-      ...getInitialValues(),
+      ...getCSOInitialValues(),
       test: {
-        radio_field: false,
         checkbox_field: false,
       },
     };
@@ -186,14 +343,52 @@ describe("isFormSectionEmpty", () => {
 
     // Test with a true value - should be considered non-empty
     const valuesWithTrue = {
-      ...getInitialValues(),
+      ...getCSOInitialValues(),
       test: {
-        radio_field: true,
-        checkbox_field: false,
+        checkbox_field: true,
       },
     };
 
     expect(isFormSectionEmpty([booleanSection], section, valuesWithTrue)).toBeFalsy();
+  });
+
+  test("radio fields with empty value are considered null", () => {
+    const radioSection: DataEntrySection = {
+      id: "radio_test",
+      title: "Radio Test Section",
+      short_title: "Radio Test",
+      subsections: [
+        {
+          type: "radio",
+          short_title: "Radio Test",
+          error: "Radio error",
+          path: "test.radio_field",
+          options: [{ label: "Radio", short_label: "Radio", value: "OptionA" }],
+        },
+      ],
+    };
+
+    const section = getDefaultFormSection("radio_test", 0);
+
+    // Test with empty values - should be considered null
+    const data = {
+      ...getCSOInitialValues(),
+      test: {
+        radio_field: "",
+      },
+    };
+
+    expect(isFormSectionEmpty([radioSection], section, data)).toBeTruthy();
+
+    // Test with a non-empty value - should be considered non-empty
+    const valuesWithTrue = {
+      ...getCSOInitialValues(),
+      test: {
+        radio_field: "OptionA",
+      },
+    };
+
+    expect(isFormSectionEmpty([radioSection], section, valuesWithTrue)).toBeFalsy();
   });
 });
 
@@ -212,6 +407,35 @@ describe("calculateDataEntryProgress", () => {
     };
     const progress = calculateDataEntryProgress(formState);
     expect(progress).toBe(16);
+  });
+});
+
+describe("setIsSavedBeforeFurthestSection", () => {
+  test("check is saved is set to true for sections before furthest section", () => {
+    const formState: FormState = getDefaultDataEntryState("DSOFirstSession").formState;
+    expect(formState.sections.about_report!.isSaved).toBe(false);
+    expect(formState.sections.checks_and_corrections!.isSaved).toBe(false);
+    expect(formState.sections.voters_votes_counts!.isSaved).toBe(false);
+    setIsSavedBeforeFurthestSection(formState);
+    expect(formState.sections.about_report!.isSaved).toBe(true);
+    expect(formState.sections.checks_and_corrections!.isSaved).toBe(true);
+    expect(formState.sections.voters_votes_counts!.isSaved).toBe(false);
+  });
+});
+
+describe("updateFormStateAfterSubmit", () => {
+  test("check is saved is set to true for sections before furthest section", () => {
+    const defaultState = getDefaultDataEntryState("DSOFirstSession");
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
+    expect(formState.sections.checks_and_corrections!.isSaved).toBe(false);
+    const validationResults = { errors: [], warnings: [] };
+
+    updateFormStateAfterSubmit(dataEntryStructure, formState, validationResults, "voters_votes_counts");
+
+    expect(formState.sections.about_report!.isSaved).toBe(true);
+    expect(formState.sections.checks_and_corrections!.isSaved).toBe(true);
+    expect(formState.sections.voters_votes_counts!.isSaved).toBe(false);
   });
 });
 
@@ -260,5 +484,84 @@ describe("addValidationResultToFormState", () => {
     addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
     expect(formState.sections.differences_counts!.errors.size()).toBe(0);
+  });
+});
+
+describe("correction warnings", () => {
+  test("addCorrectionWarnings", () => {
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const structure = defaultState.dataEntryStructure;
+
+    const correctionWarnings = [
+      "data.voters_counts.poll_card_count",
+      "data.voters_counts.proxy_certificate_count",
+      "data.political_group_votes.0.candidate_votes.0.votes",
+    ];
+
+    addCorrectionWarnings(structure, correctionWarnings, formState);
+
+    expect(formState.sections.voters_votes_counts!.correctionWarning).toStrictEqual({
+      code: "W002",
+      fields: ["data.voters_counts.poll_card_count", "data.voters_counts.proxy_certificate_count"],
+    });
+    expect(formState.sections.differences_counts!.correctionWarning).toBeUndefined();
+    expect(formState.sections.political_group_votes_1!.correctionWarning).toStrictEqual({
+      code: "W002",
+      fields: ["data.political_group_votes.0.candidate_votes.0.votes"],
+    });
+  });
+
+  test("resetFieldValues", () => {
+    const defaultState = getDefaultDataEntryState();
+    const structure = defaultState.dataEntryStructure;
+    const data: DataEntryResults = {
+      voters_counts: {
+        poll_card_count: 99,
+        proxy_certificate_count: 1,
+        voter_card_count: 5,
+        total_admitted_voters_count: 5,
+      },
+      differences_counts: {
+        difference_completely_accounted_for: {
+          yes: true,
+          no: false,
+        },
+      },
+      political_group_votes: [
+        {
+          candidate_votes: [{ votes: 100 }, { votes: 33 }, { votes: 2 }],
+        },
+      ],
+    };
+
+    const correctionWarnings = [
+      "data.voters_counts.poll_card_count",
+      "data.voters_counts.proxy_certificate_count",
+      "data.differences_counts.difference_completely_accounted_for",
+      "data.political_group_votes.0.candidate_votes.0.votes",
+    ];
+
+    resetFieldValues(structure, correctionWarnings, undefined, data);
+
+    expect(data).toStrictEqual({
+      voters_counts: {
+        poll_card_count: 0,
+        proxy_certificate_count: 0,
+        voter_card_count: 5,
+        total_admitted_voters_count: 5,
+      },
+      differences_counts: {
+        difference_completely_accounted_for: {
+          yes: false,
+          no: false,
+        },
+      },
+      political_group_votes: [
+        {
+          candidate_votes: [{ votes: 0 }, { votes: 33 }, { votes: 2 }],
+        },
+      ],
+    });
   });
 });

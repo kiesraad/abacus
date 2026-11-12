@@ -1,8 +1,8 @@
 import type { Locator, Page } from "@playwright/test";
 
-import { CheckDefinitionBasePgObj } from "./CheckDefinitionBasePgObj";
+import { CheckHashBasePgObj } from "../../CheckHashBasePgObj";
 
-export class CheckElectionDefinitionPgObj extends CheckDefinitionBasePgObj {
+export class CheckElectionDefinitionPgObj extends CheckHashBasePgObj {
   readonly header: Locator;
 
   constructor(protected readonly page: Page) {

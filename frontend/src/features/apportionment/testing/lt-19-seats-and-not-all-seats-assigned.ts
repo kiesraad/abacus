@@ -3,7 +3,7 @@ import type {
   ApportionmentWarning,
   CandidateNomination,
   CommitteeSession,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   SeatAssignment,
 } from "@/types/generated/openapi";
@@ -705,7 +705,8 @@ export const candidate_nomination: CandidateNomination = {
   ],
 };
 
-export const election_summary: ElectionSummary = {
+export const election_totals: ElectionTotals = {
+  committee_specific: { committee: "CSB", number_of_voters: 91 },
   voters_counts: {
     poll_card_count: 60,
     proxy_certificate_count: 0,
@@ -785,12 +786,6 @@ export const election_summary: ElectionSummary = {
       ],
     },
   ],
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    investigated_other_reason: [],
-    ballots_recounted: [],
-  },
-  number_of_voters: 91,
 };
 
 export const warnings: ApportionmentWarning[] = ["NotAllSeatsAssigned"];
@@ -807,10 +802,15 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 13,
   name: "Election < 19 seats & Not All Seats Assigned",
+  official_name: "Gemeenteraad Juinen 2026",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",
-  domain_id: "0035",
+  authority_id: "CSB",
+  authority_name: "Juinen",
+  authority_region: "Juinen",
+  district: { district: "None" },
+  domain: { id: "0035", name: "Juinen" },
   category: "Municipal",
   sub_category: "GR1",
   number_of_seats: 6,

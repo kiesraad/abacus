@@ -62,7 +62,6 @@ test.describe("full data entry flow with gaps in party/candidate numbers", () =>
 
     const differencesPage = new DifferencesPage(page);
     await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-    await differencesPage.differenceCompletelyAccountedForYes.check();
     await differencesPage.next.click();
 
     const candidatesListPage_1 = new CandidatesListPage(page, 0, "Partijdige Partij");

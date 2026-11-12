@@ -3,23 +3,27 @@ resolver = "3"
 members = [
     ".",
     "apportionment",
+    "eml_signature",
+    "windows_socket",
     "pdf_gen/types",
     "pdf_gen/impl",
     "pdf_gen/wrapper",
+    "windows_service",
 ]
 
 [workspace.package]
-version = "1.1.0"
+version = "1.3.0"
 edition = "2024"
 license = "EUPL-1.2"
 rust-version = "1.95"
 
 [workspace.dependencies]
+eml_signature = { path = "./eml_signature" }
 pdf_gen = { path = "./pdf_gen/wrapper" }
 pdf_gen_impl = { path = "./pdf_gen/impl" }
 pdf_gen_types = { path = "./pdf_gen/types" }
 async_zip = { version = "0.0.18", features = ["tokio", "deflate", "chrono"] }
-axum = { version = "0.8", features = ["macros", "tracing", "tokio"] }
+axum = { version = "0.8", features = ["macros", "multipart", "tracing", "tokio"] }
 axum-extra = { version = "0.12", default-features = false, features = [
     "attachment",
     "cookie",
@@ -32,8 +36,18 @@ rand = "0.10.1"
 strum = { version = "0.28", features = ["derive"] }
 test-log = "0.2.19"
 tokio = { version = "1", features = ["full"] }
+tokio-util = { version = "0.7.18", features = ["compat"] }
 tracing = "0.1.44"
-rcgen = { version = "0.14", default-features = false, features = ["aws_lc_rs", "pem", "x509-parser"] }
+rcgen = { version = "0.14", default-features = false, features = ["aws_lc_rs", "pem", "x509-parser", "zeroize"] }
+const-oid = { version = "0.10", features = ["db"] }
+der = { version = "0.8", features = ["alloc", "derive", "oid", "pem", "std"] }
+x509-cert = { version = "0.3", default-features = false, features = ["std", "pem"] }
+zeroize = "1"
+aws-lc-rs = "1"
+# No stable `cms` release supports der 0.8 / x509-cert 0.3 yet, see
+# https://github.com/RustCrypto/formats/pull/2393. Keep `builder` off: it signs
+# the `signedAttrs` DER rather than the EML bytes, and pulls in the `rsa` crate.
+cms = { version = "=0.3.0-rc.1", default-features = false, features = ["std"] }
 rustls-pki-types = "1"
 if-addrs = "0.15"
 rustls = "0.23"
@@ -73,26 +87,29 @@ name = "gen-pdf"
 [dependencies]
 apportionment = { path = "./apportionment" }
 pdf_gen.workspace = true
+async_zip.workspace = true
 axum.workspace = true
 axum-extra.workspace = true
 chrono.workspace = true
-clap = { version = "4.6", default-features = false, features = ["derive", "std", "help", "env"] }
-eml-nl = { version = "0.6.1" }
+clap = { version = "4.6", default-features = false, features = ["derive", "std", "help", "env", "string"] }
+eml-nl = { version = "0.8.1" }
+eml_signature.workspace = true
 hyper = { version = "1", features = ["full"] }
 icu_collator = "2.2.0"
 icu_locale_core = "2.2.0"
 tokio.workspace = true
+tokio-util.workspace = true
 memory-serve = { version = "2.1.0", optional = true, features = ["force-embed"] }
-utoipa = { version = "5.4.0", features = ["axum_extras", "chrono"] }
-utoipa-axum = "0.2.0"
-utoipa-swagger-ui = { version = "9.0.2", features = ["axum"], optional = true }
+utoipa = { version = "6.0.0", features = ["axum_extras", "chrono"] }
+utoipa-axum = "0.3.0"
+utoipa-swagger-ui = { version = "10.0.2", features = ["axum", "vendored"], optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sqlx = { version = "0.9.0", features = ["runtime-tokio", "sqlite", "chrono", "sqlx-toml"] }
 tower = "0.5"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 tracing.workspace = true
-tower-http = { version = "0.6", features = ["set-header", "trace"] }
+tower-http = { version = "0.7", features = ["set-header", "trace"] }
 sha2 = "0.11.0"
 sha1 = "0.11.0"
 argon2 = { version = "0.5.3", features = ["std"] }
@@ -107,11 +124,15 @@ rustls-pki-types = { workspace = true, optional = true }
 if-addrs = { workspace = true, optional = true }
 rustls = { workspace = true, optional = true }
 axum-server = { workspace = true, optional = true }
+zeroize.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows_socket = { path = "./windows_socket" }
+abacus_windows_service = { path = "./windows_service" }
 
 [dev-dependencies]
-async_zip.workspace = true
 http-body-util.workspace = true
-reqwest = { version = "0.13", default-features = false, features = ["json"] }
+reqwest = { version = "0.13", default-features = false, features = ["json", "multipart"] }
 test-log.workspace = true
 tempfile = "3"
 
@@ -123,6 +144,7 @@ unsafe_code = "forbid"
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
 
 [workspace.lints.clippy]
+allow_attributes = "warn"
 cast_possible_truncation = "deny"
 cloned_instead_of_copied = "warn"
 cognitive_complexity = "warn"
@@ -141,3 +163,13 @@ workspace = true
 
 [profile.release]
 overflow-checks = true
+
+# line-tables-only keeps file and line numbers in backtraces but omits type and variable information.
+# This saves ~30% compile time and ~60% disk space for the linked (test) binaries.
+# See "Debugging with gdb/lldb" in README.md to go back to full DWARF debug symbols.
+[profile.dev]
+debug = "line-tables-only"
+
+# Optimising Argon2 make hashing operations ~12x faster and cuts backend test suite CPU time by ~60%
+[profile.dev.package.argon2]
+opt-level = 3

@@ -164,6 +164,7 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
   switch (s.type) {
     case "string":
     case "boolean":
+    case "null":
       type = s.type;
       break;
     case "integer":
@@ -177,8 +178,9 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
       if (s.properties) {
         type = "{";
         Object.entries(s.properties).forEach(([k, v2]) => {
-          if ("description" in v2 && v2.description) {
-            type += `\n  /** ${v2.description} */\n`;
+          const description = schemaDescription(v2);
+          if (description) {
+            type += `\n  /** ${description} */\n`;
           }
           type += `  ${k}${isRequired(k, s.required)}: ${tsType(v2)};`;
         });
@@ -212,6 +214,18 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
   }
 
   return type;
+}
+
+function schemaDescription(s: ReferenceObject | SchemaObject): string | undefined {
+  if ("description" in s && s.description) {
+    return s.description;
+  }
+
+  if ("oneOf" in s && s.oneOf) {
+    return s.oneOf.map((s2) => schemaDescription(s2)).find((d) => d !== undefined);
+  }
+
+  return undefined;
 }
 
 function isRequired(k: string, req: string[] | undefined): string {

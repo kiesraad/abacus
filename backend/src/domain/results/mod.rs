@@ -1,6 +1,6 @@
 use common_polling_station_results::CommonPollingStationResults;
 use cso_first_session_results::CSOFirstSessionResults;
-use cso_next_session_results::CSONextSessionResults;
+use next_session_results::NextSessionResults;
 use political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes};
 use political_group_total_votes::PoliticalGroupTotalVotes;
 use serde::{Deserialize, Serialize};
@@ -9,28 +9,39 @@ use voters_counts::VotersCounts;
 use votes_counts::VotesCounts;
 
 use crate::domain::{
+    committee_session::CommitteeSession,
     compare::Compare,
-    election::{ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup},
+    election::{
+        CommitteeCategory, ElectionWithPoliticalGroups, PoliticalGroup, VoteCountingMethod,
+    },
     field_path::FieldPath,
-    results::{count::Count, gsb_results::GSBResults},
+    results::{
+        count::Count, dso_first_session_results::DSOFirstSessionResults, gsb_results::GSBResults,
+    },
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
 };
 
+pub mod about_report;
+pub mod checks_and_corrections;
 pub mod common_polling_station_results;
 pub mod common_validation;
 pub mod count;
 pub mod counting_differences_polling_station;
 pub mod cso_first_session_results;
-pub mod cso_next_session_results;
 pub mod differences_counts;
+pub mod dso_first_session_results;
 pub mod extra_investigation;
 pub mod gsb_differences_counts;
 pub mod gsb_results;
+pub mod next_session_results;
 pub mod political_group_candidate_votes;
 pub mod political_group_total_votes;
 pub mod voters_counts;
 pub mod votes_counts;
 pub mod yes_no;
+
+#[derive(Debug)]
+pub struct IncorrectResultsModel;
 
 /// Results contains the results for a data entry
 ///
@@ -39,12 +50,20 @@ pub mod yes_no;
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(tag = "model")]
 pub enum Results {
+    /// Results for decentrally counted (DSO) elections, first election committee session.
+    /// This contains the data entry values from Model Model N 10-1 and possibly in combination with the values from Model Na 14-1 versie 1.
+    DSOFirstSession(DSOFirstSessionResults),
+    /// Results for decentrally counted (DSO) elections, any subsequent election committee session.
+    /// This contains the data entry values from Model Na 14-1 versie 2.
+    DSONextSession(NextSessionResults),
+
     /// Results for centrally counted (CSO) elections, first election committee session.
     /// This contains the data entry values from Model Na 31-2 Bijlage 1.
     CSOFirstSession(CSOFirstSessionResults),
     /// Results for centrally counted (CSO) elections, any subsequent election committee session.
     /// This contains the data entry values from Model Na 14-2 Bijlage 1.
-    CSONextSession(CSONextSessionResults),
+    CSONextSession(NextSessionResults),
+
     /// HSB/CSB enters GSB results
     /// This contains the data entry values from Model Na 31-2.
     GSB(GSBResults),
@@ -63,10 +82,101 @@ pub struct CommonDifferenceCountsMut<'a> {
 
 /// Contains common functions for all result models
 impl Results {
+    pub fn new(
+        election: &ElectionWithPoliticalGroups,
+        committee_session: &CommitteeSession,
+        previous_results: Option<&CommonPollingStationResults>,
+    ) -> Self {
+        match (
+            election.committee_category,
+            committee_session.is_next_session(),
+        ) {
+            (CommitteeCategory::GSB, false) => match election.counting_method {
+                Some(VoteCountingMethod::CSO) => {
+                    Results::CSOFirstSession(CSOFirstSessionResults::empty(election))
+                }
+                Some(VoteCountingMethod::DSO) => {
+                    Results::DSOFirstSession(DSOFirstSessionResults::empty(election))
+                }
+                None => panic!("Invalid election {election:?}"),
+            },
+            (CommitteeCategory::GSB, true) => {
+                if let Some(prev) = previous_results {
+                    let mut copy = NextSessionResults {
+                        voters_counts: prev.voters_counts.clone(),
+                        votes_counts: prev.votes_counts.clone(),
+                        differences_counts: prev.differences_counts.clone(),
+                        political_group_votes: prev.political_group_votes.to_vec(),
+                    };
+
+                    // clear checkboxes in differences because they always need to be re-entered
+                    copy.differences_counts.compare_votes_cast_admitted_voters = Default::default();
+                    copy.differences_counts.difference_completely_accounted_for =
+                        Default::default();
+
+                    match election.counting_method {
+                        Some(VoteCountingMethod::CSO) => Results::CSONextSession(copy),
+                        Some(VoteCountingMethod::DSO) => Results::DSONextSession(copy),
+                        None => panic!("Invalid election {election:?}"),
+                    }
+                } else {
+                    match election.counting_method {
+                        Some(VoteCountingMethod::CSO) => {
+                            Results::CSONextSession(NextSessionResults::empty(election))
+                        }
+                        Some(VoteCountingMethod::DSO) => {
+                            Results::DSONextSession(NextSessionResults::empty(election))
+                        }
+                        None => panic!("Invalid election {election:?}"),
+                    }
+                }
+            }
+            (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(election)),
+        }
+    }
+
+    pub fn verify_model(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        session: &CommitteeSession,
+    ) -> Result<(), IncorrectResultsModel> {
+        let category = election.committee_category;
+        let method = election.counting_method;
+        let next = session.is_next_session();
+
+        let correct = match self {
+            Results::DSOFirstSession(_) => {
+                category == CommitteeCategory::GSB && method == Some(VoteCountingMethod::DSO)
+            }
+            Results::DSONextSession(_) => {
+                category == CommitteeCategory::GSB
+                    && method == Some(VoteCountingMethod::DSO)
+                    && next
+            }
+            Results::CSOFirstSession(_) => {
+                category == CommitteeCategory::GSB && method == Some(VoteCountingMethod::CSO)
+            }
+            Results::CSONextSession(_) => {
+                category == CommitteeCategory::GSB
+                    && method == Some(VoteCountingMethod::CSO)
+                    && next
+            }
+            Results::GSB(_) => category == CommitteeCategory::CSB && method.is_none() && !next,
+        };
+
+        if correct {
+            Ok(())
+        } else {
+            Err(IncorrectResultsModel)
+        }
+    }
+
     /// Common accessor for voter counts regardless of the underlying model.
     pub fn voters_counts(&self) -> &VotersCounts {
         match self {
+            Results::DSOFirstSession(results) => &results.voters_counts,
             Results::CSOFirstSession(results) => &results.voters_counts,
+            Results::DSONextSession(results) => &results.voters_counts,
             Results::CSONextSession(results) => &results.voters_counts,
             Results::GSB(results) => &results.voters_counts,
         }
@@ -76,7 +186,9 @@ impl Results {
     #[cfg(test)]
     pub fn voters_counts_mut(&mut self) -> &mut VotersCounts {
         match self {
+            Results::DSOFirstSession(results) => &mut results.voters_counts,
             Results::CSOFirstSession(results) => &mut results.voters_counts,
+            Results::DSONextSession(results) => &mut results.voters_counts,
             Results::CSONextSession(results) => &mut results.voters_counts,
             Results::GSB(results) => &mut results.voters_counts,
         }
@@ -85,7 +197,9 @@ impl Results {
     /// Common accessor for votes counts regardless of the underlying model.
     pub fn votes_counts(&self) -> &VotesCounts {
         match self {
+            Results::DSOFirstSession(results) => &results.votes_counts,
             Results::CSOFirstSession(results) => &results.votes_counts,
+            Results::DSONextSession(results) => &results.votes_counts,
             Results::CSONextSession(results) => &results.votes_counts,
             Results::GSB(results) => &results.votes_counts,
         }
@@ -95,7 +209,9 @@ impl Results {
     #[cfg(test)]
     pub fn votes_counts_mut(&mut self) -> &mut VotesCounts {
         match self {
+            Results::DSOFirstSession(results) => &mut results.votes_counts,
             Results::CSOFirstSession(results) => &mut results.votes_counts,
+            Results::DSONextSession(results) => &mut results.votes_counts,
             Results::CSONextSession(results) => &mut results.votes_counts,
             Results::GSB(results) => &mut results.votes_counts,
         }
@@ -104,7 +220,15 @@ impl Results {
     /// Common accessor for differences counts regardless of the underlying model.
     pub fn differences_counts(&self) -> CommonDifferencesCounts<'_> {
         match self {
+            Results::DSOFirstSession(results) => CommonDifferencesCounts {
+                more_ballots_count: &results.differences_counts.more_ballots_count,
+                fewer_ballots_count: &results.differences_counts.fewer_ballots_count,
+            },
             Results::CSOFirstSession(results) => CommonDifferencesCounts {
+                more_ballots_count: &results.differences_counts.more_ballots_count,
+                fewer_ballots_count: &results.differences_counts.fewer_ballots_count,
+            },
+            Results::DSONextSession(results) => CommonDifferencesCounts {
                 more_ballots_count: &results.differences_counts.more_ballots_count,
                 fewer_ballots_count: &results.differences_counts.fewer_ballots_count,
             },
@@ -123,7 +247,15 @@ impl Results {
     #[cfg(test)]
     pub fn differences_counts_mut(&mut self) -> CommonDifferenceCountsMut<'_> {
         match self {
+            Results::DSOFirstSession(results) => CommonDifferenceCountsMut {
+                more_ballots_count: &mut results.differences_counts.more_ballots_count,
+                fewer_ballots_count: &mut results.differences_counts.fewer_ballots_count,
+            },
             Results::CSOFirstSession(results) => CommonDifferenceCountsMut {
+                more_ballots_count: &mut results.differences_counts.more_ballots_count,
+                fewer_ballots_count: &mut results.differences_counts.fewer_ballots_count,
+            },
+            Results::DSONextSession(results) => CommonDifferenceCountsMut {
                 more_ballots_count: &mut results.differences_counts.more_ballots_count,
                 fewer_ballots_count: &mut results.differences_counts.fewer_ballots_count,
             },
@@ -141,7 +273,9 @@ impl Results {
     /// Common accessor for political group votes regardless of the underlying model.
     pub fn political_group_votes(&self) -> &[PoliticalGroupCandidateVotes] {
         match self {
+            Results::DSOFirstSession(results) => &results.political_group_votes,
             Results::CSOFirstSession(results) => &results.political_group_votes,
+            Results::DSONextSession(results) => &results.political_group_votes,
             Results::CSONextSession(results) => &results.political_group_votes,
             Results::GSB(results) => &results.political_group_votes,
         }
@@ -151,7 +285,9 @@ impl Results {
     #[cfg(test)]
     pub fn political_group_votes_mut(&mut self) -> &mut Vec<PoliticalGroupCandidateVotes> {
         match self {
+            Results::DSOFirstSession(results) => &mut results.political_group_votes,
             Results::CSOFirstSession(results) => &mut results.political_group_votes,
+            Results::DSONextSession(results) => &mut results.political_group_votes,
             Results::CSONextSession(results) => &mut results.political_group_votes,
             Results::GSB(results) => &mut results.political_group_votes,
         }
@@ -161,7 +297,9 @@ impl Results {
     pub fn is_same_model(&self, other: &Self) -> bool {
         matches!(
             (self, other),
-            (Results::CSOFirstSession(_), Results::CSOFirstSession(_))
+            (Results::DSOFirstSession(_), Results::DSOFirstSession(_))
+                | (Results::CSOFirstSession(_), Results::CSOFirstSession(_))
+                | (Results::DSONextSession(_), Results::DSONextSession(_))
                 | (Results::CSONextSession(_), Results::CSONextSession(_))
                 | (Results::GSB(_), Results::GSB(_))
         )
@@ -203,10 +341,10 @@ impl Results {
     }
 
     /// Create a default value for `voters_counts`, with all counts set to 0.
-    /// Voter cards ("kiezerspassen") only exist for non-municipal elections.
+    /// Voter cards ("kiezerspassen") only exist for non-local elections.
     pub fn default_voters_counts(election: &ElectionWithPoliticalGroups) -> VotersCounts {
         VotersCounts {
-            voter_card_count: (election.category != ElectionCategory::Municipal).then_some(0),
+            voter_card_count: (!election.category.is_local_election()).then_some(0),
             ..Default::default()
         }
     }
@@ -249,7 +387,36 @@ impl PollingStationResults for CSOFirstSessionResults {
     }
 }
 
-impl PollingStationResults for CSONextSessionResults {
+impl PollingStationResults for DSOFirstSessionResults {
+    fn as_common(&self) -> CommonPollingStationResults {
+        CommonPollingStationResults {
+            voters_counts: self.voters_counts.clone(),
+            votes_counts: self.votes_counts.clone(),
+            differences_counts: self.differences_counts.clone(),
+            political_group_votes: self.political_group_votes.to_vec(),
+        }
+    }
+
+    fn empty(election: &ElectionWithPoliticalGroups) -> Self {
+        Self {
+            about_report: Default::default(),
+            checks_and_corrections: Default::default(),
+            voters_counts: Results::default_voters_counts(election),
+            votes_counts: VotesCounts {
+                political_group_total_votes: Results::default_political_group_total_votes(
+                    &election.political_groups,
+                ),
+                ..Default::default()
+            },
+            differences_counts: Default::default(),
+            political_group_votes: Results::default_political_group_votes(
+                &election.political_groups,
+            ),
+        }
+    }
+}
+
+impl PollingStationResults for NextSessionResults {
     fn as_common(&self) -> CommonPollingStationResults {
         CommonPollingStationResults {
             voters_counts: self.voters_counts.clone(),
@@ -298,7 +465,13 @@ impl GSBResults {
 impl Compare for Results {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         match (self, first_entry) {
+            (Results::DSOFirstSession(s), Results::DSOFirstSession(f)) => {
+                s.compare(f, different_fields, path)
+            }
             (Results::CSOFirstSession(s), Results::CSOFirstSession(f)) => {
+                s.compare(f, different_fields, path)
+            }
+            (Results::DSONextSession(s), Results::DSONextSession(f)) => {
                 s.compare(f, different_fields, path)
             }
             (Results::CSONextSession(s), Results::CSONextSession(f)) => {
@@ -321,6 +494,8 @@ impl Validate for Results {
         path: &FieldPath,
     ) -> Result<ValidationResults, DataError> {
         match self {
+            Results::DSOFirstSession(results) => results.validate(election, path),
+            Results::DSONextSession(results) => results.as_common().validate(election, path),
             Results::CSOFirstSession(results) => {
                 let mut validation_results = results
                     .extra_investigation
@@ -338,12 +513,42 @@ impl Validate for Results {
     }
 }
 
+pub trait VerifyModels {
+    fn verify_models(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        session: &CommitteeSession,
+    ) -> Result<(), IncorrectResultsModel>;
+}
+
+impl<T> VerifyModels for [(T, Results)] {
+    fn verify_models(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        session: &CommitteeSession,
+    ) -> Result<(), IncorrectResultsModel> {
+        for (_, results) in self {
+            results.verify_model(election, session)?;
+        }
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 pub mod tests {
+    use std::{assert_matches, iter};
+
+    use strum::VariantArray;
+
     use super::*;
     use crate::domain::{
-        election::PGNumber,
+        election::{
+            ElectionCategory, PGNumber,
+            tests::{ElectionBuilder, election_fixture},
+        },
         results::{
+            about_report::{AboutReport, ChecksAndCorrectionsPresent},
+            checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},
             count::Count,
             differences_counts::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
@@ -388,7 +593,7 @@ pub mod tests {
                         votes_cast_greater_than_admitted_voters: false,
                         votes_cast_smaller_than_admitted_voters: false,
                     },
-                difference_completely_accounted_for: YesNo::yes(),
+                difference_completely_accounted_for: YesNo::default(),
             },
             political_group_votes: vec![
                 PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[36, 20]),
@@ -430,5 +635,262 @@ pub mod tests {
 
             self
         }
+    }
+
+    mod results_new {
+        use test_log::test;
+
+        use super::*;
+
+        #[test]
+        fn test_initial_voter_card_count() {
+            let first_session = CommitteeSession::first_session();
+
+            // Voter cards only exist for non-local elections
+            let cases = [
+                (ElectionCategory::Municipal, None),
+                (ElectionCategory::Provincial, Some(0)),
+                (ElectionCategory::WaterAuthority, Some(0)),
+            ];
+
+            for (category, expected_voter_card_count) in cases {
+                for committee_category in [CommitteeCategory::GSB, CommitteeCategory::CSB] {
+                    let election = election_fixture(category, committee_category, &[2]);
+                    let results = Results::new(&election, &first_session, None);
+
+                    assert_eq!(
+                        results.voters_counts().voter_card_count,
+                        expected_voter_card_count,
+                        "election category {category:?}, committee category {committee_category:?}"
+                    );
+                }
+            }
+        }
+
+        #[test]
+        fn test_initial_voter_card_count_next_session() {
+            let election =
+                election_fixture(ElectionCategory::Provincial, CommitteeCategory::GSB, &[2]);
+            let mut previous_results = CSOFirstSessionResults::empty(&election).as_common();
+            previous_results.voters_counts.voter_card_count = Some(5);
+
+            let results = Results::new(
+                &election,
+                &CommitteeSession::next_session(),
+                Some(&previous_results),
+            );
+
+            assert_matches!(results, Results::CSONextSession(_));
+            assert_eq!(results.voters_counts().voter_card_count, Some(5));
+        }
+
+        #[test]
+        fn test_gsb_first_session_cso() {
+            let first_session = CommitteeSession::first_session();
+            let election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            let results = Results::new(&election, &first_session, None);
+
+            assert_matches!(results, Results::CSOFirstSession(_));
+        }
+
+        #[test]
+        fn test_gsb_first_session_dso() {
+            let first_session = CommitteeSession::first_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = Some(VoteCountingMethod::DSO);
+            let results = Results::new(&election, &first_session, None);
+
+            assert_matches!(results, Results::DSOFirstSession(_));
+        }
+
+        #[test]
+        #[should_panic(expected = "Invalid election")]
+        fn test_gsb_first_session_with_invalid_counting_method() {
+            let first_session = CommitteeSession::first_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = None;
+            Results::new(&election, &first_session, None);
+        }
+
+        #[test]
+        fn test_gsb_next_session_cso_with_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            let previous_results = CSOFirstSessionResults::empty(&election).as_common();
+            let results = Results::new(&election, &next_session, Some(&previous_results));
+
+            assert_matches!(results, Results::CSONextSession(_));
+        }
+
+        #[test]
+        fn test_gsb_next_session_dso_with_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = Some(VoteCountingMethod::DSO);
+            let previous_results = DSOFirstSessionResults::empty(&election).as_common();
+            let results = Results::new(&election, &next_session, Some(&previous_results));
+
+            assert_matches!(results, Results::DSONextSession(_));
+        }
+
+        #[test]
+        #[should_panic(expected = "Invalid election")]
+        fn test_gsb_next_session_with_invalid_counting_method_and_with_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = None;
+            let previous_results = CSOFirstSessionResults::empty(&election).as_common();
+            Results::new(&election, &next_session, Some(&previous_results));
+        }
+
+        #[test]
+        fn test_gsb_next_session_cso_without_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            let results = Results::new(&election, &next_session, None);
+
+            assert_matches!(results, Results::CSONextSession(_));
+        }
+
+        #[test]
+        fn test_gsb_next_session_dso_without_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = Some(VoteCountingMethod::DSO);
+            let results = Results::new(&election, &next_session, None);
+
+            assert_matches!(results, Results::DSONextSession(_));
+        }
+
+        #[test]
+        #[should_panic(expected = "Invalid election")]
+        fn test_gsb_next_session_with_invalid_counting_method_and_without_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = None;
+            Results::new(&election, &next_session, None);
+        }
+
+        #[test]
+        fn test_csb() {
+            let first_session = CommitteeSession::first_session();
+            let election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2]);
+
+            let results = Results::new(&election, &first_session, None);
+
+            assert_matches!(results, Results::GSB(_));
+        }
+    }
+
+    #[test]
+    fn test_is_correct_model() {
+        use CommitteeCategory::*;
+        use VoteCountingMethod::*;
+
+        let gsb_election = election_fixture(ElectionCategory::Municipal, GSB, &[2]);
+
+        let dso_first_session =
+            Results::DSOFirstSession(DSOFirstSessionResults::empty(&gsb_election));
+        let dso_next_session = Results::DSONextSession(NextSessionResults::empty(&gsb_election));
+        let cso_first_session =
+            Results::CSOFirstSession(CSOFirstSessionResults::empty(&gsb_election));
+        let cso_next_session = Results::CSONextSession(NextSessionResults::empty(&gsb_election));
+        let gsb = Results::GSB(GSBResults::default());
+
+        let results_variants = [
+            &dso_first_session,
+            &dso_next_session,
+            &cso_first_session,
+            &cso_next_session,
+            &gsb,
+        ];
+
+        let first = CommitteeSession::first_session();
+        let next = CommitteeSession::next_session();
+
+        let correct_combinations = [
+            (&dso_first_session, GSB, Some(DSO), &first),
+            (&dso_first_session, GSB, Some(DSO), &next),
+            (&dso_next_session, GSB, Some(DSO), &next),
+            (&cso_first_session, GSB, Some(CSO), &first),
+            (&cso_first_session, GSB, Some(CSO), &next),
+            (&cso_next_session, GSB, Some(CSO), &next),
+            (&gsb, CSB, None, &first),
+        ];
+
+        // All counting methods wrapped in Some(), and None
+        let counting_methods = VoteCountingMethod::VARIANTS
+            .iter()
+            .map(|m| Some(*m))
+            .chain(iter::once(None))
+            .collect::<Vec<_>>();
+
+        for results in results_variants {
+            for category in CommitteeCategory::VARIANTS {
+                for method in &counting_methods {
+                    for session in [&first, &next] {
+                        let election = ElectionBuilder::municipal()
+                            .with_committee_category(*category)
+                            .with_counting_method(*method)
+                            .build();
+
+                        let combination = (results, *category, *method, session);
+                        let expect_correct = correct_combinations.contains(&combination);
+
+                        assert_eq!(
+                            results.verify_model(&election, session).is_ok(),
+                            expect_correct,
+                            "is_correct_model is not {expect_correct} for {combination:?}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_error_when_checks_and_corrections_not_empty() {
+        // Non-empty checks and corrections, while `checks_and_corrections = missing`
+        // This is an invalid state, so it should return an error
+        let results = Results::DSOFirstSession(DSOFirstSessionResults {
+            about_report: AboutReport {
+                corrigendum_present: Some(about_report::CorrigendumPresent::OneDocument),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PageMissing),
+            },
+            checks_and_corrections: ChecksAndCorrections {
+                reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                corrected_results_own_initiative: YesNo::yes(),
+                corrected_results_csb_request: YesNo::no(),
+            },
+            voters_counts: VotersCounts::default(),
+            votes_counts: VotesCounts::default(),
+            differences_counts: DifferencesCounts::default(),
+            political_group_votes: vec![],
+        });
+
+        let validation_results = results.validate(
+            &election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]),
+            &"data".into(),
+        );
+
+        assert_eq!(
+            validation_results,
+            Err(DataError::new(
+                "`checks_and_corrections` must be empty when `ChecksAndCorrectionsPresent::PageMissing`.",
+            ))
+        );
     }
 }

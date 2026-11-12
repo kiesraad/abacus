@@ -2,6 +2,8 @@ use axum::{
     Router, extract::DefaultBodyLimit, http::StatusCode, middleware, response::IntoResponse,
     routing::any,
 };
+#[cfg(feature = "tls")]
+use axum::{body::Bytes, routing::get};
 use hyper::http::{HeaderName, HeaderValue, header};
 use sqlx::SqlitePool;
 use tower_http::{
@@ -23,12 +25,14 @@ use crate::infra::tls::CaCertificate;
 use crate::test_data_gen;
 use crate::{
     AppError, AppState, MAX_BODY_SIZE_MB, api,
-    api::middleware::{airgap, airgap::AirgapDetection, authentication},
+    api::middleware::{
+        airgap,
+        airgap::AirgapDetection,
+        authentication::{self, ratelimit::LoginRateLimit},
+    },
     error,
     infra::{audit_log, backup::BackupConfig},
 };
-#[cfg(feature = "tls")]
-use axum::{body::Bytes, routing::get};
 
 pub fn openapi_router() -> OpenApiRouter<AppState> {
     #[derive(utoipa::OpenApi)]
@@ -70,7 +74,8 @@ fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
         .merge(api::report::router())
         .merge(api::document::router())
         .merge(api::investigation::router())
-        .merge(api::backup::router());
+        .merge(api::backup::router())
+        .merge(api::signing::router());
 
     #[cfg(feature = "dev-database")]
     let router = router.merge(test_data_gen::router());
@@ -273,12 +278,14 @@ pub fn create_router(
     pool: SqlitePool,
     airgap_detection: AirgapDetection,
     backup_config: BackupConfig,
+    login_ratelimit: LoginRateLimit,
 ) -> Result<Router, AppError> {
     let router = axum_router_from_openapi(openapi_router());
     let state = AppState {
         pool,
         airgap_detection,
         backup_config,
+        login_ratelimit,
     };
     let router = add_middleware(router, &state);
     #[cfg(feature = "memory-serve")]

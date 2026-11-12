@@ -195,6 +195,8 @@ describe("PollingStationUpdatePage", () => {
       { status: "second_entry_in_progress", extra_warning: true },
       { status: "definitive", extra_warning: true },
       { status: "entries_different", extra_warning: true },
+      { status: "first_entry_correction", extra_warning: true },
+      { status: "second_entry_correction", extra_warning: true },
     ] satisfies Array<{
       status: DataEntryStatusName;
       extra_warning: boolean;

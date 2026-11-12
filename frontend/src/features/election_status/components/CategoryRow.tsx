@@ -8,6 +8,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import type { DataEntryStatusName, ElectionStatusResponseEntry } from "@/types/generated/openapi";
+import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { formatDateTime } from "@/utils/dateTime";
 import type { StatusCategory, StatusEntryWithTypist } from "../hooks/useElectionStatus";
 import cls from "./ElectionStatus.module.css";
@@ -21,7 +22,9 @@ interface CategoryRowProps {
 
 const SHOW_BADGE: DataEntryStatusName[] = [
   "first_entry_in_progress",
+  "first_entry_correction",
   "second_entry_in_progress",
+  "second_entry_correction",
   "entries_different",
   "first_entry_has_errors",
 ];
@@ -72,7 +75,7 @@ function CategoryRowContent({ category, statusEntryWithTypist, warning }: Catego
 
   return (
     <>
-      <Table.NumberCell key={`${key}-number`}>{entry.source.number}</Table.NumberCell>
+      <Table.NumberCell key={`${key}-number`}>{getDataEntrySourceNumber(entry.source)}</Table.NumberCell>
       <Table.Cell key={`${key}-name`}>
         <div className={cls.cellWithBadge}>
           <span>{entry.source.name}</span>
@@ -90,7 +93,7 @@ function CategoryRowContent({ category, statusEntryWithTypist, warning }: Catego
           <ProgressBar
             id={`${key}-progressbar`}
             data={{
-              percentage: entry.second_entry_progress ?? entry.first_entry_progress ?? 0,
+              percentage: entry.data_entry_progress ?? 0,
               class: "default",
             }}
             showPercentage

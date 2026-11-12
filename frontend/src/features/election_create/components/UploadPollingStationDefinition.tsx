@@ -40,12 +40,12 @@ export function UploadPollingStationDefinition() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      setFile(currentFile);
       if (await isFileTooLarge(currentFile)) {
         setError(fileTooLargeError(currentFile));
         return;
       }
 
-      setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
         committee_category: state.committeeCategory,
@@ -55,6 +55,7 @@ export function UploadPollingStationDefinition() {
         candidate_data: state.candidateDefinitionData,
         polling_station_data: data,
         polling_station_file_name: currentFile.name,
+        selected_region: state.gsbSelected,
       });
 
       if (isSuccess(response) && response.data.committee_category === "GSB") {

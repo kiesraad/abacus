@@ -1,0 +1,22 @@
+{
+  "election": {
+    "id": 2,
+    "name": "Gemeenteraad Juinen 2035",
+    "official_name": "Gemeenteraad Juinen 2035",
+    "committee_category": "GSB",
+    "counting_method": "DSO",
+    "election_id": "GR2035_Juinen",
+    "location": "Juinen",
+    "authority_id": "0035",
+    "authority_name": "Juinen",
+    "authority_region": "Juinen",
+    "district": {"district": "None"},
+    "domain": {"id": "0035", "name": "Juinen"},
+    "category": "Municipal",
+    "sub_category": "GR2",
+    "number_of_seats": 29,
+    "number_of_voters": 820,
+    "election_date": "2035-01-08",
+    "nomination_date": "2034-12-15"
+  }
+}

@@ -76,11 +76,11 @@ export function emptyResults(model: DataEntryModel = "CSOFirstSession"): Results
       return {
         model,
         extra_investigation: {
-          extra_investigation_other_reason: { yes: false, no: false },
+          extra_investigation_done: { yes: false, no: false },
           ballots_recounted_extra_investigation: { yes: false, no: false },
         },
         counting_differences_polling_station: {
-          unexplained_difference_ballots_voters: { yes: false, no: false },
+          difference_ballots_voters_completely_accounted_for: { yes: false, no: false },
           difference_ballots_per_list: { yes: false, no: false },
         },
         ...commonPollingStationResults,
@@ -101,6 +101,7 @@ export const claimDataEntryResponse: ClaimDataEntryResponse = {
   client_state: null,
   source: source(1),
   status: "first_entry_in_progress",
+  is_correction: false,
 };
 
 export const saveDataEntryResponse: SaveDataEntryResponse = {
@@ -108,16 +109,16 @@ export const saveDataEntryResponse: SaveDataEntryResponse = {
 };
 
 export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
-  first_entry_user_id: 3,
+  first_entry_origin: { type: "Typist", user_id: 3 },
   second_entry_user_id: 4,
   first_entry: {
     model: "CSOFirstSession",
     extra_investigation: {
-      extra_investigation_other_reason: { yes: false, no: false },
+      extra_investigation_done: { yes: false, no: true },
       ballots_recounted_extra_investigation: { yes: false, no: false },
     },
     counting_differences_polling_station: {
-      unexplained_difference_ballots_voters: { yes: false, no: false },
+      difference_ballots_voters_completely_accounted_for: { yes: false, no: false },
       difference_ballots_per_list: { yes: false, no: false },
     },
     voters_counts: {
@@ -173,11 +174,11 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
   second_entry: {
     model: "CSOFirstSession",
     extra_investigation: {
-      extra_investigation_other_reason: { yes: false, no: false },
+      extra_investigation_done: { yes: false, no: true },
       ballots_recounted_extra_investigation: { yes: false, no: false },
     },
     counting_differences_polling_station: {
-      unexplained_difference_ballots_voters: { yes: false, no: false },
+      difference_ballots_voters_completely_accounted_for: { yes: false, no: false },
       difference_ballots_per_list: { yes: false, no: false },
     },
     voters_counts: {
@@ -230,6 +231,8 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       },
     ],
   },
+  first_entry_has_errors: false,
+  second_entry_has_errors: false,
   source: source(3),
 };
 

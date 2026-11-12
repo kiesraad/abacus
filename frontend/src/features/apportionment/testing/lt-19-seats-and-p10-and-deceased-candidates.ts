@@ -2,7 +2,7 @@ import type {
   ApportionmentState,
   CandidateNomination,
   CommitteeSession,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   SeatAssignment,
 } from "@/types/generated/openapi";
@@ -1759,7 +1759,7 @@ export const candidate_nomination: CandidateNomination = {
       initials: "S.",
       first_name: "Sammie",
       last_name: "Prakken",
-      locality: "'s Gravenveen",
+      locality: "'s-Gravenveen",
       gender: "Female",
       list_number: 1,
       list_name: "Stem nu!",
@@ -1770,7 +1770,7 @@ export const candidate_nomination: CandidateNomination = {
       first_name: "Leontien",
       last_name_prefix: "van der",
       last_name: "Spek",
-      locality: "'s Gravenveen",
+      locality: "'s-Gravenveen",
       gender: "Female",
       list_number: 1,
       list_name: "Stem nu!",
@@ -1780,7 +1780,7 @@ export const candidate_nomination: CandidateNomination = {
       initials: "J.C.M.",
       first_name: "Tiemen",
       last_name: "Titulaer",
-      locality: "'s Gravenveen",
+      locality: "'s-Gravenveen",
       gender: "Female",
       list_number: 1,
       list_name: "Stem nu!",
@@ -1922,7 +1922,7 @@ export const candidate_nomination: CandidateNomination = {
           first_name: "Leontien",
           last_name_prefix: "van der",
           last_name: "Spek",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -1930,7 +1930,7 @@ export const candidate_nomination: CandidateNomination = {
           initials: "S.",
           first_name: "Sammie",
           last_name: "Prakken",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
         {
@@ -1946,7 +1946,7 @@ export const candidate_nomination: CandidateNomination = {
           initials: "J.C.M.",
           first_name: "Tiemen",
           last_name: "Titulaer",
-          locality: "'s Gravenveen",
+          locality: "'s-Gravenveen",
           gender: "Female",
         },
       ],
@@ -2035,8 +2035,8 @@ export const candidate_nomination: CandidateNomination = {
   ],
 };
 
-export const election_summary: ElectionSummary = {
-  number_of_voters: 2000,
+export const election_totals: ElectionTotals = {
+  committee_specific: { committee: "CSB", number_of_voters: 2000 },
   voters_counts: {
     poll_card_count: 1203,
     proxy_certificate_count: 2,
@@ -2067,11 +2067,6 @@ export const election_summary: ElectionSummary = {
       count: 0,
       data_entry_sources: [],
     },
-  },
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    ballots_recounted: [],
-    investigated_other_reason: [],
   },
   political_group_votes: [
     {
@@ -2313,10 +2308,15 @@ export const committee_session: CommitteeSession = {
 export const election: ElectionWithPoliticalGroups = {
   id: 12,
   name: "Election < 19 seats & List Exhaustion & Deceased Candidates",
+  official_name: "Gemeenteraad Juinen 2026",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",
   location: "Juinen",
-  domain_id: "0035",
+  authority_id: "CSB",
+  authority_name: "Juinen",
+  authority_region: "Juinen",
+  district: { district: "None" },
+  domain: { id: "0035", name: "Juinen" },
   category: "Municipal",
   sub_category: "GR1",
   number_of_seats: 15,

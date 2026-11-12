@@ -11,11 +11,11 @@ import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 const results: Results = {
   model: "CSOFirstSession",
   extra_investigation: {
-    extra_investigation_other_reason: { yes: false, no: false },
+    extra_investigation_done: { yes: false, no: true },
     ballots_recounted_extra_investigation: { yes: false, no: false },
   },
   counting_differences_polling_station: {
-    unexplained_difference_ballots_voters: { yes: false, no: false },
+    difference_ballots_voters_completely_accounted_for: { yes: false, no: false },
     difference_ballots_per_list: { yes: false, no: false },
   },
   voters_counts: {

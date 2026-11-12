@@ -6,6 +6,7 @@ const meta = {
   component: InvestigationFindings,
   parameters: {
     needsElection: true,
+    needsElectionStatus: true,
     needsMessages: true,
     committeeSessionNumber: 2,
   },

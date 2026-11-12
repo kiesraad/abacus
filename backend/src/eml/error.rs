@@ -2,7 +2,6 @@ use crate::domain::election::{CandidateNumber, PGNumber};
 
 #[derive(Debug)]
 pub enum EMLImportError {
-    CandidateListWithoutContest,
     CandidateNumbersNotIncreasing {
         political_group_number: PGNumber,
         expected_larger_than: CandidateNumber,
@@ -11,17 +10,20 @@ pub enum EMLImportError {
     CommitteeCategoryForElectionCategoryNotSupported,
     EMLError(eml_nl::EMLError),
     InvalidCandidate,
+    InvalidCountType,
     InvalidDateFormat,
-    InvalidNumberOfVoters,
+    InvalidDistrict,
+    InvalidNumberOfContests {
+        found: usize,
+    },
     InvalidPollingStation,
     InvalidVotingMethod,
     LimitedElectionsSupported,
     MismatchElection,
-    MismatchElectionCategoryAndSubCategory,
-    MismatchElectionDate,
     MismatchElectionDomain,
     MismatchNumberOfSeats,
     MismatchPreferenceThreshold,
+    MissingCommitteeNumber,
     MissingElectionDomain,
     MissingFileName,
     MissingManagingAuthority,
@@ -30,6 +32,7 @@ pub enum EMLImportError {
     MissingPollingStations,
     MissingPreferenceThreshold,
     MissingSubcategory,
+    MissingLastName,
     Needs110a,
     Needs110b,
     Needs230b,
@@ -39,8 +42,9 @@ pub enum EMLImportError {
         expected_larger_than: PGNumber,
         found: PGNumber,
     },
-    PollingStationsWithoutContest,
     TooManyPoliticalGroups,
+    UnknownCommittee,
+    UnsupportedDistrictElection,
 }
 
 impl From<eml_nl::EMLError> for EMLImportError {

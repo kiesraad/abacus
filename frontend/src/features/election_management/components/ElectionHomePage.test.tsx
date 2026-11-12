@@ -2,14 +2,15 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
 import type { ReactNode } from "react";
+import * as ReactRouter from "react-router";
 import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { ApiProvider } from "@/api/ApiProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import {
   getCommitteeSessionListMockData,
   getCSBCommitteeSessionMockData,
@@ -18,27 +19,42 @@ import { getCSBElectionMockData, getElectionMockData } from "@/testing/api-mocks
 import {
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
+  DismissPublicKeyUploadReminderRequestHandler,
   ElectionRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
-import type { CommitteeSession, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
-
+import type {
+  CommitteeSession,
+  ELECTION_DOWNLOAD_N_10_1_INLEGVEL_REQUEST_PATH,
+  ELECTION_DOWNLOAD_N_10_1_REQUEST_PATH,
+  ELECTION_DOWNLOAD_N_10_2_REQUEST_PATH,
+  ELECTION_DOWNLOAD_NA_14_1_VERSIE1_REQUEST_PATH,
+  ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH,
+  ElectionDetailsResponse,
+  ErrorResponse,
+  Role,
+} from "@/types/generated/openapi";
+import * as download from "@/utils/download";
 import { ElectionHomePage } from "./ElectionHomePage";
+
+const navigate = vi.fn();
 
 const renderGSBPage = async (userRole: Role) => {
   render(
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <ElectionHomePage />
+          <MessagesProvider>
+            <ElectionHomePage />
+          </MessagesProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
   );
-  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraad Heemdamseburg 2026" })).toBeVisible();
 
   expect(await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" })).toBeVisible();
 };
@@ -48,12 +64,14 @@ const renderCSBPage = async () => {
     <TestUserProvider userRole={"coordinator_csb"}>
       <ElectionProvider electionId={2}>
         <ElectionStatusProvider electionId={2}>
-          <ElectionHomePage />
+          <MessagesProvider>
+            <ElectionHomePage />
+          </MessagesProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
   );
-  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraad Heemdamseburg 2026" })).toBeVisible();
 
   expect(await screen.findByRole("heading", { level: 2, name: "Centraal stembureau Heemdamseburg" })).toBeVisible();
 };
@@ -105,8 +123,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -175,11 +193,12 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
+        ["Publieke sleutel", "Bekijken en downloaden"],
         ["Stembureaus", "8 stembureaus"],
         ["Type stemopneming", "Centrale stemopneming"],
       ]);
@@ -286,7 +305,9 @@ describe("ElectionHomePage", () => {
             <TestUserProvider userRole="coordinator_gsb">
               <ElectionProvider electionId={1}>
                 <ElectionStatusProvider electionId={1}>
-                  <RouterProvider router={router} />
+                  <MessagesProvider>
+                    <RouterProvider router={router} />
+                  </MessagesProvider>
                 </ElectionStatusProvider>
               </ElectionProvider>
             </TestUserProvider>
@@ -324,7 +345,7 @@ describe("ElectionHomePage", () => {
 
       rtlRender(<Providers router={router} />);
 
-      expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+      expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraad Heemdamseburg 2026" })).toBeVisible();
       expect(
         await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" }),
       ).toBeVisible();
@@ -369,8 +390,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
@@ -379,61 +400,627 @@ describe("ElectionHomePage", () => {
       ]);
     });
 
-    test("Shows empty documents section for first committee session", async () => {
-      server.use(ElectionRequestHandler);
+    describe("CSO", () => {
+      test("Shows empty documents section for first committee session", async () => {
+        server.use(ElectionRequestHandler);
 
-      await renderGSBPage("coordinator_gsb");
+        await renderGSBPage("coordinator_gsb");
 
-      expect(
-        await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
-      ).toBeVisible();
-      expect(screen.getByText("Na 31-2 Bijlage 1")).toBeVisible();
-      expect(screen.getByText("N 10-2")).toBeVisible();
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("CSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["N 10-2", "Processen-verbaal per stembureau"],
+          ["Na 31-2 Bijlage 1", "Verslagen van tellingen van stembureau"],
+        ]);
+      });
+
+      test.each([
+        { model: "N 10-2", rowIndex: 1, role: "coordinator_gsb", endpoint: "/api/elections/1/download_n_10_2" },
+        {
+          model: "Na 31-2 Bijlage 1",
+          rowIndex: 2,
+          role: "coordinator_gsb",
+          endpoint: "/api/elections/1/download_na_31_2_bijlage1",
+        },
+        { model: "N 10-2", rowIndex: 1, role: "administrator", endpoint: "/api/elections/1/download_n_10_2" },
+        {
+          model: "Na 31-2 Bijlage 1",
+          rowIndex: 2,
+          role: "administrator",
+          endpoint: "/api/elections/1/download_na_31_2_bijlage1",
+        },
+      ] satisfies {
+        model: string;
+        rowIndex: number;
+        role: Role;
+        endpoint: ELECTION_DOWNLOAD_N_10_2_REQUEST_PATH | ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH;
+      }[])("Does not show modal on clicking download $model when polling stations exist for $role", async ({
+        model,
+        rowIndex,
+        role,
+        endpoint,
+      }) => {
+        const user = userEvent.setup();
+        const electionDataFirstSession = getElectionMockData();
+        const directDownload = vi.spyOn(download, "directDownload").mockImplementation(() => {});
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage(role);
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("CSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        const row = rows[rowIndex]!;
+        expect(row).toHaveTextContent(model);
+        await user.click(row);
+
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(directDownload).toHaveBeenCalledExactlyOnceWith(endpoint);
+      });
+
+      test.each([
+        { model: "N 10-2", rowIndex: 1, role: "coordinator_gsb" },
+        {
+          model: "Na 31-2 Bijlage 1",
+          rowIndex: 2,
+          role: "coordinator_gsb",
+        },
+        { model: "N 10-2", rowIndex: 1, role: "administrator" },
+        {
+          model: "Na 31-2 Bijlage 1",
+          rowIndex: 2,
+          role: "administrator",
+        },
+      ] satisfies {
+        model: string;
+        rowIndex: number;
+        role: Role;
+      }[])("Shows modal on clicking download $model when polling stations missing for $role", async ({
+        model,
+        rowIndex,
+        role,
+      }) => {
+        const user = userEvent.setup();
+        const electionDataFirstSession = getElectionMockData();
+        electionDataFirstSession.polling_stations = [];
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage(role);
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("CSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        const row = rows[rowIndex]!;
+        expect(row).toHaveTextContent(model);
+        await user.click(row);
+
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        const title = within(modal).getByText("Voeg eerst stembureaus toe");
+        expect(title).toBeVisible();
+        const instruction = within(modal).getByText(
+          "In deze download zit voor elk onderliggend stembureau een proces-verbaal met de gegevens van dat stembureau al ingevuld. Voeg daarom eerst de onderliggende stembureaus toe.",
+        );
+        expect(instruction).toBeVisible();
+
+        const add_polling_stations_button = await within(modal).findByRole("button", { name: "Stembureaus toevoegen" });
+        expect(add_polling_stations_button).toBeVisible();
+        await user.click(add_polling_stations_button);
+
+        expect(navigate).toHaveBeenCalledExactlyOnceWith("polling-stations");
+      });
+
+      test("Shows empty document section for second committee session", async () => {
+        const electionDataSecondSession = getElectionMockData({}, { id: 2, number: 2 });
+        electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(2, 3);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("CSO-next-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaand model is relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["Na 31-2 inlegvel", "Inlegvel controles en correcties"],
+        ]);
+      });
+
+      test("Shows empty document section for third committee session", async () => {
+        const electionDataThirdSession = getElectionMockData({}, { id: 2, number: 3 });
+        electionDataThirdSession.committee_sessions = getCommitteeSessionListMockData().slice(1, 3);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataThirdSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("CSO-next-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaand model is relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["Na 31-2 inlegvel", "Inlegvel controles en correcties"],
+        ]);
+      });
     });
 
-    test("Shows empty document section for second committee session", async () => {
-      const electionDataSecondSession = getElectionMockData({}, { id: 2, number: 2 });
-      electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(2, 3);
-      server.use(
-        http.get("/api/elections/1", () =>
-          HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
-        ),
-      );
+    describe("DSO", () => {
+      test("Shows empty documents section for first committee session", async () => {
+        const electionDataFirstSession = getElectionMockData({ counting_method: "DSO" });
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
 
-      await renderGSBPage("coordinator_gsb");
+        await renderGSBPage("coordinator_gsb");
 
-      expect(
-        await screen.findByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" }),
-      ).toBeVisible();
-      expect(screen.getByText("Na 31-2 Inlegvel")).toBeVisible();
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["N 10-1", "Processen-verbaal per stembureau"],
+          ["N 10-1", "Inlegvellen controles en correcties per stembureau"],
+          ["Na 14-1, versie 1", "Corrigenda eerste zitting per stembureau"],
+        ]);
+      });
 
-      expect(
-        screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
-      ).not.toBeInTheDocument();
-      expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
-      expect(screen.queryByText("N 10-2")).not.toBeInTheDocument();
+      test.each([
+        {
+          model: ["N 10-1", "Processen-verbaal per stembureau"].join(""),
+          rowIndex: 1,
+          role: "coordinator_gsb",
+          endpoint: "/api/elections/1/download_n_10_1",
+        },
+        {
+          model: ["N 10-1", "Inlegvellen controles en correcties per stembureau"].join(""),
+          rowIndex: 2,
+          role: "coordinator_gsb",
+          endpoint: "/api/elections/1/download_n_10_1_inlegvel",
+        },
+        {
+          model: "Na 14-1, versie 1",
+          rowIndex: 3,
+          role: "coordinator_gsb",
+          endpoint: "/api/elections/1/download_na_14_1_versie1",
+        },
+        {
+          model: ["N 10-1", "Processen-verbaal per stembureau"].join(""),
+          rowIndex: 1,
+          role: "administrator",
+          endpoint: "/api/elections/1/download_n_10_1",
+        },
+        {
+          model: ["N 10-1", "Inlegvellen controles en correcties per stembureau"].join(""),
+          rowIndex: 2,
+          role: "administrator",
+          endpoint: "/api/elections/1/download_n_10_1_inlegvel",
+        },
+        {
+          model: "Na 14-1, versie 1",
+          rowIndex: 3,
+          role: "administrator",
+          endpoint: "/api/elections/1/download_na_14_1_versie1",
+        },
+      ] satisfies {
+        model: string;
+        rowIndex: number;
+        role: Role;
+        endpoint:
+          | ELECTION_DOWNLOAD_N_10_1_REQUEST_PATH
+          | ELECTION_DOWNLOAD_N_10_1_INLEGVEL_REQUEST_PATH
+          | ELECTION_DOWNLOAD_NA_14_1_VERSIE1_REQUEST_PATH;
+      }[])("Does not show modal on clicking download $model when polling stations exist for $role", async ({
+        model,
+        rowIndex,
+        role,
+        endpoint,
+      }) => {
+        const user = userEvent.setup();
+        const directDownload = vi.spyOn(download, "directDownload").mockImplementation(() => {});
+        const electionDataFirstSessionWithDetails = getElectionMockData(
+          { counting_method: "DSO" },
+          { location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+        );
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataFirstSessionWithDetails satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage(role);
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        const row = rows[rowIndex]!;
+        expect(row).toHaveTextContent(model);
+        await user.click(row);
+
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(directDownload).toHaveBeenCalledExactlyOnceWith(endpoint);
+      });
+
+      test.each([
+        { model: ["N 10-1", "Processen-verbaal per stembureau"].join(""), rowIndex: 1, role: "coordinator_gsb" },
+        {
+          model: ["N 10-1", "Inlegvellen controles en correcties per stembureau"].join(""),
+          rowIndex: 2,
+          role: "coordinator_gsb",
+        },
+        { model: "Na 14-1, versie 1", rowIndex: 3, role: "coordinator_gsb" },
+        { model: ["N 10-1", "Processen-verbaal per stembureau"].join(""), rowIndex: 1, role: "administrator" },
+        {
+          model: ["N 10-1", "Inlegvellen controles en correcties per stembureau"].join(""),
+          rowIndex: 2,
+          role: "administrator",
+        },
+        { model: "Na 14-1, versie 1", rowIndex: 3, role: "administrator" },
+      ] satisfies {
+        model: string;
+        rowIndex: number;
+        role: Role;
+      }[])("Shows modal on clicking download $model when polling stations missing for $role", async ({
+        model,
+        rowIndex,
+        role,
+      }) => {
+        const user = userEvent.setup();
+        const electionDataFirstSession = getElectionMockData({ counting_method: "DSO" });
+        electionDataFirstSession.polling_stations = [];
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage(role);
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        const row = rows[rowIndex]!;
+        expect(row).toHaveTextContent(model);
+        await user.click(row);
+
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        const title = within(modal).getByText("Voeg eerst stembureaus toe");
+        expect(title).toBeVisible();
+        const instruction = within(modal).getByText(
+          "In deze download zit voor elk onderliggend stembureau een proces-verbaal met de gegevens van dat stembureau al ingevuld. Voeg daarom eerst de onderliggende stembureaus toe.",
+        );
+        expect(instruction).toBeVisible();
+
+        const add_polling_stations_button = await within(modal).findByRole("button", { name: "Stembureaus toevoegen" });
+        expect(add_polling_stations_button).toBeVisible();
+        await user.click(add_polling_stations_button);
+
+        expect(navigate).toHaveBeenCalledExactlyOnceWith("polling-stations");
+      });
+
+      test("Shows modal on clicking download Na 14-1 versie 1 when committee session details missing", async () => {
+        const user = userEvent.setup();
+        const electionDataFirstSession = getElectionMockData({ counting_method: "DSO" });
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        await user.click(rows[3]!);
+
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        const title = within(modal).getByText("Vul eerst de details van de zitting in");
+        expect(title).toBeVisible();
+
+        const enter_details_button = within(modal).getByRole("button", { name: "Details invullen" });
+        expect(enter_details_button).toBeVisible();
+        await user.click(enter_details_button);
+
+        expect(navigate).toHaveBeenCalledExactlyOnceWith("details");
+      });
+
+      test("Does not show modal on clicking download Na 14-1 versie 1 when committee session details present", async () => {
+        const user = userEvent.setup();
+        const directDownload = vi.spyOn(download, "directDownload").mockImplementation(() => {});
+        const electionDataFirstSessionWithDetails = getElectionMockData(
+          { counting_method: "DSO" },
+          { location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+        );
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataFirstSessionWithDetails satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        await user.click(rows[3]!);
+
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(directDownload).toHaveBeenCalledExactlyOnceWith("/api/elections/1/download_na_14_1_versie1");
+      });
+
+      test("Shows modal on clicking download Na 14-1 versie 1 when committee session details missing for administrator", async () => {
+        const user = userEvent.setup();
+        const electionDataFirstSession = getElectionMockData({ counting_method: "DSO" });
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataFirstSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("administrator");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        await user.click(rows[3]!);
+
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        const title = within(modal).getByText("Vul eerst de details van de zitting in");
+        expect(title).toBeVisible();
+        const instruction = within(modal).getByText("Vraag de coördinator om de details van de zitting in te vullen.");
+        expect(instruction).toBeVisible();
+
+        const enter_details_button = within(modal).queryByRole("button", { name: "Details invullen" });
+        expect(enter_details_button).not.toBeInTheDocument();
+      });
+
+      test("Shows empty document section for second committee session", async () => {
+        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" }, { id: 2, number: 2 });
+        electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(2, 3);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege inlegvellen voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-next-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["N 10-1", "Inlegvellen controles en correcties per stembureau"],
+          ["Na 31-1 inlegvel", "Inlegvel controles en correcties bij GSB proces-verbaal"],
+        ]);
+      });
+
+      test("Shows empty document section for third committee session", async () => {
+        const electionDataThirdSession = getElectionMockData({ counting_method: "DSO" }, { id: 2, number: 3 });
+        electionDataThirdSession.committee_sessions = getCommitteeSessionListMockData().slice(1, 3);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataThirdSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege inlegvellen voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-next-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["N 10-1", "Inlegvellen controles en correcties per stembureau"],
+          ["Na 31-1 inlegvel", "Inlegvel controles en correcties bij GSB proces-verbaal"],
+        ]);
+      });
     });
 
-    test("Does not show empty documents section for third committee session", async () => {
-      const electionDataSecondSession = getElectionMockData({}, { id: 2, number: 3 });
-      electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(1, 3);
-      server.use(
-        http.get("/api/elections/1", () =>
-          HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
-        ),
-      );
+    describe("Certificate registration alert", () => {
+      test("Shows dismissable alert for administrator and hides it after confirming", async () => {
+        const user = userEvent.setup();
+        const dismissReminder = spyOnHandler(DismissPublicKeyUploadReminderRequestHandler);
+        server.use(ElectionRequestHandler, DismissPublicKeyUploadReminderRequestHandler);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(
+              { ...getElectionMockData(), show_keypair_reminder: "Dismissable" } satisfies ElectionDetailsResponse,
+              { status: 200 },
+            ),
+          ),
+        );
+        await renderGSBPage("administrator");
 
-      await renderGSBPage("coordinator_gsb");
+        const alert = await screen.findByRole("alert");
+        expect(within(alert).getByText("Publieke sleutel registreren", { selector: "strong" })).toBeVisible();
+        expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+          "Je moet de publieke sleutel van dit gemeentelijk stembureau registreren. Doe dit door de sleutel te uploaden naar het overdrachtsplatform van Kiesraad. Doe dit uiterlijk twee dagen voor de dag van stemming.",
+        );
+        expect(within(alert).getByRole("link", { name: "Publieke sleutel registreren" })).toHaveAttribute(
+          "href",
+          "/certificate",
+        );
 
-      expect(
-        screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" }),
-      ).not.toBeInTheDocument();
-      expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
-      expect(screen.queryByText("N 10-2")).not.toBeInTheDocument();
-      expect(screen.queryByText("Na 31-2 Inlegvel")).not.toBeInTheDocument();
+        const election_information_table = await screen.findByTestId("election-information-table");
+        expect(within(election_information_table).getByRole("row", { name: /Publieke sleutel/ })).toHaveTextContent(
+          "Nog niet geregistreerd",
+        );
+
+        overrideOnce("get", "/api/elections/1", 200, getElectionMockData());
+        await user.click(within(alert).getByRole("button", { name: "Ik heb dit al gedaan" }));
+        expect(alert).not.toBeInTheDocument();
+        expect(dismissReminder).toHaveBeenCalledOnce();
+        expect(within(election_information_table).getByRole("row", { name: /Publieke sleutel/ })).toHaveTextContent(
+          "Bekijken en downloaden",
+        );
+      });
+
+      test("Disables dismiss button when non-dismissable", async () => {
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(
+              { ...getElectionMockData(), show_keypair_reminder: "NonDismissable" } satisfies ElectionDetailsResponse,
+              { status: 200 },
+            ),
+          ),
+        );
+        await renderGSBPage("administrator");
+
+        const alert = await screen.findByRole("alert");
+        expect(within(alert).getByText("Publieke sleutel registreren", { selector: "strong" })).toBeVisible();
+        expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+          "Je moet de publieke sleutel van dit gemeentelijk stembureau registreren. Doe dit door de sleutel te uploaden naar het overdrachtsplatform van Kiesraad. Doe dit uiterlijk twee dagen voor de dag van stemming.",
+        );
+        expect(within(alert).getByRole("link", { name: "Publieke sleutel registreren" })).toHaveAttribute(
+          "href",
+          "/certificate",
+        );
+        expect(within(alert).getByRole("button", { name: "Ik heb dit al gedaan" })).toBeDisabled();
+      });
+
+      test("Does not show alert for administrator when no reminder is set", async () => {
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(getElectionMockData() satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+        await renderGSBPage("administrator");
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      });
+
+      test("Does not show alert for coordinator", async () => {
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(
+              { ...getElectionMockData(), show_keypair_reminder: "Dismissable" } satisfies ElectionDetailsResponse,
+              { status: 200 },
+            ),
+          ),
+        );
+        await renderGSBPage("coordinator_gsb");
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      });
     });
   });
 
@@ -470,8 +1057,8 @@ describe("ElectionHomePage", () => {
       const election_information_table = await screen.findByTestId("election-information-table");
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
-        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
+        ["Kiesgebied", "CSB - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
         ["Type stembureau", "Centraal stembureau"],
       ]);

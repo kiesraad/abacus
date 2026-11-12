@@ -25,23 +25,27 @@ use crate::{
         },
         committee_session_status::CommitteeSessionStatus,
         election::{
-            CommitteeCategory, Election, ElectionCategory, ElectionId,
-            ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups, NewElection,
-            VoteCountingMethod,
+            CommitteeCategory, CommitteeDistrict, Election, ElectionCategory, ElectionDomain,
+            ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups,
+            NewElection, RegionDetails, RegionKey, VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
         polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
         role::Role,
+        sub_committee::NewSubCommittee,
     },
     eml::{
-        EMLImportError, EmlHash, RedactedEmlHash, number_of_voters_from_polling_stations_eml,
-        parse_polling_stations_eml_str, polling_stations_eml_matches_election,
-        polling_stations_from_eml, polling_stations_from_eml_str,
+        EMLImportError, EmlHash, RedactedEmlHash,
+        committees::{CommitteeDetails, ElectionTreeDetails},
+        election_identifier_from_eml, number_of_voters_from_polling_stations_eml,
+        parse_polling_stations_eml_str, polling_stations_from_eml, polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, user_repo::User},
+    repository::{committee_session_repo, election_repo, signing_keypair_repo, user_repo::User},
     service::{create_sub_committee, list_polling_stations_for_session},
 };
+
+pub mod handlers;
 
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
@@ -49,6 +53,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     const ALL_ROLES: &[Role] = Role::VARIANTS;
     const ADMIN: &[Role] = &[Administrator];
     const ADMIN_GSB_COORDINATOR: &[Role] = &[Administrator, CoordinatorGSB];
+    const CSB_COORDINATOR: &[Role] = &[CoordinatorCSB];
 
     OpenApiRouter::default()
         .routes(routes!(election_import_validate).authorize(ADMIN))
@@ -56,6 +61,14 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_list).authorize(ALL_ROLES))
         .routes(routes!(election_details).authorize(ALL_ROLES))
         .routes(routes!(election_number_of_voters_change).authorize(ADMIN_GSB_COORDINATOR))
+        .routes(
+            routes!(handlers::data_entry_import::election_data_entry_import_validate)
+                .authorize(CSB_COORDINATOR),
+        )
+        .routes(
+            routes!(handlers::data_entry_import::election_data_entry_import)
+                .authorize(CSB_COORDINATOR),
+        )
 }
 
 /// Election list response
@@ -79,6 +92,9 @@ pub struct ElectionDetailsResponse {
     pub election: ElectionWithPoliticalGroups,
     pub polling_stations: Vec<PollingStationResponse>,
     pub investigations: Vec<PollingStationInvestigation>,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    #[schema(nullable = false)]
+    pub show_keypair_reminder: Option<KeypairReminder>,
 }
 
 #[derive(Serialize)]
@@ -89,7 +105,11 @@ pub struct ElectionAuditData {
     pub election_counting_method: Option<String>,
     pub election_election_id: String,
     pub election_location: String,
-    pub election_domain_id: String,
+    pub election_authority_id: String,
+    pub election_authority_name: String,
+    pub election_authority_region: String,
+    pub election_district: CommitteeDistrict,
+    pub election_domain: Option<ElectionDomain>,
     pub election_category: String,
     pub election_number_of_seats: u32,
     pub election_number_of_voters: u32,
@@ -106,7 +126,11 @@ impl From<Election> for ElectionAuditData {
             election_counting_method: value.counting_method.map(|cm| cm.to_string()),
             election_election_id: value.election_id,
             election_location: value.location,
-            election_domain_id: value.domain_id,
+            election_authority_id: value.authority_id,
+            election_authority_name: value.authority_name,
+            election_authority_region: value.authority_region,
+            election_district: value.district,
+            election_domain: value.domain,
             election_category: value.category.to_string(),
             election_number_of_seats: value.number_of_seats,
             election_number_of_voters: value.number_of_voters,
@@ -161,6 +185,33 @@ pub async fn election_list(
     }))
 }
 
+#[derive(Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub enum KeypairReminder {
+    Dismissable,
+    NonDismissable,
+}
+
+async fn get_show_keypair_reminder(
+    conn: &mut SqliteConnection,
+    election: &ElectionWithPoliticalGroups,
+) -> Result<Option<KeypairReminder>, sqlx::Error> {
+    if !election.committee_category.supports_signing() {
+        // Don't show a reminder if signing is not supported
+        return Ok(None);
+    }
+
+    signing_keypair_repo::get_show_reminder(conn, election.id)
+        .await
+        .map(|show_reminder| match show_reminder {
+            // Certificate is generated and reminder should be shown dismissable
+            Some(true) => Some(KeypairReminder::Dismissable),
+            // Certificate is generated and reminder is dismissed
+            Some(false) => None,
+            // Certificate is not generated yet, so the reminder should be shown non-dismissable
+            None => Some(KeypairReminder::NonDismissable),
+        })
+}
+
 /// Get election details including the election's candidate list (political groups),
 /// its polling stations and the current committee session and its investigations
 #[utoipa::path(
@@ -195,6 +246,7 @@ pub async fn election_details(
         list_polling_stations_for_session(&mut conn, &current_committee_session).await?;
     let investigations = session_pss.investigations();
     let polling_stations = session_pss.into_responses(election_id);
+    let show_keypair_reminder = get_show_keypair_reminder(&mut conn, &election).await?;
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,
@@ -202,6 +254,7 @@ pub async fn election_details(
         election,
         polling_stations,
         investigations,
+        show_keypair_reminder,
     }))
 }
 
@@ -307,6 +360,10 @@ pub struct GSBElectionCreationValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     polling_station_file_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    selected_region: Option<RegionKey>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -344,6 +401,7 @@ pub struct GSBElectionDefinitionValidateResponse {
     #[schema(nullable = false)]
     pub polling_station_definition_matches_election: Option<bool>,
     number_of_voters: u32,
+    gsb_list: Vec<RegionDetails>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -386,8 +444,12 @@ fn validate_gsb_election(
     }
 
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
-    let mut election =
-        parse_election_candidates_eml(&edu.election_data, edu.candidate_data.as_deref())?;
+    let (mut election, election_tree_details) = parse_election_candidates_eml(
+        &edu.election_data,
+        Some((CommitteeCategory::GSB, edu.selected_region)),
+        true,
+        edu.candidate_data.as_deref(),
+    )?;
 
     if let Some(ref data) = edu.candidate_data {
         hash = RedactedEmlHash::from(data.as_bytes());
@@ -407,10 +469,11 @@ fn validate_gsb_election(
         }
 
         let eml = parse_polling_stations_eml_str(data)?;
+        let election_identifier = election_identifier_from_eml(&eml)?;
         polling_stations = Some(polling_stations_from_eml(&eml)?);
         number_of_voters = number_of_voters_from_polling_stations_eml(&eml)?;
         polling_station_definition_matches_election =
-            Some(polling_stations_eml_matches_election(&eml, &election)?);
+            Some(election_identifier.matches_new_election(&election));
     } else {
         polling_stations = None;
     }
@@ -426,6 +489,11 @@ fn validate_gsb_election(
             polling_stations,
             number_of_voters,
             polling_station_definition_matches_election,
+            gsb_list: election_tree_details
+                .get_committees(CommitteeCategory::GSB)
+                .iter()
+                .map(|c| c.responsible_region.clone())
+                .collect(),
         },
     )))
 }
@@ -439,8 +507,12 @@ fn validate_csb_election(
     }
 
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
-    let mut election =
-        parse_election_candidates_eml(&edu.election_data, edu.candidate_data.as_deref())?;
+    let (mut election, _) = parse_election_candidates_eml(
+        &edu.election_data,
+        Some((CommitteeCategory::CSB, None)),
+        false,
+        edu.candidate_data.as_deref(),
+    )?;
     election.committee_category = CommitteeCategory::CSB;
 
     if let Some(ref data) = edu.candidate_data {
@@ -474,6 +546,9 @@ pub struct GSBElectionCreationRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     polling_station_file_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    selected_region: Option<RegionKey>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -540,8 +615,12 @@ async fn import_gsb_election(
     let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
     let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
 
-    let mut new_election =
-        parse_election_candidates_eml(&edu.election_data, Some(&edu.candidate_data))?;
+    let (mut new_election, _) = parse_election_candidates_eml(
+        &edu.election_data,
+        Some((CommitteeCategory::GSB, edu.selected_region)),
+        false,
+        Some(&edu.candidate_data),
+    )?;
 
     // Validate polling stations
     if let Some(polling_station_data) = edu.polling_station_data.as_ref() {
@@ -559,6 +638,7 @@ async fn import_gsb_election(
         &mut tx,
         audit_service,
         new_election,
+        &[],
         election_data_hash,
         candidate_data_hash,
     )
@@ -574,7 +654,7 @@ async fn import_gsb_election(
         create_imported_polling_stations(
             &mut tx,
             audit_service.clone(),
-            election.id,
+            &election,
             polling_stations_request,
         )
         .await?;
@@ -593,13 +673,14 @@ async fn import_csb_election(
     let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
     let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
 
-    let mut new_election =
-        parse_election_candidates_eml(&edu.election_data, Some(&edu.candidate_data))?;
-    // PS/WS CSB support will be implemented later
-    if matches!(
-        new_election.category,
-        ElectionCategory::Provincial | ElectionCategory::WaterAuthority
-    ) {
+    let (mut new_election, election_tree_details) = parse_election_candidates_eml(
+        &edu.election_data,
+        Some((CommitteeCategory::CSB, None)),
+        false,
+        Some(&edu.candidate_data),
+    )?;
+    // PS CSB support will be implemented later
+    if new_election.category == ElectionCategory::Provincial {
         return Err(EMLImportError::CommitteeCategoryForElectionCategoryNotSupported.into());
     }
     new_election.committee_category = CommitteeCategory::CSB;
@@ -609,6 +690,7 @@ async fn import_csb_election(
         &mut tx,
         audit_service,
         new_election,
+        election_tree_details.get_committees(CommitteeCategory::GSB),
         election_data_hash,
         candidate_data_hash,
     )
@@ -620,7 +702,7 @@ async fn import_csb_election(
 }
 
 /// Check if the user's entered hash matches the hash of given data
-fn check_hash(
+pub fn check_hash(
     data: &[u8],
     user_hash: Option<&[String; crate::eml::hash::CHUNK_COUNT]>,
 ) -> Result<[String; crate::eml::hash::CHUNK_COUNT], APIError> {
@@ -636,14 +718,27 @@ fn check_hash(
 /// Parse EML_NL 110 election definition and EML_NL 230 candidate list into a [`NewElection`]
 fn parse_election_candidates_eml(
     election_eml_data: &str,
+    selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
+    fallback_to_csb: bool,
     candidate_eml_data: Option<&str>,
-) -> Result<NewElection, APIError> {
-    let mut election = NewElection::from_eml_str(election_eml_data)?;
-    if let Some(candidate_eml_data) = candidate_eml_data {
-        election.add_candidates_from_eml_str(candidate_eml_data)?;
+) -> Result<(NewElection, ElectionTreeDetails), APIError> {
+    let (mut election, election_tree) =
+        NewElection::from_eml_str(election_eml_data, selected_committee, fallback_to_csb)?;
+    // Committees concerning all districts are not supported yet.
+    // When `fallback_to_csb` is true, we allow it so that the list
+    // of GSBs can be shown.
+    if election.district == CommitteeDistrict::All && !fallback_to_csb {
+        return Err(APIError::EmlImportError(
+            EMLImportError::UnsupportedDistrictElection,
+        ));
     }
 
-    Ok(election)
+    if let Some(candidate_eml_data) = candidate_eml_data {
+        let district = election.district.clone();
+        election.add_candidates_from_eml_str(candidate_eml_data, &district)?;
+    }
+
+    Ok((election, election_tree))
 }
 
 /// Create an election with a committee session
@@ -651,6 +746,7 @@ async fn create_election_with_committee_session(
     tx: &mut SqliteConnection,
     audit_service: &AuditService,
     new_election: NewElection,
+    sub_committees: &[CommitteeDetails],
     election_data_hash: [String; 16],
     candidate_data_hash: [String; 16],
 ) -> Result<ElectionWithPoliticalGroups, APIError> {
@@ -672,7 +768,7 @@ async fn create_election_with_committee_session(
     )
     .await?;
 
-    create_sub_committees(tx, &election, committee_session.id).await?;
+    create_sub_committees(tx, committee_session.id, sub_committees).await?;
 
     // CSB elections have sub committees created at import time, so they can
     // go straight to InPreparation.
@@ -698,31 +794,27 @@ async fn create_election_with_committee_session(
 /// Create sub electoral committees for CSB elections
 async fn create_sub_committees(
     tx: &mut SqliteConnection,
-    election: &ElectionWithPoliticalGroups,
     committee_session_id: CommitteeSessionId,
+    sub_committees: &[CommitteeDetails],
 ) -> Result<(), APIError> {
-    match (election.committee_category, election.category) {
-        (CommitteeCategory::CSB, ElectionCategory::Municipal) => {
-            let number = election
-                .domain_id
-                .parse()
-                .expect("domain_id should be numeric");
-            create_sub_committee(
-                tx,
-                committee_session_id,
-                number,
-                &election.location,
-                CommitteeCategory::GSB,
-            )
-            .await?;
-        }
-        (
-            CommitteeCategory::CSB,
-            ElectionCategory::Provincial | ElectionCategory::WaterAuthority,
-        ) => {
-            todo!("Will be implemented in the future")
-        }
-        (CommitteeCategory::GSB, _) => {}
+    for committee in sub_committees {
+        let region_number = committee
+            .responsible_region
+            .key
+            .number
+            .ok_or(EMLImportError::MissingCommitteeNumber)? as u32;
+        create_sub_committee(
+            tx,
+            committee_session_id,
+            NewSubCommittee {
+                number: region_number,
+                name: committee.responsible_region.name.clone(),
+                category: committee.category,
+                authority_id: committee.managing_authority_id.clone(),
+                authority_name: committee.managing_authority_name(),
+            },
+        )
+        .await?;
     }
     Ok(())
 }
@@ -750,11 +842,74 @@ mod tests {
 
     use super::*;
     use crate::{
-        api::tests::{
-            assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
+        api::{
+            election::handlers::data_entry_import::{
+                CSBDataEntryImportRequest, CSBDataEntryImportValidateRequest,
+                election_data_entry_import, election_data_entry_import_validate,
+            },
+            tests::{
+                assert_committee_category_authorization_err,
+                assert_committee_category_authorization_ok,
+            },
         },
         repository::user_repo::UserId,
     };
+
+    mod get_show_keypair_reminder {
+        use test_log::test;
+
+        use super::*;
+        use crate::repository::{election_repo::get, signing_keypair_repo::set_show_reminder};
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
+        async fn none_when_signing_not_supported(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let election = get(&mut conn, ElectionId::from(9)).await.unwrap();
+            let show_reminder = get_show_keypair_reminder(&mut conn, &election)
+                .await
+                .unwrap();
+            assert_eq!(show_reminder, None);
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1"))))]
+        async fn non_dismissable_when_certificate_not_generated(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let election = get(&mut conn, ElectionId::from(1)).await.unwrap();
+            let show_reminder = get_show_keypair_reminder(&mut conn, &election)
+                .await
+                .unwrap();
+            assert_eq!(show_reminder, Some(KeypairReminder::NonDismissable));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_1", "signing_keypair")
+        )))]
+        async fn dismissable_when_certificate_generated(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let election = get(&mut conn, ElectionId::from(1)).await.unwrap();
+            let show_reminder = get_show_keypair_reminder(&mut conn, &election)
+                .await
+                .unwrap();
+            assert_eq!(show_reminder, Some(KeypairReminder::Dismissable));
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_1", "signing_keypair")
+        )))]
+        async fn none_when_dismissed(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let election = get(&mut conn, ElectionId::from(1)).await.unwrap();
+            set_show_reminder(&mut conn, election.id, false)
+                .await
+                .unwrap();
+            let show_reminder = get_show_keypair_reminder(&mut conn, &election)
+                .await
+                .unwrap();
+            assert_eq!(show_reminder, None);
+        }
+    }
 
     async fn call_handlers(
         pool: SqlitePool,
@@ -763,11 +918,14 @@ mod tests {
         let user = User::test_user(coordinator_role, UserId::from(1));
         let audit = AuditService::new(Some(user.clone()), None);
         let election_id = ElectionId::from(2);
+        let import_hash = std::array::from_fn(|_| String::new());
 
         #[rustfmt::skip]
         let results = vec![
             ("details", election_details(user.clone(), State(pool.clone()), Path(election_id)).await.into_response()),
             ("voters", election_number_of_voters_change(user.clone(), State(pool.clone()), audit.clone(), Path(election_id), Json(ElectionNumberOfVotersChangeRequest { number_of_voters: 1000 })).await.into_response()),
+            ("import_validate", election_data_entry_import_validate(user.clone(), State(pool.clone()), Path(election_id), CSBDataEntryImportValidateRequest { hash: None, data: vec![] }).await.into_response()),
+            ("import", election_data_entry_import(user.clone(), State(pool.clone()), Path(election_id), audit, CSBDataEntryImportRequest { hash: import_hash, data: vec![] }).await.into_response()),
         ];
         results
     }

@@ -110,6 +110,8 @@ pub enum AuditEventType {
     // election events
     ElectionCreated,
     ElectionUpdated,
+    // signing events
+    PublicKeyUploadReminderDismissed,
     // committee session events
     CommitteeSessionCreated,
     CommitteeSessionDeleted,
@@ -130,17 +132,23 @@ pub enum AuditEventType {
     PollingStationUpdated,
     PollingStationDeleted,
     PollingStationsImported,
+    PollingStationsExported,
     // data entry events
     DataEntryStarted,
     DataEntrySaved,
+    DataEntryImported,
     DataEntryResumed,
     DataEntryDeleted,
+    DataEntryDiscarded,
+    DataEntryReset,
     DataEntryFinalised,
     // data entry resolving events
     DataEntryDiscardedFirst,
     DataEntryReturnedFirst,
     DataEntryKeptFirst,
     DataEntryKeptSecond,
+    DataEntryKeptFirstReturnedSecond,
+    DataEntryKeptSecondReturnedFirst,
     DataEntryDiscardedBoth,
     // airgap detection events
     AirGapViolationDetected,
@@ -148,6 +156,10 @@ pub enum AuditEventType {
     // system events
     ApplicationStarted,
     DatabaseBackupCreated,
+    // signing events
+    SigningKeypairCreated,
+    SubCommitteeCertificateAdded,
+    SubCommitteeCertificateDeleted,
     // API events (one for each severity level)
     ApiError,
     ApiWarning,

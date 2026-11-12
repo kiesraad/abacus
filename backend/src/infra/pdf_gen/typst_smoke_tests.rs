@@ -17,16 +17,20 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         data_entry::{DataEntryId, DataEntrySource, DataEntrySourceNumber},
         election::{
-            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
-            ElectionId, ElectionSubCategory, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
-            VoteCountingMethod,
+            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
+            ElectionCategory, ElectionDomain, ElectionId, ElectionSubCategory,
+            ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
+            RegionCategory::ElectoralDistrict, RegionDetails, RegionKey, VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
         models::{
-            ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
+            ModelN10_1InlegvelInput, ModelN10_1Input, ModelN10_2Input, ModelNa14_1Versie1Input,
+            ModelNa14_1Versie2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input,
+            ModelNa31_1InlegvelInput, ModelNa31_1Input, ModelNa31_2Bijlage1Input,
             ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
             ModelP22_2Input, PdfFileModel, PdfModel,
             apportionment_footnotes::ApportionmentFootnotes,
+            election_totals::ElectionTotalsCSB,
             enriched_candidate_nomination::EnrichedCandidateNomination,
             enriched_seat_assignment::EnrichedSeatAssignment,
             votes_table::{
@@ -52,9 +56,9 @@ use crate::{
             votes_counts::{EnrichedVotesCounts, VotesCounts},
             yes_no::YesNo,
         },
-        summary::{
-            ElectionSummary, ElectionSummaryCSB, PollingStationInvestigations, SumCount,
-            SummaryDifferencesCounts,
+        tabulation::{
+            CSOInvestigations, CommitteeSpecificTotals, DSOInvestigations, DifferencesTotals,
+            ElectionTotals, GSBTotals, SumCount,
         },
     },
 };
@@ -124,31 +128,48 @@ fn random_yes_no(rng: &mut impl RngExt) -> YesNo {
     }
 }
 
+#[expect(clippy::too_many_arguments)]
 fn random_election(
     rng: &mut impl RngExt,
+    category: ElectionCategory,
+    committee_category: CommitteeCategory,
+    counting_method: Option<VoteCountingMethod>,
     parties: u32,
     candidates: u32,
     string_length: usize,
     none_where_possible: bool,
 ) -> ElectionWithPoliticalGroups {
     let number_of_seats = rng.random_range(9..45);
+    let name = random_string(rng, string_length);
+    let random_domain = ElectionDomain {
+        id: random_string_option(rng, string_length, none_where_possible),
+        name: random_string(rng, string_length),
+    };
+
+    // For Provincial GSB elections, randomize between PS1 and PS2
+    // Determine from category otherwise
+    let sub_category = match (category, committee_category) {
+        (ElectionCategory::Provincial, CommitteeCategory::GSB) if rng.random_bool(0.5) => {
+            ElectionSubCategory::PS2
+        }
+        _ => category.sub_category(number_of_seats),
+    };
+
     ElectionWithPoliticalGroups {
         id: ElectionId::from(rng.random_range(0..5)),
-        name: random_string(rng, string_length),
-        committee_category: random_value(rng, &[CommitteeCategory::GSB, CommitteeCategory::CSB]),
-        counting_method: Some(random_value(
-            rng,
-            &[VoteCountingMethod::CSO, VoteCountingMethod::DSO],
-        )),
+        name: name.clone(),
+        official_name: name,
+        committee_category,
+        counting_method,
         election_id: random_string(rng, string_length),
         location: random_string(rng, string_length),
-        domain_id: random_string(rng, string_length),
-        category: ElectionCategory::Municipal,
-        sub_category: if number_of_seats < 19 {
-            ElectionSubCategory::GR1
-        } else {
-            ElectionSubCategory::GR2
-        },
+        authority_id: random_string(rng, string_length),
+        authority_name: random_string(rng, string_length),
+        authority_region: random_string(rng, string_length),
+        district: random_committee_district(rng, sub_category, string_length),
+        domain: random_option(rng, random_domain, none_where_possible),
+        category,
+        sub_category,
         number_of_seats,
         number_of_voters: rng.random_range(0..=10_000),
         election_date: random_date(rng),
@@ -160,6 +181,25 @@ fn random_election(
             string_length,
             none_where_possible,
         ),
+    }
+}
+
+fn random_committee_district(
+    rng: &mut impl RngExt,
+    sub_category: ElectionSubCategory,
+    string_length: usize,
+) -> CommitteeDistrict {
+    match sub_category {
+        ElectionSubCategory::PS2 => CommitteeDistrict::Specific(RegionDetails {
+            name: random_string(rng, string_length),
+            key: RegionKey {
+                category: ElectoralDistrict,
+                number: Some(rng.random_range(1..=19)),
+            },
+            roman_numerals: rng.random_bool(0.5),
+            frisian_export_allowed: rng.random_bool(0.5),
+        }),
+        _ => CommitteeDistrict::None,
     }
 }
 
@@ -358,8 +398,8 @@ fn random_csb_result(
     election: &ElectionWithPoliticalGroups,
     data_sources: &[DataEntrySource],
     string_length: usize,
-) -> ElectionSummaryCSB {
-    ElectionSummaryCSB {
+) -> ElectionTotalsCSB {
+    ElectionTotalsCSB {
         number_of_voters: rng.random_range(3000..5000),
         voters_counts: VotersCounts {
             poll_card_count: rng.random_range(0..500),
@@ -382,7 +422,7 @@ fn random_csb_result(
             invalid_votes_count: rng.random_range(0..500),
             total_votes_cast_count: rng.random_range(0..500),
         },
-        differences_counts: SummaryDifferencesCounts {
+        differences_counts: DifferencesTotals {
             more_ballots_count: SumCount {
                 count: rng.random_range(0..500),
                 data_entry_sources: random_station_subset(rng, data_sources),
@@ -413,26 +453,26 @@ fn random_sum_count(rng: &mut impl RngExt, data_sources: &[DataEntrySource]) -> 
     }
 }
 
-fn random_election_summary(
+fn random_election_totals_gsb_cso(
     rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
     data_sources: &[DataEntrySource],
-) -> ElectionSummary {
+) -> ElectionTotals {
     let result = random_result(rng, election);
     let data_source_num = |n| match n {
         DataEntrySourceNumber::PollingStation(i) => i,
         DataEntrySourceNumber::SubCommittee(i) => i,
     };
 
-    ElectionSummary {
+    ElectionTotals {
         voters_counts: result.voters_counts,
         votes_counts: result.votes_counts,
-        differences_counts: SummaryDifferencesCounts {
+        differences_counts: DifferencesTotals {
             more_ballots_count: random_sum_count(rng, data_sources),
             fewer_ballots_count: random_sum_count(rng, data_sources),
         },
         political_group_votes: result.political_group_votes,
-        polling_station_investigations: PollingStationInvestigations {
+        committee_specific: CommitteeSpecificTotals::GSB(GSBTotals::CSO(CSOInvestigations {
             admitted_voters_recounted: random_station_subset(rng, data_sources)
                 .into_iter()
                 .map(data_source_num)
@@ -445,23 +485,58 @@ fn random_election_summary(
                 .into_iter()
                 .map(data_source_num)
                 .collect(),
-        },
-        number_of_voters: Some(100),
+        })),
     }
 }
 
-fn random_election_summary_csb(
+fn random_election_totals_gsb_dso(
+    rng: &mut impl RngExt,
+    election: &ElectionWithPoliticalGroups,
+    data_sources: &[DataEntrySource],
+) -> ElectionTotals {
+    let result = random_result(rng, election);
+    let data_source_num = |n| match n {
+        DataEntrySourceNumber::PollingStation(i) => i,
+        DataEntrySourceNumber::SubCommittee(i) => i,
+    };
+
+    ElectionTotals {
+        voters_counts: result.voters_counts,
+        votes_counts: result.votes_counts,
+        differences_counts: DifferencesTotals {
+            more_ballots_count: random_sum_count(rng, data_sources),
+            fewer_ballots_count: random_sum_count(rng, data_sources),
+        },
+        political_group_votes: result.political_group_votes,
+        committee_specific: CommitteeSpecificTotals::GSB(GSBTotals::DSO(DSOInvestigations {
+            unaccounted_difference: random_station_subset(rng, data_sources)
+                .into_iter()
+                .map(data_source_num)
+                .collect(),
+            other_error: random_station_subset(rng, data_sources)
+                .into_iter()
+                .map(data_source_num)
+                .collect(),
+            corrected_results: random_station_subset(rng, data_sources)
+                .into_iter()
+                .map(data_source_num)
+                .collect(),
+        })),
+    }
+}
+
+fn random_election_totals_csb(
     rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
     data_sources: &[DataEntrySource],
     string_length: usize,
-) -> ElectionSummaryCSB {
+) -> ElectionTotalsCSB {
     let result = random_csb_result(rng, election, data_sources, string_length);
-    ElectionSummaryCSB {
+    ElectionTotalsCSB {
         number_of_voters: result.number_of_voters,
         voters_counts: result.voters_counts,
         votes_counts: result.votes_counts,
-        differences_counts: SummaryDifferencesCounts {
+        differences_counts: DifferencesTotals {
             more_ballots_count: random_sum_count(rng, data_sources),
             fewer_ballots_count: random_sum_count(rng, data_sources),
         },
@@ -528,219 +603,529 @@ async fn test_pdf(model: PdfModel) {
 }
 
 #[test(tokio::test)]
+async fn test_n_10_1() {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
+
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::DSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let polling_station =
+                random_polling_station(&mut rng, string_length, none_where_possible);
+
+            let model = PdfModel::ModelN10_1(Box::new(ModelN10_1Input {
+                candidates_tables: CandidatesTables::new(&election).unwrap(),
+                election: election.into(),
+                polling_station,
+            }));
+
+            test_pdf(model).await;
+        }
+    }
+}
+
+#[test(tokio::test)]
+async fn test_n_10_1_inlegvel() {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
+
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::DSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let polling_station =
+                random_polling_station(&mut rng, string_length, none_where_possible);
+
+            let model = PdfModel::ModelN10_1Inlegvel(Box::new(ModelN10_1InlegvelInput {
+                election: election.into(),
+                polling_station,
+            }));
+
+            test_pdf(model).await;
+        }
+    }
+}
+
+#[test(tokio::test)]
 async fn test_n_10_2() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
-        let election = random_election(
-            &mut rng,
-            parties,
-            candidates,
-            string_length,
-            none_where_possible,
-        );
-        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::CSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let polling_station =
+                random_polling_station(&mut rng, string_length, none_where_possible);
 
-        let model = PdfModel::ModelN10_2(Box::new(ModelN10_2Input {
-            election,
-            polling_station,
-        }));
+            let model = PdfModel::ModelN10_2(Box::new(ModelN10_2Input {
+                election,
+                polling_station,
+            }));
 
-        test_pdf(model).await;
+            test_pdf(model).await;
+        }
+    }
+}
+
+#[test(tokio::test)]
+async fn test_na_14_1_versie_1() {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
+
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::DSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let polling_station =
+                random_polling_station(&mut rng, string_length, none_where_possible);
+            let committee_session = random_committee_session(&mut rng, election.id, string_length);
+
+            let model = PdfModel::ModelNa14_1Versie1(Box::new(ModelNa14_1Versie1Input {
+                candidates_tables: CandidatesTables::new(&election).unwrap(),
+                committee_session,
+                election: election.into(),
+                polling_station,
+            }));
+
+            test_pdf(model).await;
+        }
+    }
+}
+
+#[test(tokio::test)]
+async fn test_na_14_1_versie_2() {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
+
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::DSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let polling_station =
+                random_polling_station(&mut rng, string_length, none_where_possible);
+            let committee_session = random_committee_session(&mut rng, election.id, string_length);
+            let investigation = random_investigation(
+                &mut rng,
+                &polling_station,
+                string_length,
+                none_where_possible,
+            );
+            let previous_results = random_result(&mut rng, &election);
+
+            let model = PdfModel::ModelNa14_1Versie2(Box::new(ModelNa14_1Versie2Input {
+                votes_tables: VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)
+                    .unwrap(),
+                previous_results: previous_results.into(),
+                committee_session,
+                election: election.into(),
+                polling_station,
+                investigation,
+            }));
+
+            test_pdf(model).await;
+        }
     }
 }
 
 #[test(tokio::test)]
 async fn test_na_14_2() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
-        let election = random_election(
-            &mut rng,
-            parties,
-            candidates,
-            string_length,
-            none_where_possible,
-        );
-        let committee_session = random_committee_session(&mut rng, election.id, string_length);
-        let previous_committee_session =
-            random_committee_session(&mut rng, election.id, string_length);
-        let polling_stations =
-            random_polling_stations(&mut rng, string_length, none_where_possible);
-        let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-        let previous_summary = random_election_summary(&mut rng, &election, &data_sources);
-        let summary = random_election_summary(&mut rng, &election, &data_sources);
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::CSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let committee_session = random_committee_session(&mut rng, election.id, string_length);
+            let previous_committee_session =
+                random_committee_session(&mut rng, election.id, string_length);
+            let polling_stations =
+                random_polling_stations(&mut rng, string_length, none_where_possible);
+            let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+            let previous_totals =
+                random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
+            let totals = random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
 
-        let hash = random_string(&mut rng, 64);
-        let creation_date_time = random_date_time(&mut rng)
-            .format(DEFAULT_DATE_TIME_FORMAT)
-            .to_string();
+            let hash = random_string(&mut rng, 64);
+            let creation_date_time = random_date_time(&mut rng)
+                .format(DEFAULT_DATE_TIME_FORMAT)
+                .to_string();
 
-        let model = PdfModel::ModelNa14_2(Box::new(ModelNa14_2Input {
-            votes_tables: VotesTablesWithPreviousVotes::new(&election, &summary, &previous_summary)
+            let model = PdfModel::ModelNa14_2(Box::new(ModelNa14_2Input {
+                votes_tables: VotesTablesWithPreviousVotes::new(
+                    &election,
+                    &totals,
+                    &previous_totals,
+                )
                 .unwrap(),
-            election: election.into(),
-            previous_summary: previous_summary.into(),
-            summary: summary.into(),
-            committee_session,
-            previous_committee_session,
-            hash,
-            creation_date_time,
-        }));
+                election: election.into(),
+                previous_summary: (&previous_totals).into(),
+                summary: (&totals).into(),
+                committee_session,
+                previous_committee_session,
+                hash,
+                creation_date_time,
+            }));
 
-        test_pdf(model).await;
+            test_pdf(model).await;
+        }
     }
 }
 
 #[test(tokio::test)]
 async fn test_na_14_2_bijlage_1() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
-        let election = random_election(
-            &mut rng,
-            parties,
-            candidates,
-            string_length,
-            none_where_possible,
-        );
-        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
-        let investigation = random_investigation(
-            &mut rng,
-            &polling_station,
-            string_length,
-            none_where_possible,
-        );
-        let previous_results = random_result(&mut rng, &election);
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::CSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let polling_station =
+                random_polling_station(&mut rng, string_length, none_where_possible);
+            let investigation = random_investigation(
+                &mut rng,
+                &polling_station,
+                string_length,
+                none_where_possible,
+            );
+            let previous_results = random_result(&mut rng, &election);
 
-        let model = PdfModel::ModelNa14_2Bijlage1(Box::new(ModelNa14_2Bijlage1Input {
-            votes_tables: VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)
-                .unwrap(),
-            previous_results: previous_results.into(),
-            election: election.into(),
-            polling_station,
-            investigation,
-        }));
+            let model = PdfModel::ModelNa14_2Bijlage1(Box::new(ModelNa14_2Bijlage1Input {
+                votes_tables: VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)
+                    .unwrap(),
+                previous_results: previous_results.into(),
+                election: election.into(),
+                polling_station,
+                investigation,
+            }));
 
-        test_pdf(model).await;
+            test_pdf(model).await;
+        }
+    }
+}
+
+#[test(tokio::test)]
+async fn test_na_31_1() {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
+
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::DSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let committee_session = random_committee_session(&mut rng, election.id, string_length);
+            let polling_stations =
+                random_polling_stations(&mut rng, string_length, none_where_possible);
+            let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+            let totals = random_election_totals_gsb_dso(&mut rng, &election, &data_sources);
+            let hash = random_string(&mut rng, 64);
+            let creation_date_time = random_date_time(&mut rng)
+                .format(DEFAULT_DATE_TIME_FORMAT)
+                .to_string();
+
+            let model = PdfModel::ModelNa31_1(Box::new(ModelNa31_1Input {
+                votes_tables: VotesTables::new(&election, &totals).unwrap(),
+                committee_session,
+                election: election.into(),
+                summary: (&totals).into(),
+                polling_stations,
+                polling_station_investigations: totals.dso_investigations().unwrap().clone(),
+                hash,
+                creation_date_time,
+            }));
+
+            test_pdf(model).await;
+        }
+    }
+}
+
+#[test(tokio::test)]
+async fn test_na_31_1_inlegvel() {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
+
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::DSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+
+            let model = PdfModel::ModelNa31_1Inlegvel(Box::new(ModelNa31_1InlegvelInput {
+                election: election.into(),
+            }));
+
+            test_pdf(model).await;
+        }
     }
 }
 
 #[test(tokio::test)]
 async fn test_na_31_2() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
-        let election = random_election(
-            &mut rng,
-            parties,
-            candidates,
-            string_length,
-            none_where_possible,
-        );
-        let committee_session = random_committee_session(&mut rng, election.id, string_length);
-        let polling_stations =
-            random_polling_stations(&mut rng, string_length, none_where_possible);
-        let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-        let summary = random_election_summary(&mut rng, &election, &data_sources);
-        let hash = random_string(&mut rng, 64);
-        let creation_date_time = random_date_time(&mut rng)
-            .format(DEFAULT_DATE_TIME_FORMAT)
-            .to_string();
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::CSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let committee_session = random_committee_session(&mut rng, election.id, string_length);
+            let polling_stations =
+                random_polling_stations(&mut rng, string_length, none_where_possible);
+            let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+            let totals = random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
+            let hash = random_string(&mut rng, 64);
+            let creation_date_time = random_date_time(&mut rng)
+                .format(DEFAULT_DATE_TIME_FORMAT)
+                .to_string();
 
-        let model = PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
-            votes_tables: VotesTables::new(&election, &summary).unwrap(),
-            committee_session,
-            election: election.into(),
-            summary: summary.into(),
-            polling_stations,
-            hash,
-            creation_date_time,
-        }));
+            let model = PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
+                votes_tables: VotesTables::new(&election, &totals).unwrap(),
+                committee_session,
+                election: election.into(),
+                summary: (&totals).into(),
+                polling_station_investigations: totals.cso_investigations().unwrap().clone(),
+                polling_stations,
+                hash,
+                creation_date_time,
+            }));
 
-        test_pdf(model).await;
+            test_pdf(model).await;
+        }
     }
 }
 
 #[test(tokio::test)]
 async fn test_na_31_2_bijlage_1() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
-        let election = random_election(
-            &mut rng,
-            parties,
-            candidates,
-            string_length,
-            none_where_possible,
-        );
-        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::CSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let polling_station =
+                random_polling_station(&mut rng, string_length, none_where_possible);
 
-        let model = PdfModel::ModelNa31_2Bijlage1(Box::new(ModelNa31_2Bijlage1Input {
-            candidates_tables: CandidatesTables::new(&election).unwrap(),
-            election: election.into(),
-            polling_station,
-        }));
+            let model = PdfModel::ModelNa31_2Bijlage1(Box::new(ModelNa31_2Bijlage1Input {
+                candidates_tables: CandidatesTables::new(&election).unwrap(),
+                election: election.into(),
+                polling_station,
+            }));
 
-        test_pdf(model).await;
+            test_pdf(model).await;
+        }
     }
 }
 
 #[test(tokio::test)]
 async fn test_na_31_2_inlegvel() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
-        let election = random_election(
-            &mut rng,
-            parties,
-            candidates,
-            string_length,
-            none_where_possible,
-        );
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                Some(VoteCountingMethod::CSO),
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
 
-        let model = PdfModel::ModelNa31_2Inlegvel(Box::new(ModelNa31_2InlegvelInput {
-            election: election.into(),
-        }));
+            let model = PdfModel::ModelNa31_2Inlegvel(Box::new(ModelNa31_2InlegvelInput {
+                election: election.into(),
+            }));
 
-        test_pdf(model).await;
+            test_pdf(model).await;
+        }
     }
 }
 
 #[test(tokio::test)]
 async fn test_p_2a() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
-        let election = random_election(
-            &mut rng,
-            parties,
-            candidates,
-            string_length,
-            none_where_possible,
-        );
-        let committee_session = random_committee_session(&mut rng, election.id, string_length);
-        let polling_stations =
-            random_polling_stations(&mut rng, string_length, none_where_possible);
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::WaterAuthority,
+        ElectionCategory::Provincial,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::GSB,
+                None,
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let committee_session = random_committee_session(&mut rng, election.id, string_length);
+            let polling_stations =
+                random_polling_stations(&mut rng, string_length, none_where_possible);
 
-        let mut investigations = polling_stations
-            .iter()
-            .map(|polling_station| {
-                (
-                    polling_station.clone(),
-                    random_finished_investigation(&mut rng, polling_station, string_length),
-                )
-            })
-            .collect::<Vec<_>>();
-        investigations.retain(|_| rng.random_bool(0.8));
+            let mut investigations = polling_stations
+                .iter()
+                .map(|polling_station| {
+                    (
+                        polling_station.clone(),
+                        random_finished_investigation(&mut rng, polling_station, string_length),
+                    )
+                })
+                .collect::<Vec<_>>();
+            investigations.retain(|_| rng.random_bool(0.8));
 
-        let model = PdfModel::ModelP2a(Box::new(ModelP2aInput {
-            committee_session,
-            election: election.into(),
-            investigations,
-        }));
+            let model = PdfModel::ModelP2a(Box::new(ModelP2aInput {
+                committee_session,
+                election: election.into(),
+                investigations,
+            }));
 
-        test_pdf(model).await;
+            test_pdf(model).await;
+        }
     }
 }
 
@@ -753,60 +1138,72 @@ async fn test_p_22_2() {
     // We only test with values that have a possible apportionment outcome
     let (parties, candidates, string_length, none_where_possible) = (10, 10, 10, false);
 
-    let election = random_election(
-        &mut rng,
-        parties,
-        candidates,
-        string_length,
-        none_where_possible,
-    );
-    let committee_session = random_committee_session(&mut rng, election.id, string_length);
-    let polling_stations = random_polling_stations(&mut rng, string_length, none_where_possible);
-    let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-    let summary_gsb = random_election_summary(&mut rng, &election, &data_sources);
-    let summary = random_election_summary_csb(&mut rng, &election, &data_sources, string_length);
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::WaterAuthority,
+    ] {
+        let election = random_election(
+            &mut rng,
+            election_category,
+            CommitteeCategory::CSB,
+            None,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+        let committee_session = random_committee_session(&mut rng, election.id, string_length);
+        let polling_stations =
+            random_polling_stations(&mut rng, string_length, none_where_possible);
+        let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+        let totals_gsb = random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
+        let totals_csb =
+            random_election_totals_csb(&mut rng, &election, &data_sources, string_length);
 
-    let apportionment_input = ApportionmentInputData::new(
-        election.number_of_seats,
-        &summary_gsb.political_group_votes,
-        &[],
-        &[],
-        &[],
-    );
-    let apportionment_result = apportionment::process(&apportionment_input);
-    let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
-        panic!("should be Completed");
-    };
+        let apportionment_input = ApportionmentInputData::new(
+            election.number_of_seats,
+            &totals_gsb.political_group_votes,
+            &[],
+            &[],
+            &[],
+        );
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
 
-    let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
-    let enriched_seat_assignment =
-        EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
-    let candidate_nomination = map_candidate_nomination(
-        &apportionment.candidate_nomination,
-        &election.political_groups,
-    );
-    let enriched_candidate_nomination =
-        EnrichedCandidateNomination::new(&election, &candidate_nomination).unwrap();
-    let footnotes =
-        ApportionmentFootnotes::new(&election.political_groups, &seat_assignment.steps).unwrap();
+        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
+        let enriched_seat_assignment =
+            EnrichedSeatAssignment::new(election.number_of_seats, &totals_csb, &seat_assignment)
+                .unwrap();
+        let candidate_nomination = map_candidate_nomination(
+            &apportionment.candidate_nomination,
+            &election.political_groups,
+        );
+        let enriched_candidate_nomination =
+            EnrichedCandidateNomination::new(&election, &candidate_nomination).unwrap();
+        let footnotes =
+            ApportionmentFootnotes::new(&election.political_groups, &seat_assignment.steps)
+                .unwrap();
 
-    let hash = random_string(&mut rng, 64);
-    let creation_date_time = random_date_time(&mut rng)
-        .format(DEFAULT_DATE_TIME_FORMAT)
-        .to_string();
+        let hash = random_string(&mut rng, 64);
+        let creation_date_time = random_date_time(&mut rng)
+            .format(DEFAULT_DATE_TIME_FORMAT)
+            .to_string();
 
-    let model = PdfModel::ModelP22_2(Box::new(ModelP22_2Input {
-        committee_session,
-        election: election.into(),
-        summary,
-        footnotes,
-        seat_assignment: enriched_seat_assignment,
-        candidate_nomination: enriched_candidate_nomination,
-        hash,
-        creation_date_time,
-    }));
+        let model = PdfModel::ModelP22_2(Box::new(ModelP22_2Input {
+            committee_session,
+            election: election.into(),
+            summary: totals_csb,
+            footnotes,
+            seat_assignment: enriched_seat_assignment,
+            candidate_nomination: enriched_candidate_nomination,
+            hash,
+            creation_date_time,
+        }));
 
-    test_pdf(model).await;
+        test_pdf(model).await;
+    }
 }
 
 /// Regression test for #3669, "number must be positive" error from Typst.
@@ -820,6 +1217,9 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
 
     let mut election = random_election(
         &mut rng,
+        ElectionCategory::Municipal,
+        CommitteeCategory::CSB,
+        None,
         parties,
         candidates,
         string_length,
@@ -832,7 +1232,7 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
     let committee_session = random_committee_session(&mut rng, election.id, string_length);
     let polling_stations = random_polling_stations(&mut rng, string_length, none_where_possible);
     let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-    let summary = random_election_summary_csb(&mut rng, &election, &data_sources, string_length);
+    let totals_csb = random_election_totals_csb(&mut rng, &election, &data_sources, string_length);
 
     // Zero votes cast on any candidate/list
     let political_group_votes: Vec<PoliticalGroupCandidateVotes> = election
@@ -871,7 +1271,8 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
     );
 
     let enriched_seat_assignment =
-        EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
+        EnrichedSeatAssignment::new(election.number_of_seats, &totals_csb, &seat_assignment)
+            .unwrap();
     let candidate_nomination = map_candidate_nomination(
         &apportionment.candidate_nomination,
         &election.political_groups,
@@ -889,7 +1290,7 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
     let model = PdfModel::ModelP22_2(Box::new(ModelP22_2Input {
         committee_session,
         election: election.into(),
-        summary,
+        summary: totals_csb,
         footnotes,
         seat_assignment: enriched_seat_assignment,
         candidate_nomination: enriched_candidate_nomination,
@@ -902,32 +1303,42 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
 
 #[test(tokio::test)]
 async fn test_p_22_2_bijlage_1() {
-    let mut rng = rand::rng();
-    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
-        let election = random_election(
-            &mut rng,
-            parties,
-            candidates,
-            string_length,
-            none_where_possible,
-        );
-        let polling_stations =
-            random_polling_stations(&mut rng, string_length, none_where_possible);
-        let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-        let summary = random_election_summary(&mut rng, &election, &data_sources);
-        let votes_tables = VotesTables::new(&election, &summary).unwrap();
-        let hash = random_string(&mut rng, 64);
-        let creation_date_time = random_date_time(&mut rng)
-            .format(DEFAULT_DATE_TIME_FORMAT)
-            .to_string();
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-        let model = PdfModel::ModelP22_2Bijlage1(Box::new(ModelP22_2Bijlage1Input {
-            election: election.into(),
-            votes_tables,
-            hash,
-            creation_date_time,
-        }));
+    for election_category in [
+        ElectionCategory::Municipal,
+        ElectionCategory::WaterAuthority,
+    ] {
+        for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+            let election = random_election(
+                &mut rng,
+                election_category,
+                CommitteeCategory::CSB,
+                None,
+                parties,
+                candidates,
+                string_length,
+                none_where_possible,
+            );
+            let polling_stations =
+                random_polling_stations(&mut rng, string_length, none_where_possible);
+            let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+            let totals_gsb = random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
+            let votes_tables = VotesTables::new(&election, &totals_gsb).unwrap();
+            let hash = random_string(&mut rng, 64);
+            let creation_date_time = random_date_time(&mut rng)
+                .format(DEFAULT_DATE_TIME_FORMAT)
+                .to_string();
 
-        test_pdf(model).await;
+            let model = PdfModel::ModelP22_2Bijlage1(Box::new(ModelP22_2Bijlage1Input {
+                election: election.into(),
+                votes_tables,
+                hash,
+                creation_date_time,
+            }));
+
+            test_pdf(model).await;
+        }
     }
 }

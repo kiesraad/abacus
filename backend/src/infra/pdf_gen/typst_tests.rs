@@ -5,27 +5,36 @@ use test_log::test;
 use crate::domain::{
     committee_session::committee_session_fixture,
     election::{
-        CommitteeCategory, ElectionCategory, ElectionId, ElectionSubCategory,
-        ElectionWithPoliticalGroups, VoteCountingMethod, tests::election_fixture,
+        CommitteeCategory, CommitteeDistrict, ElectionCategory, ElectionDomain, ElectionId,
+        ElectionSubCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
+        tests::election_fixture,
     },
     models::{
         ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input,
         votes_table::VotesTables,
     },
     polling_station::test_helpers::polling_stations_fixture,
-    summary::ElectionSummary,
+    tabulation::ElectionTotals,
 };
 
 #[test(tokio::test)]
 async fn it_generates_a_pdf() {
     let election = ElectionWithPoliticalGroups {
         id: ElectionId::from(1),
-        name: "Municipal Election".to_string(),
+        name: "Gemeenteraad Heemdamseburg 2025".to_string(),
+        official_name: "Gemeenteraad Heemdamseburg 2025".to_string(),
         committee_category: CommitteeCategory::GSB,
         counting_method: Some(VoteCountingMethod::CSO),
-        election_id: "MunicipalElection_2025".to_string(),
+        election_id: "GR2025_Heemdamseburg".to_string(),
         location: "Heemdamseburg".to_string(),
-        domain_id: "0000".to_string(),
+        authority_id: "0000".to_string(),
+        authority_name: "Heemdamseburg".to_string(),
+        authority_region: "Heemdamseburg".to_string(),
+        district: CommitteeDistrict::None,
+        domain: Some(ElectionDomain {
+            id: Some("0000".to_string()),
+            name: "Heemdamseburg".to_string(),
+        }),
         category: ElectionCategory::Municipal,
         sub_category: ElectionSubCategory::GR2,
         number_of_seats: 29,
@@ -35,10 +44,12 @@ async fn it_generates_a_pdf() {
         political_groups: vec![],
     };
 
+    let totals = ElectionTotals::zero(&election);
     let content = generate_pdf(
         ModelNa31_2Input {
-            summary: ElectionSummary::zero().into(),
-            votes_tables: VotesTables::new(&election, &ElectionSummary::zero()).unwrap(),
+            summary: (&totals).into(),
+            polling_station_investigations: totals.cso_investigations().unwrap().clone(),
+            votes_tables: VotesTables::new(&election, &totals).unwrap(),
             committee_session: committee_session_fixture(ElectionId::from(1)),
             election: election.into(),
             polling_stations: vec![],
@@ -98,14 +109,15 @@ async fn it_generates_a_pdf_with_unsupported_chars() {
 
 #[test(tokio::test)]
 async fn it_generates_a_pdf_with_polling_stations() {
-    let election = election_fixture(CommitteeCategory::GSB, &[2, 3]);
+    let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2, 3]);
     let committee_session = committee_session_fixture(election.id);
-    let summary = ElectionSummary::from_results(&election, &[]).unwrap();
+    let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
 
     let content = generate_pdf(
         ModelNa31_2Input {
-            votes_tables: VotesTables::new(&election, &summary).unwrap(),
-            summary: summary.into(),
+            votes_tables: VotesTables::new(&election, &totals).unwrap(),
+            summary: (&totals).into(),
+            polling_station_investigations: totals.cso_investigations().unwrap().clone(),
             polling_stations: polling_stations_fixture(&[100, 200, 300]),
             committee_session,
             election: election.into(),

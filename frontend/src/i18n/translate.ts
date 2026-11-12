@@ -76,13 +76,18 @@ export function t(k: TranslationPath, vars?: Record<string, string | number>): s
   return translate(k);
 }
 
+// get translation for a given key, return fallback if not found
+export function tOrDefault<T>(k: string, vars: Record<string, string | number> | undefined, fallback: T): string | T {
+  return hasTranslation(k) ? t(k, vars) : fallback;
+}
+
 /**
  * Translate a text and optionally interpolate variables and elements
  *
  * @param k translation key
  * @param elements React elements to interpolate
  * @param vars variables to interpolate
- * @returns a translated string
+ * @returns a ReactElement with translation
  * @example
  *
  * return (
@@ -102,4 +107,14 @@ export function tx(
   const allowed = elements ? [...DEFAULT_ALLOWED_TAGS, ...Object.keys(elements)] : DEFAULT_ALLOWED_TAGS;
 
   return renderAst(parse(text, allowed), elements);
+}
+
+// get ReactElement with translation for a given key, return fallback if not found
+export function txOrDefault<T>(
+  k: string,
+  elements: Record<string, RenderFunction> | undefined,
+  vars: Record<string, string | number> | undefined,
+  fallback: T,
+): ReactElement | T {
+  return hasTranslation(k) ? tx(k, elements, vars) : fallback;
 }

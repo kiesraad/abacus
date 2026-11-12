@@ -1,0 +1,31 @@
+.checkHash {
+  border-left: 4px solid var(--color-notify);
+  background-color: var(--color-notify-bg);
+  padding: 1rem 1.5rem;
+  width: 32rem;
+  color: var(--base-black);
+
+  &.success {
+    border-left: 4px solid var(--color-success);
+    background-color: var(--color-success-bg);
+  }
+
+  section {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    word-break: break-word;
+
+    > p {
+      margin: 0;
+      width: 100%;
+      color: var(--base-black);
+    }
+
+    > div {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+}

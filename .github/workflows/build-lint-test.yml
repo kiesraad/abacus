@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 0
       # Build frontend+Storybook for embedding in the backend binary
       - name: Setup Node
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           package-manager-cache: false
@@ -66,11 +66,11 @@ jobs:
           rustup toolchain install &&
           rustup target add x86_64-unknown-linux-musl
       - name: Cargo cache
-        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: "backend -> target"
       - name: Build
-        run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --no-default-features --features openapi,dev-database,memory-serve,embed-typst,storybook --bin abacus
+        run: cargo build --verbose --locked --target=x86_64-unknown-linux-musl --no-default-features --features openapi,dev-database,memory-serve,embed-typst,storybook --bin abacus
       - uses: actions/upload-artifact@v7
         with:
           name: abacus
@@ -78,6 +78,8 @@ jobs:
 
   backend:
     name: Backend
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -86,53 +88,39 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
       BINSTALL_DISABLE_TELEMETRY: "true"
+      BINSTALL_NO_CONFIRM: "true"
     steps:
-      # Free up runner disk space, so that our job has enough space to run
-      # https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
-      - name: Free up runner disk space
-        working-directory: /
-        run: >
-          df -h
-          &&
-          echo "Freeing up disk space..."
-          &&
-          sudo rm -rf
-          /usr/local/.ghcup
-          /usr/share/dotnet
-          /usr/share/swift
-          &&
-          df -h
       - uses: actions/checkout@v7.0.1
-      # Test backend
-      - name: Install musl
-        run: sudo apt-get update && sudo apt-get install -y musl-tools
+      # Test backend. Uses the default host target (x86_64-unknown-linux-gnu) for faster linking
+      # using rust-lld, and avoiding copying libc and libstd into every test binary.
       - name: Setup Rust
-        shell: bash
-        run: >
-          rustup toolchain install &&
-          rustup target add x86_64-unknown-linux-musl
+        run: rustup toolchain install
       - name: Cargo cache
-        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@ead08b90bd7b2e6d81963fb9cf0b7239f66d5db4 # main
+        uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # main
       - name: Create empty frontend build dir for memory-serve
         run: mkdir -p dist dist-storybook
         working-directory: ./frontend
       - name: Check rustfmt
-        run: cargo --verbose --locked fmt --all -- --check
+        run: cargo fmt --verbose --all -- --check
       - name: Check Clippy with default features
-        run: cargo --verbose --locked clippy --workspace --all-targets -- -D warnings
+        run: cargo clippy --verbose --locked --workspace --all-targets -- -D warnings
       - name: Check Clippy with all features
-        run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --workspace --all-targets --all-features -- -D warnings
+        run: cargo clippy --verbose --locked --workspace --all-targets --all-features -- -D warnings
       - name: Install Nextest
-        run: cargo binstall cargo-nextest
+        run: cargo binstall --locked cargo-nextest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Symlink sqlx test directory to /dev/shm
+        run: mkdir -p target /dev/shm/sqlx && rm -rf target/sqlx && ln -s /dev/shm/sqlx target/sqlx
       - name: Run tests
-        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst,tls
+        run: cargo nextest run --verbose --locked --workspace --no-default-features --features openapi,dev-database,embed-typst,tls
       - name: Build documentation
-        run: cargo doc --workspace --no-deps --all-features --document-private-items
+        run: cargo doc --locked --workspace --no-deps --all-features --document-private-items
         env:
           RUSTDOCFLAGS: "-D warnings"
       - name: Create documentation artifact
@@ -141,6 +129,33 @@ jobs:
           name: rustdoc
           path: backend/target/doc
           retention-days: 30
+
+  cargo-deny:
+    name: Cargo deny
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    env:
+      CARGO_TERM_COLOR: always
+      BINSTALL_DISABLE_TELEMETRY: "true"
+      BINSTALL_NO_CONFIRM: "true"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Setup Rust
+        run: rustup toolchain install
+      - name: Install Binstall
+        uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # main
+      - name: Install cargo-deny
+        run: cargo binstall --locked cargo-deny
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      # Advisories are checked in the scheduled cargo-deny.yml workflow, so that
+      # newly published RUSTSEC advisories do not break PRs.
+      - name: Check bans, licenses and sources
+        run: cargo deny check bans licenses sources
 
   frontend:
     name: Frontend
@@ -151,7 +166,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Setup Node
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           package-manager-cache: false
@@ -163,7 +178,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Run Biome
-        run: pnpm biome ci
+        run: pnpm biome ci --error-on-warnings
       - name: Run TypeScript compiler
         run: pnpm lint:tsc
       - name: Run ESLint
@@ -194,7 +209,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Setup Node
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           package-manager-cache: false
@@ -252,8 +267,8 @@ jobs:
           -T ./abacus \
           https://abacus-test.nl/etes/api/v1/executable/${{ github.event.pull_request.head.sha || github.sha }}/${{ github.sha }}
 
-  fuzz:
-    name: Backend fuzzer
+  fuzz-check:
+    name: Fuzz targets
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -266,31 +281,21 @@ jobs:
       - name: Setup Rust Nightly
         working-directory: ./backend/fuzz
         run: rustup toolchain install
-      - name: Setup Rust Nightly (apportionment)
-        working-directory: ./backend/apportionment/fuzz
-        run: rustup toolchain install
       - name: Cargo cache
-        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: |
             backend/fuzz -> target
             backend/apportionment/fuzz -> target
-          shared-key: "fuzzer"
-      - name: Install cargo fuzz
-        working-directory: ./backend/fuzz
-        run: cargo install cargo-fuzz
+          shared-key: "fuzz-check"
+          # Save cache only for main and release branches to prevent cache thrashing
+          save-if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release-') }}
       - name: Check Clippy for ./backend/fuzz
-        run: cargo --verbose --locked clippy -- -D warnings
+        run: cargo clippy --verbose --locked --all-targets -- -D warnings
         working-directory: ./backend/fuzz
       - name: Check Clippy for ./backend/apportionment/fuzz
-        run: cargo --verbose --locked clippy -- -D warnings
+        run: cargo clippy --verbose --locked --all-targets -- -D warnings
         working-directory: ./backend/apportionment/fuzz
-      - name: Run data entry fuzzer
-        working-directory: ./backend/fuzz
-        run: cargo fuzz run data_entry_status -- -max_total_time=60
-      - name: Run simple apportionment fuzzer
-        working-directory: ./backend/apportionment/fuzz
-        run: cargo fuzz run simple_apportionment -- -max_total_time=60
 
   rustdoc:
     name: Deploy rustdoc to GitHub Pages

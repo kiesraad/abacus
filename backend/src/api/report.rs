@@ -3,9 +3,9 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
-use chrono::{DateTime, Datelike, Local};
-use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
-use sqlx::SqlitePool;
+use chrono::{DateTime, Local};
+use pdf_gen::zip::{ZipResponse, ZipResponseError, zip_files, zip_single_file};
+use sqlx::{SqliteConnection, SqlitePool};
 use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -13,8 +13,9 @@ use crate::{
     APIError, AppState, ErrorResponse,
     api::middleware::authentication::RouteAuthorization,
     domain::{
-        committee_session::CommitteeSessionId,
+        committee_session::{CommitteeSession, CommitteeSessionId},
         election::{ElectionId, ElectionWithPoliticalGroups},
+        filename::{format_datetime, hyphenate},
         report::files::{get_files_csb_election, get_files_gsb_election},
         role::Role,
     },
@@ -72,24 +73,38 @@ pub fn download_zip_filename(
     election: &ElectionWithPoliticalGroups,
     created_at: DateTime<Local>,
 ) -> String {
-    let location = election.location.to_lowercase();
-    let location_without_whitespace: String = location.split_whitespace().collect();
-    slugify_filename(&format!(
-        "{} {}{} {} gemeente {}-{}-{}.zip",
+    format!(
+        "{}_{}_{}_{}-{}.zip",
         base,
-        election.category.to_eml_code().to_lowercase(),
-        election.election_date.year(),
-        location_without_whitespace,
-        location.replace(" ", "-"),
-        created_at.date_naive().format("%Y%m%d"),
-        created_at.time().format("%H%M%S"),
-    ))
+        election.election_id.to_lowercase(),
+        election.region_category(),
+        hyphenate(&election.authority_region),
+        format_datetime(created_at),
+    )
 }
 
 /// Replaces the extension of the given filename with .zip
 pub fn with_zip_extension(filename: &str) -> String {
     let base = filename.split('.').next().unwrap_or("Noname");
     format!("{}.zip", base)
+}
+
+pub async fn get_election_committee_session(
+    conn: &mut SqliteConnection,
+    election_id: ElectionId,
+    committee_session_id: CommitteeSessionId,
+) -> Result<(ElectionWithPoliticalGroups, CommitteeSession), APIError> {
+    let committee_session = committee_session_repo::get(conn, committee_session_id).await?;
+    if committee_session.election_id != election_id {
+        return Err(APIError::NotFound(
+            "Committee session does not match election".to_string(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
+
+    let election = election_repo::get(conn, election_id).await?;
+
+    Ok((election, committee_session))
 }
 
 /// Download a zip containing a PDF for the PV and the EML with GSB election results
@@ -128,8 +143,8 @@ pub async fn election_download_zip_results_gsb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    let election = election_repo::get(&mut conn, election_id).await?;
-    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let (election, committee_session) =
+        get_election_committee_session(&mut conn, election_id, committee_session_id).await?;
     let files = get_files_gsb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -141,6 +156,17 @@ pub async fn election_download_zip_results_gsb(
     let created_at = files.created_at().with_timezone(&Local);
     let download_zip_filename = download_zip_filename(base_name, &election, created_at);
 
+    // The EML is always generated and stored together with its signature
+    let results_eml = match (files.results_eml, files.results_eml_signature) {
+        (Some(eml), Some(signature)) => Some((eml, signature)),
+        (None, None) => None,
+        _ => {
+            return Err(APIError::DataIntegrityError(
+                "GSB results EML and its signature should both be present".to_string(),
+            ));
+        }
+    };
+
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
     tokio::spawn(async move {
@@ -148,9 +174,10 @@ pub async fn election_download_zip_results_gsb(
             zip_writer.add_file(&pdf_file.name, &pdf_file.data).await?;
         }
 
-        if let Some(eml_file) = files.results_eml {
-            let xml_zip_filename = with_zip_extension(&eml_file.name);
-            let xml_zip = zip_single_file(&eml_file.name, &eml_file.data).await?;
+        if let Some((eml, signature)) = results_eml {
+            let xml_zip_filename = with_zip_extension(&eml.name);
+            let xml_zip =
+                zip_files(&[(&eml.name, &eml.data), (&signature.name, &signature.data)]).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
 
@@ -208,8 +235,8 @@ pub async fn election_download_zip_results_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    let election = election_repo::get(&mut conn, election_id).await?;
-    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let (election, committee_session) =
+        get_election_committee_session(&mut conn, election_id, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -274,8 +301,8 @@ pub async fn election_download_zip_attachment_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    let election = election_repo::get(&mut conn, election_id).await?;
-    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let (election, committee_session) =
+        get_election_committee_session(&mut conn, election_id, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -335,8 +362,8 @@ pub async fn election_download_zip_total_counts_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    let election = election_repo::get(&mut conn, election_id).await?;
-    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let (election, committee_session) =
+        get_election_committee_session(&mut conn, election_id, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -375,6 +402,7 @@ mod tests {
         response::{IntoResponse, Response},
     };
     use chrono::NaiveDateTime;
+    use http_body_util::BodyExt;
     use sqlx::SqlitePool;
     use test_log::test;
 
@@ -393,10 +421,10 @@ mod tests {
     async fn call_handlers_gsb(
         pool: SqlitePool,
         coordinator_role: Role,
+        election_id: ElectionId,
     ) -> Vec<(&'static str, Response)> {
         let user = User::test_user(coordinator_role, UserId::from(1));
         let audit = AuditService::new(Some(user.clone()), None);
-        let election_id = ElectionId::from(5);
         let committee_session_id = CommitteeSessionId::from(5);
 
         #[rustfmt::skip]
@@ -409,11 +437,11 @@ mod tests {
     async fn call_handlers_csb(
         pool: SqlitePool,
         coordinator_role: Role,
+        election_id: ElectionId,
     ) -> Vec<(&'static str, Response)> {
         let mut conn = pool.acquire().await.unwrap();
         let user = User::test_user(coordinator_role, UserId::from(1));
         let audit = AuditService::new(Some(user.clone()), None);
-        let election_id = ElectionId::from(8);
         let committee_session_id = CommitteeSessionId::from(801);
 
         // Change committee session status to completed
@@ -446,25 +474,53 @@ mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_gsb_election_committee_category_authorization_err(pool: SqlitePool) {
-        let results = call_handlers_gsb(pool, Role::CoordinatorCSB).await;
+        let results = call_handlers_gsb(pool, Role::CoordinatorCSB, ElectionId::from(5)).await;
         assert_committee_category_authorization_err(results).await;
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_5_with_results", "signing_keypair")
+    )))]
     async fn test_gsb_election_committee_category_authorization_ok(pool: SqlitePool) {
-        let results = call_handlers_gsb(pool, Role::CoordinatorGSB).await;
+        let results = call_handlers_gsb(pool, Role::CoordinatorGSB, ElectionId::from(5)).await;
         assert_committee_category_authorization_ok(results);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_csb_election_committee_category_authorization_err(pool: SqlitePool) {
-        let results = call_handlers_csb(pool, Role::CoordinatorGSB).await;
+        let results = call_handlers_csb(pool, Role::CoordinatorGSB, ElectionId::from(8)).await;
         assert_committee_category_authorization_err(results).await;
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_csb_election_committee_category_authorization_ok(pool: SqlitePool) {
-        let results = call_handlers_csb(pool, Role::CoordinatorCSB).await;
+        let results = call_handlers_csb(pool, Role::CoordinatorCSB, ElectionId::from(8)).await;
         assert_committee_category_authorization_ok(results);
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_5_with_results", "election_8_csb_with_results")
+    )))]
+    async fn test_err_election_committee_session_mismatch(pool: SqlitePool) {
+        // Passing non-matching election ids
+        let gsb_results =
+            call_handlers_gsb(pool.clone(), Role::CoordinatorGSB, ElectionId::from(4)).await;
+        let csb_results = call_handlers_csb(pool, Role::CoordinatorCSB, ElectionId::from(7)).await;
+
+        for (handler, response) in gsb_results.into_iter().chain(csb_results) {
+            let body = response.into_body().collect().await.unwrap().to_bytes();
+            let error: ErrorResponse = serde_json::from_slice(&body).unwrap();
+            assert_eq!(
+                error.reference,
+                ErrorReference::EntryNotFound,
+                "handler '{handler}'"
+            );
+            assert_eq!(
+                error.error, "Committee session does not match election",
+                "handler '{handler}'"
+            );
+        }
     }
 }

@@ -5,7 +5,7 @@ import { UserCreateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler, within } from "@/testing/test-utils";
-import type { Role, USER_CREATE_REQUEST_PATH } from "@/types/generated/openapi";
+import type { ErrorResponse, Role, USER_CREATE_REQUEST_PATH } from "@/types/generated/openapi";
 
 import { UserCreateDetailsForm } from "./UserCreateDetailsForm";
 
@@ -150,14 +150,14 @@ describe("UserCreateDetailsForm", () => {
         error: "PasswordRejectionTooShort",
         expectedErrorMessage: "Het wachtwoord moet minimaal 13 karakters lang zijn.",
       },
-    ])("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
+    ] as const)("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
       const { onSubmitted } = renderForm("typist_gsb", false);
       const user = userEvent.setup();
       overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
         reference: error,
-      });
+      } satisfies ErrorResponse);
 
       await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "Invoerder0123");
       const passwordInput = await screen.findByLabelText("Tijdelijk wachtwoord");
@@ -177,5 +177,64 @@ describe("UserCreateDetailsForm", () => {
       expect(passwordInput).toBeValid();
       expect(onSubmitted).toHaveBeenCalledExactlyOnceWith(userMockData[0]);
     });
+  });
+
+  test("Invalid username", async () => {
+    const { onSubmitted } = renderForm("typist_gsb", false);
+    const user = userEvent.setup();
+    overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 422, {
+      error: "Invalid character",
+      fatal: false,
+      reference: "InvalidUsername",
+    } satisfies ErrorResponse);
+
+    const username = await screen.findByRole("textbox", { name: "Gebruikersnaam" });
+    const password = await screen.findByLabelText("Tijdelijk wachtwoord");
+
+    await user.type(username, "Dubbel");
+    await user.type(password, "Wachtwoord123");
+    const saveButton = screen.getByRole("button", { name: "Opslaan" });
+    await user.click(saveButton);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      [
+        "Gebruikersnaam bevat ongeldige tekens",
+        "Gebruik alleen letters zonder accenten, cijfers en tekens zoals _ - + . !. Spaties zijn niet toegestaan.",
+      ].join(""),
+    );
+
+    expect(username).toBeInvalid();
+    expect(username).toHaveAccessibleErrorMessage(
+      "Gebruik alleen letters zonder accenten, cijfers en tekens zoals _ - + . !. Spaties zijn niet toegestaan.",
+    );
+    expect(onSubmitted).not.toHaveBeenCalled();
+  });
+
+  test("Invalid fullname", async () => {
+    const { onSubmitted } = renderForm("typist_gsb", true);
+    const user = userEvent.setup();
+    overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 422, {
+      error: "Invalid character",
+      fatal: false,
+      reference: "InvalidFullname",
+    } satisfies ErrorResponse);
+
+    const fullname = await screen.findByRole("textbox", { name: "Volledige naam" });
+    const username = await screen.findByRole("textbox", { name: "Gebruikersnaam" });
+    const password = await screen.findByLabelText("Tijdelijk wachtwoord");
+
+    await user.type(fullname, "Volledige naam");
+    await user.type(username, "Dubbel");
+    await user.type(password, "Wachtwoord123");
+    const saveButton = screen.getByRole("button", { name: "Opslaan" });
+    await user.click(saveButton);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      ["Volledige naam bevat ongeldige tekens", "In de volledige naam mogen geen tabs of enter zitten."].join(""),
+    );
+
+    expect(fullname).toBeInvalid();
+    expect(fullname).toHaveAccessibleErrorMessage("In de volledige naam mogen geen tabs of enter zitten.");
+    expect(onSubmitted).not.toHaveBeenCalled();
   });
 });

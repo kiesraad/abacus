@@ -5,7 +5,7 @@ import browserslist from "browserslist";
 import { browserslistToTargets } from "lightningcss";
 import { defineConfig, type UserConfig } from "vite";
 
-import pkgjson from "./package.json";
+import pkgjson from "./package.json" with { type: "json" };
 
 // https://vitejs.dev/config/
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
@@ -84,7 +84,7 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [react()],
     build: {
-      outDir: path.resolve(__dirname, "dist"),
+      outDir: path.resolve(import.meta.dirname, "dist"),
       emptyOutDir: true,
       sourcemap: true,
       minify: false,
@@ -103,7 +103,7 @@ export default defineConfig(({ command }) => {
     define,
     optimizeDeps: { exclude: ["msw"] },
     resolve: {
-      alias: [{ find: "@", replacement: path.resolve(__dirname, "./src") }],
+      alias: [{ find: "@", replacement: path.resolve(import.meta.dirname, "./src") }],
     },
   } satisfies UserConfig;
 });

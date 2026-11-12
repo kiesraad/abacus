@@ -8,26 +8,84 @@ use abacus::{
     domain::{
         committee_session::CommitteeSession,
         data_entry::DataEntrySource,
-        election::{CommitteeCategory, ElectionWithPoliticalGroups},
+        election::{
+            CommitteeCategory, ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
+        },
         models::{ModelNa31_2Input, ToPdfFileModel, votes_table::VotesTables},
         polling_station::PollingStation,
         report::DEFAULT_DATE_TIME_FORMAT,
         results::Results,
-        summary::ElectionSummary,
+        tabulation::ElectionTotals,
     },
     test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
 };
-use clap::Parser;
+use clap::{
+    Arg, Command, Parser,
+    builder::{PossibleValue, PossibleValuesParser, TypedValueParser},
+    error::Error as ClapError,
+};
 use eml_nl::io::EMLWrite as _;
+use strum::VariantArray;
 use tracing::{info, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 
-/// Abacus API and asset server
+#[derive(Clone)]
+struct EnumParser<T>(std::marker::PhantomData<T>);
+
+impl<T> EnumParser<T>
+where
+    T: VariantArray + std::fmt::Display,
+{
+    fn new() -> Self {
+        Self(std::marker::PhantomData)
+    }
+
+    fn variant_names() -> impl Iterator<Item = String> {
+        T::VARIANTS.iter().map(ToString::to_string)
+    }
+}
+
+impl<T> TypedValueParser for EnumParser<T>
+where
+    T: VariantArray + std::fmt::Display + std::str::FromStr + Clone + Send + Sync + 'static,
+{
+    type Value = T;
+
+    fn parse_ref(
+        &self,
+        cmd: &Command,
+        arg: Option<&Arg>,
+        value: &std::ffi::OsStr,
+    ) -> Result<T, ClapError> {
+        value
+            .to_str()
+            .and_then(|value| T::from_str(value).ok())
+            .ok_or_else(|| {
+                PossibleValuesParser::new(Self::variant_names())
+                    .parse_ref(cmd, arg, value)
+                    .expect_err("value did not parse, so it is not a possible value either")
+            })
+    }
+
+    fn possible_values(&self) -> Option<Box<dyn Iterator<Item = PossibleValue> + '_>> {
+        Some(Box::new(Self::variant_names().map(PossibleValue::new)))
+    }
+}
+
+/// Generate a random test election in the Abacus database
 #[derive(Parser, Debug, Clone)]
 struct Args {
     /// The committee category
-    #[arg(value_enum)]
+    #[arg(value_parser = EnumParser::<CommitteeCategory>::new())]
     committee_category: CommitteeCategory,
+
+    /// The election category
+    #[arg(value_parser = EnumParser::<ElectionCategory>::new())]
+    election_category: ElectionCategory,
+
+    /// The vote counting method (required for GSB, if not provided uses default: CSO)
+    #[arg(short, long, value_parser = EnumParser::<VoteCountingMethod>::new())]
+    counting_method: Option<VoteCountingMethod>,
 
     /// Location of the database file, will be created if it doesn't exist
     #[arg(short, long, default_value = "db.sqlite")]
@@ -97,6 +155,10 @@ struct Args {
     #[arg(long, default_value = "1100", value_parser = parse_range::<u32>)]
     political_group_distribution_slope: Range<u32>,
 
+    /// Amount of GSBs
+    #[arg(long, default_value = "5..10", value_parser = parse_range::<u32>)]
+    gsbs: Range<u32>,
+
     /// Export the election definition, candidate list and polling stations to a directory
     #[arg(long)]
     export_definition: Option<PathBuf>,
@@ -107,6 +169,8 @@ impl From<Args> for GenerateElectionArgs {
         GenerateElectionArgs {
             custom_name: args.custom_name,
             committee_category: args.committee_category,
+            counting_method: args.counting_method,
+            election_category: args.election_category,
             political_groups: RandomRange(args.political_groups),
             candidates_per_group: RandomRange(args.candidates_per_group),
             polling_stations: RandomRange(args.polling_stations),
@@ -122,12 +186,12 @@ impl From<Args> for GenerateElectionArgs {
             political_group_distribution_slope: RandomRange(
                 args.political_group_distribution_slope,
             ),
+            gsbs: RandomRange(args.gsbs),
         }
     }
 }
 
-/// Main entry point for the application. Sets up the database, and starts the
-/// API server and in-memory file router on port 8080.
+/// Main entry point for the application.
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
     // setup logging
@@ -169,8 +233,8 @@ async fn main() -> Result<(), AppError> {
 }
 
 /// Export an election (in EML) to the specified directory
-#[allow(clippy::too_many_lines)]
-#[allow(clippy::cognitive_complexity)]
+#[expect(clippy::too_many_lines)]
+#[expect(clippy::cognitive_complexity)]
 async fn export_election(
     export_dir: &Path,
     committee_session: &CommitteeSession,
@@ -238,12 +302,16 @@ async fn export_election(
         .expect("Failed to write polling stations file");
 
     if export_results_json {
-        let election_summary = ElectionSummary::from_results(election, &results)
-            .expect("Failed to create election summary");
+        let election_totals =
+            ElectionTotals::tabulate(election, &results).expect("Failed to create election totals");
         let input = ModelNa31_2Input {
-            votes_tables: VotesTables::new(election, &election_summary)
-                .expect("Failed to create votes tables"),
-            summary: election_summary.into(),
+            votes_tables: VotesTables::new(election, &election_totals)
+                .expect("Votes tables should be created"),
+            summary: (&election_totals).into(),
+            polling_station_investigations: election_totals
+                .cso_investigations()
+                .expect("Election totals should be CSO totals")
+                .clone(),
             committee_session: committee_session.clone(),
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
             election: election.clone().into(),

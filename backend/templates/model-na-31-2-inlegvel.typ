@@ -2,19 +2,19 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2-inlegvel.json")
 
-#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
-#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.authority_region, municipal, public_body)
+#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_id #input.election.authority_region]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
 #show: doc => conf(
   doc,
   header-left: [
-    Controles en correcties
+    Controles en correcties \ #input.election.official_name
   ],
   header-right: location_name,
   footer: [
     Proces-verbaal van een #location_type\
-    Model Na 31-2 centrale stemopneming
+    Model Na 31-2 centrale stemopneming (versie 2027)
   ]
 )
 

@@ -13,21 +13,35 @@ type Stat = {
   percentage: number;
 };
 
+/**
+ * Returns the number of entries that are considered to be finished in a given DataEntryStatus
+ */
+function entriesFinishedInStatus(status: DataEntryStatusName): number {
+  switch (status) {
+    case "empty":
+    case "first_entry_in_progress":
+    case "first_entry_has_errors":
+      return 0;
+    case "first_entry_finalised":
+    case "second_entry_in_progress":
+    case "first_entry_correction":
+    case "second_entry_correction":
+      return 1;
+    case "entries_different":
+    case "definitive":
+      return 2;
+  }
+}
+
 export function ElectionProgress() {
   const { statuses } = useElectionStatus();
 
   const stats: Stat[] = useMemo(() => {
     const total = statuses.length;
-    const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
-    const firstEntryFinished: DataEntryStatusName[] = [
-      "first_entry_finalised",
-      "second_entry_in_progress",
-      ...firstAndSecondEntryFinished,
-    ];
-    const totalFirstEntryFinished = statuses.filter((s) => firstEntryFinished.includes(s.status)).length;
-    const totalFirstAndSecondEntryFinished = statuses.filter((s) =>
-      firstAndSecondEntryFinished.includes(s.status),
-    ).length;
+    const entriesFinished = statuses.map((s) => entriesFinishedInStatus(s.status));
+    const totalFirstEntryFinished = entriesFinished.filter((n) => n > 0).length;
+    const totalFirstAndSecondEntryFinished = entriesFinished.filter((n) => n > 1).length;
+
     return [
       {
         title: t("status.first_entry_finished_short"),

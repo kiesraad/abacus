@@ -3,9 +3,12 @@ use sqlx::SqlitePool;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, AppState, ErrorResponse,
+    AppState, ErrorResponse,
     api::middleware::authentication::RouteAuthorization,
-    test_data_gen::{GenerateElectionArgs, RandomRange, generators::CreateTestElectionResult},
+    test_data_gen::{
+        GenerateElectionArgs, RandomRange, error::GenerateError,
+        generators::CreateTestElectionResult,
+    },
 };
 
 /// Router for the test data generation API
@@ -24,7 +27,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 async fn generate_election_handler(
     State(pool): State<SqlitePool>,
     Json(args): Json<GenerateElectionArgs>,
-) -> Result<StatusCode, APIError> {
+) -> Result<StatusCode, GenerateError> {
     if args.generate_p22_2_variants {
         generate_p22_2_variants(&args, &pool).await
     }
@@ -155,11 +158,12 @@ async fn create_test_election_with_votes(
     pool: &SqlitePool,
     seats: u32,
     votes: Vec<Vec<u32>>,
-) -> Result<CreateTestElectionResult, Box<dyn std::error::Error>> {
+) -> Result<CreateTestElectionResult, GenerateError> {
     let mut args = common_args.clone();
 
     let total_votes = votes.iter().flatten().sum();
-    let political_groups = u32::try_from(votes.len())?;
+    let political_groups =
+        u32::try_from(votes.len()).expect("Number of political groups should fit u32");
     args.voters = RandomRange(total_votes..total_votes + 1);
     args.political_groups = RandomRange(political_groups..political_groups + 1);
     args.seats = RandomRange(seats..seats + 1);

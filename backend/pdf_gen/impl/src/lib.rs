@@ -48,7 +48,7 @@ fn convert_datetime<Tz: chrono::TimeZone>(date_time: &chrono::DateTime<Tz>) -> O
     )
 }
 
-#[allow(clippy::cognitive_complexity)]
+#[expect(clippy::cognitive_complexity)]
 fn compile_pdf(world: &world::PdfWorld) -> Result<PdfGenResult, PdfGenError> {
     debug!(
         "Starting Typst compilation for {:?}",

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import type { PercentageAndColorClass, ProgressBarColorClass } from "@/components/ui/ProgressBar/ProgressBar";
 import { useUsers } from "@/hooks/user/useUsers";
+import { t } from "@/i18n/translate";
 import type { DataEntryStatusName, ElectionStatusResponseEntry } from "@/types/generated/openapi";
 import { calculateProgressPercentage } from "@/utils/progressPercentage";
 
@@ -30,7 +31,12 @@ export const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> =
 
 export const statusesForCategory: Record<StatusCategory, DataEntryStatusName[]> = {
   errors_and_warnings: ["entries_different", "first_entry_has_errors"],
-  in_progress: ["first_entry_in_progress", "second_entry_in_progress"],
+  in_progress: [
+    "first_entry_in_progress",
+    "second_entry_in_progress",
+    "first_entry_correction",
+    "second_entry_correction",
+  ],
   first_entry_finished: ["first_entry_finalised"],
   definitive: ["definitive"],
   not_started: ["empty"],
@@ -40,13 +46,22 @@ export function statusCount(entries: ElectionStatusResponseEntry[], category: St
   return entries.filter((s) => statusesForCategory[category].includes(s.status)).length;
 }
 
-function getTypist(status: ElectionStatusResponseEntry | undefined): number | undefined {
+function getTypist(
+  status: ElectionStatusResponseEntry | undefined,
+  getName: (userId?: number, fallback?: string) => string,
+): string | undefined {
   switch (status?.status) {
     case "first_entry_in_progress":
     case "first_entry_finalised":
-      return status.first_entry_user_id;
+    case "first_entry_correction":
+      return status.first_entry_origin === undefined
+        ? undefined
+        : status.first_entry_origin.type === "Typist"
+          ? getName(status.first_entry_origin.user_id)
+          : t("imported");
     case "second_entry_in_progress":
-      return status.second_entry_user_id;
+    case "second_entry_correction":
+      return getName(status.second_entry_user_id);
     default:
       return undefined;
   }
@@ -94,7 +109,7 @@ export function useElectionStatus(statuses: ElectionStatusResponseEntry[]): Elec
     () =>
       statuses.map((status) => ({
         entry: status,
-        typist: getName(getTypist(status)),
+        typist: getTypist(status, getName),
       })),
     [statuses, getName],
   );

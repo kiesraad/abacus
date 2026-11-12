@@ -1,7 +1,9 @@
 import { stat } from "node:fs/promises";
 import { expect, type Page } from "@playwright/test";
+import { AboutReportPage } from "e2e-tests/page-objects/data_entry/AboutReportPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
+import { ChecksAndCorrectionsPage } from "e2e-tests/page-objects/data_entry/ChecksAndCorrectionsPgObj";
 import { CountingDifferencesPollingStationPage } from "e2e-tests/page-objects/data_entry/CountingDifferencesPollingStationPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
@@ -14,14 +16,14 @@ import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/cr
 import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
-import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
+import { UploadPollingStationsFilePgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationsFilePgObj";
 import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import type { Results } from "@/types/generated/openapi";
-import { type Eml230b, eml110a, eml110b } from "../test-data/eml-files";
+import { type Eml110a, type Eml230b, eml110a, eml110b } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: Results) {
   if (results.model === "CSOFirstSession") {
@@ -30,6 +32,16 @@ export async function fillDataEntryPages(page: Page, results: Results) {
 
     const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
     await countingDifferencesPollingStationPage.fillAndClickNext(results.counting_differences_polling_station);
+  }
+
+  if (results.model === "DSOFirstSession") {
+    const aboutReportPage = new AboutReportPage(page);
+    await aboutReportPage.fillAndClickNext(results.about_report);
+
+    if (results.about_report.checks_and_corrections_present === "PagePresent") {
+      const checksAndCorrectionsPage = new ChecksAndCorrectionsPage(page);
+      await checksAndCorrectionsPage.fillAndClickNext(results.checks_and_corrections);
+    }
   }
 
   const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -41,23 +53,21 @@ export async function fillDataEntryPages(page: Page, results: Results) {
   }
 
   switch (results.model) {
+    case "DSOFirstSession":
+    case "DSONextSession":
     case "CSOFirstSession":
-    case "CSONextSession":
-      {
-        const differencesPage = new DifferencesPage(page);
-        await expect(differencesPage.fieldset).toBeVisible();
-        await differencesPage.fillInPageAndClickNext(results.differences_counts);
-      }
+    case "CSONextSession": {
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.fieldset).toBeVisible();
+      await differencesPage.fillInPageAndClickNext(results.differences_counts);
       break;
-
-    case "GSB":
-      {
-        const gsbDifferencesPage = new GSBDifferencesPage(page);
-        await expect(gsbDifferencesPage.fieldset).toBeVisible();
-        await gsbDifferencesPage.fillInPageAndClickNext(results.differences_counts);
-      }
+    }
+    case "GSB": {
+      const gsbDifferencesPage = new GSBDifferencesPage(page);
+      await expect(gsbDifferencesPage.fieldset).toBeVisible();
+      await gsbDifferencesPage.fillInPageAndClickNext(results.differences_counts);
       break;
-
+    }
     default:
       // Exhaustive check
       results satisfies never;
@@ -101,16 +111,16 @@ export async function fillDataEntryPagesAndSave(page: Page, results: Results) {
   return dataEntryHomePage;
 }
 
-export async function uploadElectionAndInputHash(page: Page) {
+export async function uploadElectionAndInputHash(page: Page, eml: Eml110a = eml110a) {
   const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
   await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-  await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
-  await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.electionDate);
+  await uploadElectionDefinitionPage.uploadFile(eml.path);
+  await expect(uploadElectionDefinitionPage.main).toContainText(eml.filename);
+  await expect(uploadElectionDefinitionPage.main).toContainText(eml.electionDate);
 
   const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
-  await checkDefinitionPage.inputHash(eml110a.hashInput1, eml110a.hashInput2);
+  await checkDefinitionPage.inputHashFrom(eml.fullHash);
 }
 
 export async function uploadCandidatesAndInputHash(page: Page, eml: Eml230b) {
@@ -118,17 +128,20 @@ export async function uploadCandidatesAndInputHash(page: Page, eml: Eml230b) {
   await expect(uploadCandidateDefinitionPage.header).toBeVisible();
   await uploadCandidateDefinitionPage.uploadFile(eml.path);
   await expect(uploadCandidateDefinitionPage.main).toContainText(eml.filename);
-  await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionDate);
+  await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionIdentifier);
+  if (eml.electionDistrict) {
+    await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionDistrict);
+  }
 
   const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
   await expect(checkCandidateDefinitionPage.header).toBeVisible();
-  await checkCandidateDefinitionPage.inputHash(eml.hashInput1, eml.hashInput2);
+  await checkCandidateDefinitionPage.inputHashFrom(eml.fullHash);
 }
 
 export async function uploadPollingStations(page: Page, eml = eml110b) {
-  const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-  await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  await uploadElectionDefinitionPage.uploadFile(eml.path);
+  const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
+  await expect(uploadPollingStationsPage.header).toBeVisible();
+  await uploadPollingStationsPage.uploadFile(eml.path);
 
   const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
@@ -136,7 +149,12 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
   await checkDefinitionPage.next.click();
 }
 
-export async function createInvestigation(page: Page, pollingStation: string, reason: string) {
+export async function createInvestigation(
+  page: Page,
+  pollingStation: string,
+  reason: string,
+  expectedFilename: RegExp,
+) {
   const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
   await investigationsOverviewPage.addInvestigationButton.click();
 
@@ -154,7 +172,7 @@ export async function createInvestigation(page: Page, pollingStation: string, re
   const downloadPromise = page.waitForEvent("download");
   await investigationPrintCorrigendumPage.downloadLink.click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/);
+  expect(download.suggestedFilename()).toMatch(expectedFilename);
   expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 
   await investigationPrintCorrigendumPage.backToInvestigationsButton.click();

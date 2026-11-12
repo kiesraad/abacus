@@ -33,12 +33,26 @@ export interface RequestParams {
 }
 
 /**
- * Abstraction over the browser fetch API to handle JSON responses and errors.
+ * Abstraction over the browser fetch API: sends JSON or multipart request bodies, and handles responses and errors.
  */
 export class BaseApiClient extends EventTarget {
-  // encode an optional JSON body
-  setRequestBodyAndHeaders(requestBody?: object | string, additionalHeaders?: Record<string, string>): RequestInit {
+  // Object/string is sent as JSON, FormData as multipart/form-data.
+  setRequestBodyAndHeaders(
+    requestBody?: object | string | FormData,
+    additionalHeaders?: Record<string, string>,
+  ): RequestInit {
     if (requestBody) {
+      if (requestBody instanceof FormData) {
+        return {
+          // Note: do not set Content-Type here, as this will be set by the browser including the multipart boundary.
+          headers: {
+            ...additionalHeaders,
+            [HEADER_ACCEPT]: MIME_JSON,
+          },
+          body: requestBody,
+        };
+      }
+
       return {
         headers: {
           ...additionalHeaders,

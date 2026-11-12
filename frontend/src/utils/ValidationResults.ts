@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { hasTranslation, t, tx } from "@/i18n/translate";
+import { t, tOrDefault, txOrDefault } from "@/i18n/translate";
 import type { Election, ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
 import type { DataEntrySection } from "@/types/types";
 
@@ -51,67 +51,73 @@ export function doesValidationResultApplyToSection(
   validationResult: ValidationResult,
   section: DataEntrySection,
 ): boolean {
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
-  return validationResult.fields.some((fieldName) => {
-    // Remove "data." prefix if present
-    const normalizedFieldName = fieldName.startsWith("data.") ? fieldName.substring(5) : fieldName;
+  return validationResult.fields.some((field) => isFieldInSection(field, section));
+}
 
-    // Check exact matches in the section
-    for (const subsection of section.subsections) {
-      switch (subsection.type) {
-        case "radio":
-          if (subsection.path === normalizedFieldName) {
+/** Remove "data." prefix if present */
+export function normalizeFieldName(fieldName: string): string {
+  return fieldName.startsWith("data.") ? fieldName.substring(5) : fieldName;
+}
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
+export function isFieldInSection(fieldName: string, section: DataEntrySection): boolean {
+  const normalizedFieldName = normalizeFieldName(fieldName);
+
+  // Check exact matches in the section
+  for (const subsection of section.subsections) {
+    switch (subsection.type) {
+      case "radio":
+        if (subsection.path === normalizedFieldName) {
+          return true;
+        }
+        break;
+
+      case "inputGrid":
+        for (const row of subsection.rows) {
+          if (row.path === normalizedFieldName) {
             return true;
           }
-          break;
+        }
+        break;
 
-        case "inputGrid":
-          for (const row of subsection.rows) {
-            if (row.path === normalizedFieldName) {
-              return true;
-            }
-          }
-          break;
-
-        case "checkboxes":
-          for (const option of subsection.options) {
-            if (option.path === normalizedFieldName) {
-              return true;
-            }
-          }
-          break;
-      }
-    }
-
-    // Check parent object paths
-    for (const subsection of section.subsections) {
-      switch (subsection.type) {
-        case "radio":
-          if (subsection.path.startsWith(`${normalizedFieldName}.`)) {
+      case "checkboxes":
+        for (const option of subsection.options) {
+          if (option.path === normalizedFieldName) {
             return true;
           }
-          break;
-
-        case "inputGrid":
-          for (const row of subsection.rows) {
-            if (row.path.startsWith(`${normalizedFieldName}.`) || row.path.startsWith(`${normalizedFieldName}[`)) {
-              return true;
-            }
-          }
-          break;
-
-        case "checkboxes":
-          for (const option of subsection.options) {
-            if (option.path.startsWith(`${normalizedFieldName}.`)) {
-              return true;
-            }
-          }
-          break;
-      }
+        }
+        break;
     }
+  }
 
-    return false;
-  });
+  // Check parent object paths
+  for (const subsection of section.subsections) {
+    switch (subsection.type) {
+      case "radio":
+        if (subsection.path.startsWith(`${normalizedFieldName}.`)) {
+          return true;
+        }
+        break;
+
+      case "inputGrid":
+        for (const row of subsection.rows) {
+          if (row.path.startsWith(`${normalizedFieldName}.`) || row.path.startsWith(`${normalizedFieldName}[`)) {
+            return true;
+          }
+        }
+        break;
+
+      case "checkboxes":
+        for (const option of subsection.options) {
+          if (option.path.startsWith(`${normalizedFieldName}.`)) {
+            return true;
+          }
+        }
+        break;
+    }
+  }
+
+  return false;
 }
 
 /*
@@ -169,14 +175,17 @@ export function getTranslations(
 ): ValidationResultTranslations {
   const defaultTitle = role === "typist" ? t(`feedback.typist_title`) : "";
 
-  const titlePath = `feedback_${election.committee_category}.${result.code}.${role}.title`;
-  const contentPath = `feedback_${election.committee_category}.${result.code}.${role}.content`;
-  const actionsPath = `feedback_${election.committee_category}.${result.code}.${role}.actions`;
+  const basePath = `feedback_${election.committee_category}.${result.code}.${role}`;
+  let title = tOrDefault(`${basePath}.title`, { ...result.context }, defaultTitle);
+  let content = txOrDefault(`${basePath}.content`, undefined, { ...result.context }, undefined);
+  let actions = txOrDefault(`${basePath}.actions`, undefined, { ...result.context }, undefined);
 
-  return {
-    code: dottedCode(result.code),
-    title: hasTranslation(titlePath) ? t(titlePath, { ...result.context }) : defaultTitle,
-    content: hasTranslation(contentPath) ? tx(contentPath, undefined, { ...result.context }) : undefined,
-    actions: hasTranslation(actionsPath) ? tx(actionsPath, undefined, { ...result.context }) : undefined,
-  };
+  if (election.counting_method === "DSO") {
+    const basePath = `feedback_${election.committee_category}_DSO.${result.code}.${role}`;
+    title = tOrDefault(`${basePath}.title`, { ...result.context }, title);
+    content = txOrDefault(`${basePath}.content`, undefined, { ...result.context }, content);
+    actions = txOrDefault(`${basePath}.actions`, undefined, { ...result.context }, actions);
+  }
+
+  return { code: dottedCode(result.code), title, content, actions };
 }

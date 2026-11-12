@@ -1,7 +1,5 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { IconPlus } from "@/components/generated/icons";
@@ -12,6 +10,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import useInvestigations from "@/hooks/election/useInvestigations";
+import { useLiveData } from "@/hooks/useLiveData";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t, tx } from "@/i18n/translate";
 import type {
@@ -20,12 +19,11 @@ import type {
 } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatList } from "@/utils/strings";
-
 import { InvestigationCard } from "./InvestigationCard";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function InvestigationsOverviewPage() {
-  const { currentCommitteeSession, election } = useElection();
+  const { currentCommitteeSession, election, refetch: refetchElection } = useElection();
   const { investigations, currentInvestigations, handledInvestigations, missingInvestigations } = useInvestigations();
   const { refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
@@ -48,16 +46,8 @@ export function InvestigationsOverviewPage() {
     throw new NotFoundError();
   }
 
-  // re-fetch statuses when component mounts
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    void refetchStatuses(abortController);
-
-    return () => {
-      abortController.abort(DEFAULT_CANCEL_REASON);
-    };
-  }, [refetchStatuses]);
+  useLiveData(refetchStatuses, true);
+  useLiveData(refetchElection, true);
 
   return (
     <>
@@ -120,12 +110,16 @@ export function InvestigationsOverviewPage() {
       <main>
         <section>
           <h2>{t("investigations.from_central_polling_station")}</h2>
-          {investigations.length === 0 && (
+          {investigations.length === 0 && election.counting_method && (
             <>
               <p>{t("investigations.add_investigation_for_each_csb_request")}</p>
               <ul className="md mb-0">
                 <li>{t("investigations.add_the_reason")}</li>
-                <li>{t("investigations.abacus_creates_the_corrigendum")}</li>
+                <li>
+                  {t("investigations.abacus_creates_the_corrigendum", {
+                    model: t(`investigations.corrigendum_model.${election.counting_method}`),
+                  })}
+                </li>
                 <li>{t("investigations.print_corrigendum_form")}</li>
               </ul>
             </>

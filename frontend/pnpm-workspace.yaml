@@ -13,16 +13,22 @@ pmOnFail: error
 strictDepBuilds: true
 strictPeerDependencies: true
 catalog:
-  vite: 8.1.4
-  vitest: &vitest 4.1.10
-  "@vitest/browser-playwright": *vitest
-  "@vitest/coverage-v8": *vitest
-  "@vitest/expect": *vitest
+  vite: 8.3.5
+  # These four versions should match, not using a YAML anchor because
+  # unfortunately Dependabot does not support updating those.
+  vitest: 4.1.12
+  "@vitest/browser-playwright": 4.1.12
+  "@vitest/coverage-v8": 4.1.12
+  "@vitest/expect": 4.1.12
 overrides:
   # Storybook currently uses @vitest/expect 3.2.4 which doesn't work with our vitest.d.ts
   "@vitest/expect": "catalog:"
   # @codecov/vite-plugin does not have official support for Vite 8, but works:
   # https://github.com/codecov/codecov-javascript-bundler-plugins/issues/264
   "vite": "catalog:"
-  # Fix GHSA-gv7w-rqvm-qjhr, GHSA-g7r4-m6w7-qqqr
-  esbuild@>=0.17.0 <0.28.1: ">=0.28.1"
+  # Fix GHSA-mrhx-c7xc-m3w5: @codecov/bundler-plugin-core requires zod ^3, which has no patched release
+  "zod@<4.6.6": "4.6.6"
+  # Fix GHSA-g3hv-75wg-m249: eslint and @eslint/config-array require minimatch ^10, which has no patched release
+  "minimatch@>=7.0.0 <11.0.1": "11.0.5"
+  # Fix GHSA-3g3m-2fjr-6pw4: @storybook/react-vite requires a docgen plugin that depends on glob ^13, which has no patched release
+  "glob@>=9.0.0 <14.0.2": "14.0.4"

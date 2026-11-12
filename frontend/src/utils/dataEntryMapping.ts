@@ -1,20 +1,27 @@
-import type { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
+import {
+  type DataEntryResults,
+  type DataEntrySection,
+  isCheckboxesSubsection,
+  type ResultsPath,
+  type SectionValues,
+} from "@/types/types";
 import { parseIntUserInput } from "@/utils/strings";
+import { normalizeFieldName } from "@/utils/ValidationResults";
 
-type PathValue = boolean | number | string | undefined;
+type PathValue = boolean | number | string | null | undefined;
 
 /**
  * Extracts all data field paths and their types from a DataEntrySection as a Map
  * @param section The data entry section to extract field information from
  * @returns Map where key is the field path and value is the field type
  */
-export function extractFieldInfoFromSection(section: DataEntrySection): Map<string, "boolean" | "number"> {
-  const fieldInfoMap = new Map<string, "boolean" | "number">();
+export function extractFieldInfoFromSection(section: DataEntrySection): Map<string, "boolean" | "number" | "enum"> {
+  const fieldInfoMap = new Map<string, "boolean" | "number" | "enum">();
 
   for (const subsection of section.subsections) {
     switch (subsection.type) {
       case "radio":
-        fieldInfoMap.set(subsection.path, "boolean");
+        fieldInfoMap.set(subsection.path, "enum");
         break;
       case "inputGrid":
         for (const row of subsection.rows) {
@@ -101,7 +108,7 @@ export function setValueAtPath(
   data: DataEntryResults,
   path: string,
   value: string,
-  valueType: "boolean" | "number" | undefined,
+  valueType: "boolean" | "number" | "enum" | undefined,
 ): void {
   const segments = path.split(".");
   const lastProperty = segments.pop();
@@ -116,6 +123,52 @@ export function setValueAtPath(
   } else {
     throw new Error(`Cannot set value at path ${path}.`);
   }
+}
+
+/**
+ * Reset the value at the specified path to its empty value.
+ */
+export function resetValueAtPath(
+  section: DataEntrySection,
+  previousResults: DataEntryResults | undefined,
+  data: DataEntryResults,
+  path: ResultsPath,
+) {
+  const normalizedPath = normalizeFieldName(path);
+
+  // Check if the path refers to a checkboxes subsection by its error_path,
+  // because then we have to reset the individual options instead.
+  const checkboxes = section.subsections
+    .filter(isCheckboxesSubsection)
+    .find(({ error_path }) => error_path === normalizedPath);
+
+  if (checkboxes) {
+    for (const option of checkboxes.options) {
+      // Checkboxes are always unset
+      setValueAtPath(data, option.path, "", "boolean");
+    }
+  } else {
+    const value = getValueForReset(previousResults, normalizedPath);
+    const fieldInfoMap = extractFieldInfoFromSection(section);
+    const valueType = fieldInfoMap.get(normalizedPath);
+    setValueAtPath(data, normalizedPath, value, valueType);
+  }
+}
+
+function getValueForReset(previousResults: DataEntryResults | undefined, path: ResultsPath): string {
+  if (previousResults === undefined) {
+    // When there is no corrigendum, set to empty string
+    return "";
+  }
+
+  // Try to get value from previous results
+  const value = getValueAtPath(previousResults, path);
+  if (value === undefined || value === null) {
+    return "";
+  }
+
+  // Return as string
+  return String(value);
 }
 
 /**
@@ -144,17 +197,18 @@ function traversePath(data: DataEntryResults, segments: string[]): unknown {
 
 function processValue(
   value: string,
-  valueType: "boolean" | "number" | undefined,
-): boolean | number | string | undefined {
+  valueType: "boolean" | "number" | "enum" | undefined,
+): boolean | number | string | null | undefined {
   if (valueType === "boolean") {
-    if (value === "") {
-      return undefined;
-    }
     return value === "true";
   }
 
   if (valueType === "number") {
     return parseIntUserInput(value) ?? 0;
+  }
+
+  if (valueType === "enum" && value === "") {
+    return null;
   }
 
   return value;
@@ -170,7 +224,7 @@ export function stringRepresentsInteger(str: string): boolean {
 }
 
 function valueToString(value: PathValue): string {
-  if (value === undefined || value === 0) {
+  if (value === undefined || value === null || value === 0) {
     return "";
   }
   return String(value);
@@ -181,7 +235,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isPathValue(value: unknown): value is PathValue {
-  return typeof value === "boolean" || typeof value === "number" || typeof value === "string" || value === undefined;
+  return (
+    typeof value === "boolean" ||
+    typeof value === "number" ||
+    typeof value === "string" ||
+    value === null ||
+    value === undefined
+  );
 }
 
 /**

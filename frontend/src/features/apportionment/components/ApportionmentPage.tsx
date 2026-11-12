@@ -11,7 +11,7 @@ import type {
   ApportionmentState,
   ApportionmentWarning,
   ChosenCandidate,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   PoliticalGroup,
   PreferenceThreshold,
@@ -285,7 +285,7 @@ function renderLinksToSeatAssignmentPages(seatAssignment: SeatAssignment) {
 }
 
 interface ElectionSummaryTableSectionProps {
-  electionSummary: ElectionSummary;
+  electionSummary: ElectionTotals;
   seatAssignment: SeatAssignment;
   election: ElectionWithPoliticalGroups;
   preferenceThreshold: PreferenceThreshold | undefined;
@@ -307,7 +307,11 @@ function ElectionSummaryTableSection({
           votesCounts={electionSummary.votes_counts}
           seats={seatAssignment.seats}
           quota={seatAssignment.quota}
-          numberOfVoters={electionSummary.number_of_voters}
+          numberOfVoters={
+            electionSummary.committee_specific.committee === "CSB"
+              ? electionSummary.committee_specific.number_of_voters
+              : undefined
+          }
           preferenceThreshold={preferenceThreshold}
           deceasedCandidatesInfo={
             {

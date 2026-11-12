@@ -18,6 +18,11 @@ export interface UserCreateDetailsFormProps {
   onSubmitted: (user: User) => void;
 }
 
+interface FormError {
+  title: string;
+  message?: string;
+}
+
 type ValidationErrors = Partial<CreateUserRequest>;
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
@@ -25,7 +30,7 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
   const createPath: USER_CREATE_REQUEST_PATH = "/api/users";
   const { create, isLoading } = useCrud<User>({ createPath });
-  const [usernameUniqueError, setUsernameUniqueError] = useState<string | undefined>(undefined);
+  const [formError, setFormError] = useState<FormError>();
   const [error, setError] = useState<AnyApiError>();
 
   if (error && !(error instanceof ApiError)) {
@@ -34,7 +39,7 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    setUsernameUniqueError(undefined);
+    setFormError(undefined);
 
     const formData = new StringFormData(event.currentTarget);
 
@@ -52,18 +57,41 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
     void create(user).then((result) => {
       if (isSuccess(result)) {
         onSubmitted(result.data);
-      } else if (result instanceof ApiError && result.reference === "UsernameNotUnique") {
-        setUsernameUniqueError(t("users.username_not_unique_error", { username: user.username }));
-        setValidationErrors({ username: t("users.username_unique") });
-      } else if (
-        result instanceof ApiError &&
-        (result.reference === "PasswordRejectionSameAsOld" ||
-          result.reference === "PasswordRejectionSameAsUsername" ||
-          result.reference === "PasswordRejectionTooShort")
-      ) {
-        setValidationErrors({ temp_password: t(`error.api_error.${result.reference}`) });
-      } else {
-        setError(result);
+        return;
+      }
+
+      if (result instanceof ApiError) {
+        switch (result.reference) {
+          case "UsernameNotUnique":
+            setFormError({
+              title: t("users.username_not_unique_error", { username: user.username }),
+              message: t("users.username_unique"),
+            });
+            setValidationErrors({ username: t("users.username_unique") });
+            return;
+          case "InvalidUsername":
+            setFormError({
+              title: t("error.api_error.InvalidUsername"),
+              message: t("users.invalid_username"),
+            });
+            setValidationErrors({ username: t("users.invalid_username") });
+            return;
+          case "InvalidFullname":
+            setFormError({
+              title: t("error.api_error.InvalidFullname"),
+              message: t("users.invalid_fullname"),
+            });
+            setValidationErrors({ fullname: t("users.invalid_fullname") });
+            return;
+          case "PasswordRejectionSameAsOld":
+          case "PasswordRejectionSameAsUsername":
+          case "PasswordRejectionTooShort":
+            setValidationErrors({ temp_password: t(`error.api_error.${result.reference}`) });
+            return;
+          default:
+            setError(result);
+            return;
+        }
       }
     });
   }
@@ -90,11 +118,11 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
         </FormLayout.Alert>
       )}
 
-      {usernameUniqueError && (
+      {formError && (
         <FormLayout.Alert>
           <Alert type="error">
-            <strong className="heading-md">{usernameUniqueError}</strong>
-            <p>{t("users.username_unique")}</p>
+            <strong className="heading-md">{formError.title}</strong>
+            <p>{formError.message}</p>
           </Alert>
         </FormLayout.Alert>
       )}
@@ -108,6 +136,7 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
                 name="fullname"
                 label={t("users.fullname")}
                 hint={t("users.fullname_hint")}
+                maxLength={255}
                 error={validationErrors?.fullname}
               />
             )}
@@ -117,6 +146,7 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
               name="username"
               label={t("users.username")}
               hint={t("users.username_hint")}
+              maxLength={255}
               error={validationErrors?.username}
             />
 

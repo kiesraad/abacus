@@ -11,12 +11,16 @@ import type {
   ADD_DECEASED_CANDIDATE_REQUEST_PATH,
   ADMIN_EXISTS_REQUEST_PARAMS,
   ADMIN_EXISTS_REQUEST_PATH,
+  AddSubCommitteeCertificateResponse,
   ApportionmentState,
   AUDIT_LOG_LIST_REQUEST_PARAMS,
   AUDIT_LOG_LIST_REQUEST_PATH,
   AUDIT_LOG_LIST_USERS_REQUEST_PARAMS,
   AUDIT_LOG_LIST_USERS_REQUEST_PATH,
   AuditLogListResponse,
+  CERTIFICATE_DETAILS_REQUEST_PARAMS,
+  CERTIFICATE_DETAILS_REQUEST_PATH,
+  CertificateDetailsResponse,
   ClaimDataEntryResponse,
   COMMITTEE_SESSION_CREATE_REQUEST_PARAMS,
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
@@ -61,6 +65,8 @@ import type {
   DELETE_DECEASED_CANDIDATE_REQUEST_BODY,
   DELETE_DECEASED_CANDIDATE_REQUEST_PARAMS,
   DELETE_DECEASED_CANDIDATE_REQUEST_PATH,
+  DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PARAMS,
+  DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PARAMS,
   ELECTION_DETAILS_REQUEST_PATH,
   ELECTION_IMPORT_REQUEST_BODY,
@@ -125,6 +131,12 @@ import type {
   SaveDataEntryResponse,
   SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS,
   SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH,
+  SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS,
+  SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH,
+  SubCommittee,
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PARAMS,
   USER_CREATE_REQUEST_PATH,
@@ -150,16 +162,16 @@ import {
 } from "./DataEntryMockData";
 import {
   csbElectionDetailsMockResponse,
-  csbElectionImportMockResponse,
   electionDetailsMockResponse,
   electionImportMockResponse,
+  electionImportValidateMockResponse,
   electionListMockResponse,
-  gsbElectionImportValidateMockResponse,
   investigationListMockResponse,
 } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
 import { logMockResponse } from "./LogMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
+import { addCertificateResponse, subCommitteesMockData } from "./SubCommitteeMockData";
 import { loginResponseMockData, userMockData } from "./UserMockData";
 
 type ParamsToString<T> = {
@@ -328,6 +340,29 @@ export const ElectionRequestHandler = http.get<
   HttpResponse.json(electionDetailsMockResponse, { status: 200 }),
 );
 
+export const ElectionCertificateDetailsRequestHandler = http.get<
+  ParamsToString<CERTIFICATE_DETAILS_REQUEST_PARAMS>,
+  null,
+  CertificateDetailsResponse
+>("/api/elections/1/certificate_details" satisfies CERTIFICATE_DETAILS_REQUEST_PATH, () => {
+  const response: CertificateDetailsResponse = {
+    election_identifier: "AB2027_Aardenboezem",
+    organizational_unit: "Abacus 1.2.0",
+    common_name: "Gemeente Juinen",
+    signature_algorithm: "RSA 4096-bit",
+    not_before: "2026-01-01T00:00:00Z",
+    not_after: "2026-04-01T00:00:00Z",
+  };
+  return HttpResponse.json(response, { status: 200 });
+});
+
+export const DismissPublicKeyUploadReminderRequestHandler = http.put<
+  ParamsToString<DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PARAMS>
+>(
+  "/api/elections/1/dismiss_public_key_upload_reminder" satisfies DISMISS_PUBLIC_KEY_UPLOAD_REMINDER_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 204 }),
+);
+
 // get election details handler
 export const CSBElectionRequestHandler = http.get<
   ParamsToString<ELECTION_DETAILS_REQUEST_PARAMS>,
@@ -335,6 +370,22 @@ export const CSBElectionRequestHandler = http.get<
   ElectionDetailsResponse | ErrorResponse
 >("/api/elections/2" satisfies ELECTION_DETAILS_REQUEST_PATH, () =>
   HttpResponse.json(csbElectionDetailsMockResponse, { status: 200 }),
+);
+
+export const CSBSubCommitteeCertificatesRequestHandler = http.get<
+  ParamsToString<SUB_COMMITTEE_CERTIFICATES_REQUEST_PARAMS>,
+  null,
+  SubCommittee[]
+>("/api/elections/2/sub_committee_certificates" satisfies SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH, () =>
+  HttpResponse.json(subCommitteesMockData, { status: 200 }),
+);
+
+export const CSBSubCommitteeCertificateAddRequestHandler = http.post<
+  ParamsToString<SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PARAMS>,
+  SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_BODY,
+  AddSubCommitteeCertificateResponse
+>("/api/elections/2/sub_committee_certificates" satisfies SUB_COMMITTEE_CERTIFICATE_ADD_REQUEST_PATH, () =>
+  HttpResponse.json(addCertificateResponse, { status: 201 }),
 );
 
 // get election status handler
@@ -355,20 +406,48 @@ export const CSBElectionStatusRequestHandler = http.get<
   HttpResponse.json(statusResponseMock, { status: 200 }),
 );
 
-export const GSBElectionImportRequestHandler = http.post<
+export const GSBABElectionImportRequestHandler = http.post<
   ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
   ELECTION_IMPORT_REQUEST_BODY,
   ElectionWithPoliticalGroups
 >("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
-  HttpResponse.json(electionImportMockResponse, { status: 201 }),
+  HttpResponse.json(electionImportMockResponse({ committeeCategory: "GSB", category: "WaterAuthority" }), {
+    status: 201,
+  }),
 );
 
-export const CSBElectionImportRequestHandler = http.post<
+export const GSBGRElectionImportRequestHandler = http.post<
   ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
   ELECTION_IMPORT_REQUEST_BODY,
   ElectionWithPoliticalGroups
 >("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
-  HttpResponse.json(csbElectionImportMockResponse, { status: 201 }),
+  HttpResponse.json(electionImportMockResponse({ committeeCategory: "GSB", category: "Municipal" }), { status: 201 }),
+);
+
+export const GSBPSElectionImportRequestHandler = http.post<
+  ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
+  ELECTION_IMPORT_REQUEST_BODY,
+  ElectionWithPoliticalGroups
+>("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
+  HttpResponse.json(electionImportMockResponse({ committeeCategory: "GSB", category: "Provincial" }), { status: 201 }),
+);
+
+export const CSBABElectionImportRequestHandler = http.post<
+  ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
+  ELECTION_IMPORT_REQUEST_BODY,
+  ElectionWithPoliticalGroups
+>("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
+  HttpResponse.json(electionImportMockResponse({ committeeCategory: "CSB", category: "WaterAuthority" }), {
+    status: 201,
+  }),
+);
+
+export const CSBGRElectionImportRequestHandler = http.post<
+  ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
+  ELECTION_IMPORT_REQUEST_BODY,
+  ElectionWithPoliticalGroups
+>("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
+  HttpResponse.json(electionImportMockResponse({ committeeCategory: "CSB", category: "Municipal" }), { status: 201 }),
 );
 
 export const ElectionImportValidateRequestHandler = http.post<
@@ -376,7 +455,7 @@ export const ElectionImportValidateRequestHandler = http.post<
   ELECTION_IMPORT_VALIDATE_REQUEST_BODY,
   ElectionDefinitionValidateResponse
 >("/api/elections/import/validate" satisfies ELECTION_IMPORT_VALIDATE_REQUEST_PATH, () =>
-  HttpResponse.json(gsbElectionImportValidateMockResponse(), { status: 200 }),
+  HttpResponse.json(electionImportValidateMockResponse(), { status: 200 }),
 );
 
 export const ElectionChangeNumberOfVotersHandler = http.put<
@@ -645,9 +724,17 @@ export const handlers: HttpHandler[] = [
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  ElectionCertificateDetailsRequestHandler,
+  DismissPublicKeyUploadReminderRequestHandler,
+  CSBElectionRequestHandler,
+  CSBSubCommitteeCertificatesRequestHandler,
+  CSBSubCommitteeCertificateAddRequestHandler,
   CSBElectionStatusRequestHandler,
-  GSBElectionImportRequestHandler,
-  CSBElectionImportRequestHandler,
+  GSBABElectionImportRequestHandler,
+  GSBGRElectionImportRequestHandler,
+  GSBPSElectionImportRequestHandler,
+  CSBABElectionImportRequestHandler,
+  CSBGRElectionImportRequestHandler,
   ElectionImportValidateRequestHandler,
   ElectionChangeNumberOfVotersHandler,
   LoginHandler,

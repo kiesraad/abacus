@@ -18,6 +18,11 @@ export function hasBooleanProperty<T extends string>(state: unknown, key: T): st
   return descriptor !== undefined && typeof descriptor.value === "boolean";
 }
 
+/// Checks if the given string is one of the given values
+export function isOneOf<T extends string>(values: readonly T[], value: string | undefined): value is T {
+  return value !== undefined && (values as readonly string[]).includes(value);
+}
+
 /// Checks if the given value is a Record<string, unknown>
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

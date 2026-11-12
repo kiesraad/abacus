@@ -3,7 +3,16 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::domain::{committee_session::CommitteeSessionId, identifier::id};
+use crate::domain::{
+    committee_session::{CommitteeSession, CommitteeSessionId},
+    election::{ElectionWithPoliticalGroups, InvalidElectionError, VoteCountingMethod},
+    file::FileType::{
+        CsbAttachmentPdf, CsbCsvCounts, CsbResultsEml, CsbResultsPdf, CsbTotalCountsEml,
+        GsbCsvCounts, GsbOverviewPdf, GsbResultsEml, GsbResultsEmlSignature, GsbResultsPdf,
+    },
+    filename::slugify,
+    identifier::id,
+};
 
 id!(FileId);
 
@@ -14,6 +23,8 @@ id!(FileId);
 pub enum FileType {
     /// GSB results EML (510b)
     GsbResultsEml,
+    /// Signature of the GSB results EML
+    GsbResultsEmlSignature,
     /// GSB results PDF (Model Na 31-2 for first session, Model Na 14-2 for next session)
     GsbResultsPdf,
     /// GSB overview PDF for next session (Model P 2a)
@@ -26,9 +37,9 @@ pub enum FileType {
     CsbResultsPdf,
     /// CSB attachment PDF (Model P 22-2 Bijlage 1)
     CsbAttachmentPdf,
-    /// CSB CSV counts file (OSV4-3)
+    /// CSB CSV counts file
     CsbCsvCounts,
-    /// GSB CSV counts file (OSV4-3)
+    /// GSB CSV counts file
     GsbCsvCounts,
 }
 
@@ -39,8 +50,71 @@ impl FileType {
         match self {
             CsbCsvCounts | GsbCsvCounts => "text/csv",
             GsbResultsEml | CsbResultsEml | CsbTotalCountsEml => "text/xml",
+            GsbResultsEmlSignature => "application/pkcs7-signature",
             GsbResultsPdf | GsbOverviewPdf | CsbResultsPdf | CsbAttachmentPdf => "application/pdf",
         }
+    }
+
+    pub fn filename(
+        &self,
+        committee_session: &CommitteeSession,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<String, InvalidElectionError> {
+        let filename = match self {
+            GsbResultsEml => {
+                format!(
+                    "Telling_{}_{}_{}.eml.xml",
+                    election.election_id,
+                    election.region_category(),
+                    slugify(&election.authority_region)
+                )
+            }
+            GsbResultsEmlSignature => {
+                format!(
+                    "{}.signature",
+                    GsbResultsEml.filename(committee_session, election)?
+                )
+            }
+            GsbResultsPdf => {
+                if committee_session.is_next_session() {
+                    "Model_Na14-2.pdf".to_string()
+                } else {
+                    match election.counting_method {
+                        Some(VoteCountingMethod::CSO) => "Model_Na31-2.pdf".to_string(),
+                        Some(VoteCountingMethod::DSO) => "Model_Na31-1.pdf".to_string(),
+                        None => {
+                            return Err(InvalidElectionError(
+                                "GSB election needs to have a vote counting method".to_string(),
+                            ));
+                        }
+                    }
+                }
+            }
+            GsbOverviewPdf => "Leeg_Model_P2a.pdf".to_string(),
+            CsbResultsEml => format!("Resultaat_{}.eml.xml", election.election_id),
+            CsbTotalCountsEml => {
+                format!(
+                    "Totaaltelling_{}_{}_{}.eml.xml",
+                    election.election_id,
+                    election.region_category(),
+                    slugify(&election.authority_region)
+                )
+            }
+            CsbResultsPdf => "Model_P22-2.pdf".to_string(),
+            CsbAttachmentPdf => "Model_P22-2_bijlage.pdf".to_string(),
+            GsbCsvCounts => {
+                format!(
+                    "abacus_telling_{}_{}_{}.csv",
+                    election.election_id,
+                    election.region_category(),
+                    slugify(&election.authority_region)
+                )
+            }
+            CsbCsvCounts => {
+                format!("abacus_telling_{}.csv", election.election_id.to_lowercase())
+            }
+        };
+        Ok(filename)
     }
 }
 

@@ -10,7 +10,8 @@ import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import { isCoordinator } from "@/utils/role";
 import { StringFormData } from "@/utils/stringFormData";
-import { type CommitteeCategory, isRoleWithoutCommitteeCategory } from "../../hooks/UserCreateContext";
+import { isOneOf } from "@/utils/typeChecks";
+import { type CommitteeCategory, roleWithoutCommitteeCategoryValues } from "../../hooks/UserCreateContext";
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
 function committeeCategoryFromRole(role: "coordinator_csb" | "coordinator_gsb"): CommitteeCategory {
@@ -47,7 +48,7 @@ export function UserCreateRolePage() {
     const formData = new StringFormData(event.currentTarget);
     const roleValue = formData.getString("role") || null;
 
-    if (!roleValue || !isRoleWithoutCommitteeCategory(roleValue)) {
+    if (!roleValue || !isOneOf(roleWithoutCommitteeCategoryValues, roleValue)) {
       setError(t("users.mandatory"));
       return;
     }

@@ -8,6 +8,7 @@ pub mod election;
 pub mod entry_number;
 pub mod field_path;
 pub mod file;
+pub mod filename;
 pub mod identifier;
 pub mod investigation;
 pub mod models;
@@ -16,7 +17,7 @@ pub mod report;
 pub mod results;
 pub mod role;
 pub mod sub_committee;
-pub mod summary;
+pub mod tabulation;
 #[cfg(test)]
 pub mod valid_default;
 pub mod validate;

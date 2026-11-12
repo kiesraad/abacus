@@ -14,6 +14,7 @@ import {
 } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { emptyCSOFirstSessionResults } from "e2e-tests/test-data/request-response-templates";
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import type { ClaimDataEntryResponse, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 import { type DataEntry, test } from "../../fixtures";
 
@@ -118,7 +119,6 @@ test.describe("resume data entry flow", () => {
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-      await differencesPage.differenceCompletelyAccountedForYes.check();
       await expect(differencesPage.fieldset).toBeVisible();
       await differencesPage.next.click();
 
@@ -174,26 +174,8 @@ test.describe("resume data entry flow", () => {
           },
         },
         validation_results: {
-          errors: [
-            {
-              fields: [
-                "data.voters_counts.poll_card_count",
-                "data.voters_counts.proxy_certificate_count",
-                "data.voters_counts.total_admitted_voters_count",
-              ],
-              code: "F201",
-            },
-            {
-              fields: ["data.differences_counts.compare_votes_cast_admitted_voters"],
-              code: "F304",
-            },
-          ],
-          warnings: [
-            {
-              fields: ["data.votes_counts.total_votes_cast_count"],
-              code: "W204",
-            },
-          ],
+          errors: [validationResultMockData.F201, validationResultMockData.F304],
+          warnings: [validationResultMockData.W204],
         },
       });
 
@@ -384,7 +366,6 @@ test.describe("resume data entry flow", () => {
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-      await differencesPage.differenceCompletelyAccountedForYes.check();
       await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, 0, "Partijdige Partij");
@@ -436,19 +417,23 @@ test.describe("resume data entry flow", () => {
       // extra investigation section should be empty
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await expect(extraInvestigationPage.fieldset).toBeVisible();
-      await expect(extraInvestigationPage.extraInvestigationOtherReasonYes).not.toBeChecked();
-      await expect(extraInvestigationPage.extraInvestigationOtherReasonNo).not.toBeChecked();
+      await expect(extraInvestigationPage.extraInvestigationDoneYes).not.toBeChecked();
+      await expect(extraInvestigationPage.extraInvestigationDoneNo).not.toBeChecked();
       await expect(extraInvestigationPage.ballotsRecountedYes).not.toBeChecked();
       await expect(extraInvestigationPage.ballotsRecountedNo).not.toBeChecked();
-      await extraInvestigationPage.next.click();
+      await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
 
       // counting differences polling station section should be empty
       const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
       await expect(countingDifferencesPollingStationPage.fieldset).toBeVisible();
       await expect(countingDifferencesPollingStationPage.differenceBallotsPerListYes).not.toBeChecked();
       await expect(countingDifferencesPollingStationPage.differenceBallotsPerListNo).not.toBeChecked();
-      await expect(countingDifferencesPollingStationPage.unexplainedDifferenceBallotsVotersYes).not.toBeChecked();
-      await expect(countingDifferencesPollingStationPage.unexplainedDifferenceBallotsVotersNo).not.toBeChecked();
+      await expect(
+        countingDifferencesPollingStationPage.differenceBallotsVotersCompletelyAccountedForYes,
+      ).not.toBeChecked();
+      await expect(
+        countingDifferencesPollingStationPage.differenceBallotsVotersCompletelyAccountedForNo,
+      ).not.toBeChecked();
       await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
       // voters and votes page should have empty fields
@@ -569,7 +554,6 @@ test.describe("resume data entry flow", () => {
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
-      await differencesPage.differenceCompletelyAccountedForYes.check();
       await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, 0, "Partijdige Partij");

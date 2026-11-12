@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, collections::HashMap, hash::Hash};
+use std::{collections::HashMap, hash::Hash};
 
 mod residual_seat_assignment;
 mod structs;
@@ -268,17 +268,13 @@ fn list_numbers_with_exhausted_seats<T: ListVotes>(
 ) -> Vec<(T::ListNumber, u32)> {
     standings
         .iter()
-        .fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
+        .filter_map(|s| {
             let number_of_candidates =
                 get_number_of_candidates(input_list_votes, s.list_number(), deceased_candidates);
-            if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
-                exhausted_list_numbers_and_seats.push((
-                    s.list_number(),
-                    number_of_candidates.abs_diff(s.total_seats()),
-                ))
-            }
-            exhausted_list_numbers_and_seats
+            (number_of_candidates < s.total_seats())
+                .then(|| (s.list_number(), s.total_seats() - number_of_candidates))
         })
+        .collect()
 }
 
 /// If a list got the absolute majority of votes but not the absolute majority of seats,
@@ -382,70 +378,70 @@ fn reassign_residual_seats_for_exhausted_lists<'a, T: ListVotes>(
 ) -> RemainderAssignmentResult<T::ListNumber> {
     let exhausted_lists =
         list_numbers_with_exhausted_seats(&previous_standings, list_votes, deceased_candidates);
-    if !exhausted_lists.is_empty() {
-        let mut current_standings = previous_standings.clone();
-        let mut seats_to_reassign = 0;
-        let mut list_exhaustion_steps: Vec<SeatChangeStep<T::ListNumber>> = vec![];
-
-        // Remove excess seats from exhausted lists
-        for (list_number, seats) in exhausted_lists {
-            seats_to_reassign += seats;
-            let mut full_seat: bool = false;
-            for _ in 1..=seats {
-                // Clone standings for returned step as they are before changes
-                let standings = current_standings.clone();
-
-                let list_standing = current_standings
-                    .iter_mut()
-                    .find(|list_standing| list_standing.list_number() == list_number)
-                    .expect("list standing should exist");
-
-                if list_standing.residual_seats() > 0 {
-                    list_standing.remove_residual_seat();
-                } else {
-                    list_standing.remove_full_seat();
-                    full_seat = true;
-                }
-
-                info!(
-                    "Seat first assigned to list {:?} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
-                    list_number
-                );
-
-                let step = SeatChangeStep {
-                    standings,
-                    residual_seat_number: None,
-                    change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
-                        list_retracted_seat: list_number,
-                        full_seat,
-                    }),
-                };
-                assert_ne!(
-                    step.standings, current_standings,
-                    "standings should be different"
-                );
-                list_exhaustion_steps.push(step);
-            }
-        }
-        let mut current_steps = previous_steps.to_owned();
-        current_steps.extend(list_exhaustion_steps);
-
-        // Reassign removed seats to non-exhausted lists
-        Ok(assign_remainder(
-            &current_standings,
-            seats,
-            assigned_residual_seats + seats_to_reassign,
-            assigned_residual_seats,
-            &current_steps,
-            Some((list_votes, deceased_candidates)),
-            lists_drawn,
-        )?)
-    } else {
-        Ok(RemainderAssignment::Completed(
+    if exhausted_lists.is_empty() {
+        return Ok(RemainderAssignment::Completed(
             previous_steps,
             previous_standings,
-        ))
+        ));
     }
+
+    let mut current_standings = previous_standings;
+    let mut current_steps = previous_steps;
+    let mut seats_to_reassign = 0;
+
+    // Remove excess seats from exhausted lists
+    for (list_number, seats) in exhausted_lists {
+        seats_to_reassign += seats;
+        for _ in 1..=seats {
+            // Clone standings for returned step as they are before changes
+            let standings = current_standings.clone();
+
+            let list_standing = current_standings
+                .iter_mut()
+                .find(|list_standing| list_standing.list_number() == list_number)
+                .expect("list standing should exist");
+
+            // Residual seats are removed first, so once a full seat has been removed
+            // all following removals for this list are full seats as well
+            let full_seat = if list_standing.residual_seats() > 0 {
+                list_standing.remove_residual_seat();
+                false
+            } else {
+                list_standing.remove_full_seat();
+                true
+            };
+
+            info!(
+                "Seat first assigned to list {:?} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
+                list_number
+            );
+
+            let step = SeatChangeStep {
+                standings,
+                residual_seat_number: None,
+                change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
+                    list_retracted_seat: list_number,
+                    full_seat,
+                }),
+            };
+            assert_ne!(
+                step.standings, current_standings,
+                "standings should be different"
+            );
+            current_steps.push(step);
+        }
+    }
+
+    // Reassign removed seats to non-exhausted lists
+    assign_remainder(
+        &current_standings,
+        seats,
+        assigned_residual_seats + seats_to_reassign,
+        assigned_residual_seats,
+        &current_steps,
+        Some((list_votes, deceased_candidates)),
+        lists_drawn,
+    )
 }
 
 #[cfg(test)]

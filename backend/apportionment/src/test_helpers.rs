@@ -1,4 +1,7 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    assert_matches,
+    collections::{HashMap, HashSet},
+};
 
 use super::{
     CandidateDrawingLotsVariant, ListVotes, fraction::Fraction, structs::CandidateNominationInput,
@@ -158,15 +161,9 @@ pub fn check_list_candidate_nomination(
     );
 
     if expected_updated_ranking.is_empty() {
-        assert!(matches!(
-            nomination.candidate_ranking,
-            CandidateRanking::Original(_)
-        ));
+        assert_matches!(nomination.candidate_ranking, CandidateRanking::Original(_));
     } else {
-        assert!(matches!(
-            nomination.candidate_ranking,
-            CandidateRanking::Updated(_)
-        ));
+        assert_matches!(nomination.candidate_ranking, CandidateRanking::Updated(_));
         assert_eq!(
             nomination.candidate_ranking.as_slice(),
             expected_updated_ranking

@@ -453,6 +453,8 @@ pub async fn are_results_complete_for_committee_session(
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use sqlx::SqlitePool;
     use test_log::test;
 
@@ -557,10 +559,10 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(
+            assert_matches!(
                 results.unwrap_err(),
                 DatabaseError::Sqlx(sqlx::Error::RowNotFound)
-            ));
+            );
         }
 
         /// Test with 4th session, one polling station with investigation, but no corrected results
@@ -639,10 +641,10 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(
+            assert_matches!(
                 results.unwrap_err(),
                 DatabaseError::Sqlx(sqlx::Error::RowNotFound)
-            ));
+            );
         }
 
         /// Test with 4th session, new polling station with no investigation (error)
@@ -667,10 +669,10 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(
+            assert_matches!(
                 results.unwrap_err(),
                 DatabaseError::Sqlx(sqlx::Error::RowNotFound)
-            ));
+            );
         }
 
         /// Test with 4th session, new polling station with investigation, but no corrected results (error)
@@ -699,10 +701,10 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(
+            assert_matches!(
                 results.unwrap_err(),
                 DatabaseError::Sqlx(sqlx::Error::RowNotFound)
-            ));
+            );
         }
 
         /// Test with 4th session, new polling station with investigation, corrected results=true and results exist
@@ -787,10 +789,10 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(
+            assert_matches!(
                 results.unwrap_err(),
                 DatabaseError::Sqlx(sqlx::Error::RowNotFound)
-            ));
+            );
         }
 
         /// Test with 4th session, new polling station with investigation, corrected results=true and results exist in 3rd session
@@ -905,10 +907,10 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(
+            assert_matches!(
                 results.unwrap_err(),
                 DatabaseError::Sqlx(sqlx::Error::RowNotFound)
-            ));
+            );
         }
     }
 
@@ -1296,10 +1298,10 @@ mod tests {
 
         let results = previous_results_for_polling_station(&mut conn, polling_station_id).await;
         assert!(results.is_err());
-        assert!(matches!(
+        assert_matches!(
             results.unwrap_err(),
             DatabaseError::Sqlx(sqlx::Error::RowNotFound)
-        ));
+        );
     }
 
     #[test(sqlx::test(fixtures(

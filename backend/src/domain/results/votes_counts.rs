@@ -295,6 +295,8 @@ impl Validate for VotesCounts {
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use test_log::test;
 
     use super::*;
@@ -375,16 +377,16 @@ mod tests {
         };
 
         let result = curr_votes.add(&other);
-        assert!(matches!(
+        assert_matches!(
             result,
             Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-        ));
+        );
 
         let result = other.add(&curr_votes);
-        assert!(matches!(
+        assert_matches!(
             result,
             Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-        ));
+        );
     }
 
     fn validate(

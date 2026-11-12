@@ -597,6 +597,8 @@ async fn logout(
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use http_body_util::BodyExt;
     use test_log::test;
 
@@ -767,7 +769,7 @@ mod tests {
         // No admin user exists yet
         let response = admin_exists(State(pool.clone())).await;
         assert!(response.is_err());
-        assert!(matches!(response, Err(APIError::NotFound(_, _))));
+        assert_matches!(response, Err(APIError::NotFound(_, _)));
 
         // Create an admin user
         let admin_request = CreateFirstAdminRequest {

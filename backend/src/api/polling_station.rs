@@ -32,6 +32,7 @@ use crate::{
         role::Role,
     },
     eml::{EMLImportError, EmlHash, polling_stations_from_eml_str},
+    error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
@@ -410,6 +411,13 @@ async fn polling_station_delete(
 
     let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
 
+    if polling_station.prev_data_entry_id().is_some() {
+        return Err(APIError::Conflict(
+            "Polling station linked to a previous session cannot be deleted".to_string(),
+            ErrorReference::InvalidStateTransition,
+        ));
+    }
+
     if committee_session.is_next_session() {
         // Also deletes the data entry, which belongs to the investigation
         delete_investigation_for_polling_station(
@@ -695,13 +703,18 @@ async fn polling_station_export(
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
     use super::*;
-    use crate::domain::{
-        election::ElectionId,
-        polling_station::{PollingStationId, PollingStationRequest},
+    use crate::{
+        domain::{
+            election::ElectionId,
+            polling_station::{PollingStationId, PollingStationRequest},
+        },
+        repository::user_repo::UserId,
     };
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
@@ -840,6 +853,36 @@ VALUES
         data.number = Some(123);
         let result = update(&mut conn, election_id, polling_station_id, data).await;
         assert!(result.is_err());
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_delete_rejected_when_prev_session(pool: SqlitePool) {
+        // Polling station 741 has a prev_data_entry_id
+        let polling_station_id = PollingStationId::from(741);
+
+        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let audit = AuditService::new(Some(user.clone()), None);
+        let result = polling_station_delete(
+            user,
+            State(pool.clone()),
+            audit,
+            Path((ElectionId::from(7), polling_station_id)),
+        )
+        .await;
+        assert_matches!(
+            result,
+            Err(APIError::Conflict(
+                _,
+                ErrorReference::InvalidStateTransition
+            ))
+        );
+
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(
+            polling_station_repo::exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[expect(clippy::bool_assert_comparison)]

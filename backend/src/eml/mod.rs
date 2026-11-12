@@ -155,6 +155,7 @@ impl NewElection {
             Eml::AB => Domain::WaterAuthority,
             Eml::GR => Domain::Municipal,
             Eml::PS => Domain::Provincial,
+            Eml::TK => Domain::HouseOfRepresentatives,
             _ => return Err(EMLImportError::LimitedElectionsSupported),
         };
         Ok(category)
@@ -172,6 +173,7 @@ impl NewElection {
             Eml::GR2 => Domain::GR2,
             Eml::PS1 => Domain::PS1,
             Eml::PS2 => Domain::PS2,
+            Eml::TK => Domain::TK,
             _ => return Err(EMLImportError::LimitedElectionsSupported),
         };
         Ok(sub_category)
@@ -215,7 +217,7 @@ impl NewElection {
         let number_of_voters = max_votes(&election.contest.max_votes);
 
         // only require an election domain if the category requires one
-        if category.has_election_domain() && identifier.domain.is_none() {
+        if category.has_election_domain(category) && identifier.domain.is_none() {
             return Err(EMLImportError::MissingElectionDomain);
         }
 
@@ -544,6 +546,7 @@ impl ElectionWithPoliticalGroups {
             Domain::Municipal => Eml::GR,
             Domain::Provincial => Eml::PS,
             Domain::WaterAuthority => Eml::AB,
+            Domain::HouseOfRepresentatives => Eml::TK,
         }
     }
 
@@ -559,6 +562,7 @@ impl ElectionWithPoliticalGroups {
             Domain::GR2 => Eml::GR2,
             Domain::PS1 => Eml::PS1,
             Domain::PS2 => Eml::PS2,
+            Domain::TK => Eml::TK,
         }
     }
 

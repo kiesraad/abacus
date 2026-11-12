@@ -4,9 +4,13 @@ export function isLocalElection(electionCategory: ElectionCategory): boolean {
   switch (electionCategory) {
     case "Municipal":
       return true;
+    case "HouseOfRepresentatives":
     case "Provincial":
     case "WaterAuthority":
       return false;
+    default:
+      // missing exhaustive check
+      return electionCategory satisfies never;
   }
 }
 

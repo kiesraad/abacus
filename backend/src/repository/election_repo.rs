@@ -187,7 +187,6 @@ pub async fn create(
 ) -> Result<ElectionWithPoliticalGroups, sqlx::Error> {
     let political_groups = Json(election.political_groups);
     let district = Json(election.district);
-    let domain = Json(election.domain);
     let row = query_as!(
         ElectionRow,
         r#"
@@ -242,7 +241,8 @@ pub async fn create(
         election.authority_name,
         election.authority_region,
         district,
-        domain,
+        // Better to pass directly, because Json(None) gives a DbError?
+        election.domain,
         election.category,
         election.sub_category,
         election.number_of_seats,

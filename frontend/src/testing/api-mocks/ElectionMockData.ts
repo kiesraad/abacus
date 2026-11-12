@@ -332,7 +332,34 @@ const baseElectionABCSB = {
   authority_region: "Rivier en Polder",
 } satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
 
+const baseElectionTK = {
+  name: "Tweede Kamer der Staten-Generaal 2025",
+  official_name: "Tweede Kamer der Staten-Generaal 2025",
+  election_id: "TK2025",
+  location: "Juinen",
+  authority_id: "0037",
+  authority_name: "Juinen",
+  authority_region: "Juinen",
+  district: {
+    district: "Specific",
+    name: "Juinen",
+    key: {
+      category: "ElectoralDistrict",
+      number: 9,
+    },
+    roman_numerals: false,
+    frisian_export_allowed: false,
+  },
+  domain: undefined,
+  category: "HouseOfRepresentatives",
+  sub_category: "TK",
+  number_of_seats: 150,
+  election_date: "2025-10-29",
+  nomination_date: "2025-09-15",
+} satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
+
 const baseElections = {
+  HouseOfRepresentatives: baseElectionTK,
   Municipal: baseElectionGR,
   Provincial: baseElectionPS1,
   WaterAuthority: baseElectionABGSB,

@@ -161,6 +161,7 @@ impl ElectionWithPoliticalGroups {
             (CSB, Provincial) => "provincie",
             (CSB, WaterAuthority) => "waterschap",
             (CSB, Municipal) | (GSB, _) => "gemeente",
+            (CSB, HouseOfRepresentatives) => "tweede_kamer",
         }
     }
 }
@@ -341,6 +342,8 @@ pub enum ElectionCategory {
     Provincial,
     /// Waterschapsverkiezing
     WaterAuthority,
+    /// Tweede Kamerverkiezing
+    HouseOfRepresentatives,
 }
 
 impl ElectionCategory {
@@ -349,6 +352,7 @@ impl ElectionCategory {
             ElectionCategory::Municipal => true,
             ElectionCategory::Provincial => false,
             ElectionCategory::WaterAuthority => false,
+            ElectionCategory::HouseOfRepresentatives => false,
         }
     }
 
@@ -357,6 +361,7 @@ impl ElectionCategory {
             ElectionCategory::Municipal => "GR",
             ElectionCategory::Provincial => "PS",
             ElectionCategory::WaterAuthority => "AB",
+            ElectionCategory::HouseOfRepresentatives => "TK",
         }
     }
 
@@ -365,8 +370,13 @@ impl ElectionCategory {
     /// An election domain is the specific region that an election takes place in,
     /// i.e. the municipality, province or water authority. Country wide elections
     /// do not have an election domain.
-    pub fn has_election_domain(&self) -> bool {
-        true
+    pub fn has_election_domain(&self, category: ElectionCategory) -> bool {
+        match category {
+            ElectionCategory::Municipal => true,
+            ElectionCategory::Provincial => true,
+            ElectionCategory::WaterAuthority => true,
+            ElectionCategory::HouseOfRepresentatives => false,
+        }
     }
 
     /// Get the sub category for test elections, only available for tests and test data generation
@@ -389,6 +399,7 @@ impl ElectionCategory {
                     ElectionSubCategory::AB2
                 }
             }
+            ElectionCategory::HouseOfRepresentatives => ElectionSubCategory::TK,
         }
     }
 }
@@ -490,6 +501,8 @@ pub enum ElectionSubCategory {
     PS1,
     /// Provinciale Statenverkiezing multiple districts
     PS2,
+    /// Tweede Kamerverkiezing
+    TK,
 }
 
 /// Committee category

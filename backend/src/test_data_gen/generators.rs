@@ -247,6 +247,11 @@ async fn generate_csb_election_data(
                 "CSB voor Provinciale Statenverkiezing wordt nog niet ondersteund",
             ));
         }
+        ElectionCategory::HouseOfRepresentatives => {
+            return Err(GenerateError::unsupported(
+                "CSB voor Tweede Kamerverkiezing wordt nog niet ondersteund",
+            ));
+        }
     };
 
     let new_status = match (args.with_data_entry, data_entry_complete) {
@@ -345,6 +350,7 @@ fn format_election_name(
                 .expect("Missing test data"),
             domain_name,
         ),
+        ElectionCategory::HouseOfRepresentatives => ("Tweede Kamer", domain_name),
     };
     format!("{election_type} {election_locality} {year}")
 }
@@ -397,6 +403,11 @@ fn generate_election(
         ElectionCategory::WaterAuthority => ElectionDomain {
             id: Some(rng.random_range(1..23).to_string()),
             name: super::data::water_authority(rng).to_owned(),
+        },
+        // TODO: check this
+        ElectionCategory::HouseOfRepresentatives => ElectionDomain {
+            id: None,
+            name: "Nederland".to_owned(),
         },
     };
 

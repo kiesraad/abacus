@@ -22,6 +22,7 @@ mod expected {
         (ElectionCategory::GR, RegionCategory::Municipality),
         (ElectionCategory::PS, RegionCategory::Province),
         (ElectionCategory::AB, RegionCategory::WaterAuthority),
+        (ElectionCategory::TK, RegionCategory::State),
     ];
 }
 
@@ -366,6 +367,10 @@ impl TryFrom<&ElectionDefinition> for ElectionTreeDetails {
             // Elections with HSBs
             (ElectionCategory::PS, ElectionSubcategory::PS2) => {
                 (committees_multiple_electoral_districts(root_region)?, true)
+            }
+
+            (ElectionCategory::TK, _) => {
+                (committees_multiple_electoral_districts(root_region)?, false)
             }
 
             _ => return Err(EMLError::custom("Unsupported election type")),

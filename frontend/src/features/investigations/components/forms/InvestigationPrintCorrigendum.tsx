@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MissingCommitteeSessionDetailsModal } from "@/components/committee_session/MissingCommitteeSessionDetailsModal";
+import { MissingCommitteeSessionDetailsCorrigendumModal } from "@/components/committee_session/MissingCommitteeSessionDetailsCorrigendumModal";
 import { Button } from "@/components/ui/Button/Button";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { Form } from "@/components/ui/Form/Form";
@@ -86,7 +86,7 @@ export function InvestigationPrintCorrigendum({ pollingStationId }: Investigatio
         </FormLayout>
       </Form>
       {showMissingCommitteeSessionDetailsModal && (
-        <MissingCommitteeSessionDetailsModal
+        <MissingCommitteeSessionDetailsCorrigendumModal
           to={`/elections/${election.id}/details`}
           onClose={() => {
             setShowMissingCommitteeSessionDetailsModal(false);

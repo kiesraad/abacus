@@ -124,8 +124,8 @@ describe("ElectionHomePage", () => {
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
         ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
-        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
         ["Stembureaus", "8 stembureaus"],
@@ -227,8 +227,8 @@ describe("ElectionHomePage", () => {
         expect(election_information_table).toBeVisible();
         expect(election_information_table).toHaveTableContent([
           ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
-          ["Kiesgebied", "0035 - Heemdamseburg"],
           ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
+          ["Kiesgebied", "0035 - Heemdamseburg"],
           ["Aantal kiesgerechtigden", "2.000"],
           ["Type stembureau", "Gemeentelijk stembureau"],
           ["Publieke sleutel", "Bekijken en downloaden"],
@@ -425,8 +425,8 @@ describe("ElectionHomePage", () => {
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
         ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
-        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
+        ["Kiesgebied", "0035 - Heemdamseburg"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
         ["Stembureaus", "0 stembureaus"],
@@ -1092,8 +1092,8 @@ describe("ElectionHomePage", () => {
       expect(election_information_table).toBeVisible();
       expect(election_information_table).toHaveTableContent([
         ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
-        ["Kiesgebied", "CSB - Heemdamseburg"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
+        ["Kiesgebied", "CSB - Heemdamseburg"],
         ["Type stembureau", "Centraal stembureau"],
       ]);
     });

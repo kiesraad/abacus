@@ -161,7 +161,7 @@ impl ElectionWithPoliticalGroups {
             (CSB, Provincial) => "provincie",
             (CSB, WaterAuthority) => "waterschap",
             (CSB, Municipal) | (GSB, _) => "gemeente",
-            (CSB, HouseOfRepresentatives) => "staat",
+            (CSB, HouseOfRepresentatives) => "",
         }
     }
 }
@@ -861,9 +861,11 @@ pub mod tests {
             (CSB, Provincial, "provincie"),
             (CSB, WaterAuthority, "waterschap"),
             (CSB, Municipal, "gemeente"),
+            (CSB, HouseOfRepresentatives, ""),
             (GSB, Provincial, "gemeente"),
             (GSB, WaterAuthority, "gemeente"),
             (GSB, Municipal, "gemeente"),
+            (GSB, HouseOfRepresentatives, "gemeente"),
         ];
 
         for (committee_category, election_category, expected) in &test_cases {

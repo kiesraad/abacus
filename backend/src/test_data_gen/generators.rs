@@ -339,7 +339,7 @@ pub async fn create_test_election(
 fn format_election_name(
     rng: &mut impl rand::RngExt,
     election_category: ElectionCategory,
-    domain_name: String,
+    domain_name: Option<String>,
     year: i32,
 ) -> String {
     let (election_type, election_locality) = match election_category {
@@ -355,10 +355,10 @@ fn format_election_name(
             ("Tweede Kamer der Staten-Generaal", domain_name)
         }
     };
-    if election_locality.is_empty() {
-        format!("{election_type} {year}")
+    if let Some(locality) = election_locality {
+        format!("{election_type} {locality} {year}")
     } else {
-        format!("{election_type} {election_locality} {year}")
+        format!("{election_type} {year}")
     }
 }
 
@@ -418,9 +418,9 @@ fn generate_election(
         rng,
         args.election_category,
         if let Some(domain) = domain.clone() {
-            domain.name
+            Some(domain.name)
         } else {
-            "".to_string()
+            None
         },
         year,
     );
@@ -429,16 +429,19 @@ fn generate_election(
         .custom_name
         .clone()
         .unwrap_or_else(|| official_name.clone());
-    let election_id = if args.election_category == ElectionCategory::HouseOfRepresentatives {
-        format!("{category}{year}")
-    } else {
-        let cleaned_up_locality = &domain
-            .clone()
-            .expect("Domain name should exist for non country wide election")
-            .name
-            .replace(" ", "_")
-            .replace("'", "");
-        format!("{category}{year}_{cleaned_up_locality}")
+    let election_id = match args.election_category {
+        ElectionCategory::HouseOfRepresentatives => format!("{category}{year}"),
+        ElectionCategory::Municipal
+        | ElectionCategory::Provincial
+        | ElectionCategory::WaterAuthority => {
+            let cleaned_up_locality = &domain
+                .clone()
+                .expect("Domain name should exist for non country wide election")
+                .name
+                .replace(" ", "_")
+                .replace("'", "");
+            format!("{category}{year}_{cleaned_up_locality}")
+        }
     };
     let mut seats_range = args.seats.clone();
     match args.election_category {
@@ -461,10 +464,11 @@ fn generate_election(
 
     info!("Election has name '{name}'");
 
-    let number_of_seats = if args.election_category == ElectionCategory::HouseOfRepresentatives {
-        150
-    } else {
-        rng.random_range(seats_range)
+    let number_of_seats = match args.election_category {
+        ElectionCategory::HouseOfRepresentatives => 150,
+        ElectionCategory::Municipal
+        | ElectionCategory::Provincial
+        | ElectionCategory::WaterAuthority => rng.random_range(seats_range),
     };
 
     let counting_method = match args.committee_category {
@@ -522,18 +526,21 @@ fn generate_election(
         },
         authority_name: authority_name.clone(),
         authority_region: authority_name.clone(),
-        district: if args.election_category == ElectionCategory::HouseOfRepresentatives {
-            CommitteeDistrict::Specific(RegionDetails {
-                name: authority_name.clone(),
-                key: RegionKey {
-                    category: ElectoralDistrict,
-                    number: Some(rng.random_range(1..=19)),
-                },
-                roman_numerals: rng.random_bool(0.5),
-                frisian_export_allowed: rng.random_bool(0.5),
-            })
-        } else {
-            CommitteeDistrict::None
+        district: match args.election_category {
+            ElectionCategory::HouseOfRepresentatives => {
+                CommitteeDistrict::Specific(RegionDetails {
+                    name: authority_name.clone(),
+                    key: RegionKey {
+                        category: ElectoralDistrict,
+                        number: Some(rng.random_range(1..=20)),
+                    },
+                    roman_numerals: false,
+                    frisian_export_allowed: rng.random_bool(0.5),
+                })
+            }
+            ElectionCategory::Municipal
+            | ElectionCategory::Provincial
+            | ElectionCategory::WaterAuthority => CommitteeDistrict::None,
         },
         domain,
         election_id,

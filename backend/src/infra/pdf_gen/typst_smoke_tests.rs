@@ -191,13 +191,22 @@ fn random_committee_district(
 ) -> CommitteeDistrict {
     match sub_category {
         ElectionSubCategory::PS2 | ElectionSubCategory::TK => {
+            let num_districts = if sub_category == ElectionSubCategory::TK {
+                20
+            } else {
+                19
+            };
             CommitteeDistrict::Specific(RegionDetails {
                 name: random_string(rng, string_length),
                 key: RegionKey {
                     category: ElectoralDistrict,
-                    number: Some(rng.random_range(1..=19)),
+                    number: Some(rng.random_range(1..=num_districts)),
                 },
-                roman_numerals: rng.random_bool(0.5),
+                roman_numerals: if sub_category == ElectionSubCategory::TK {
+                    false
+                } else {
+                    rng.random_bool(0.5)
+                },
                 frisian_export_allowed: rng.random_bool(0.5),
             })
         }
@@ -614,6 +623,7 @@ async fn test_n_10_1() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -649,6 +659,7 @@ async fn test_n_10_1_inlegvel() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -683,6 +694,7 @@ async fn test_n_10_2() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -717,6 +729,7 @@ async fn test_na_14_1_versie_1() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -754,6 +767,7 @@ async fn test_na_14_1_versie_2() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -801,6 +815,7 @@ async fn test_na_14_2() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -858,6 +873,7 @@ async fn test_na_14_2_bijlage_1() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -903,6 +919,7 @@ async fn test_na_31_1() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -950,6 +967,7 @@ async fn test_na_31_1_inlegvel() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -981,6 +999,7 @@ async fn test_na_31_2() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -1028,6 +1047,7 @@ async fn test_na_31_2_bijlage_1() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -1063,6 +1083,7 @@ async fn test_na_31_2_inlegvel() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
         ElectionCategory::Provincial,
         ElectionCategory::WaterAuthority,
@@ -1094,9 +1115,10 @@ async fn test_p_2a() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     for election_category in [
+        ElectionCategory::HouseOfRepresentatives,
         ElectionCategory::Municipal,
-        ElectionCategory::WaterAuthority,
         ElectionCategory::Provincial,
+        ElectionCategory::WaterAuthority,
     ] {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(

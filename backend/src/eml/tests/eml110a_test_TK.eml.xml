@@ -25,12 +25,12 @@
                 <kr:Region RegionCategory="STAAT">
                     <kr:RegionName>Nederland</kr:RegionName>
                 </kr:Region>
-                <kr:Region RegionNumber="1" RegionCategory="KIESKRING" RomanNumerals="true" SuperiorRegionCategory="STAAT">
+                <kr:Region RegionNumber="1" RegionCategory="KIESKRING" SuperiorRegionCategory="STAAT">
                     <kr:RegionName>Heemdamseburg</kr:RegionName>
                     <kr:Committee CommitteeCategory="CSB" CommitteeName="De Kiesraad"/>
                     <kr:Committee CommitteeCategory="HSB" AcceptCentralSubmissions="true"/>
                 </kr:Region>
-                <kr:Region RegionNumber="2" RegionCategory="KIESKRING" RomanNumerals="true" SuperiorRegionCategory="STAAT">
+                <kr:Region RegionNumber="2" RegionCategory="KIESKRING" SuperiorRegionCategory="STAAT">
                     <kr:RegionName>'s-Gravenveen</kr:RegionName>
                     <kr:Committee CommitteeCategory="HSB"/>
                 </kr:Region>

@@ -19,6 +19,7 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   BINSTALL_DISABLE_TELEMETRY: "true"
+  BINSTALL_NO_CONFIRM: "true"
 
 concurrency:
   group: cargo-deny-${{ github.head_ref || github.run_id }}
@@ -38,7 +39,9 @@ jobs:
       - name: Install Binstall
         uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # main
       - name: Install cargo-deny
-        run: cargo binstall cargo-deny
+        run: cargo binstall --locked cargo-deny
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Check advisories (backend workspace)
         run: cargo deny check advisories
       - name: Check advisories (fuzz workspace)

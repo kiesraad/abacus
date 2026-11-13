@@ -7,6 +7,7 @@ describe("Election util", () => {
     ["Municipal", true],
     ["Provincial", false],
     ["WaterAuthority", false],
+    ["HouseOfRepresentatives", false],
   ] satisfies Array<[ElectionCategory, boolean]>)("Election isLocalElection category %s as %s", (input, expected) => {
     expect(isLocalElection(input)).toBe(expected);
   });

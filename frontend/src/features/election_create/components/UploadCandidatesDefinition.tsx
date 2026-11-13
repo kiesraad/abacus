@@ -19,7 +19,7 @@ import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
 function getSubtitle(election: NewElection) {
-  if (election.sub_category === "PS2") {
+  if (["PS2", "TK"].includes(election.sub_category)) {
     switch (election.committee_category) {
       case "GSB":
         if (election.district.district === "Specific") {
@@ -133,7 +133,7 @@ export function UploadCandidatesDefinition() {
 
     return (
       <CheckHash
-        title={`${state.election.election_id.split("_")[0]} ${state.election.domain?.name}`}
+        title={`${state.election.election_id.split("_")[0]} ${state.election.domain?.name ?? ""}`.trim()}
         subtitle={getSubtitle(state.election)}
         header={t("election.check_eml.candidates_title")}
         description={tx("election.check_eml.candidates_description", {

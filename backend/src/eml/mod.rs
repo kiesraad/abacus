@@ -155,6 +155,7 @@ impl NewElection {
             Eml::AB => Domain::WaterAuthority,
             Eml::GR => Domain::Municipal,
             Eml::PS => Domain::Provincial,
+            Eml::TK => Domain::HouseOfRepresentatives,
             _ => return Err(EMLImportError::LimitedElectionsSupported),
         };
         Ok(category)
@@ -172,6 +173,7 @@ impl NewElection {
             Eml::GR2 => Domain::GR2,
             Eml::PS1 => Domain::PS1,
             Eml::PS2 => Domain::PS2,
+            Eml::TK => Domain::TK,
             _ => return Err(EMLImportError::LimitedElectionsSupported),
         };
         Ok(sub_category)
@@ -544,6 +546,7 @@ impl ElectionWithPoliticalGroups {
             Domain::Municipal => Eml::GR,
             Domain::Provincial => Eml::PS,
             Domain::WaterAuthority => Eml::AB,
+            Domain::HouseOfRepresentatives => Eml::TK,
         }
     }
 
@@ -559,6 +562,7 @@ impl ElectionWithPoliticalGroups {
             Domain::GR2 => Eml::GR2,
             Domain::PS1 => Eml::PS1,
             Domain::PS2 => Eml::PS2,
+            Domain::TK => Eml::TK,
         }
     }
 
@@ -567,7 +571,7 @@ impl ElectionWithPoliticalGroups {
         use crate::domain::election::ElectionSubCategory as Domain;
         match self.sub_category {
             Domain::GR1 => 50,
-            Domain::GR2 | Domain::PS1 | Domain::PS2 | Domain::AB1 | Domain::AB2 => 25,
+            Domain::GR2 | Domain::PS1 | Domain::PS2 | Domain::AB1 | Domain::AB2 | Domain::TK => 25,
         }
     }
 
@@ -985,7 +989,7 @@ impl ElectionWithPoliticalGroups {
         data_source: &DataEntrySource,
         results: &crate::domain::results::Results,
         previous_results: Option<(&DataEntrySource, &crate::domain::results::Results)>,
-        committee_specific_totals: &crate::domain::tabulation::CommitteeSpecificTotals,
+        committee_specific_totals: &CommitteeSpecificTotals,
     ) -> Result<ReportingUnitVotes, EMLError> {
         let mut builder = ReportingUnitVotes::builder()
             .identifier(ReportingUnitIdentifier::new(
@@ -995,7 +999,7 @@ impl ElectionWithPoliticalGroups {
                 data_source.eml_reporting_unit_identifier_name(),
             ))
             .reporting_unit_type_option(match data_source {
-                crate::domain::data_entry::DataEntrySource::PollingStation(ps) => ps
+                DataEntrySource::PollingStation(ps) => ps
                     .polling_station()
                     .polling_station_type
                     .map(|t| t.as_eml_reporting_unit_type()),
@@ -1262,8 +1266,8 @@ fn build_candidate_result(
 fn add_reporting_unit_investigations(
     mut builder: ReportingUnitVotesBuilder,
     committee_session: &CommitteeSession,
-    data_source: &crate::domain::data_entry::DataEntrySource,
-    committee_specific_totals: &crate::domain::tabulation::CommitteeSpecificTotals,
+    data_source: &DataEntrySource,
+    committee_specific_totals: &CommitteeSpecificTotals,
 ) -> ReportingUnitVotesBuilder {
     use crate::domain::tabulation::{CommitteeSpecificTotals, GSBTotals};
 
@@ -1657,7 +1661,7 @@ mod tests {
     }
 
     #[test]
-    fn test_eml_repoting_unit_type_conversion() {
+    fn test_eml_reporting_unit_type_conversion() {
         use eml_nl::utils::ReportingUnitType;
 
         assert_eq!(

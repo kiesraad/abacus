@@ -22,6 +22,8 @@
   let name_parts = election.official_name.split(" ")
   name_parts.first() = lower(name_parts.first())
   [Verkiezing van de leden van het #name_parts.join(" ")]
+} else if (election.category == "HouseOfRepresentatives") {
+  [Verkiezing van de leden van de Tweede Kamer der Staten-Generaal]
 } else {
   ""
 }

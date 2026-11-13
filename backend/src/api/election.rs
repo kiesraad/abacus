@@ -681,8 +681,8 @@ async fn import_csb_election(
     )?;
     match new_election.category {
         ElectionCategory::Municipal | ElectionCategory::WaterAuthority => {}
-        // PS CSB support will be implemented later
-        ElectionCategory::Provincial => {
+        // PS & TK CSB support will be implemented later
+        ElectionCategory::Provincial | ElectionCategory::HouseOfRepresentatives => {
             return Err(EMLImportError::CommitteeCategoryForElectionCategoryNotSupported.into());
         }
     }

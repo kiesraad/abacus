@@ -190,15 +190,17 @@ fn random_committee_district(
     string_length: usize,
 ) -> CommitteeDistrict {
     match sub_category {
-        ElectionSubCategory::PS2 => CommitteeDistrict::Specific(RegionDetails {
-            name: random_string(rng, string_length),
-            key: RegionKey {
-                category: ElectoralDistrict,
-                number: Some(rng.random_range(1..=19)),
-            },
-            roman_numerals: rng.random_bool(0.5),
-            frisian_export_allowed: rng.random_bool(0.5),
-        }),
+        ElectionSubCategory::PS2 | ElectionSubCategory::TK => {
+            CommitteeDistrict::Specific(RegionDetails {
+                name: random_string(rng, string_length),
+                key: RegionKey {
+                    category: ElectoralDistrict,
+                    number: Some(rng.random_range(1..=19)),
+                },
+                roman_numerals: rng.random_bool(0.5),
+                frisian_export_allowed: rng.random_bool(0.5),
+            })
+        }
         ElectionSubCategory::AB1
         | ElectionSubCategory::AB2
         | ElectionSubCategory::GR1

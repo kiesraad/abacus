@@ -15,7 +15,8 @@ use crate::{
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
             ElectionCategory, ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber,
-            RegisteredPoliticalGroup, VoteCountingMethod,
+            RegionCategory::ElectoralDistrict, RegionDetails, RegionKey, RegisteredPoliticalGroup,
+            VoteCountingMethod,
         },
         field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
@@ -247,6 +248,11 @@ async fn generate_csb_election_data(
                 "CSB voor Provinciale Statenverkiezing wordt nog niet ondersteund",
             ));
         }
+        ElectionCategory::HouseOfRepresentatives => {
+            return Err(GenerateError::unsupported(
+                "CSB voor Tweede Kamerverkiezing wordt nog niet ondersteund",
+            ));
+        }
     };
 
     let new_status = match (args.with_data_entry, data_entry_complete) {
@@ -333,7 +339,7 @@ pub async fn create_test_election(
 fn format_election_name(
     rng: &mut impl rand::RngExt,
     election_category: ElectionCategory,
-    domain_name: &str,
+    domain_name: String,
     year: i32,
 ) -> String {
     let (election_type, election_locality) = match election_category {
@@ -345,8 +351,15 @@ fn format_election_name(
                 .expect("Missing test data"),
             domain_name,
         ),
+        ElectionCategory::HouseOfRepresentatives => {
+            ("Tweede Kamer der Staten-Generaal", domain_name)
+        }
     };
-    format!("{election_type} {election_locality} {year}")
+    if election_locality.is_empty() {
+        format!("{election_type} {year}")
+    } else {
+        format!("{election_type} {election_locality} {year}")
+    }
 }
 
 /// Generate a random election using the limits from args.
@@ -386,31 +399,52 @@ fn generate_election(
     let category = args.election_category.to_eml_code();
     let year = election_date.year();
     let domain = match args.election_category {
-        ElectionCategory::Municipal => ElectionDomain {
+        ElectionCategory::Municipal => Some(ElectionDomain {
             id: Some(super::data::domain_id(rng)),
             name: super::data::locality(rng).to_owned(),
-        },
-        ElectionCategory::Provincial => ElectionDomain {
+        }),
+        ElectionCategory::Provincial => Some(ElectionDomain {
             id: None,
             name: super::data::province(rng).to_owned(),
-        },
-        ElectionCategory::WaterAuthority => ElectionDomain {
+        }),
+        ElectionCategory::WaterAuthority => Some(ElectionDomain {
             id: Some(rng.random_range(1..23).to_string()),
             name: super::data::water_authority(rng).to_owned(),
-        },
+        }),
+        ElectionCategory::HouseOfRepresentatives => None,
     };
 
+    let mut official_name = format_election_name(
+        rng,
+        args.election_category,
+        if let Some(domain) = domain.clone() {
+            domain.name
+        } else {
+            "".to_string()
+        },
+        year,
+    );
     // use the previous data to generate some identifiers and names
     let name: String = args
         .custom_name
         .clone()
-        .unwrap_or_else(|| format_election_name(rng, args.election_category, &domain.name, year));
-    let cleaned_up_locality = domain.name.replace(" ", "_").replace("'", "");
-    let election_id = format!("{category}{year}_{cleaned_up_locality}");
-    let mut official_name = format_election_name(rng, args.election_category, &domain.name, year);
+        .unwrap_or_else(|| official_name.clone());
+    let election_id = if args.election_category == ElectionCategory::HouseOfRepresentatives {
+        format!("{category}{year}")
+    } else {
+        let cleaned_up_locality = &domain
+            .clone()
+            .expect("Domain name should exist for non country wide election")
+            .name
+            .replace(" ", "_")
+            .replace("'", "");
+        format!("{category}{year}_{cleaned_up_locality}")
+    };
     let mut seats_range = args.seats.clone();
     match args.election_category {
-        ElectionCategory::Municipal | ElectionCategory::Provincial => {}
+        ElectionCategory::Municipal
+        | ElectionCategory::Provincial
+        | ElectionCategory::HouseOfRepresentatives => {}
         ElectionCategory::WaterAuthority => {
             let mut chars = official_name.chars();
             let lowercased_name = match chars.next() {
@@ -427,7 +461,11 @@ fn generate_election(
 
     info!("Election has name '{name}'");
 
-    let number_of_seats = rng.random_range(seats_range);
+    let number_of_seats = if args.election_category == ElectionCategory::HouseOfRepresentatives {
+        150
+    } else {
+        rng.random_range(seats_range)
+    };
 
     let counting_method = match args.committee_category {
         CommitteeCategory::GSB => Some(args.counting_method.unwrap_or(VoteCountingMethod::CSO)),
@@ -441,18 +479,22 @@ fn generate_election(
 
     let is_municipal = match args.election_category {
         ElectionCategory::Municipal => true,
-        ElectionCategory::Provincial | ElectionCategory::WaterAuthority => false,
+        ElectionCategory::HouseOfRepresentatives
+        | ElectionCategory::Provincial
+        | ElectionCategory::WaterAuthority => false,
     };
 
-    // only used when we generate for a GSB committee
-    let gsb_committee_locality = super::data::locality(rng);
-
     let authority_name = if is_municipal || args.committee_category == CommitteeCategory::CSB {
-        // municipalities and CSB committees take the authority name from the domain
-        domain.name.clone()
+        if let Some(domain) = domain.clone() {
+            // municipalities and CSB committees take the authority name from the domain
+            domain.name
+        } else {
+            // except TK CSB committees, because then the authority name is "De Kiesraad"
+            "De Kiesraad".to_string()
+        }
     } else {
         // for GSBs we use another locality
-        gsb_committee_locality.to_owned()
+        super::data::locality(rng).to_owned()
     };
 
     // and put it all in the struct (generating some additional fields where needed)
@@ -466,6 +508,8 @@ fn generate_election(
             CommitteeCategory::GSB => {
                 if is_municipal {
                     domain
+                        .clone()
+                        .expect("Domain should exist for municipal election")
                         .id
                         .as_ref()
                         .expect("Domain ID should exist for municipal election")
@@ -478,8 +522,20 @@ fn generate_election(
         },
         authority_name: authority_name.clone(),
         authority_region: authority_name.clone(),
-        district: CommitteeDistrict::None,
-        domain: Some(domain.clone()),
+        district: if args.election_category == ElectionCategory::HouseOfRepresentatives {
+            CommitteeDistrict::Specific(RegionDetails {
+                name: authority_name.clone(),
+                key: RegionKey {
+                    category: ElectoralDistrict,
+                    number: Some(rng.random_range(1..=19)),
+                },
+                roman_numerals: rng.random_bool(0.5),
+                frisian_export_allowed: rng.random_bool(0.5),
+            })
+        } else {
+            CommitteeDistrict::None
+        },
+        domain,
         election_id,
         location: authority_name,
         category: args.election_category,

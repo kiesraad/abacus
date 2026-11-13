@@ -22,6 +22,7 @@ mod expected {
         (ElectionCategory::GR, RegionCategory::Municipality),
         (ElectionCategory::PS, RegionCategory::Province),
         (ElectionCategory::AB, RegionCategory::WaterAuthority),
+        (ElectionCategory::TK, RegionCategory::State),
     ];
 }
 
@@ -335,7 +336,7 @@ impl TryFrom<&ElectionDefinition> for ElectionTreeDetails {
         let election_sub_category = election_identifier.subcategory.copied_value()?;
         let root_region = election_hierarchy.root();
 
-        // Check if the root region is of the exepected category
+        // Check if the root region is of the expected category
         if !expected::CSB_REGION_CATEGORY
             .iter()
             .any(|(ec, rc)| *ec == election_category && *rc == root_region.key.category)
@@ -347,7 +348,7 @@ impl TryFrom<&ElectionDefinition> for ElectionTreeDetails {
         }
 
         let (committees, has_districts) = match (election_category, election_sub_category) {
-            // election within a municipality
+            // Election within a municipality
             (ElectionCategory::GR, _) => (
                 vec![CommitteeDetails::new(
                     root_region.region(),
@@ -358,13 +359,12 @@ impl TryFrom<&ElectionDefinition> for ElectionTreeDetails {
                 )?],
                 false,
             ),
-            // elections without a HSB, but larger than a municipality
+            // Elections without a HSB, but larger than a municipality
             (ElectionCategory::AB, _) | (ElectionCategory::PS, ElectionSubcategory::PS1) => {
                 (committees_single_electoral_district(root_region)?, false)
             }
-
             // Elections with HSBs
-            (ElectionCategory::PS, ElectionSubcategory::PS2) => {
+            (ElectionCategory::PS, ElectionSubcategory::PS2) | (ElectionCategory::TK, _) => {
                 (committees_multiple_electoral_districts(root_region)?, true)
             }
 

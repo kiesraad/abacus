@@ -58,10 +58,54 @@ describe("votersAndVotesSection", () => {
 describe("differencesSection", () => {
   test("should have correct structure", () => {
     expect(createDifferencesSection(model).id).toBe("differences_counts");
-    expect(createDifferencesSection(model).subsections).toHaveLength(3);
-    expect(createDifferencesSection(model).subsections[0]?.type).toBe("checkboxes");
-    expect(createDifferencesSection(model).subsections[1]?.type).toBe("inputGrid");
-    expect(createDifferencesSection(model).subsections[2]?.type).toBe("checkboxes");
+    expect(createDifferencesSection(model).subsections).toHaveLength(4);
+    expect(createDifferencesSection(model).subsections[0]?.type).toBe("message");
+    expect(createDifferencesSection(model).subsections[1]?.type).toBe("checkboxes");
+    expect(createDifferencesSection(model).subsections[2]?.type).toBe("inputGrid");
+    expect(createDifferencesSection(model).subsections[3]?.type).toBe("checkboxes");
+  });
+
+  test.each([
+    "DSONextSession",
+    "CSONextSession",
+  ] as const)("should start with a notice about the checkboxes for %s", (nextSessionModel) => {
+    const subsections = createDifferencesSection(nextSessionModel).subsections;
+    expect(subsections.map((subsection) => subsection.type)).toEqual([
+      "message",
+      "checkboxes",
+      "inputGrid",
+      "checkboxes",
+    ]);
+    expect(subsections[0]).toEqual({
+      type: "message",
+      variant: "notify",
+      title: "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+      message: "Zijn er ook getallen gecorrigeerd? Neem die over in de kolom ‘gecorrigeerd’",
+    });
+  });
+
+  test.each([
+    "DSOFirstSession",
+    "CSOFirstSession",
+  ] as const)("should start with a plain message about the checkboxes for %s", (firstSessionModel) => {
+    const subsections = createDifferencesSection(firstSessionModel).subsections;
+    expect(subsections.map((subsection) => subsection.type)).toEqual([
+      "message",
+      "checkboxes",
+      "inputGrid",
+      "checkboxes",
+    ]);
+    expect(subsections[0]).toEqual({
+      type: "message",
+      message: "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+    });
+  });
+
+  test("should not have a notice about the checkboxes for GSB", () => {
+    const subsections = createDifferencesSection("GSB").subsections;
+    expect(subsections.some((subsection) => subsection.type === "message" && subsection.variant === "notify")).toBe(
+      false,
+    );
   });
 
   test("should have correct section number", () => {
@@ -70,7 +114,7 @@ describe("differencesSection", () => {
   });
 
   test("should have all differences count fields", () => {
-    const inputGrid = createDifferencesSection(model).subsections[1] as InputGridSubsection;
+    const inputGrid = createDifferencesSection(model).subsections[2] as InputGridSubsection;
     expect(inputGrid.type).toBe("inputGrid");
 
     expect(inputGrid.rows.map((row) => row.path)).toEqual([
@@ -80,13 +124,13 @@ describe("differencesSection", () => {
   });
 
   test("should have correct row codes", () => {
-    const differencesSectionInputGrid = createDifferencesSection(model).subsections[1] as InputGridSubsection;
+    const differencesSectionInputGrid = createDifferencesSection(model).subsections[2] as InputGridSubsection;
     expect(differencesSectionInputGrid.type).toBe("inputGrid");
     expect(differencesSectionInputGrid.rows.map((row) => row.code)).toEqual(["I", "J"]);
   });
 
   test("should not have autoFocusInput on first row because it is not the first section", () => {
-    const differencesSectionInputGrid = createDifferencesSection(model).subsections[1] as InputGridSubsection;
+    const differencesSectionInputGrid = createDifferencesSection(model).subsections[2] as InputGridSubsection;
     expect(differencesSectionInputGrid.type).toBe("inputGrid");
     expect(differencesSectionInputGrid.rows[0]!.autoFocusInput).not.toBe(true);
   });

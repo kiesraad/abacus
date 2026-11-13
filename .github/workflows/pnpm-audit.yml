@@ -35,10 +35,10 @@ jobs:
           node-version: 24
           package-manager-cache: false
       - name: Install pnpm
-        run: >
-          npm install --global corepack@latest &&
-          corepack enable &&
-          corepack prepare pnpm@latest-11 --activate
+        uses: pnpm/setup@v3.1.2
+        with:
+          working-directory: frontend
+          install: false
       # Production dependencies are checked separately, so that a failure
       # shows whether shipped code or only development tooling is affected.
       - name: Check advisories (production dependencies)

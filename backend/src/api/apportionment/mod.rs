@@ -14,7 +14,7 @@ pub use self::{
 use crate::{
     APIError, AppState,
     api::middleware::authentication::RouteAuthorization,
-    domain::role::Role,
+    domain::{apportionment_state::ApportionmentStateError, role::Role},
     error::{ApiErrorResponse, ErrorReference, ErrorResponse},
 };
 
@@ -88,6 +88,33 @@ impl ApiErrorResponse for ApportionmentApiError {
     }
 }
 
+impl ApiErrorResponse for ApportionmentStateError {
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        match self {
+            ApportionmentStateError::CandidateNotFound => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new("Candidate not found", ErrorReference::EntryNotFound, false),
+            ),
+            ApportionmentStateError::CandidateNotUnique => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new(
+                    "Candidate not unique",
+                    ErrorReference::EntryNotUnique,
+                    false,
+                ),
+            ),
+            ApportionmentStateError::InvalidState => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new(
+                    "Invalid state",
+                    ErrorReference::InvalidStateTransition,
+                    false,
+                ),
+            ),
+        }
+    }
+}
+
 impl From<apportionment::ApportionmentError> for APIError {
     fn from(error: apportionment::ApportionmentError) -> Self {
         match error {
@@ -101,12 +128,6 @@ impl From<apportionment::ApportionmentError> for APIError {
                 ApportionmentApiError::UnsortedInput.into()
             }
         }
-    }
-}
-
-impl From<ApportionmentApiError> for APIError {
-    fn from(err: ApportionmentApiError) -> Self {
-        APIError::Delegated(Box::new(err))
     }
 }
 

@@ -82,7 +82,7 @@ pub async fn update_state(
 ) -> Result<ApportionmentState, APIError> {
     let (committee_session, state) = get_state(conn, election_id).await?;
 
-    let state = update_fn(state).map_err(|err| APIError::Delegated(Box::new(err)))?;
+    let state = update_fn(state)?;
 
     apportionment_state_repo::upsert(conn, committee_session.id, &state).await?;
 

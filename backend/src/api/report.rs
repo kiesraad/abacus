@@ -52,12 +52,6 @@ impl ApiErrorResponse for ReportApiError {
     }
 }
 
-impl From<ReportApiError> for APIError {
-    fn from(err: ReportApiError) -> Self {
-        APIError::Delegated(Box::new(err))
-    }
-}
-
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 

@@ -1,16 +1,11 @@
-use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::{
-    ErrorResponse,
-    domain::{
-        apportionment::{
-            CandidateDrawingLotsVariant, CandidateDrawn, ListDrawingLotsVariant, ListDrawn,
-        },
-        election::{CandidateNumber, PGNumber},
+use crate::domain::{
+    apportionment::{
+        CandidateDrawingLotsVariant, CandidateDrawn, ListDrawingLotsVariant, ListDrawn,
     },
-    error::{ApiErrorResponse, ErrorReference},
+    election::{CandidateNumber, PGNumber},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -18,33 +13,6 @@ pub enum ApportionmentStateError {
     CandidateNotFound,
     CandidateNotUnique,
     InvalidState,
-}
-
-impl ApiErrorResponse for ApportionmentStateError {
-    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
-        match self {
-            ApportionmentStateError::CandidateNotFound => (
-                StatusCode::CONFLICT,
-                ErrorResponse::new("Candidate not found", ErrorReference::EntryNotFound, false),
-            ),
-            ApportionmentStateError::CandidateNotUnique => (
-                StatusCode::CONFLICT,
-                ErrorResponse::new(
-                    "Candidate not unique",
-                    ErrorReference::EntryNotUnique,
-                    false,
-                ),
-            ),
-            ApportionmentStateError::InvalidState => (
-                StatusCode::CONFLICT,
-                ErrorResponse::new(
-                    "Invalid state",
-                    ErrorReference::InvalidStateTransition,
-                    false,
-                ),
-            ),
-        }
-    }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize, ToSchema)]

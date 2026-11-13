@@ -43,7 +43,7 @@ jobs:
         run: pnpm install --prod
       - name: Build
         run: pnpm build
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: frontend-production-build
           path: frontend/dist
@@ -75,7 +75,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Download Abacus Frontend
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v8.0.2
         with:
           name: frontend-production-build
           path: frontend/dist
@@ -99,14 +99,14 @@ jobs:
       # no airgap detection build, used for the abacus-test.nl deployment
       - name: Build without airgap detection
         run: cargo build --locked --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: abacus-${{ matrix.target.os }}-no-airgap-detection
           path: ${{ matrix.target.binary }}
       # TLS build without airgap detection, used for the e2e tests
       - name: Build with TLS, without airgap detection
         run: cargo build --locked --release --no-default-features --features memory-serve,embed-typst,tls --target=${{ matrix.target.name }}
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: abacus-${{ matrix.target.os }}-e2e-tls
           path: ${{ matrix.target.binary }}
@@ -114,7 +114,7 @@ jobs:
       - name: Build with airgap detection and TLS
         run: cargo build --locked --release --no-default-features --features memory-serve,embed-typst,airgap-detection,tls --target=${{ matrix.target.name }}
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest-build-provenance@v4.2.2
         with:
           subject-path: ${{ matrix.target.binary }}
         if: inputs.attest
@@ -128,12 +128,12 @@ jobs:
         env:
           NAME: abacus-linux-${{ inputs.version }}
         if: matrix.target.os == 'ubuntu-latest'
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: abacus-release-ubuntu-latest
           path: ${{ runner.temp }}/abacus-linux-${{ inputs.version }}.tar.gz
         if: matrix.target.os == 'ubuntu-latest'
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: abacus-release-windows-latest
           path: ${{ matrix.target.binary }}
@@ -151,7 +151,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Download Abacus
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v8.0.2
         with:
           name: abacus-release-windows-latest
           path: packaging/windows
@@ -160,7 +160,7 @@ jobs:
       # Inno Setup is preinstalled on the runner image
       - name: Compile installer
         run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" abacus.iss'
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: abacus-release-windows-installer
           path: packaging/windows/Output/abacussetup.exe
@@ -198,7 +198,7 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm playwright install --with-deps --no-shell
       - name: Download abacus
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v8.0.2
         with:
           name: abacus-${{ matrix.os }}-e2e-tls
           path: builds/backend
@@ -208,7 +208,7 @@ jobs:
       - name: Run Playwright e2e tests
         run: pnpm test:e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: playwright-report-release-${{ matrix.os }}-${{ matrix.shardIndex }}

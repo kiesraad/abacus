@@ -54,7 +54,9 @@ export function ElectionInformationTable({
             <Table.HeaderCell scope="row" className="normal">
               {t("election.district")}
             </Table.HeaderCell>
-            <Table.Cell>{`${getDistrictNumber(election.district)} - ${election.district.name}`}</Table.Cell>
+            <Table.Cell>
+              {getDistrictNumber(election.district)} - {election.district.name}
+            </Table.Cell>
           </Table.Row>
         )}
         <Table.Row>

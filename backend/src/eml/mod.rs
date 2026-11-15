@@ -1658,6 +1658,13 @@ mod tests {
             ),
             "Provinciale Staten Juinen 2023"
         );
+        assert_eq!(
+            format_election_name(
+                "Tweede Kamer der Staten-Generaal 2025",
+                ElectionCategory::HouseOfRepresentatives
+            ),
+            "Tweede Kamer der Staten-Generaal 2025"
+        )
     }
 
     #[test]

@@ -49,8 +49,9 @@ const config: PlaywrightTestConfig = defineConfig({
   workers: process.env.CI ? "100%" : undefined,
   fullyParallel: true,
   // ...commonConfig,
-  // Increase the test timeout on CI, which is usually slower
+  // Increase the test and expect timeout on CI, which is usually slower
   timeout: process.env.CI ? 30_000 : 20_000,
+  expect: { timeout: process.env.CI ? 10_000 : 5_000 },
   reporter: process.env.CI
     ? [["list"], ["github"], ["junit", { outputFile: "playwright.e2e.junit.xml" }], ["html", { open: "never" }]]
     : "list",

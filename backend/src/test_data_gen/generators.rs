@@ -1263,9 +1263,23 @@ mod tests {
             create_test_election(&election(GSB, Municipal, Some(CSO)), &pool, None).await,
             create_test_election(&election(GSB, Municipal, Some(DSO)), &pool, None).await,
             create_test_election(&election(CSB, Municipal, None), &pool, None).await,
+            create_test_election(&election(GSB, Provincial, Some(CSO)), &pool, None).await,
+            create_test_election(&election(GSB, Provincial, Some(DSO)), &pool, None).await,
             create_test_election(&election(GSB, WaterAuthority, Some(CSO)), &pool, None).await,
             create_test_election(&election(GSB, WaterAuthority, Some(DSO)), &pool, None).await,
             create_test_election(&election(CSB, WaterAuthority, None), &pool, None).await,
+            create_test_election(
+                &election(GSB, HouseOfRepresentatives, Some(CSO)),
+                &pool,
+                None,
+            )
+            .await,
+            create_test_election(
+                &election(GSB, HouseOfRepresentatives, Some(DSO)),
+                &pool,
+                None,
+            )
+            .await,
         ];
 
         let mut conn = pool.acquire().await.unwrap();

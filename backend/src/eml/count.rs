@@ -5,6 +5,7 @@ use eml_nl::{
     },
 };
 
+use super::EMLImportError;
 use crate::domain::{
     election::{CandidateNumber, ElectionCategory, PGNumber},
     results::{
@@ -16,8 +17,6 @@ use crate::domain::{
         votes_counts::VotesCounts,
     },
 };
-
-use super::EMLImportError;
 
 impl GSBResults {
     /// Create GSB results from the `TotalVotes` element in an EML_NL 510b count document.
@@ -400,6 +399,8 @@ mod tests {
             (Provincial, 42, Some(42), true),
             (WaterAuthority, 0, Some(0), true),
             (WaterAuthority, 42, Some(42), true),
+            (HouseOfRepresentatives, 0, Some(0), true),
+            (HouseOfRepresentatives, 42, Some(42), true),
         ];
 
         for (category, voter_cards, expected, accepted) in cases {

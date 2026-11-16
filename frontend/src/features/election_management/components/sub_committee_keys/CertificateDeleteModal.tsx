@@ -49,7 +49,7 @@ export function CertificateDeleteModal({
         >
           {t("sub_committee_keys.delete_key")}
         </Button>
-        <Button variant="secondary" size="xl" onClick={onCancel} disabled={isLoading}>
+        <Button variant="secondary" size="lg" onClick={onCancel} disabled={isLoading}>
           {t("cancel")}
         </Button>
       </nav>

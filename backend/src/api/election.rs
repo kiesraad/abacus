@@ -493,6 +493,8 @@ fn validate_gsb_election(
                 .get_committees(CommitteeCategory::GSB)
                 .iter()
                 .map(|c| c.responsible_region.clone())
+                // Filter out NBSB until supported
+                .filter(|r| r.key.number != Some(NBSB_REGION_NUMBER))
                 .collect(),
         },
     )))
@@ -718,6 +720,9 @@ pub fn check_hash(
     Ok(computed)
 }
 
+/// Region number of the NBSB, which is not supported yet.
+const NBSB_REGION_NUMBER: u16 = 9010;
+
 /// Parse EML_NL 110 election definition and EML_NL 230 candidate list into a [`NewElection`]
 fn parse_election_candidates_eml(
     election_eml_data: &str,
@@ -725,6 +730,13 @@ fn parse_election_candidates_eml(
     fallback_to_csb: bool,
     candidate_eml_data: Option<&str>,
 ) -> Result<(NewElection, ElectionTreeDetails), APIError> {
+    // Do not allow NBSB until supported
+    if let Some((_, Some(key))) = selected_committee
+        && key.number == Some(NBSB_REGION_NUMBER)
+    {
+        return Err(APIError::EmlImportError(EMLImportError::UnknownCommittee));
+    }
+
     let (mut election, election_tree) =
         NewElection::from_eml_str(election_eml_data, selected_committee, fallback_to_csb)?;
     // Committees concerning all districts are not supported yet.

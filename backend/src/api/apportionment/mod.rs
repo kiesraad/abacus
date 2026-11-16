@@ -1,6 +1,5 @@
 use apportionment;
 use axum::http::StatusCode;
-use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod handlers;
@@ -30,10 +29,6 @@ pub enum ApportionmentApiError {
 }
 
 impl ApiErrorResponse for ApportionmentApiError {
-    fn log(&self) {
-        error!("Apportionment error: {:?}", self);
-    }
-
     fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
         match self {
             ApportionmentApiError::ApportionmentNotCompleted => (

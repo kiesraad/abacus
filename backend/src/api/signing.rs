@@ -11,7 +11,6 @@ use chrono::{DateTime, Utc};
 use eml_signature;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
-use tracing::info;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -34,10 +33,6 @@ use crate::{
 };
 
 impl ApiErrorResponse for SubCommitteeCertificateError {
-    fn log(&self) {
-        info!("Sub committee certificate rejected: {:?}", self);
-    }
-
     fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
         let (status, message, reference) = match self {
             SubCommitteeCertificateError::InvalidCertificate(_) => (

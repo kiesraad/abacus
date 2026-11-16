@@ -43,14 +43,6 @@ impl ApiErrorResponse for ModelsError {
             ),
         }
     }
-
-    fn log(&self) {
-        match self {
-            ModelsError::DataIntegrityError(message) => {
-                error!("Models data integrity error: {}", message);
-            }
-        }
-    }
 }
 
 pub fn router() -> OpenApiRouter<AppState> {

@@ -68,6 +68,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_download_zip_total_counts_csb).authorize(&[CoordinatorCSB]))
 }
 
+// TODO: TK CSB doesn't have a region category
 pub fn download_zip_filename(
     base: &str,
     election: &ElectionWithPoliticalGroups,

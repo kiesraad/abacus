@@ -8605,7 +8605,8 @@
         "enum": [
           "Municipal",
           "Provincial",
-          "WaterAuthority"
+          "WaterAuthority",
+          "HouseOfRepresentatives"
         ]
       },
       "ElectionCreationRequest": {
@@ -8926,7 +8927,8 @@
           "GR1",
           "GR2",
           "PS1",
-          "PS2"
+          "PS2",
+          "TK"
         ]
       },
       "ElectionTotals": {

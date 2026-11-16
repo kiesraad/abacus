@@ -1195,7 +1195,7 @@ export interface ElectionApportionmentResponse {
 /**
  * Election category (limited for now)
  */
-export const electionCategoryValues = ["Municipal", "Provincial", "WaterAuthority"] as const;
+export const electionCategoryValues = ["Municipal", "Provincial", "WaterAuthority", "HouseOfRepresentatives"] as const;
 export type ElectionCategory = (typeof electionCategoryValues)[number];
 
 export type ElectionCreationRequest =
@@ -1287,7 +1287,7 @@ export interface ElectionStatusResponseEntry {
 /**
  * Election sub category (limited for now)
  */
-export const electionSubCategoryValues = ["AB1", "AB2", "GR1", "GR2", "PS1", "PS2"] as const;
+export const electionSubCategoryValues = ["AB1", "AB2", "GR1", "GR2", "PS1", "PS2", "TK"] as const;
 export type ElectionSubCategory = (typeof electionSubCategoryValues)[number];
 
 /**

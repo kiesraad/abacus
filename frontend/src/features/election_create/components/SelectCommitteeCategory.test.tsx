@@ -30,6 +30,7 @@ describe("CommitteeCategory component", () => {
     ["GSB for a municipal election", "GSB", "Municipal", "/elections/create/list-of-candidates"],
     ["GSB for a provincial election", "GSB", "Provincial", "/elections/create/select-gsb"],
     ["GSB for a water authority election", "GSB", "WaterAuthority", "/elections/create/select-gsb"],
+    ["GSB for a house of representatives election", "GSB", "HouseOfRepresentatives", "/elections/create/select-gsb"],
   ])("%s", async (_, committeeCategory, electionCategory, expected) => {
     const state = { election: { ...election, category: electionCategory }, committeeCategory: committeeCategory };
     const dispatch = vi.fn();
@@ -60,7 +61,7 @@ describe("CommitteeCategory component", () => {
       expect(optionGsb).toBeChecked();
       expect(optionCsb).not.toBeChecked();
     }
-    if (electionCategory === "Provincial") {
+    if (electionCategory === "Provincial" || electionCategory === "HouseOfRepresentatives") {
       expect(optionCsb).toBeDisabled();
     } else {
       expect(optionCsb).not.toBeDisabled();

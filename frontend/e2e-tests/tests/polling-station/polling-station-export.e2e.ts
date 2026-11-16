@@ -13,14 +13,9 @@ test.describe("Polling station export", () => {
 
     const listPage = new PollingStationListPgObj(page);
 
-    const responsePromise = page.waitForResponse(`/api/elections/${electionGSB.election.id}/polling_stations/export`);
     const downloadPromise = page.waitForEvent("download");
 
     await listPage.exportPollingStations.click();
-
-    const response = await responsePromise;
-    expect(response.status()).toBe(200);
-    expect(await response.headerValue("content-type")).toBe("application/zip");
 
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(

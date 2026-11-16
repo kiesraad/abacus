@@ -283,14 +283,14 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-PS.json",
     },
     ModelVariant {
-        name: "model-na-31-2-bijlage-1-TK-G",
+        name: "model-na-31-2-bijlage-1-TK-GSB",
         model: "model-na-31-2-bijlage-1",
-        input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-TK-G.json",
+        input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-TK-GSB.json",
     },
     ModelVariant {
-        name: "model-na-31-2-bijlage-1-TK-OL",
+        name: "model-na-31-2-bijlage-1-TK-SOL",
         model: "model-na-31-2-bijlage-1",
-        input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-TK-OL.json",
+        input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-TK-SOL.json",
     },
     ModelVariant {
         name: "model-na-31-2-bijlage-1-WS",

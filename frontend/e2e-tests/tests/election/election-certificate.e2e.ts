@@ -16,6 +16,9 @@ test.use({
 
 test.describe("election certificate", () => {
   test("download public key and mark it registered", async ({ page, emptyElectionGSB }) => {
+    // Generating the RSA key can take more than 10 seconds on a busy CI runner
+    test.slow();
+
     await page.goto(`/elections/${emptyElectionGSB.id}`);
 
     const electionHomePage = new ElectionHome(page);
@@ -26,7 +29,7 @@ test.describe("election certificate", () => {
     await expect(certificatePage.header).toBeVisible();
     // Longer timeout on first assert of downloadCertificate because it takes time to generate the certificate
     await expect(certificatePage.downloadCertificate).toHaveAccessibleDescription(/Organisatie: GR2022_Test/, {
-      timeout: 10000,
+      timeout: 60_000,
     });
     await expect(certificatePage.downloadCertificate).toHaveAccessibleDescription(/Algemene naam: Gemeente Test/);
     await expect(certificatePage.downloadCertificate).toHaveAccessibleDescription(

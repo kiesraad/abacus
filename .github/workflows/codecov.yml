@@ -86,10 +86,10 @@ jobs:
           node-version: 24
           package-manager-cache: false
       - name: Install pnpm
-        run: >
-          npm install --global corepack@latest &&
-          corepack enable &&
-          corepack prepare pnpm@latest-11 --activate
+        uses: pnpm/setup@v3.1.2
+        with:
+          working-directory: frontend
+          install: false
       - name: Install dependencies
         run: pnpm install
       - name: Run Vite build to report bundle size

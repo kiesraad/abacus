@@ -8,8 +8,6 @@ export function isLocalElection(electionCategory: ElectionCategory): boolean {
     case "Provincial":
     case "WaterAuthority":
       return false;
-    default:
-      return electionCategory satisfies never;
   }
 }
 

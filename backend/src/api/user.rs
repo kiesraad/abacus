@@ -11,7 +11,9 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
-        authentication::{UserCreatedAuditData, UserDeletedAuditData, UserUpdatedAuditData},
+        authentication::{
+            UserCreatedAuditData, UserDeletedAuditData, UserUpdatedAuditData, remove_user_session,
+        },
         middleware::authentication::{
             RouteAuthorization,
             error::AuthenticationError,
@@ -21,10 +23,7 @@ use crate::{
     domain::role::Role,
     error::ErrorReference,
     infra::audit_log::AuditService,
-    repository::{
-        session_repo,
-        user_repo::{self, User, UserId},
-    },
+    repository::user_repo::{self, User, UserId},
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {
@@ -303,7 +302,7 @@ pub async fn user_update(
     if let Some(password_hash) = temp_password_hash {
         user_repo::set_temporary_password(&mut tx, user_id, &password_hash).await?;
 
-        session_repo::delete_user_session(&mut tx, user_id).await?;
+        remove_user_session(&mut tx, &user).await?;
     };
 
     let user = user_repo::get_by_id(&mut tx, user_id)
@@ -377,9 +376,14 @@ async fn user_delete(
 #[cfg(test)]
 mod tests {
     use axum::response::IntoResponse;
+    use chrono::TimeDelta;
     use http_body_util::BodyExt;
 
     use super::*;
+    use crate::{
+        infra::audit_log::AuditEventType,
+        repository::session_repo::{self, Session},
+    };
 
     impl CreateUserRequest {
         pub fn from_username(username: &str) -> Self {
@@ -451,6 +455,41 @@ mod tests {
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.reference, ErrorReference::InvalidFullname);
         assert_eq!(result.error, "Invalid character");
+    }
+
+    #[test_log::test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_user_update_temp_password_logs_session_removal(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let session = Session::create(UserId::from(5), "ua", "0.0.0.0", TimeDelta::seconds(60));
+        session_repo::save(&mut conn, &session).await.unwrap();
+        drop(conn);
+
+        let response = user_update(
+            User::test_user(Role::Administrator, UserId::from(1)),
+            State(pool.clone()),
+            AuditService::new(None, None),
+            Path(UserId::from(5)),
+            Json(UpdateUserRequest {
+                fullname: None,
+                temp_password: Some("test_password_123".to_string()),
+            }),
+        )
+        .await
+        .into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let mut conn = pool.acquire().await.unwrap();
+        assert_eq!(session_repo::count(&mut conn).await.unwrap(), 0);
+        let events = crate::audit_log::list_all(&mut conn).await.unwrap();
+        let event_names: Vec<_> = events.iter().map(|e| *e.event_name()).collect();
+        assert_eq!(
+            event_names,
+            [
+                AuditEventType::UserSessionRemoved,
+                AuditEventType::UserUpdated
+            ]
+        );
+        assert_eq!(events[0].user_id(), Some(UserId::from(5)));
     }
 
     mod validate_user_request {

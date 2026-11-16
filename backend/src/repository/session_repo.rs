@@ -176,54 +176,51 @@ pub(crate) async fn delete(
     Ok(())
 }
 
-/// Delete the single user session of the given user. *Only call via
-/// `remove_user_session`* since the removed session needs to be logged.
-// This function is needed in this module since `Session` has private fields.
+/// Delete the session of a certain user and return the deleted session if there was one
 pub(crate) async fn delete_user_session(
     conn: &mut SqliteConnection,
     user_id: UserId,
 ) -> Result<Option<Session>, sqlx::Error> {
-    let mut sessions = sqlx::query_as!(
+    sqlx::query_as!(
         Session,
         r#"
-                         DELETE FROM sessions WHERE user_id = ?
-                         RETURNING user_id AS "user_id: _",
-                                   session_key AS "session_key: _",
-                                   user_agent AS "user_agent: _",
-                                   ip_address AS "ip_address: _",
-                                   expires_at AS "expires_at: _",
-                                   created_at AS "created_at: _"
-                        "#,
+        DELETE FROM sessions
+        WHERE user_id = ?
+        RETURNING
+            session_key,
+            user_id,
+            user_agent,
+            ip_address,
+            expires_at,
+            created_at
+        "#,
         user_id
     )
-    .fetch_all(conn)
-    .await?;
-    let opt_session = sessions.pop();
-    assert!(sessions.is_empty());
-    Ok(opt_session)
+    .fetch_optional(conn)
+    .await
 }
 
-/// Delete all sessions that have expired.  *Only call via `expire_sessions`* since the
-/// expired sessions need to be logged.
-// This function is needed in this module since `Session` has private fields.
+/// Delete all sessions that have expired and return the deleted sessions
 pub(crate) async fn delete_expired_sessions(
-    tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+    conn: &mut SqliteConnection,
 ) -> Result<Vec<Session>, sqlx::Error> {
     let now = Utc::now();
     sqlx::query_as!(
         Session,
         r#"
-                         DELETE FROM sessions WHERE expires_at <= ?
-                         RETURNING user_id AS "user_id: _",
-                                   session_key AS "session_key: _",
-                                   user_agent AS "user_agent: _",
-                                   ip_address AS "ip_address: _",
-                                   expires_at AS "expires_at: _",
-                                   created_at AS "created_at: _"
-                        "#,
+        DELETE FROM sessions
+        WHERE expires_at <= ?
+        RETURNING
+            session_key,
+            user_id,
+            user_agent,
+            ip_address,
+            expires_at,
+            created_at
+        "#,
         now
     )
-    .fetch_all(tx.as_mut())
+    .fetch_all(conn)
     .await
 }
 
@@ -275,7 +272,7 @@ mod tests {
     use std::assert_matches;
 
     use chrono::TimeDelta;
-    use sqlx::{Connection, Sqlite, SqlitePool, pool::PoolConnection};
+    use sqlx::SqlitePool;
     use test_log::test;
 
     use super::*;
@@ -359,20 +356,19 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_old_sessions(pool: SqlitePool) {
-        let mut conn: PoolConnection<Sqlite> = pool.acquire().await.unwrap();
-        let mut tx = conn.begin().await.unwrap();
+        let mut conn = pool.acquire().await.unwrap();
         let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(0),
         );
-        save(&mut tx, &session).await.unwrap();
+        save(&mut conn, &session).await.unwrap();
 
-        let deleted = delete_expired_sessions(&mut tx).await.unwrap();
+        let deleted = delete_expired_sessions(&mut conn).await.unwrap();
         assert_eq!(deleted, std::slice::from_ref(&session));
 
-        let session_from_db = super::get_by_key(&mut tx, session.session_key())
+        let session_from_db = super::get_by_key(&mut conn, session.session_key())
             .await
             .unwrap();
 

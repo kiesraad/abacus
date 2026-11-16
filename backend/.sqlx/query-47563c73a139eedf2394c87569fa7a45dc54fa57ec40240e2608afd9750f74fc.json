@@ -1,22 +1,11 @@
 {
   "db_name": "SQLite",
-  "query": "\n                         DELETE FROM sessions WHERE expires_at <= ?\n                         RETURNING user_id AS \"user_id: _\",\n                                   session_key AS \"session_key: _\",\n                                   user_agent AS \"user_agent: _\",\n                                   ip_address AS \"ip_address: _\",\n                                   expires_at AS \"expires_at: _\",\n                                   created_at AS \"created_at: _\"\n                        ",
+  "query": "\n        DELETE FROM sessions\n        WHERE user_id = ?\n        RETURNING\n            session_key,\n            user_id,\n            user_agent,\n            ip_address,\n            expires_at,\n            created_at\n        ",
   "describe": {
     "columns": [
       {
-        "name": "user_id: _",
+        "name": "session_key",
         "ordinal": 0,
-        "type_info": "Integer",
-        "origin": {
-          "Table": {
-            "table": "sessions",
-            "name": "user_id"
-          }
-        }
-      },
-      {
-        "name": "session_key: _",
-        "ordinal": 1,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -26,7 +15,18 @@
         }
       },
       {
-        "name": "user_agent: _",
+        "name": "user_id",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "sessions",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "name": "user_agent",
         "ordinal": 2,
         "type_info": "Text",
         "origin": {
@@ -37,7 +37,7 @@
         }
       },
       {
-        "name": "ip_address: _",
+        "name": "ip_address",
         "ordinal": 3,
         "type_info": "Text",
         "origin": {
@@ -48,7 +48,7 @@
         }
       },
       {
-        "name": "expires_at: _",
+        "name": "expires_at",
         "ordinal": 4,
         "type_info": "Text",
         "origin": {
@@ -59,7 +59,7 @@
         }
       },
       {
-        "name": "created_at: _",
+        "name": "created_at",
         "ordinal": 5,
         "type_info": "Text",
         "origin": {
@@ -82,5 +82,5 @@
       false
     ]
   },
-  "hash": "b6e29dfd718e32739d9be12efd40a9fe39b1c2cc7173254ec97131f693951722"
+  "hash": "47563c73a139eedf2394c87569fa7a45dc54fa57ec40240e2608afd9750f74fc"
 }

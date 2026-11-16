@@ -33,13 +33,12 @@ where
 }
 
 impl AuditService {
-    /// If you need a different user for an existing instance, call `with_user`
     #[cfg(test)]
     pub fn new(user: Option<User>, ip: Option<IpAddr>) -> Self {
         Self { user, ip }
     }
 
-    /// For actions that are carried out by the system independent of a user (e.g. session expiry cleanup)
+    /// For events that are not triggered by the request of a user, such as session expiry cleanup
     pub fn new_anon() -> Self {
         Self {
             user: None,

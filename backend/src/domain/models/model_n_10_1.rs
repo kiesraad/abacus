@@ -35,8 +35,9 @@ impl ToPdfFileModel for ModelN10_1InlegvelInput {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::{fs::File, io::BufReader};
+
+    use super::*;
 
     #[test]
     fn test_json_variations_match_struct() {
@@ -57,6 +58,18 @@ mod tests {
         );
         serde_json::from_reader::<_, ModelN10_1Input>(reader)
             .expect("model-n-10-1-PS2.json should deserialize to struct ModelN10_1Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-n-10-1-variations/model-n-10-1-TK-G.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelN10_1Input>(reader)
+            .expect("model-n-10-1-TK-G.json should deserialize to struct ModelN10_1Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-n-10-1-variations/model-n-10-1-TK-OL.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelN10_1Input>(reader)
+            .expect("model-n-10-1-TK-OL.json should deserialize to struct ModelN10_1Input");
 
         reader = BufReader::new(
             File::open("templates/inputs/model-n-10-1-variations/model-n-10-1-WS.json").unwrap(),

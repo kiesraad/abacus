@@ -75,6 +75,20 @@ mod tests {
             .expect("model-na-14-2-PS2.json should deserialize to struct ModelNa14_2Input");
 
         reader = BufReader::new(
+            File::open("templates/inputs/model-na-14-2-variations/model-na-14-2-TK-GSB.json")
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa14_2Input>(reader)
+            .expect("model-na-14-2-TK-GSB.json should deserialize to struct ModelNa14_2Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-na-14-2-variations/model-na-14-2-TK-SOL.json")
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa14_2Input>(reader)
+            .expect("model-na-14-2-TK-SOL.json should deserialize to struct ModelNa14_2Input");
+
+        reader = BufReader::new(
             File::open("templates/inputs/model-na-14-2-variations/model-na-14-2-WS.json").unwrap(),
         );
         serde_json::from_reader::<_, ModelNa14_2Input>(reader)
@@ -93,6 +107,18 @@ mod tests {
             BufReader::new(File::open("templates/inputs/model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-PS.json").unwrap());
         serde_json::from_reader::<_, ModelNa14_2Bijlage1Input>(reader).expect(
             "model-na-14-2-bijlage-1-PS.json should deserialize to struct ModelNa14_2Bijlage1Input",
+        );
+
+        reader =
+            BufReader::new(File::open("templates/inputs/model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-TK-GSB.json").unwrap());
+        serde_json::from_reader::<_, ModelNa14_2Bijlage1Input>(reader).expect(
+            "model-na-14-2-bijlage-1-TK-GSB.json should deserialize to struct ModelNa14_2Bijlage1Input",
+        );
+
+        reader =
+            BufReader::new(File::open("templates/inputs/model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-TK-SOL.json").unwrap());
+        serde_json::from_reader::<_, ModelNa14_2Bijlage1Input>(reader).expect(
+            "model-na-14-2-bijlage-1-TK-SOL.json should deserialize to struct ModelNa14_2Bijlage1Input",
         );
 
         reader =

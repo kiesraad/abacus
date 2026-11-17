@@ -45,6 +45,18 @@ mod tests {
             .expect("model-n-10-2-PS2.json should deserialize to struct ModelN10_2Input");
 
         reader = BufReader::new(
+            File::open("templates/inputs/model-n-10-2-variations/model-n-10-2-TK-G.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelN10_2Input>(reader)
+            .expect("model-n-10-2-TK-G.json should deserialize to struct ModelN10_2Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-n-10-2-variations/model-n-10-2-TK-OL.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelN10_2Input>(reader)
+            .expect("model-n-10-2-TK-OL.json should deserialize to struct ModelN10_2Input");
+
+        reader = BufReader::new(
             File::open("templates/inputs/model-n-10-2-variations/model-n-10-2-WS.json").unwrap(),
         );
         serde_json::from_reader::<_, ModelN10_2Input>(reader)

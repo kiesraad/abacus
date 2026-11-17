@@ -8,6 +8,7 @@ use apportionment::ApportionmentOutput;
 use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
 use pdf_gen::generate_pdf;
 use rand::{RngExt, seq::IndexedRandom};
+use strum::VariantArray;
 use test_log::test;
 
 use crate::{
@@ -197,6 +198,15 @@ fn random_committee_district(
                 number: Some(rng.random_range(1..=19)),
             },
             roman_numerals: rng.random_bool(0.5),
+            frisian_export_allowed: rng.random_bool(0.5),
+        }),
+        ElectionSubCategory::TK => CommitteeDistrict::Specific(RegionDetails {
+            name: random_string(rng, string_length),
+            key: RegionKey {
+                category: ElectoralDistrict,
+                number: Some(rng.random_range(1..=20)),
+            },
+            roman_numerals: false,
             frisian_export_allowed: rng.random_bool(0.5),
         }),
         ElectionSubCategory::AB1
@@ -611,15 +621,11 @@ async fn test_n_10_1() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::DSO),
                 parties,
@@ -646,15 +652,11 @@ async fn test_n_10_1_inlegvel() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::DSO),
                 parties,
@@ -680,15 +682,11 @@ async fn test_n_10_2() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::CSO),
                 parties,
@@ -714,15 +712,11 @@ async fn test_na_14_1_versie_1() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::DSO),
                 parties,
@@ -751,15 +745,11 @@ async fn test_na_14_1_versie_2() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::DSO),
                 parties,
@@ -798,15 +788,11 @@ async fn test_na_14_2() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::CSO),
                 parties,
@@ -855,15 +841,11 @@ async fn test_na_14_2_bijlage_1() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::CSO),
                 parties,
@@ -900,15 +882,11 @@ async fn test_na_31_1() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::DSO),
                 parties,
@@ -947,15 +925,11 @@ async fn test_na_31_1_inlegvel() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::DSO),
                 parties,
@@ -978,15 +952,11 @@ async fn test_na_31_2() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::CSO),
                 parties,
@@ -1025,15 +995,11 @@ async fn test_na_31_2_bijlage_1() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::CSO),
                 parties,
@@ -1060,15 +1026,11 @@ async fn test_na_31_2_inlegvel() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::Provincial,
-        ElectionCategory::WaterAuthority,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 Some(VoteCountingMethod::CSO),
                 parties,
@@ -1091,15 +1053,11 @@ async fn test_p_2a() {
     use rand::SeedableRng;
     let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
-    for election_category in [
-        ElectionCategory::Municipal,
-        ElectionCategory::WaterAuthority,
-        ElectionCategory::Provincial,
-    ] {
+    for election_category in ElectionCategory::VARIANTS {
         for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
             let election = random_election(
                 &mut rng,
-                election_category,
+                *election_category,
                 CommitteeCategory::GSB,
                 None,
                 parties,

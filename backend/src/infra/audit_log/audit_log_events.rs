@@ -219,7 +219,7 @@ pub async fn list_all(conn: &mut SqliteConnection) -> Result<Vec<AuditLogEvent>,
             user_fullname,
             user_role as "user_role: Role"
         FROM audit_log
-        ORDER BY time ASC
+        ORDER BY time ASC, id ASC
         "#,
     )
     .fetch_all(conn)
@@ -259,7 +259,8 @@ pub async fn list(
 ) -> Result<Vec<AuditLogEvent>, APIError> {
     let (level, event, user, since) = filter.as_query_values()?;
 
-    // The ordering is reversed when we choose a since date
+    // The ordering is reversed when we choose a since date.
+    // Events logged within the same millisecond share a time, the id keeps them in insertion order.
     let events = sqlx::query_as!(
         AuditLogEvent,
         r#"SELECT
@@ -281,7 +282,9 @@ pub async fn list(
             AND ($4 IS NULL OR unixepoch(time) >= $4)
         ORDER BY
             CASE WHEN $4 IS NULL THEN time ELSE 1 END DESC,
-            CASE WHEN $4 IS NULL THEN 1 ELSE time END ASC
+            CASE WHEN $4 IS NULL THEN audit_log.id ELSE 1 END DESC,
+            CASE WHEN $4 IS NULL THEN 1 ELSE time END ASC,
+            CASE WHEN $4 IS NULL THEN 1 ELSE audit_log.id END ASC
         LIMIT $5 OFFSET $6
         "#,
         level,
@@ -340,4 +343,55 @@ pub async fn list_users(conn: &mut SqliteConnection) -> Result<Vec<AuditLogUser>
     .await?;
 
     Ok(users)
+}
+
+#[cfg(test)]
+mod tests {
+    use chrono::TimeZone;
+    use sqlx::SqlitePool;
+    use test_log::test;
+
+    use super::*;
+    use crate::{api::authentication::UserLoginFailedAuditData, infra::audit_log::AuditService};
+
+    #[test(sqlx::test)]
+    async fn test_list_orders_same_time_by_id(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let audit_event = UserLoginFailedAuditData {
+            username: "random".to_string(),
+            user_agent: "Mozilla/5.0".to_string(),
+        };
+        for message in ["first", "second", "third"] {
+            AuditService::new_anon()
+                .log(&mut conn, &audit_event, Some(message.to_string()))
+                .await
+                .unwrap();
+        }
+        // Events logged within the same millisecond share a time
+        sqlx::query!("UPDATE audit_log SET time = '2026-11-17 12:00:00.000'")
+            .execute(&mut *conn)
+            .await
+            .unwrap();
+
+        let mut filter = LogFilter {
+            limit: 10,
+            offset: 0,
+            level: vec![],
+            event: vec![],
+            user: vec![],
+            since: None,
+        };
+        let events = list(&mut conn, &filter).await.unwrap();
+        let messages: Vec<_> = events.iter().filter_map(|e| e.message()).collect();
+        assert_eq!(messages, ["third", "second", "first"]);
+
+        filter.since = Some(Utc.with_ymd_and_hms(2026, 11, 17, 0, 0, 0).unwrap());
+        let events = list(&mut conn, &filter).await.unwrap();
+        let messages: Vec<_> = events.iter().filter_map(|e| e.message()).collect();
+        assert_eq!(messages, ["first", "second", "third"]);
+
+        let events = list_all(&mut conn).await.unwrap();
+        let messages: Vec<_> = events.iter().filter_map(|e| e.message()).collect();
+        assert_eq!(messages, ["first", "second", "third"]);
+    }
 }

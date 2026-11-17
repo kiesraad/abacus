@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE audit_log SET time = '2026-11-17 12:00:00.000'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "53c0e961469b3dde23e6994084d1b7ae24a2fe3aee29b35c9858acb2a533f11b"
+}

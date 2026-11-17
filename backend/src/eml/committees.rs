@@ -477,6 +477,7 @@ fn managing_authority_id(category: CommitteeCategory, key: RegionKey) -> Result<
         //     key.id
         //         .ok_or(EMLError::custom("Missing region id for HSB"))?
         // ),
+        CommitteeCategory::HSB => todo!("https://github.com/kiesraad/abacus/issues/3861"),
         CommitteeCategory::GSB => format!(
             "{:04}",
             key.number

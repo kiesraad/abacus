@@ -331,6 +331,7 @@ impl CommitteeSpecificTotals {
                 }
                 None => panic!("Invalid election"),
             },
+            CommitteeCategory::HSB => todo!("https://github.com/kiesraad/abacus/issues/4379"),
             CommitteeCategory::CSB => CommitteeSpecificTotals::CSB {
                 number_of_voters: 0,
             },

@@ -161,6 +161,8 @@ impl ElectionWithPoliticalGroups {
             (CSB, Provincial) => "provincie",
             (CSB, WaterAuthority) => "waterschap",
             (CSB, Municipal) | (GSB, _) => "gemeente",
+            (HSB, HouseOfRepresentatives) => "kieskring",
+            (HSB, _) => todo!("https://github.com/kiesraad/abacus/issues/3861"),
             (CSB, HouseOfRepresentatives) => "",
         }
     }
@@ -525,6 +527,8 @@ pub enum ElectionSubCategory {
 pub enum CommitteeCategory {
     /// Gemeentelijk stembureau
     GSB,
+    /// Hoofd stembureau
+    HSB,
     /// Centraal stembureau
     CSB,
 }
@@ -532,8 +536,9 @@ pub enum CommitteeCategory {
 impl CommitteeCategory {
     pub fn supports_signing(&self) -> bool {
         match self {
-            CommitteeCategory::CSB => false,
             CommitteeCategory::GSB => true,
+            CommitteeCategory::HSB => true,
+            CommitteeCategory::CSB => false,
         }
     }
 }
@@ -728,6 +733,7 @@ pub mod tests {
             location: "Test".to_string(),
             authority_id: match committee_category {
                 CommitteeCategory::GSB => "0000".to_string(),
+                CommitteeCategory::HSB => todo!("https://github.com/kiesraad/abacus/issues/4377"),
                 CommitteeCategory::CSB => "CSB".to_string(),
             },
             authority_name: "Test".to_string(),

@@ -609,7 +609,7 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
         .put(&url)
         .json(&serde_json::json!({
             "username": "typist1",
-            "password": "Typist1Password02",
+            "password": "Typist1Password01",
         }))
         .header("cookie", &typist_cookie)
         .send()

@@ -348,6 +348,7 @@ pub async fn create_any_result(
         addr,
         match committee_category {
             CommitteeCategory::GSB => FixtureUser::TypistGSB,
+            CommitteeCategory::HSB => FixtureUser::TypistHSB,
             CommitteeCategory::CSB => FixtureUser::TypistCSB,
         },
     )
@@ -363,7 +364,7 @@ pub async fn create_any_result(
                 Some(VoteCountingMethod::DSO) => example_dso_data_entry(None),
                 None => panic!("Invalid election {election_id:?}"),
             },
-            CommitteeCategory::CSB => example_gsb_data_entry(None),
+            CommitteeCategory::CSB | CommitteeCategory::HSB => example_gsb_data_entry(None),
         },
     )
     .await;
@@ -371,6 +372,7 @@ pub async fn create_any_result(
         addr,
         match committee_category {
             CommitteeCategory::GSB => FixtureUser::Typist2GSB,
+            CommitteeCategory::HSB => FixtureUser::Typist2HSB,
             CommitteeCategory::CSB => FixtureUser::Typist2CSB,
         },
     )
@@ -386,7 +388,7 @@ pub async fn create_any_result(
                 Some(VoteCountingMethod::DSO) => example_dso_data_entry(None),
                 None => panic!("Invalid election {election_id:?}"),
             },
-            CommitteeCategory::CSB => example_gsb_data_entry(None),
+            CommitteeCategory::CSB | CommitteeCategory::HSB => example_gsb_data_entry(None),
         },
     )
     .await;
@@ -437,6 +439,7 @@ pub async fn create_any_result_with_non_example_data_entry(
         addr,
         match committee_category {
             CommitteeCategory::GSB => FixtureUser::TypistGSB,
+            CommitteeCategory::HSB => FixtureUser::TypistHSB,
             CommitteeCategory::CSB => FixtureUser::TypistCSB,
         },
     )
@@ -446,6 +449,7 @@ pub async fn create_any_result_with_non_example_data_entry(
         addr,
         match committee_category {
             CommitteeCategory::GSB => FixtureUser::Typist2GSB,
+            CommitteeCategory::HSB => FixtureUser::Typist2HSB,
             CommitteeCategory::CSB => FixtureUser::Typist2CSB,
         },
     )
@@ -681,9 +685,12 @@ pub async fn apportionment_state_action(
 pub enum FixtureUser {
     Admin,
     CoordinatorGSB,
+    CoordinatorHSB,
     CoordinatorCSB,
     TypistGSB,
     Typist2GSB,
+    TypistHSB,
+    Typist2HSB,
     TypistCSB,
     Typist2CSB,
 }
@@ -693,11 +700,14 @@ impl FixtureUser {
         match self {
             Self::Admin => ("admin1", "Admin1Password01"),
             Self::CoordinatorGSB => ("coordinator1", "Coordinator1Password01"),
+            Self::CoordinatorHSB => ("coordinator2", "Coordinator2Password02"),
             Self::CoordinatorCSB => ("coordinator3", "Coordinator3Password03"),
             Self::TypistGSB => ("typist1", "Typist1Password01"),
-            Self::Typist2GSB => ("typist2", "Typist2Password01"),
+            Self::Typist2GSB => ("typist2", "Typist2Password02"),
             Self::TypistCSB => ("typist3", "Typist3Password03"),
             Self::Typist2CSB => ("typist4", "Typist4Password04"),
+            Self::TypistHSB => ("typist5", "Typist5Password05"),
+            Self::Typist2HSB => ("typist6", "Typist6Password06"),
         }
     }
 }

@@ -62,6 +62,7 @@ impl Role {
         (self.is_administrator()
             || match category {
                 CommitteeCategory::GSB => matches!(self, Self::CoordinatorGSB | Self::TypistGSB),
+                CommitteeCategory::HSB => todo!("https://github.com/kiesraad/abacus/issues/4375"),
                 CommitteeCategory::CSB => matches!(self, Self::CoordinatorCSB | Self::TypistCSB),
             })
         .then_some(())

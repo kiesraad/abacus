@@ -131,7 +131,10 @@ impl Results {
                     }
                 }
             }
-            (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(election)),
+            (CommitteeCategory::CSB, _) | (CommitteeCategory::HSB, false) => {
+                Results::GSB(GSBResults::empty(election))
+            }
+            (CommitteeCategory::HSB, true) => unreachable!("HSB does not have a next session"),
         }
     }
 
@@ -161,7 +164,11 @@ impl Results {
                     && method == Some(VoteCountingMethod::CSO)
                     && next
             }
-            Results::GSB(_) => category == CommitteeCategory::CSB && method.is_none() && !next,
+            Results::GSB(_) => {
+                matches!(category, CommitteeCategory::CSB | CommitteeCategory::HSB)
+                    && method.is_none()
+                    && !next
+            }
         };
 
         if correct {

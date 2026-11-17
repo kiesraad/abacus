@@ -282,8 +282,8 @@ async fn list_results_for_gsb_committee_session(
     Ok(results)
 }
 
-/// List the results for all data entries of a committee session for the CSB.
-async fn list_results_for_csb_committee_session(
+/// List the results for all data entries of a committee session for the HSB or CSB.
+async fn list_results_for_hsb_csb_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<(DataEntrySource, Results)>, sqlx::Error> {
@@ -337,8 +337,8 @@ pub async fn list_results_for_committee_session(
         CommitteeCategory::GSB => {
             list_results_for_gsb_committee_session(&mut tx, committee_session_id).await?
         }
-        CommitteeCategory::CSB => {
-            list_results_for_csb_committee_session(&mut tx, committee_session_id).await?
+        CommitteeCategory::CSB | CommitteeCategory::HSB => {
+            list_results_for_hsb_csb_committee_session(&mut tx, committee_session_id).await?
         }
     };
     tx.commit().await?;

@@ -879,7 +879,7 @@ export interface ClaimDataEntryResponse {
 /**
  * Committee category
  */
-export const committeeCategoryValues = ["GSB", "CSB"] as const;
+export const committeeCategoryValues = ["GSB", "HSB", "CSB"] as const;
 export type CommitteeCategory = (typeof committeeCategoryValues)[number];
 
 /**

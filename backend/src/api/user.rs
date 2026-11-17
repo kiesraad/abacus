@@ -356,6 +356,9 @@ async fn user_delete(
         return Err(AuthenticationError::OwnAccountCannotBeDeleted.into());
     }
 
+    // The session would be removed by the cascading delete, remove it first so it gets logged
+    remove_user_session(&mut tx, &user).await?;
+
     let deleted = user_repo::delete(&mut tx, user_id).await?;
 
     if deleted {
@@ -487,6 +490,37 @@ mod tests {
             [
                 AuditEventType::UserSessionRemoved,
                 AuditEventType::UserUpdated
+            ]
+        );
+        assert_eq!(events[0].user_id(), Some(UserId::from(5)));
+    }
+
+    #[test_log::test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_user_delete_logs_session_removal(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let session = Session::create(UserId::from(5), "ua", "0.0.0.0", TimeDelta::seconds(60));
+        session_repo::save(&mut conn, &session).await.unwrap();
+        drop(conn);
+
+        let response = user_delete(
+            User::test_user(Role::Administrator, UserId::from(1)),
+            State(pool.clone()),
+            AuditService::new(None, None),
+            Path(UserId::from(5)),
+        )
+        .await
+        .into_response();
+        assert_eq!(response.status(), StatusCode::NO_CONTENT);
+
+        let mut conn = pool.acquire().await.unwrap();
+        assert_eq!(session_repo::count(&mut conn).await.unwrap(), 0);
+        let events = crate::audit_log::list_all(&mut conn).await.unwrap();
+        let event_names: Vec<_> = events.iter().map(|e| *e.event_name()).collect();
+        assert_eq!(
+            event_names,
+            [
+                AuditEventType::UserSessionRemoved,
+                AuditEventType::UserDeleted
             ]
         );
         assert_eq!(events[0].user_id(), Some(UserId::from(5)));

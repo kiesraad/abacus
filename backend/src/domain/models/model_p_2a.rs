@@ -24,8 +24,9 @@ impl ToPdfFileModel for ModelP2aInput {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::{fs::File, io::BufReader};
+
+    use super::*;
 
     #[test]
     fn test_json_variations_match_struct() {
@@ -46,6 +47,18 @@ mod tests {
         );
         serde_json::from_reader::<_, ModelP2aInput>(reader)
             .expect("model-p-2a-PS2.json should deserialize to struct ModelP2aInput");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-p-2a-variations/model-p-2a-TK-GSB.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP2aInput>(reader)
+            .expect("model-p-2a-TK-GSB.json should deserialize to struct ModelP2aInput");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-p-2a-variations/model-p-2a-TK-SOL.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP2aInput>(reader)
+            .expect("model-p-2a-TK-SOL.json should deserialize to struct ModelP2aInput");
 
         reader = BufReader::new(
             File::open("templates/inputs/model-p-2a-variations/model-p-2a-WS.json").unwrap(),

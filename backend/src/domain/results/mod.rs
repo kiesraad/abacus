@@ -651,6 +651,7 @@ pub mod tests {
                 (ElectionCategory::Municipal, None),
                 (ElectionCategory::Provincial, Some(0)),
                 (ElectionCategory::WaterAuthority, Some(0)),
+                (ElectionCategory::HouseOfRepresentatives, Some(0)),
             ];
 
             for (category, expected_voter_card_count) in cases {

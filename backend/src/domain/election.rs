@@ -527,7 +527,7 @@ pub enum ElectionSubCategory {
 pub enum CommitteeCategory {
     /// Gemeentelijk stembureau
     GSB,
-    /// Hoofd stembureau
+    /// Hoofdstembureau
     HSB,
     /// Centraal stembureau
     CSB,

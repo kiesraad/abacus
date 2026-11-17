@@ -26,10 +26,14 @@ pub enum Role {
     Administrator,
     #[serde(rename = "coordinator_gsb")]
     CoordinatorGSB,
+    #[serde(rename = "coordinator_hsb")]
+    CoordinatorHSB,
     #[serde(rename = "coordinator_csb")]
     CoordinatorCSB,
     #[serde(rename = "typist_gsb")]
     TypistGSB,
+    #[serde(rename = "typist_hsb")]
+    TypistHSB,
     #[serde(rename = "typist_csb")]
     TypistCSB,
 }
@@ -42,11 +46,14 @@ impl Role {
     }
 
     pub(crate) fn is_coordinator(self) -> bool {
-        matches!(self, Self::CoordinatorGSB | Self::CoordinatorCSB)
+        matches!(
+            self,
+            Self::CoordinatorGSB | Self::CoordinatorHSB | Self::CoordinatorCSB
+        )
     }
 
     pub(crate) fn is_typist(self) -> bool {
-        matches!(self, Self::TypistGSB | Self::TypistCSB)
+        matches!(self, Self::TypistGSB | Self::TypistHSB | Self::TypistCSB)
     }
 
     pub fn manages(&self, other: &Role) -> bool {
@@ -54,6 +61,7 @@ impl Role {
             (self, other),
             (Self::Administrator, _)
                 | (Self::CoordinatorCSB, Self::TypistCSB)
+                | (Self::CoordinatorHSB, Self::TypistHSB)
                 | (Self::CoordinatorGSB, Self::TypistGSB)
         )
     }
@@ -62,7 +70,7 @@ impl Role {
         (self.is_administrator()
             || match category {
                 CommitteeCategory::GSB => matches!(self, Self::CoordinatorGSB | Self::TypistGSB),
-                CommitteeCategory::HSB => todo!("https://github.com/kiesraad/abacus/issues/4375"),
+                CommitteeCategory::HSB => matches!(self, Self::CoordinatorHSB | Self::TypistHSB),
                 CommitteeCategory::CSB => matches!(self, Self::CoordinatorCSB | Self::TypistCSB),
             })
         .then_some(())
@@ -79,11 +87,13 @@ mod tests {
 
     use super::*;
 
-    const EXPECTED_NAMES: [&str; 5] = [
+    const EXPECTED_NAMES: [&str; 7] = [
         "administrator",
         "coordinator_gsb",
+        "coordinator_hsb",
         "coordinator_csb",
         "typist_gsb",
+        "typist_hsb",
         "typist_csb",
     ];
 

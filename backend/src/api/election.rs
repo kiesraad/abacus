@@ -848,6 +848,8 @@ impl From<EMLError> for APIError {
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use axum::{
         Json,
         extract::{Path, State},
@@ -867,6 +869,7 @@ mod tests {
                 assert_committee_category_authorization_ok,
             },
         },
+        domain::election::RegionCategory,
         repository::user_repo::UserId,
     };
 
@@ -955,5 +958,37 @@ mod tests {
     async fn test_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers(pool, Role::CoordinatorGSB).await;
         assert_committee_category_authorization_ok(results);
+    }
+
+    #[test]
+    fn test_validate_gsb_election_filters_and_denies_nbsb() {
+        let mut request = GSBElectionCreationValidateRequest {
+            election_hash: None,
+            election_data: include_str!("../eml/tests/eml110a_test_TK.eml.xml").to_string(),
+            candidate_hash: None,
+            candidate_data: None,
+            polling_station_data: None,
+            counting_method: None,
+            number_of_voters: None,
+            polling_station_file_name: None,
+            selected_region: None,
+        };
+
+        let Json(ElectionDefinitionValidateResponse::GSB(response)) =
+            validate_gsb_election(&request).unwrap()
+        else {
+            panic!("should be a GSB response");
+        };
+        let numbers: Vec<_> = response.gsb_list.iter().map(|r| r.key.number).collect();
+        assert_eq!(numbers, [Some(123), Some(124), Some(125), Some(126)]);
+
+        request.selected_region = Some(RegionKey {
+            category: RegionCategory::Municipality,
+            number: Some(NBSB_REGION_NUMBER),
+        });
+        assert_matches!(
+            validate_gsb_election(&request),
+            Err(APIError::EmlImportError(EMLImportError::UnknownCommittee))
+        );
     }
 }

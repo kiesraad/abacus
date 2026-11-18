@@ -12,25 +12,24 @@ use crate::{
         EML110A_TEST_HASH, EML230B_TEST_HASH,
         FixtureUser::{Admin, CoordinatorCSB},
         change_status_committee_session, get_election_committee_session, get_statuses,
-        import_certificate, login, post_multipart,
+        import_certificate, login, post_election_import, post_multipart,
     },
     utils::serve_api,
 };
 
 async fn import_election(addr: &SocketAddr, admin_cookie: &HeaderValue) -> u32 {
-    let response = reqwest::Client::new()
-        .post(format!("http://{addr}/api/elections/import"))
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    let response = post_election_import(
+        addr,
+        admin_cookie,
+        serde_json::json!({
             "committee_category": "CSB",
             "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
-        }))
-        .send()
-        .await
-        .unwrap();
+        }),
+    )
+    .await;
     assert_eq!(response.status(), StatusCode::CREATED);
     let body: serde_json::Value = response.json().await.unwrap();
     u32::try_from(body["id"].as_u64().unwrap()).unwrap()

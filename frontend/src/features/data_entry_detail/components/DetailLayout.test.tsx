@@ -7,6 +7,7 @@ import * as useMessages from "@/hooks/messages/useMessages";
 import {
   dataEntryHasWarningsGetMockResponse,
   dataEntryValidGetMockResponse,
+  subCommitteeSource,
 } from "@/testing/api-mocks/DataEntryMockData";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
@@ -106,6 +107,26 @@ describe("DetailLayout", () => {
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("/elections/1/status", { replace: true });
+    });
+  });
+
+  test("Delete message uses the sub committee name", async () => {
+    server.use(DataEntryResetHandler);
+    overrideOnce("get", "/api/data_entries/5/get", 200, {
+      ...dataEntryValidGetMockResponse,
+      source: subCommitteeSource,
+    });
+    const user = userEvent.setup();
+
+    renderLayout();
+
+    await user.click(await screen.findByRole("button", { name: "Invoer verwijderen" }));
+    const modal = await screen.findByTestId("modal-dialog");
+    await user.click(await within(modal).findByRole("button", { name: "Verwijder invoer" }));
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Invoer verwijderd",
+      text: "Stembureau Juinen is weer toegevoegd aan de werkvoorraad en kan opnieuw worden ingevoerd.",
     });
   });
 

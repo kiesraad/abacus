@@ -1,40 +1,30 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, type Mock, test, vi } from "vitest";
 
-import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
+import { dataEntryValidGetMockResponse, subCommitteeSource } from "@/testing/api-mocks/DataEntryMockData";
 import { DataEntryResetHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 import type {
   CommitteeSessionStatus,
   DATA_ENTRY_RESET_REQUEST_PATH,
-  DataEntrySource,
   DataEntryStatusName,
 } from "@/types/generated/openapi";
 
 import { ReadOnlyDataEntryDelete } from "./ReadOnlyDataEntryDelete";
 
-function renderComponent(status: DataEntryStatusName, committeeSessionStatus: CommitteeSessionStatus) {
+function renderComponent(
+  status: DataEntryStatusName,
+  committeeSessionStatus: CommitteeSessionStatus,
+  dataEntrySource = dataEntryValidGetMockResponse.source,
+) {
   const onDeleted = vi.fn();
   const onError = vi.fn();
-  const { data_entry_id, id, name, number, address, postal_code, locality } = pollingStationMockData[4]!;
-  const source: DataEntrySource = {
-    type: "PollingStation",
-    id,
-    name,
-    number,
-    committee_session_id: 1,
-    session_type: "First",
-    data_entry_id: 1,
-    address,
-    postal_code,
-    locality,
-  };
 
   render(
     <ReadOnlyDataEntryDelete
-      dataEntrySource={source}
-      dataEntryId={data_entry_id!}
+      dataEntrySource={dataEntrySource}
+      dataEntryId={5}
       status={status}
       committeeSessionStatus={committeeSessionStatus}
       onDeleted={onDeleted}
@@ -79,6 +69,17 @@ describe("ReadOnlyDataEntryDelete", () => {
     await user.click(screen.getByRole("button", { name: "Verwijder invoer" }));
     expect(deleteDataEntry).toHaveBeenCalledOnce();
     expect(onDeleted).toHaveBeenCalledOnce();
+  });
+
+  test("uses the sub committee name in the confirmation text", async () => {
+    renderComponent("first_entry_finalised", "data_entry", subCommitteeSource);
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
+
+    expect(await screen.findByTestId("modal-dialog")).toHaveTextContent(
+      "Weet je zeker dat je de invoer voor stembureau Juinen wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
+    );
   });
 
   test("cancel delete", async () => {

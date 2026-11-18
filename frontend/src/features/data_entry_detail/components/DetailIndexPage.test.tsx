@@ -7,9 +7,11 @@ import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider"
 import * as useMessages from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
+  dataEntryHasErrorsGetMockResponse,
   dataEntryHasWarningsGetMockResponse,
   dataEntryValidGetMockResponse,
   emptyResults,
+  subCommitteeSource,
 } from "@/testing/api-mocks/DataEntryMockData";
 import {
   DataEntryGetHandler,
@@ -132,6 +134,27 @@ describe("DetailIndexPage", () => {
       text: "Het stembureau kan opnieuw ingevoerd worden",
     });
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
+  });
+
+  test.each([
+    {
+      option: /Invoer bewaren en correcties laten invoeren door Gebruiker01/,
+      title: "Stembureau Juinen teruggegeven aan Gebruiker01",
+    },
+    { option: /Stembureau opnieuw laten invoeren/, title: "Invoer stembureau Juinen verwijderd" },
+  ])("should use the sub committee name in the message: $title", async ({ option, title }) => {
+    const user = userEvent.setup();
+    overrideOnce("get", "/api/data_entries/5/get", 200, {
+      ...dataEntryHasErrorsGetMockResponse,
+      source: subCommitteeSource,
+    });
+
+    renderPage();
+
+    await user.click(await screen.findByRole("radio", { name: option }));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(pushMessage).toHaveBeenCalledWith(expect.objectContaining({ title }));
   });
 
   test("should redirect to extra_investigation when there are no errors or warnings", async () => {

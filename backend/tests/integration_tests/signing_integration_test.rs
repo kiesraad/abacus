@@ -9,6 +9,7 @@ use test_log::test;
 
 use crate::{
     shared::{
+        EML110A_TEST_HASH, EML230B_TEST_HASH,
         FixtureUser::{Admin, CoordinatorCSB},
         change_status_committee_session, get_election_committee_session, get_statuses,
         import_certificate, login, post_multipart,
@@ -22,19 +23,9 @@ async fn import_election(addr: &SocketAddr, admin_cookie: &HeaderValue) -> u32 {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "CSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9",
-            ],
+            "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
         }))
         .send()

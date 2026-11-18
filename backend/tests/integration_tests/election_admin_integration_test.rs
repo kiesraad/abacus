@@ -5,7 +5,11 @@ use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
-    shared::{FixtureUser::*, get_election_details, get_statuses, login},
+    shared::{
+        EML110A_TEST_AB_HASH, EML110A_TEST_HASH, EML110A_TEST_PS1_HASH, EML230B_TEST_AB_HASH,
+        EML230B_TEST_HASH, EML230B_TEST_PS1_HASH, FixtureUser::*, get_election_details,
+        get_statuses, login,
+    },
     utils::serve_api,
 };
 
@@ -117,12 +121,7 @@ async fn test_csb_municipal_election_validate_with_candidates(pool: SqlitePool) 
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "CSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
         }))
@@ -149,12 +148,7 @@ async fn test_csb_water_authority_election_validate_with_candidates(pool: Sqlite
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "CSB",
-            "election_hash": [
-                "972b", "b30f", "70ae", "5632",
-                "702c", "5b1e", "2d34", "e30e",
-                "16b2", "d9dd", "0a94", "57eb",
-                "0877", "8ed3", "cedf", "0904",
-            ],
+            "election_hash": EML110A_TEST_AB_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test_AB.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test_AB.eml.xml"),
         }))
@@ -191,19 +185,9 @@ async fn test_csb_municipal_election_import_save(pool: SqlitePool) {
         .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "CSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9",
-            ],
+            "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
         }))
         .send()
@@ -247,19 +231,9 @@ async fn test_csb_water_authority_election_import_save(pool: SqlitePool) {
         .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "CSB",
-            "election_hash": [
-                "972b", "b30f", "70ae", "5632",
-                "702c", "5b1e", "2d34", "e30e",
-                "16b2", "d9dd", "0a94", "57eb",
-                "0877", "8ed3", "cedf", "0904",
-            ],
+            "election_hash": EML110A_TEST_AB_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test_AB.eml.xml"),
-            "candidate_hash": [
-                "9526", "1053", "22c1", "69e1",
-                "abb0", "1b89", "65cc", "5cfd",
-                "49c0", "392a", "161a", "5ba4",
-                "5e96", "77ae", "fe0d", "b775",
-            ],
+            "candidate_hash": EML230B_TEST_AB_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test_AB.eml.xml"),
         }))
         .send()
@@ -305,19 +279,9 @@ async fn test_csb_election_import_only_municipal_and_water_authority_elections_s
         .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "CSB",
-            "election_hash": [
-                "4e34", "9467", "c418", "efcd",
-                "f2c4", "b302", "bafd", "30ba",
-                "b0eb", "5689", "aaeb", "3d5e",
-                "f4c8", "9bd3", "0a51", "e384",
-            ],
+            "election_hash": EML110A_TEST_PS1_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test_PS1.eml.xml"),
-            "candidate_hash": [
-                "d464", "56c3", "78b3", "941a",
-                "baff", "1ee2", "eb41", "d88c",
-                "0af8", "465c", "33aa", "6559",
-                "ac15", "5a78", "64b0", "09d4",
-            ],
+            "candidate_hash": EML230B_TEST_PS1_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test_PS1.eml.xml"),
         }))
         .send()
@@ -382,12 +346,7 @@ async fn test_election_candidates_validate_valid(pool: SqlitePool) {
         .json(&serde_json::json!({
             "committee_category": "GSB",
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
         }))
         .send()
@@ -409,12 +368,7 @@ async fn test_election_candidates_validate_wrong_file(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_document_type.eml.xml"),
         }))
@@ -436,12 +390,7 @@ async fn test_election_candidates_validate_missing_authority(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_missing_authority.eml.xml"),
         }))
@@ -463,12 +412,7 @@ async fn test_election_candidates_validate_wrong_election_type(pool: SqlitePool)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_incorrect_election_type.eml.xml"),
         }))
@@ -490,12 +434,7 @@ async fn test_election_candidates_validate_wrong_election_id(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_incorrect_election.eml.xml"),
         }))
@@ -517,12 +456,7 @@ async fn test_election_candidates_validate_missing_election_domain(pool: SqliteP
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_incorrect_election_domain.eml.xml"),
         }))
@@ -544,11 +478,7 @@ async fn test_election_candidates_validate_wrong_domain_id(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_incorrect_election_domain.eml.xml"),
         }))
@@ -570,11 +500,7 @@ async fn test_election_candidates_validate_wrong_election_date(pool: SqlitePool)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_incorrect_election_date.eml.xml"),
         }))
@@ -596,11 +522,7 @@ async fn test_election_candidates_validate_empty_affiliates(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_empty_affiliates.eml.xml"),
         }))
@@ -622,11 +544,7 @@ async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-"c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_empty_candidates.eml.xml"),
             "number_of_voters": 1234,
@@ -650,19 +568,9 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
         .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-        "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9",
-            ],
+            "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
@@ -700,19 +608,9 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
         .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9",
-            ],
+            "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "number_of_voters": 1234,
             "counting_method": "CSO",
@@ -743,25 +641,17 @@ async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
 
     let url = format!("http://{addr}/api/elections/import");
     let admin_cookie = login(&addr, Admin).await;
+    let mut election_hash = EML110A_TEST_HASH;
+    election_hash[4] = "";
+    election_hash[10] = "";
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "", "ceb1", "57db", "d48a",
-                "88fc", "771b", "", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": election_hash,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9",
-            ],
+            "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
@@ -781,24 +671,17 @@ async fn test_election_import_save_empty_candidate_stubs(pool: SqlitePool) {
 
     let url = format!("http://{addr}/api/elections/import");
     let admin_cookie = login(&addr, Admin).await;
+    let mut candidate_hash = EML230B_TEST_HASH;
+    candidate_hash[4] = "";
+    candidate_hash[15] = "";
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-                "0e5b", "7360", "6c66", "4093",
-                "", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "",
-            ],
+            "candidate_hash": candidate_hash,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
@@ -818,17 +701,15 @@ async fn test_election_import_save_wrong_hash(pool: SqlitePool) {
 
     let url = format!("http://{addr}/api/elections/import");
     let admin_cookie = login(&addr, Admin).await;
+    let mut election_hash = EML110A_TEST_HASH;
+    election_hash[4] = "1234";
+    election_hash[10] = "5678";
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "1234", "ceb1", "57db", "d48a",
-                "88fc", "771b", "5678", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24"
-            ],
+            "election_hash": election_hash,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
                 "a0b9", "6a6e", "5d3c", "17fd",
@@ -860,19 +741,9 @@ async fn test_election_import_missing_file_name(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9"
-            ],
+            "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "number_of_voters": 1234,
@@ -895,19 +766,9 @@ async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) 
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-          ],
+          "election_hash": EML110A_TEST_HASH,
           "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9"
-            ],
+            "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../../src/eml/tests/eml110b_not_matching_election_id.eml.xml"),
             "polling_station_file_name": "eml110b_not_matching_election_id.eml.xml",
@@ -934,19 +795,9 @@ async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-          ],
+          "election_hash": EML110A_TEST_HASH,
           "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9"
-            ],
+            "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
@@ -973,19 +824,9 @@ async fn test_election_polling_stations_validate_missing_filename(pool: SqlitePo
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
+            "election_hash": EML110A_TEST_HASH,
             "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9"
-            ],
+            "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
         }))
@@ -1007,19 +848,9 @@ async fn test_election_polling_stations_validate_invalid(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_hash": [
-              "c738", "4baf", "7edc", "13e6",
-              "ede8", "ceb1", "57db", "d48a",
-              "88fc", "771b", "be49", "a7c5",
-              "a5a3", "aca7", "acbe", "ee24",
-          ],
+          "election_hash": EML110A_TEST_HASH,
           "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9"
-            ],
+            "candidate_hash": EML230B_TEST_HASH,
             "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "polling_station_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "number_of_voters": 1234,

@@ -43,6 +43,16 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-n-10-1-variations/model-n-10-1-PS2.json",
     },
     ModelVariant {
+        name: "model-n-10-1-TK-G",
+        model: "model-n-10-1",
+        input: "model-n-10-1-variations/model-n-10-1-TK-G.json",
+    },
+    ModelVariant {
+        name: "model-n-10-1-TK-OL",
+        model: "model-n-10-1",
+        input: "model-n-10-1-variations/model-n-10-1-TK-OL.json",
+    },
+    ModelVariant {
         name: "model-n-10-1-WS",
         model: "model-n-10-1",
         input: "model-n-10-1-variations/model-n-10-1-WS.json",
@@ -68,6 +78,16 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-n-10-2-variations/model-n-10-2-PS2.json",
     },
     ModelVariant {
+        name: "model-n-10-2-TK-G",
+        model: "model-n-10-2",
+        input: "model-n-10-2-variations/model-n-10-2-TK-G.json",
+    },
+    ModelVariant {
+        name: "model-n-10-2-TK-OL",
+        model: "model-n-10-2",
+        input: "model-n-10-2-variations/model-n-10-2-TK-OL.json",
+    },
+    ModelVariant {
         name: "model-n-10-2-WS",
         model: "model-n-10-2",
         input: "model-n-10-2-variations/model-n-10-2-WS.json",
@@ -86,6 +106,16 @@ static VARIANTS: &[ModelVariant] = &[
         name: "model-na-14-1-versie-1-PS2",
         model: "model-na-14-1-versie-1",
         input: "model-na-14-1-versie-1-variations/model-na-14-1-versie-1-PS2.json",
+    },
+    ModelVariant {
+        name: "model-na-14-1-versie-1-TK-GSB",
+        model: "model-na-14-1-versie-1",
+        input: "model-na-14-1-versie-1-variations/model-na-14-1-versie-1-TK-GSB.json",
+    },
+    ModelVariant {
+        name: "model-na-14-1-versie-1-TK-SOL",
+        model: "model-na-14-1-versie-1",
+        input: "model-na-14-1-versie-1-variations/model-na-14-1-versie-1-TK-SOL.json",
     },
     ModelVariant {
         name: "model-na-14-1-versie-1-WS",
@@ -108,6 +138,16 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-PS2.json",
     },
     ModelVariant {
+        name: "model-na-14-1-versie-2-TK-GSB",
+        model: "model-na-14-1-versie-2",
+        input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-TK-GSB.json",
+    },
+    ModelVariant {
+        name: "model-na-14-1-versie-2-TK-SOL",
+        model: "model-na-14-1-versie-2",
+        input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-TK-SOL.json",
+    },
+    ModelVariant {
         name: "model-na-14-1-versie-2-WS",
         model: "model-na-14-1-versie-2",
         input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-WS.json",
@@ -128,6 +168,16 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-14-2-variations/model-na-14-2-PS2.json",
     },
     ModelVariant {
+        name: "model-na-14-2-TK-GSB",
+        model: "model-na-14-2",
+        input: "model-na-14-2-variations/model-na-14-2-TK-GSB.json",
+    },
+    ModelVariant {
+        name: "model-na-14-2-TK-SOL",
+        model: "model-na-14-2",
+        input: "model-na-14-2-variations/model-na-14-2-TK-SOL.json",
+    },
+    ModelVariant {
         name: "model-na-14-2-WS",
         model: "model-na-14-2",
         input: "model-na-14-2-variations/model-na-14-2-WS.json",
@@ -141,6 +191,16 @@ static VARIANTS: &[ModelVariant] = &[
         name: "model-na-14-2-bijlage-1-PS",
         model: "model-na-14-2-bijlage-1",
         input: "model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-PS.json",
+    },
+    ModelVariant {
+        name: "model-na-14-2-bijlage-1-TK-GSB",
+        model: "model-na-14-2-bijlage-1",
+        input: "model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-TK-GSB.json",
+    },
+    ModelVariant {
+        name: "model-na-14-2-bijlage-1-TK-SOL",
+        model: "model-na-14-2-bijlage-1",
+        input: "model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-TK-SOL.json",
     },
     ModelVariant {
         name: "model-na-14-2-bijlage-1-WS",
@@ -161,6 +221,16 @@ static VARIANTS: &[ModelVariant] = &[
         name: "model-na-31-1-PS2",
         model: "model-na-31-1",
         input: "model-na-31-1-variations/model-na-31-1-PS2.json",
+    },
+    ModelVariant {
+        name: "model-na-31-1-TK-GSB",
+        model: "model-na-31-1",
+        input: "model-na-31-1-variations/model-na-31-1-TK-GSB.json",
+    },
+    ModelVariant {
+        name: "model-na-31-1-TK-SOL",
+        model: "model-na-31-1",
+        input: "model-na-31-1-variations/model-na-31-1-TK-SOL.json",
     },
     ModelVariant {
         name: "model-na-31-1-WS",
@@ -188,6 +258,16 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-31-2-variations/model-na-31-2-PS2.json",
     },
     ModelVariant {
+        name: "model-na-31-2-TK-GSB",
+        model: "model-na-31-2",
+        input: "model-na-31-2-variations/model-na-31-2-TK-GSB.json",
+    },
+    ModelVariant {
+        name: "model-na-31-2-TK-SOL",
+        model: "model-na-31-2",
+        input: "model-na-31-2-variations/model-na-31-2-TK-SOL.json",
+    },
+    ModelVariant {
         name: "model-na-31-2-WS",
         model: "model-na-31-2",
         input: "model-na-31-2-variations/model-na-31-2-WS.json",
@@ -201,6 +281,16 @@ static VARIANTS: &[ModelVariant] = &[
         name: "model-na-31-2-bijlage-1-PS",
         model: "model-na-31-2-bijlage-1",
         input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-PS.json",
+    },
+    ModelVariant {
+        name: "model-na-31-2-bijlage-1-TK-GSB",
+        model: "model-na-31-2-bijlage-1",
+        input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-TK-GSB.json",
+    },
+    ModelVariant {
+        name: "model-na-31-2-bijlage-1-TK-SOL",
+        model: "model-na-31-2-bijlage-1",
+        input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-TK-SOL.json",
     },
     ModelVariant {
         name: "model-na-31-2-bijlage-1-WS",
@@ -226,6 +316,16 @@ static VARIANTS: &[ModelVariant] = &[
         name: "model-p-2a-PS2",
         model: "model-p-2a",
         input: "model-p-2a-variations/model-p-2a-PS2.json",
+    },
+    ModelVariant {
+        name: "model-p-2a-TK-GSB",
+        model: "model-p-2a",
+        input: "model-p-2a-variations/model-p-2a-TK-GSB.json",
+    },
+    ModelVariant {
+        name: "model-p-2a-TK-SOL",
+        model: "model-p-2a",
+        input: "model-p-2a-variations/model-p-2a-TK-SOL.json",
     },
     ModelVariant {
         name: "model-p-2a-WS",

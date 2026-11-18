@@ -69,6 +69,20 @@ mod tests {
             .expect("model-na-31-1-PS2.json should deserialize to struct ModelNa31_1Input");
 
         reader = BufReader::new(
+            File::open("templates/inputs/model-na-31-1-variations/model-na-31-1-TK-GSB.json")
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa31_1Input>(reader)
+            .expect("model-na-31-1-TK-GSB.json should deserialize to struct ModelNa31_1Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-na-31-1-variations/model-na-31-1-TK-SOL.json")
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa31_1Input>(reader)
+            .expect("model-na-31-1-TK-SOL.json should deserialize to struct ModelNa31_1Input");
+
+        reader = BufReader::new(
             File::open("templates/inputs/model-na-31-1-variations/model-na-31-1-WS.json").unwrap(),
         );
         serde_json::from_reader::<_, ModelNa31_1Input>(reader)

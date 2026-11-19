@@ -30,8 +30,8 @@ export function DataEntryImportPage() {
       case "hash_check":
         return (
           <HashCheck
-            date={state.electionDate}
             title={state.electionName}
+            subtitle={`${state.subCommittee.category} ${state.subCommittee.authority_id} - ${state.subCommittee.authority_name}`}
             fileName={state.file.name}
             subCommittee={state.subCommittee}
             hash={state.hash}

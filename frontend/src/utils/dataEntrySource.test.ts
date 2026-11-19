@@ -21,6 +21,7 @@ describe("getDataEntrySourceNumber", () => {
     id: 1,
     name: "Juinen",
     number: 1,
+    category: "GSB",
     committee_session_id: 1,
     data_entry_id: 1,
     authority_id: "0035",

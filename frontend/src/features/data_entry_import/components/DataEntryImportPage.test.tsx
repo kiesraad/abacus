@@ -27,6 +27,7 @@ const subCommittee: SubCommitteeFirstSession = {
   id: 1,
   number: 35,
   name: "Heemdamseburg",
+  category: "GSB",
   authority_id: "0035",
   authority_name: "Heemdamseburg",
   data_entry_id: 1,
@@ -108,6 +109,8 @@ describe("DataEntryImportPage", () => {
     expect(await screen.findByRole("heading", { name: "Controleer tellingsbestand" })).toBeVisible();
     expect(screen.getByText("tellingsbestand_510b.zip")).toBeVisible();
     expect(screen.getByText(electionName)).toBeVisible();
+    expect(screen.getByText("GSB 0035 - Heemdamseburg")).toBeVisible();
+    expect(screen.getByText("Digitale handtekening klopt")).toBeVisible();
 
     // 2. Complete check hash form - POST to validatePath contains completed hash.
     overrideOnce("post", validatePath, 200, validateResponse);

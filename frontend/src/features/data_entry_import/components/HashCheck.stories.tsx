@@ -30,6 +30,7 @@ const subCommittee: SubCommitteeFirstSession = {
   id: 811,
   number: 35,
   name: "Juinen",
+  category: "GSB",
   authority_id: "0035",
   authority_name: "Juinen",
   data_entry_id: 801,
@@ -38,8 +39,8 @@ const subCommittee: SubCommitteeFirstSession = {
 const meta = {
   component: HashCheck,
   args: {
-    date: "2026-03-18",
-    title: "Telresultaten GSB Gemeenteraad Juinen 2026",
+    title: "Gemeenteraad Juinen 2026",
+    subtitle: "GSB 0035 - Juinen",
     fileName: "telling.eml.xml.zip",
     subCommittee,
     hash: redactedHash,
@@ -55,7 +56,9 @@ export const Default: Story = {
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Controleer tellingsbestand")).toBeVisible();
     await expect(canvas.getByText("telling.eml.xml.zip")).toBeVisible();
-    await expect(canvas.getByText("Telresultaten GSB Gemeenteraad Juinen 2026")).toBeVisible();
+    await expect(canvas.getByText("Gemeenteraad Juinen 2026")).toBeVisible();
+    await expect(canvas.getByText("GSB 0035 - Juinen")).toBeVisible();
+    await expect(canvas.getByText("Digitale handtekening klopt")).toBeVisible();
     await expect(
       canvas.getByText(
         "Controleer de volledige digitale vingerafdruk met de code op het proces-verbaal (Na 31-1, Na 31-2 of Na 14-2) van het GSB van de gemeente Juinen. Vul ter controle de twee afgeschermde delen hieronder in. Ga alleen verder als alle delen overeenkomen.",

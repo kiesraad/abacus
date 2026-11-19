@@ -8,6 +8,7 @@ const subCommittee: SubCommitteeFirstSession = {
   id: 811,
   number: 35,
   name: "Juinen",
+  category: "GSB",
   authority_id: "0035",
   authority_name: "Juinen",
   data_entry_id: 801,

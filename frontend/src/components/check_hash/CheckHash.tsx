@@ -17,7 +17,7 @@ interface CheckHashProps {
   header: string;
   description: ReactNode;
   instructions: string;
-  signatureDescription?: string;
+  signatureCorrect?: boolean;
   errorTitle: string;
   errorDescription: string;
   redactedHash: RedactedEmlHash;
@@ -32,7 +32,7 @@ export function CheckHash({
   header,
   description,
   instructions,
-  signatureDescription,
+  signatureCorrect,
   errorTitle,
   errorDescription,
   redactedHash,
@@ -102,20 +102,19 @@ export function CheckHash({
               </Alert>
             )}
             <p>{description}</p>
-            <div className={cn(cls.checkHash, signatureDescription && cls.success)}>
+            <div className={cn(cls.checkHash, signatureCorrect && cls.success)}>
               <section>
                 <p>
                   <strong>{title}</strong>
                   <br />
-                  {subtitle && <span className="capitalize-first">{subtitle}</span>}
+                  {subtitle &&
+                    (signatureCorrect ? (
+                      <strong>{subtitle}</strong>
+                    ) : (
+                      <span className="capitalize-first">{subtitle}</span>
+                    ))}
                 </p>
-                {signatureDescription && (
-                  <p>
-                    <strong>{t("check_hash.signature_correct")}</strong>
-                    <br />
-                    <span>{signatureDescription}</span>
-                  </p>
-                )}
+                {signatureCorrect && <p>{t("check_hash.signature_correct")}</p>}
               </section>
             </div>
 

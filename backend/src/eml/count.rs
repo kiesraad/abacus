@@ -256,6 +256,7 @@ mod tests {
                 id: SubCommitteeId::from(1),
                 number: 1,
                 name: "Test".to_string(),
+                category: CommitteeCategory::GSB,
                 authority_id: "0001".to_string(),
                 authority_name: "Test".to_string(),
                 data_entry_id: DataEntryId::from(1),

@@ -76,6 +76,7 @@ type TestVariant = {
   regionNumber?: string;
   regionName: string;
   electionName: string;
+  electionDistrict?: string;
   filename: string;
   corrigendumFilename: RegExp;
   dataEntry: Exclude<Results, { model: "GSB" }>;
@@ -273,7 +274,14 @@ for (const variant of variants) {
 
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
-      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionName).toHaveText(`Verkiezing: ${variant.electionName}`);
+      await expect(checkAndSavePage.committeeCategory).toHaveText("Type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toHaveText(`Gebiedsaanduiding: ${variant.regionName}`);
+      if (variant.candidateDefinition.electionDistrict) {
+        await expect(checkAndSavePage.electionDistrict).toHaveText(
+          `Kieskring: ${variant.candidateDefinition.electionDistrict}`,
+        );
+      }
       await expect(checkAndSavePage.numberOfVoters).toHaveText("61.269 kiesgerechtigden");
       const election = await checkAndSavePage.saveElection();
 

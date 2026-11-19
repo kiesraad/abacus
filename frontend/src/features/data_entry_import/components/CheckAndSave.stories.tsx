@@ -32,7 +32,7 @@ export const Default: Story = {
     await expect(await canvas.findByText("Je gaat de volgende telresultaten importeren:")).toBeVisible();
     await expect(canvas.getByText("Gemeenteraad Juinen 2026")).toBeVisible();
     await expect(canvas.getByText("Gemeentelijk stembureau")).toBeVisible();
-    await expect(canvas.getByText(/Juinen \(0035\)/)).toBeVisible();
+    await expect(canvas.getByText("0035 - Juinen")).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Opslaan" })).toBeVisible();
   },
 };

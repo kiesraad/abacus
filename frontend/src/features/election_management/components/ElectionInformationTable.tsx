@@ -2,7 +2,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import type { CommitteeSession, ElectionWithPoliticalGroups, Role } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { getDistrictNumber } from "@/utils/election";
+import { getDistrictLabel } from "@/utils/election";
 import { formatNumber } from "@/utils/number";
 import cls from "./ElectionManagement.module.css";
 
@@ -54,9 +54,7 @@ export function ElectionInformationTable({
             <Table.HeaderCell scope="row" className="normal">
               {t("election.district")}
             </Table.HeaderCell>
-            <Table.Cell>
-              {getDistrictNumber(election.district)} - {election.district.name}
-            </Table.Cell>
+            <Table.Cell>{getDistrictLabel(election.district)}</Table.Cell>
           </Table.Row>
         )}
         <Table.Row>

@@ -118,7 +118,7 @@ test.describe(`data entry import GSB 510b into CSB election`, () => {
     await expect(dataEntryImportCheckAndSavePage.electionName).toContainText(election.name);
     await expect(dataEntryImportCheckAndSavePage.committeeCategory).toContainText("Gemeentelijk stembureau");
     await expect(dataEntryImportCheckAndSavePage.areaDesignation).toContainText(
-      `${subCommittee.authority_name} (${subCommittee.authority_id})`,
+      `${subCommittee.authority_id} - ${subCommittee.authority_name}`,
     );
     await expect(dataEntryImportCheckAndSavePage.saveButton).toBeVisible();
     await dataEntryImportCheckAndSavePage.saveButton.click();

@@ -5,6 +5,7 @@ import type {
   PollingStationRequest,
   VoteCountingMethod,
 } from "@/types/generated/openapi";
+import { getDistrictLabel } from "@/utils/election";
 import { formatNumber } from "@/utils/number";
 
 interface ImportedElectionInformationProps {
@@ -30,15 +31,20 @@ export function ImportedElectionInformation({
     <>
       <ul>
         <li id="election-name">
-          <strong>{t("election.singular")}:</strong> {election.name}
+          <strong>{t("election.title.singular")}:</strong> {election.name}
         </li>
         <li id="committee-category">
-          <strong>{t("election.committee_category.title").toLowerCase()}:</strong>{" "}
+          <strong>{t("election.committee_category.title")}:</strong>{" "}
           {t(`committee_category.${committeeCategory}.short`)}
         </li>
         <li id="election-location">
-          <strong>{t("area_designation")}:</strong> {election.location}
+          <strong>{t("area_designation")}:</strong> {election.authority_region}
         </li>
+        {election.district.district === "Specific" && (
+          <li id="election-district">
+            <strong>{t("election.district")}:</strong> {getDistrictLabel(election.district)}
+          </li>
+        )}
       </ul>
       <ul>
         {election.political_groups.length > 0 && (

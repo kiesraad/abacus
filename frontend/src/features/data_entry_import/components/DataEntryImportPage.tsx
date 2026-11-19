@@ -4,6 +4,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
 import { useDataEntryImport } from "@/features/data_entry_import/hooks/useDataEntryImport";
 import { t } from "@/i18n/translate";
+import { getAreaDesignation } from "@/utils/election";
 import { CheckAndSave } from "./CheckAndSave";
 import { HashCheck } from "./HashCheck";
 import { ImportFileForm } from "./ImportFileForm";
@@ -31,7 +32,7 @@ export function DataEntryImportPage() {
         return (
           <HashCheck
             title={state.electionName}
-            subtitle={`${state.subCommittee.category} ${state.subCommittee.authority_id} - ${state.subCommittee.authority_name}`}
+            subtitle={getAreaDesignation(state.subCommittee, true)}
             fileName={state.file.name}
             subCommittee={state.subCommittee}
             hash={state.hash}

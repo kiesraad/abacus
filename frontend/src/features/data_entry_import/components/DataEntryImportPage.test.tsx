@@ -118,7 +118,7 @@ describe("DataEntryImportPage", () => {
     expect(await screen.findByRole("heading", { name: "Controleren en opslaan" })).toBeVisible();
     expect(screen.getByText(electionName)).toBeVisible();
     expect(screen.getByText("Gemeentelijk stembureau")).toBeVisible();
-    expect(screen.getByText(/Heemdamseburg \(0035\)/)).toBeVisible();
+    expect(screen.getByText("0035 - Heemdamseburg")).toBeVisible();
 
     // 3. Check and save.
     overrideOnce("post", importPath, 200, {

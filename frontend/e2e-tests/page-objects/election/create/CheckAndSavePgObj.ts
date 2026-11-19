@@ -7,6 +7,7 @@ export class CheckAndSavePgObj {
   readonly electionName: Locator;
   readonly committeeCategory: Locator;
   readonly electionLocation: Locator;
+  readonly electionDistrict: Locator;
   readonly numberOfListsAndCandidates: Locator;
   readonly numberOfPollingStations: Locator;
   readonly countingMethod: Locator;
@@ -18,6 +19,7 @@ export class CheckAndSavePgObj {
     this.electionName = page.getByTestId("election-name");
     this.committeeCategory = page.getByTestId("committee-category");
     this.electionLocation = page.getByTestId("election-location");
+    this.electionDistrict = page.getByTestId("election-district");
     this.numberOfListsAndCandidates = page.getByTestId("lists-and-candidates");
     this.numberOfPollingStations = page.getByTestId("polling-stations");
     this.countingMethod = page.getByTestId("counting-method");

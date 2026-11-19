@@ -685,6 +685,7 @@ pub async fn apportionment_state_action(
 pub enum FixtureUser {
     Admin,
     CoordinatorGSB,
+    #[expect(unused, reason = "we have to HSB test yet")]
     CoordinatorHSB,
     CoordinatorCSB,
     TypistGSB,

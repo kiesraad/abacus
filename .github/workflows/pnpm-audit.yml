@@ -35,7 +35,7 @@ jobs:
           node-version: 24
           package-manager-cache: false
       - name: Install pnpm
-        uses: pnpm/setup@v3.1.2
+        uses: pnpm/setup@v3.2.0
         with:
           working-directory: frontend
           install: false

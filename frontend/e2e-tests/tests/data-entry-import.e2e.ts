@@ -97,7 +97,9 @@ test.describe(`data entry import GSB 510b into CSB election`, () => {
 
     // Hash check page.
     await expect(dataEntryImportPage.main).toContainText(eml510b.zipFileName);
-    await expect(dataEntryImportPage.main).toContainText(eml510b.electionDate);
+    await expect(dataEntryImportPage.main).toContainText("Gemeenteraad Test 2022");
+    await expect(dataEntryImportPage.main).toContainText("GSB 0000 - Test");
+    await expect(dataEntryImportPage.main).toContainText("Digitale handtekening klopt");
 
     // Incorrect hash.
     const hashCheckPage = new DataEntryImportHashCheckPgObj(page);

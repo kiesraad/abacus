@@ -733,7 +733,7 @@ pub mod tests {
             location: "Test".to_string(),
             authority_id: match committee_category {
                 CommitteeCategory::GSB => "0000".to_string(),
-                CommitteeCategory::HSB => todo!("https://github.com/kiesraad/abacus/issues/4377"),
+                CommitteeCategory::HSB => "HSB0".to_string(),
                 CommitteeCategory::CSB => "CSB".to_string(),
             },
             authority_name: "Test".to_string(),

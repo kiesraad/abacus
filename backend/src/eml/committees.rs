@@ -471,13 +471,11 @@ fn find_committee(
 fn managing_authority_id(category: CommitteeCategory, key: RegionKey) -> Result<String, EMLError> {
     Ok(match category {
         CommitteeCategory::CSB => "CSB".to_string(),
-        // TODO: rest of Abacus first needs to support HSB, see https://github.com/kiesraad/abacus/issues/3861
-        // CommitteeCategory::HSB => format!(
-        //     "HSB{}",
-        //     key.id
-        //         .ok_or(EMLError::custom("Missing region id for HSB"))?
-        // ),
-        CommitteeCategory::HSB => todo!("https://github.com/kiesraad/abacus/issues/3861"),
+        CommitteeCategory::HSB => format!(
+            "HSB{}",
+            key.number
+                .ok_or(EMLError::custom("Missing region id for HSB"))?
+        ),
         CommitteeCategory::GSB => format!(
             "{:04}",
             key.number

@@ -1202,6 +1202,7 @@ export type ElectionCategory = (typeof electionCategoryValues)[number];
 
 export type ElectionCreationRequest =
   | (GSBElectionCreationRequest & { committee_category: "GSB" })
+  | (HSBElectionCreationRequest & { committee_category: "HSB" })
   | (CSBElectionCreationRequest & { committee_category: "CSB" });
 
 export type ElectionCreationValidateRequest =
@@ -1581,6 +1582,13 @@ export interface GenerateElectionArgs {
   voters: RandomRange;
   /** Include (part of) data entry for this election */
   with_data_entry: boolean;
+}
+
+export interface HSBElectionCreationRequest {
+  candidate_data: string;
+  candidate_hash: string[];
+  election_data: string;
+  election_hash: string[];
 }
 
 export interface HighestAverageAssignedSeat {
@@ -2023,7 +2031,15 @@ export type Results =
   | (NextSessionResults & { model: "CSONextSession" })
   | (GSBResults & { model: "GSB" });
 
-export const roleValues = ["administrator", "coordinator_gsb", "coordinator_csb", "typist_gsb", "typist_csb"] as const;
+export const roleValues = [
+  "administrator",
+  "coordinator_gsb",
+  "coordinator_hsb",
+  "coordinator_csb",
+  "typist_gsb",
+  "typist_hsb",
+  "typist_csb",
+] as const;
 export type Role = (typeof roleValues)[number];
 
 /**

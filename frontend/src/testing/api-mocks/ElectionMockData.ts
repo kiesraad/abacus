@@ -20,6 +20,7 @@ import {
   committeeSessionMockData,
   getCommitteeSessionMockData,
   getCSBCommitteeSessionMockData,
+  getHSBCommitteeSessionMockData,
 } from "./CommitteeSessionMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
 
@@ -441,6 +442,25 @@ export const getCSBElectionMockData = (
   committeeSession: Partial<CommitteeSession> = {},
 ): ElectionDetailsResponse => {
   const updatedCommitteeSession = getCSBCommitteeSessionMockData(committeeSession);
+
+  return {
+    current_committee_session: updatedCommitteeSession,
+    committee_sessions: [updatedCommitteeSession],
+    election: {
+      ...electionListMockResponse.elections[1]!,
+      political_groups: politicalGroupsMockData,
+      ...election,
+    },
+    polling_stations: [],
+    investigations: [],
+  };
+};
+
+export const getHSBElectionMockData = (
+  election: Partial<ElectionWithPoliticalGroups> = {},
+  committeeSession: Partial<CommitteeSession> = {},
+): ElectionDetailsResponse => {
+  const updatedCommitteeSession = getHSBCommitteeSessionMockData(committeeSession);
 
   return {
     current_committee_session: updatedCommitteeSession,

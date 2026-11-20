@@ -833,6 +833,7 @@ pub mod tests {
             (&cso_first_session, GSB, Some(CSO), &first),
             (&cso_first_session, GSB, Some(CSO), &next),
             (&cso_next_session, GSB, Some(CSO), &next),
+            (&gsb, HSB, None, &first),
             (&gsb, CSB, None, &first),
         ];
 

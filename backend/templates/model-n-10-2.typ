@@ -34,7 +34,7 @@
 
 #v(0.5em)
 
-#input.election.location #format_date(input.election.election_date)
+#input.election.authority_region #format_date(input.election.election_date)
 
 #v(0.5em)
 

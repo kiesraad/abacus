@@ -1717,7 +1717,7 @@ mod tests {
             NewElection::from_eml_str(data, Some((CommitteeCategory::GSB, Some(region))), false)
                 .unwrap();
         assert_eq!(election.name, "Provinciale Staten Limburg 2023");
-        assert_eq!(election.location, "Venlo");
+        assert_eq!(election.authority_region, "Venlo");
         assert_eq!(election.authority_id, "0983");
         assert_eq!(election.district.region_details().unwrap().name, "Venlo");
     }

@@ -131,6 +131,31 @@ export const eml110a_PS2: Eml110a = {
   ],
 };
 
+export const eml110a_TK: Eml110a = {
+  filename: "eml110a_test_TK.eml.xml",
+  path: "../backend/src/eml/tests/eml110a_test_TK.eml.xml",
+  electionName: "Tweede Kamer der Staten-Generaal 2025",
+  electionDate: "woensdag 29 oktober 2025",
+  fullHash: [
+    "e1a1",
+    "0daf",
+    "de26",
+    "8ef2",
+    "539b",
+    "bb5a",
+    "82e0",
+    "a1a5",
+    "81d0",
+    "2ba4",
+    "5e71",
+    "df08",
+    "5fd1",
+    "3a2a",
+    "30b8",
+    "f5a7",
+  ],
+};
+
 export const eml110b = {
   filename: "eml110b_test_420_polling_stations.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml110b_test_420_polling_stations.eml.xml",
@@ -325,6 +350,30 @@ export const eml230b_PS2: Eml230b = {
     "cbc3",
     "78c9",
     "d5f9",
+  ],
+};
+
+export const eml230b_TK: Eml230b = {
+  filename: "eml230b_test_TK.eml.xml",
+  path: "../backend/src/eml/tests/eml230b_test_TK.eml.xml",
+  electionIdentifier: "TK2025",
+  fullHash: [
+    "3957",
+    "9f74",
+    "eb8c",
+    "4800",
+    "f9db",
+    "dd8c",
+    "8514",
+    "8a55",
+    "d282",
+    "5747",
+    "0666",
+    "8a84",
+    "2478",
+    "2d9b",
+    "599b",
+    "4bf7",
   ],
 };
 

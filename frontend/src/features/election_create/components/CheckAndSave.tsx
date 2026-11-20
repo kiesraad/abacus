@@ -48,8 +48,6 @@ function buildRequest(state: ElectionCreateState): ElectionCreationRequest | und
         number_of_voters: state.numberOfVoters,
         selected_region: state.gsbSelected,
       };
-    default:
-      return state.committeeCategory satisfies never;
   }
 }
 

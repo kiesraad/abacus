@@ -1,6 +1,20 @@
 import { describe, expect, test } from "vitest";
-import type { CommitteeDistrict, ElectionCategory, SubCommitteeFirstSession } from "@/types/generated/openapi";
-import { getAreaDesignation, getDistrictLabel, getDistrictNumber, isLocalElection } from "./election";
+import type { CommitteeDistrict, Election, ElectionCategory } from "@/types/generated/openapi";
+import {
+  csbElectionMockData,
+  csbWaterAuthorityElectionMockData,
+  electionMockData,
+  provincialElectionMockData,
+  provincialElectionPS2MockData,
+  waterAuthorityElectionMockData,
+} from "../testing/api-mocks/ElectionMockData";
+import {
+  formatAreaDesignation,
+  getCommitteeTypeLabel,
+  getDistrictLabel,
+  getDistrictNumber,
+  isLocalElection,
+} from "./election";
 
 describe("Election util", () => {
   test.each([
@@ -121,22 +135,19 @@ describe("Election util", () => {
     expect(getDistrictLabel(input, withDistrictPrefix)).toBe(expected);
   });
 
+  test("Election formatAreaDesignation", () => {
+    expect(formatAreaDesignation("0035", "Juinen", "GSB")).toBe("GSB 0035 - Juinen");
+    expect(formatAreaDesignation("0035", "Juinen")).toBe("0035 - Juinen");
+  });
+
   test.each([
-    [true, "GSB 0035 - Juinen"],
-    [false, "0035 - Juinen"],
-  ] satisfies Array<
-    [boolean, string]
-  >)("Election getAreaDesignation withCategoryPrefix %s as %s", (withCategoryPrefix, expected) => {
-    const input = {
-      committee_session_id: 801,
-      id: 811,
-      number: 35,
-      name: "Juinen",
-      category: "GSB",
-      authority_id: "0035",
-      authority_name: "Juinen",
-      data_entry_id: 801,
-    } satisfies SubCommitteeFirstSession;
-    expect(getAreaDesignation(input, withCategoryPrefix)).toBe(expected);
+    [electionMockData, "GSB 0035 Heemdamseburg"],
+    [provincialElectionMockData, "GSB 0036 Juinen"],
+    [provincialElectionPS2MockData, "GSB 0036 Juinen"],
+    [waterAuthorityElectionMockData, "GSB 0037 Juinen"],
+    [csbElectionMockData, "CSB Heemdamseburg"],
+    [csbWaterAuthorityElectionMockData, "CSB Rivier en Polder"],
+  ] satisfies Array<[Election, string]>)("Election getElectionTypeLabel election %s as %s", (input, expected) => {
+    expect(getCommitteeTypeLabel(input)).toBe(expected);
   });
 });

@@ -1,7 +1,7 @@
 import { CheckHash } from "@/components/check_hash/CheckHash";
 import { t, tx } from "@/i18n/translate";
 import type { RedactedEmlHash, SubCommitteeFirstSession } from "@/types/generated/openapi";
-import { getAreaDesignation } from "@/utils/election";
+import { formatAreaDesignation } from "@/utils/election";
 
 export interface HashCheckProps {
   title: string;
@@ -16,7 +16,7 @@ export function HashCheck({ title, fileName, subCommittee, hash, error, onSubmit
   return (
     <CheckHash
       title={title}
-      subtitle={getAreaDesignation(subCommittee, true)}
+      subtitle={formatAreaDesignation(subCommittee.authority_id, subCommittee.authority_name, subCommittee.category)}
       header={t("data_entry_import.hash_check.title")}
       description={tx("data_entry_import.hash_check.description", {
         file: () => <strong>{fileName}</strong>,

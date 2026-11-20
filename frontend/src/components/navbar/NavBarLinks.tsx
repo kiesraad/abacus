@@ -6,7 +6,7 @@ import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import type { Election } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-
+import { getCommitteeTypeLabel } from "@/utils/election";
 import { NavBarMenuButton } from "./NavBarMenu";
 
 type NavBarLinksProps = { location: { pathname: string } };
@@ -16,10 +16,7 @@ const DATA_ENTRY_IMPORT_PATH = /^\/elections\/\d+\/data-entry\/import$/;
 function ElectionBreadcrumb({ election }: { election: Election }) {
   return (
     <>
-      <span className="bold">
-        {election.committee_category === "GSB" && election.committee_category} {election.authority_id}{" "}
-        {election.authority_region}
-      </span>
+      <span className="bold">{getCommitteeTypeLabel(election)}</span>
       <span>&mdash;</span>
       <span>{election.name}</span>
     </>

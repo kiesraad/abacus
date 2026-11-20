@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/Button/Button";
 import { t } from "@/i18n/translate";
 import type { SubCommitteeFirstSession } from "@/types/generated/openapi";
-import { getAreaDesignation } from "@/utils/election";
+import { formatAreaDesignation } from "@/utils/election";
 
 export interface CheckAndSaveProps {
   electionName: string;
@@ -25,7 +25,8 @@ export function CheckAndSave({ electionName, subCommittee, onSubmit, isLoading }
           {t(`committee_category.${subCommittee.category}.short`)}
         </li>
         <li id="area-designation">
-          <strong>{t("area_designation")}:</strong> {getAreaDesignation(subCommittee)}
+          <strong>{t("area_designation")}:</strong>{" "}
+          {formatAreaDesignation(subCommittee.authority_id, subCommittee.authority_name)}
         </li>
       </ul>
 

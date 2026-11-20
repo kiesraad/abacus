@@ -512,7 +512,7 @@ fn generate_election(
         counting_method,
         authority_id: match args.committee_category {
             CommitteeCategory::CSB => "CSB".to_string(),
-            CommitteeCategory::HSB => todo!("https://github.com/kiesraad/abacus/issues/4377"),
+            CommitteeCategory::HSB => format!("HSB{}", super::data::domain_id(rng)),
             CommitteeCategory::GSB => {
                 if is_municipal {
                     domain

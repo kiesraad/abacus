@@ -46,6 +46,9 @@
                 <kr:Region RegionNumber="126" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
                     <kr:RegionName>'s-Gravenveen</kr:RegionName>
                 </kr:Region>
+                <kr:Region RegionNumber="9010" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>NBSB</kr:RegionName>
+                </kr:Region>
             </kr:ElectionTree>
             <kr:RegisteredParties>
                 <kr:RegisteredParty>

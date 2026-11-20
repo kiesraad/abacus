@@ -84,8 +84,8 @@ export const InformationTable: StoryFn = () => (
           <Table.Cell>Gemeenteraadsverkiezing 2026</Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.Cell>Kiesgebied</Table.Cell>
-          <Table.Cell>045 – Gemeente Juinen</Table.Cell>
+          <Table.Cell>Gebiedsaanduiding</Table.Cell>
+          <Table.Cell>0045 – Juinen</Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>Lijsten en kandidaten</Table.Cell>

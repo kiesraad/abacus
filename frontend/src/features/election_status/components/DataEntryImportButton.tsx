@@ -12,7 +12,7 @@ export interface DataEntryImportButtonProps {
 export function DataEntryImportButton({ election, committeeSession, navigate }: DataEntryImportButtonProps) {
   const { role } = useUserRole();
 
-  if (role !== "coordinator_csb" || election.committee_category !== "CSB" || committeeSession.status === "completed") {
+  if (role !== "coordinator_csb" || election.committee_category === "GSB" || committeeSession.status === "completed") {
     return null;
   }
 

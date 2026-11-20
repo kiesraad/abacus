@@ -202,7 +202,8 @@ export function useDataEntryImport(): UseDataEntryImport {
     const response = await postImport(importRequestBody(state.file, state.hash));
     if (isSuccess(response)) {
       pushMessage({
-        title: t("data_entry_import.success", { fileAuthorityName: state.subCommittee.authority_name }),
+        title: t("data_entry_import.success_alert.title", { fileAuthorityName: state.subCommittee.authority_name }),
+        text: t("data_entry_import.success_alert.description"),
       });
       void navigate(`/elections/${election.id}/status`);
     } else {

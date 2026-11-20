@@ -5,6 +5,7 @@ import { expect, fn, mocked, within } from "storybook/test";
 import { committeeSessionMockData, csbCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { csbElectionMockData, electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
+  electionStatusesCSBMock,
   extendedElectionStatusesCSBMock,
   extendedElectionStatusesMock,
 } from "@/testing/api-mocks/ElectionStatusMockData";
@@ -248,6 +249,96 @@ export const CSBElectionStatusNoLinks: StoryObj<StoryProps> = {
 
     await step("Import button", async () => {
       await expect(canvas.getByRole("button", { name: "Tellingsbestand GSB importeren" })).toBeVisible();
+    });
+  },
+};
+
+export const CSBElectionStatusImportDone: StoryObj<StoryProps> = {
+  args: {
+    addLinks: false,
+  },
+  render: ({ addLinks, buttonNavigate }) => {
+    const statuses = [electionStatusesCSBMock[5]!, electionStatusesCSBMock[6]!];
+    return (
+      <TestUserProvider userRole={"coordinator_csb"}>
+        <ElectionStatus
+          statuses={statuses}
+          committeeSession={csbCommitteeSessionMockData}
+          election={csbElectionMockData}
+          addLinks={addLinks}
+          navigate={buttonNavigate}
+        />
+      </TestUserProvider>
+    );
+  },
+  play: async ({ canvas, step }) => {
+    await step("Heading", async () => {
+      const heading = canvas.getByTestId("status-heading");
+      const title = within(heading).getByRole("heading", { level: 2, name: "Statusoverzicht invoer" });
+      await expect(title).toBeVisible();
+    });
+
+    await step("Progress section", async () => {
+      const pollingStationsPerStatus = canvas.getByTestId("polling-stations-per-status");
+      await expect(
+        within(pollingStationsPerStatus).getByRole("heading", { level: 3, name: "Stembureaus per status" }),
+      ).toBeVisible();
+      const items = pollingStationsPerStatus.children;
+      // items[0] is the heading, which we have already checked
+      await expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (0)");
+      await expect(items[2]).toHaveTextContent("Invoer bezig (1)");
+      await expect(items[3]).toHaveTextContent("Eerste invoer klaar (1)");
+      await expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
+      await expect(items[5]).toHaveTextContent("Werkvoorraad (0)");
+
+      const progress = canvas.getByTestId("progress");
+      await expect(within(progress).getByRole("heading", { level: 3, name: "Voortgang" })).toBeVisible();
+      await expect(canvas.getByTestId("progressbar-all")).toBeVisible();
+      const bars = canvas.getByTestId("multi-outer-bar").children;
+      const expectedData = [
+        { index: 0, percentage: 0, class: "definitive" },
+        { index: 1, percentage: 50, class: "first-entry-finished" },
+        { index: 2, percentage: 50, class: "in-progress" },
+        { index: 3, percentage: 0, class: "errors-and-warnings" },
+        { index: 4, percentage: 0, class: "not-started" },
+      ];
+
+      for (const data of expectedData) {
+        const bar = bars[data.index];
+        await expect(bar).toHaveClass(data.class);
+        await expect(bar).toHaveAttribute("style", `width: ${data.percentage}%;`);
+      }
+    });
+
+    await step("Main section", async () => {
+      const tablesRoot = canvas.getByRole("article");
+      const headings = within(tablesRoot).getAllByRole("heading", { level: 3 });
+      const tables = within(tablesRoot).getAllByRole("table");
+      await expect(headings.length).toBe(2);
+      await expect(tables.length).toBe(2);
+
+      await step("Data entry in progress", async () => {
+        await expect(headings[0]).toHaveTextContent("Invoer bezig (1)");
+        await expect(tables[0]).toHaveTableContent([
+          ["Nummer", "Stembureau", "Invoerder", "Voortgang"],
+          ["0007", "Hoek van Zoom 2e invoer", "Jayden Ahmen", "20%"],
+        ]);
+
+        const inProgressRows = within(tables[0]!).getAllByRole("row");
+        await expect(within(inProgressRows[1]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "20");
+      });
+
+      await step("First entry finished", async () => {
+        await expect(headings[1]).toHaveTextContent("Eerste invoer klaar (1)");
+        await expect(tables[1]).toHaveTableContent([
+          ["Nummer", "Stembureau", "Invoerder", "Afgerond"],
+          ["0006", "Eemstricht", "Geïmporteerd", "vandaag om 09:20"],
+        ]);
+      });
+    });
+
+    await step("Import button not visible", async () => {
+      await expect(canvas.queryByRole("button", { name: "Tellingsbestand GSB importeren" })).not.toBeInTheDocument();
     });
   },
 };

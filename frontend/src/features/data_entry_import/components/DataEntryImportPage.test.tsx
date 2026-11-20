@@ -127,7 +127,10 @@ describe("DataEntryImportPage", () => {
       sub_committee: subCommittee,
     });
     await user.click(screen.getByRole("button", { name: "Opslaan" }));
-    expect(pushMessage).toHaveBeenCalledWith({ title: "Tellingsbestand GSB Heemdamseburg geïmporteerd" });
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Tellingsbestand GSB Heemdamseburg geïmporteerd",
+      text: "Geef het papieren proces-verbaal aan een invoerder om ter controle een handmatige invoer te doen.",
+    });
     expect(router.state.location.pathname).toEqual(`/elections/${electionId}/status`);
   });
 

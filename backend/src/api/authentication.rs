@@ -32,11 +32,6 @@ use crate::{
     },
 };
 
-impl From<AuthenticationError> for APIError {
-    fn from(err: AuthenticationError) -> Self {
-        APIError::Delegated(Box::new(err))
-    }
-}
 #[derive(Serialize)]
 pub struct UserLoggedInAuditData {
     pub user_agent: String,

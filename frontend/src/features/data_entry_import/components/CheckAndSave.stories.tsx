@@ -33,6 +33,8 @@ export const Default: Story = {
     await expect(canvas.getByText("Gemeenteraad Juinen 2026")).toBeVisible();
     await expect(canvas.getByText("Gemeentelijk stembureau")).toBeVisible();
     await expect(canvas.getByText("0035 - Juinen")).toBeVisible();
+    await expect(canvas.getByText("De EML 510b is ondertekend door GSB 0035 - Juinen")).toBeVisible();
+    await expect(canvas.getByText("Digitale vingerafdruk is gelijk met het papieren proces-verbaal")).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Opslaan" })).toBeVisible();
   },
 };

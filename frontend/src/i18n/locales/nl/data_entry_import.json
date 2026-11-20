@@ -3,6 +3,8 @@
   "button_title": "Tellingsbestand GSB importeren",
   "check_and_save": {
     "description": "Je gaat de volgende telresultaten importeren:",
+    "file_signed_by": "De EML 510b is ondertekend door {area_designation}",
+    "signature_matches": "Digitale vingerafdruk is gelijk met het papieren proces-verbaal",
     "title": "Controleren en opslaan"
   },
   "file_error": {

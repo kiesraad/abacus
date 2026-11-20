@@ -1,7 +1,10 @@
+import { IconCheckmark } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
+import { Icon } from "@/components/ui/Icon/Icon";
 import { t } from "@/i18n/translate";
 import type { SubCommitteeFirstSession } from "@/types/generated/openapi";
 import { formatAreaDesignation } from "@/utils/election";
+import cls from "./CheckAndSave.module.css";
 
 export interface CheckAndSaveProps {
   electionName: string;
@@ -14,7 +17,7 @@ export function CheckAndSave({ electionName, subCommittee, onSubmit, isLoading }
   return (
     <section className="md">
       <h2>{t("data_entry_import.check_and_save.title")}</h2>
-      <p className="mt-lg">{t("data_entry_import.check_and_save.description")}</p>
+      <p>{t("data_entry_import.check_and_save.description")}</p>
 
       <ul>
         <li id="election-name">
@@ -29,6 +32,23 @@ export function CheckAndSave({ electionName, subCommittee, onSubmit, isLoading }
           {formatAreaDesignation(subCommittee.authority_id, subCommittee.authority_name)}
         </li>
       </ul>
+
+      <div className={cls.confirmations}>
+        <strong>
+          <Icon color="accept" size="md" icon={<IconCheckmark />} />
+          {t("data_entry_import.check_and_save.file_signed_by", {
+            area_designation: formatAreaDesignation(
+              subCommittee.authority_id,
+              subCommittee.authority_name,
+              subCommittee.category,
+            ),
+          })}
+        </strong>
+        <strong>
+          <Icon color="accept" size="md" icon={<IconCheckmark />} />
+          {t("data_entry_import.check_and_save.signature_matches")}
+        </strong>
+      </div>
 
       <div className="mt-xl">
         <Button type="button" onClick={onSubmit} isLoading={isLoading}>

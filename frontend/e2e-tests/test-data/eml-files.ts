@@ -307,7 +307,7 @@ export const eml230b_PS2: Eml230b = {
   filename: "eml230b_test_PS2.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test_PS2.eml.xml",
   electionIdentifier: "PS2023 Zuid-Brabant",
-  electionDistrict: "Kieskring II ('s-Gravenveen)",
+  electionDistrict: "II - 's-Gravenveen",
   fullHash: [
     "bce2",
     "c279",

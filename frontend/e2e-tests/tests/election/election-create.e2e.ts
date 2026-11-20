@@ -76,9 +76,9 @@ test.describe("Election creation", () => {
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
 
-      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
-      await expect(checkAndSavePage.committeeCategory).toContainText("type stembureau: Gemeentelijk stembureau");
-      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.electionName).toContainText("Verkiezing: Gemeenteraad Test 2022");
+      await expect(checkAndSavePage.committeeCategory).toContainText("Type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("Gebiedsaanduiding: Test");
       await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
       await expect(checkAndSavePage.numberOfPollingStations).toContainText("420 stembureaus");
       await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
@@ -158,9 +158,9 @@ test.describe("Election creation", () => {
       // Now we should be at the check and save page
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
-      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
-      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Gemeentelijk stembureau");
-      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.electionName).toContainText("Verkiezing: Gemeenteraad Test 2022");
+      await expect(checkAndSavePage.committeeCategory).toHaveText("Type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("Gebiedsaanduiding: Test");
       await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
       await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
       await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
@@ -230,9 +230,9 @@ test.describe("Election creation", () => {
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
 
-      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
-      await expect(checkAndSavePage.committeeCategory).toContainText("type stembureau: Gemeentelijk stembureau");
-      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.electionName).toContainText("Verkiezing: Gemeenteraad Test 2022");
+      await expect(checkAndSavePage.committeeCategory).toContainText("Type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("Gebiedsaanduiding: Test");
       await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
       await expect(checkAndSavePage.numberOfPollingStations).toContainText("420 stembureaus");
       await expect(checkAndSavePage.countingMethod).toContainText("Decentrale stemopneming");
@@ -312,9 +312,9 @@ test.describe("Election creation", () => {
       // Now we should be at the check and save page
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
-      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
-      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Gemeentelijk stembureau");
-      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.electionName).toContainText("Verkiezing: Gemeenteraad Test 2022");
+      await expect(checkAndSavePage.committeeCategory).toHaveText("Type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("Gebiedsaanduiding: Test");
       await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
       await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
       await expect(checkAndSavePage.countingMethod).toContainText("Decentrale stemopneming");
@@ -398,10 +398,10 @@ test.describe("Election creation", () => {
         const checkAndSavePage = new CheckAndSavePgObj(page);
         await expect(checkAndSavePage.header).toBeVisible();
         await expect(checkAndSavePage.electionName).toContainText(
-          `verkiezing: ${variant.electionDefinition.electionName}`,
+          `Verkiezing: ${variant.electionDefinition.electionName}`,
         );
-        await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
-        await expect(checkAndSavePage.electionLocation).toContainText(`gebiedsaanduiding: ${variant.regionName}`);
+        await expect(checkAndSavePage.committeeCategory).toHaveText("Type stembureau: Centraal stembureau");
+        await expect(checkAndSavePage.electionLocation).toContainText(`Gebiedsaanduiding: ${variant.regionName}`);
         await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
         await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
         await expect(checkAndSavePage.countingMethod).toBeHidden();

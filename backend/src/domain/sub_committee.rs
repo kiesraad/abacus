@@ -113,6 +113,7 @@ pub struct SubCommitteeFirstSession {
     #[schema(value_type = u32)]
     pub number: SubCommitteeNumber,
     pub name: String,
+    pub category: CommitteeCategory,
     pub authority_id: String,
     pub authority_name: String,
     pub data_entry_id: DataEntryId,

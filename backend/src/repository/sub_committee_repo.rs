@@ -175,6 +175,7 @@ pub async fn list_first_session_with_status(
             id: row.id,
             number: row.number,
             name: row.name,
+            category: row.category,
             authority_id: row.authority_id,
             authority_name: row.authority_name,
         }),

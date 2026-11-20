@@ -8,6 +8,7 @@ const subCommittee: SubCommitteeFirstSession = {
   id: 811,
   number: 35,
   name: "Juinen",
+  category: "GSB",
   authority_id: "0035",
   authority_name: "Juinen",
   data_entry_id: 801,
@@ -31,7 +32,7 @@ export const Default: Story = {
     await expect(await canvas.findByText("Je gaat de volgende telresultaten importeren:")).toBeVisible();
     await expect(canvas.getByText("Gemeenteraad Juinen 2026")).toBeVisible();
     await expect(canvas.getByText("Gemeentelijk stembureau")).toBeVisible();
-    await expect(canvas.getByText(/Juinen \(0035\)/)).toBeVisible();
+    await expect(canvas.getByText("0035 - Juinen")).toBeVisible();
     await expect(canvas.getByRole("button", { name: "Opslaan" })).toBeVisible();
   },
 };

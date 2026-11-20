@@ -152,7 +152,9 @@ for (const variant of variants) {
 
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
-      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
+      await expect(checkAndSavePage.electionName).toHaveText(`Verkiezing: ${variant.electionName}`);
+      await expect(checkAndSavePage.committeeCategory).toHaveText("Type stembureau: Centraal stembureau");
+      await expect(checkAndSavePage.electionLocation).toHaveText(`Gebiedsaanduiding: ${variant.regionName}`);
       const election = await checkAndSavePage.saveElection();
 
       electionId = election.id;

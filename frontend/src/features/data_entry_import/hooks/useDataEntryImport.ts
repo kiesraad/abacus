@@ -26,7 +26,6 @@ export type ImportState =
       subCommittee: SubCommitteeFirstSession;
       hash: RedactedEmlHash;
       electionName: string;
-      electionDate: string;
       error?: string;
     }
   | {
@@ -167,7 +166,6 @@ export function useDataEntryImport(): UseDataEntryImport {
         subCommittee: response.data.sub_committee,
         hash: response.data.hash,
         electionName: response.data.election_name,
-        electionDate: response.data.election_date,
       });
     } else {
       setState({ status: "idle", error: importError(response, election.name) });

@@ -82,7 +82,6 @@
     "error": "Gemeentelijk stembureau kan niet worden geselecteerd",
     "title": "Selecteer het gemeentelijk stembureau"
   },
-  "singular": "verkiezing",
   "start_when_count_list_received": "Zodra je een proces-verbaal van een stembureau hebt gekregen kan je beginnen met invoeren.",
   "status": "Status",
   "title": {

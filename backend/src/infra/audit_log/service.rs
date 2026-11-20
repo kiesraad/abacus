@@ -38,6 +38,14 @@ impl AuditService {
         Self { user, ip }
     }
 
+    /// For events that are not triggered by the request of a user, such as session expiry cleanup
+    pub fn new_anon() -> Self {
+        Self {
+            user: None,
+            ip: None,
+        }
+    }
+
     pub fn with_user(mut self, user: User) -> Self {
         self.user = Some(user);
 

@@ -53,9 +53,11 @@ impl Session {
     }
 
     /// Get the age of a session
+    ///
+    /// The age maxes out at the expiry time.
     pub(crate) fn duration(&self) -> Duration {
-        Utc::now()
-            .signed_duration_since(self.created_at)
+        let end = Utc::now().min(self.expires_at());
+        end.signed_duration_since(self.created_at)
             .to_std()
             .unwrap_or_default()
     }
@@ -174,28 +176,52 @@ pub(crate) async fn delete(
     Ok(())
 }
 
-/// Delete a session for a certain user
+/// Delete the session of a certain user and return the deleted session if there was one
 pub(crate) async fn delete_user_session(
     conn: &mut SqliteConnection,
     user_id: UserId,
-) -> Result<(), sqlx::Error> {
-    sqlx::query!("DELETE FROM sessions WHERE user_id = ?", user_id)
-        .execute(conn)
-        .await?;
-
-    Ok(())
+) -> Result<Option<Session>, sqlx::Error> {
+    sqlx::query_as!(
+        Session,
+        r#"
+        DELETE FROM sessions
+        WHERE user_id = ?
+        RETURNING
+            session_key,
+            user_id,
+            user_agent,
+            ip_address,
+            expires_at,
+            created_at
+        "#,
+        user_id
+    )
+    .fetch_optional(conn)
+    .await
 }
 
-/// Delete all sessions that have expired
+/// Delete all sessions that have expired and return the deleted sessions
 pub(crate) async fn delete_expired_sessions(
     conn: &mut SqliteConnection,
-) -> Result<(), sqlx::Error> {
-    sqlx::query("DELETE FROM sessions WHERE expires_at <= ?")
-        .bind(Utc::now())
-        .execute(conn)
-        .await?;
-
-    Ok(())
+) -> Result<Vec<Session>, sqlx::Error> {
+    let now = Utc::now();
+    sqlx::query_as!(
+        Session,
+        r#"
+        DELETE FROM sessions
+        WHERE expires_at <= ?
+        RETURNING
+            session_key,
+            user_id,
+            user_agent,
+            ip_address,
+            expires_at,
+            created_at
+        "#,
+        now
+    )
+    .fetch_all(conn)
+    .await
 }
 
 /// Count the number of active sessions
@@ -339,7 +365,8 @@ mod tests {
         );
         save(&mut conn, &session).await.unwrap();
 
-        delete_expired_sessions(&mut conn).await.unwrap();
+        let deleted = delete_expired_sessions(&mut conn).await.unwrap();
+        assert_eq!(deleted, std::slice::from_ref(&session));
 
         let session_from_db = super::get_by_key(&mut conn, session.session_key())
             .await

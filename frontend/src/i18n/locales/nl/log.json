@@ -55,7 +55,9 @@
     "UserLoggedIn": "Gebruiker ingelogd",
     "UserLoggedOut": "Gebruiker uitgelogd",
     "UserLoginFailed": "Mislukte inlogpoging",
+    "UserSessionExpired": "Gebruikerssessie is verlopen",
     "UserSessionExtended": "Gebruikerssessie verlengd",
+    "UserSessionRemoved": "Gebruikerssessie verwijderd",
     "UserUpdated": "Gebruikersaccount bijgewerkt"
   },
   "field": {
@@ -81,6 +83,7 @@
     "election_status": "Verkiezingsstatus",
     "error_reference": "Referentie fout",
     "event_type": "Gebeurtenis",
+    "expires_at": "Sessie verlopen op",
     "file_created_at": "Aangemaakt op",
     "file_hash": "Digitale vingerafdruk",
     "file_id": "Bestands-ID",

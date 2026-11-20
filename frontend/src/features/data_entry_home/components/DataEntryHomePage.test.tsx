@@ -12,6 +12,7 @@ import {
   electionDetailsMockResponse,
   getCSBElectionMockData,
   getElectionMockData,
+  getHSBElectionMockData,
 } from "@/testing/api-mocks/ElectionMockData";
 import {
   CSBStatusResponseMock,
@@ -40,6 +41,9 @@ async function renderDataEntryHomePage(
   switch (category) {
     case "GSB":
       electionResponse = getElectionMockData({}, session);
+      break;
+    case "HSB":
+      electionResponse = getHSBElectionMockData({}, session);
       break;
     case "CSB":
       electionResponse = getCSBElectionMockData({}, session);

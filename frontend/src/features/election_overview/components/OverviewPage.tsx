@@ -56,6 +56,7 @@ export function OverviewPage() {
     switch (election.committee_category) {
       case "GSB":
         return `${label} (${election.authority_id})`;
+      case "HSB":
       case "CSB":
         if (!election.domain) return label;
         return `${label} (${election.domain.id})`;

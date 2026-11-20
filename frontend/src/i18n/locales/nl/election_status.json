@@ -3,12 +3,14 @@
   "data_entry_started": "Invoerfase gestart",
   "data_entry_started_explanation": {
     "GSB": "Invoerders kunnen nu processen-verbaal invoeren. Hieronder zie je hun voortgang.",
+    "HSB": "De telresultaten van het gemeentelijk stembureau moeten twee keer worden ingevoerd. Als eerste invoer mag het EML-tellingsbestand (510b) van het GSB gebruikt worden. De tweede invoer moet met de hand worden gedaan door een Abacus gebruiker met de rol Invoerder.",
     "CSB": "Importeer de tellingbestanden van de GSB's. Invoerders kunnen daarna processen-verbaal invoeren. Hieronder zie je de voortgang."
   },
   "definitive": {
     "title": "Alle stembureaus zijn twee keer ingevoerd",
     "message": {
       "GSB": "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitkomst nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
+      "HSB": "De resultaten van alle GSB’s in jouw kieskring zijn correct ingevoerd. Je kunt de uitkomst nu definitief maken en het proces-verbaal opmaken.",
       "CSB": "De resultaten van het gemeentelijk stembureau zijn correct ingevoerd. Je kunt de uitkomst nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden."
     },
     "finish_button": "Invoerfase afronden"

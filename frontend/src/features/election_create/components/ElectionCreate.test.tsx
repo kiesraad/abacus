@@ -127,6 +127,7 @@ async function inputElectionHash(election: Election = electionMockData) {
 async function setCommitteeCategory(election: Election = electionMockData) {
   const committeeCategoryLabels: Record<CommitteeCategory, string> = {
     GSB: "Gemeentelijk stembureau (GSB)",
+    HSB: "Hoofdstembureau (HSB)",
     CSB: "Centraal stembureau (CSB)",
   };
 

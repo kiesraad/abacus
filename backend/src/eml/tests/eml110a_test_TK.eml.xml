@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EML xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:kr="http://www.kiesraad.nl/extensions" Id="110a" SchemaVersion="5">
+    <TransactionId>1</TransactionId>
+    <IssueDate>2025-09-19</IssueDate>
+    <kr:Schema Version="1.3.1"/>
+    <kr:CreationDateTime>2025-09-19T18:36:30.685</kr:CreationDateTime>
+    <ElectionEvent>
+        <EventIdentifier/>
+        <Election>
+            <ElectionIdentifier Id="TK2025">
+                <ElectionName>Tweede Kamer der Staten-Generaal 2025</ElectionName>
+                <ElectionCategory>TK</ElectionCategory>
+                <kr:ElectionSubcategory>TK</kr:ElectionSubcategory>
+                <kr:ElectionDate>2025-10-29</kr:ElectionDate>
+                <kr:NominationDate>2025-09-15</kr:NominationDate>
+            </ElectionIdentifier>
+            <Contest>
+                <ContestIdentifier Id="alle"/>
+                <VotingMethod>SPV</VotingMethod>
+                <MaxVotes></MaxVotes>
+            </Contest>
+            <kr:NumberOfSeats>150</kr:NumberOfSeats>
+            <kr:PreferenceThreshold>25</kr:PreferenceThreshold>
+            <kr:ElectionTree>
+                <kr:Region RegionCategory="STAAT">
+                    <kr:RegionName>Nederland</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1" RegionCategory="KIESKRING" SuperiorRegionCategory="STAAT">
+                    <kr:RegionName>Heemdamseburg</kr:RegionName>
+                    <kr:Committee CommitteeCategory="CSB" CommitteeName="De Kiesraad"/>
+                    <kr:Committee CommitteeCategory="HSB" AcceptCentralSubmissions="true"/>
+                </kr:Region>
+                <kr:Region RegionNumber="2" RegionCategory="KIESKRING" SuperiorRegionCategory="STAAT">
+                    <kr:RegionName>'s-Gravenveen</kr:RegionName>
+                    <kr:Committee CommitteeCategory="HSB"/>
+                </kr:Region>
+                <kr:Region RegionNumber="123" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Heemdamseburg</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="124" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Juinen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="125" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Middelgein</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="126" RegionCategory="GEMEENTE" SuperiorRegionNumber="2" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>'s-Gravenveen</kr:RegionName>
+                </kr:Region>
+            </kr:ElectionTree>
+            <kr:RegisteredParties>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partijdige Partij</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partij voor de Stemmer</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Stemmmers 22</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>STEM</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>De Stemunie</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Stemalliantie</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Lijst De Partij</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Het Stembiljet</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partij voor de Opkomst</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Kiezers nu!</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Verkiespartij</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>WET</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partij van de Wet</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Stem van de partij</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Kiesregelingsunie</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>De Lijst</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Groep De Partij</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Stemmersgroep</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Algemene Partij</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Stem voor de Partij</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partij van de Keuze</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>KEUS</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Keuzepartij</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Voorkeurskeuzepartij</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>De Kandidatenlijst</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+            </kr:RegisteredParties>
+        </Election>
+    </ElectionEvent>
+</EML>

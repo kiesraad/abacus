@@ -638,6 +638,27 @@ describe("ElectionStatusPage", () => {
   });
 
   describe("CSB", () => {
+    test("Page render when data entry started but all data entries empty for coordinator", async () => {
+      vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser("csb"));
+      server.use(CSBElectionRequestHandler);
+      server.use(
+        http.get("/api/elections/2/status", () =>
+          HttpResponse.json(getElectionStatusMockData([{ status: "empty" }, { status: "empty" }]), {
+            status: 200,
+          }),
+        ),
+      );
+
+      await renderPage(2);
+
+      // Test that the data entry started alert is visible with the CSB explanation
+      const alert = await screen.findByRole("alert");
+      expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase gestart");
+      expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+        "Importeer de tellingbestanden van de GSB's. Invoerders kunnen daarna processen-verbaal invoeren. Hieronder zie je de voortgang.",
+      );
+    });
+
     test("Page render when data entry has completed for coordinator", async () => {
       vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser("csb"));
       const user = userEvent.setup();

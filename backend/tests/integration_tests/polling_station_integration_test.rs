@@ -735,7 +735,12 @@ async fn test_delete_for_committee_session_with_created_status_as_coordinator_wo
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     let election_id = 7;
-    let polling_station_id = 741;
+
+    // Polling stations from the previous session cannot be deleted, so add a new one
+    let response = create_polling_station(&addr, &coordinator_cookie, election_id, 3).await;
+    assert_eq!(response.status(), StatusCode::CREATED);
+    let body: serde_json::Value = response.json().await.unwrap();
+    let polling_station_id = u32::try_from(body.get("id").unwrap().as_u64().unwrap()).unwrap();
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -761,7 +766,12 @@ async fn test_delete_for_committee_session_with_created_status_as_administrator_
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
     let election_id = 7;
-    let polling_station_id = 741;
+
+    // Polling stations from the previous session cannot be deleted, so add a new one
+    let response = create_polling_station(&addr, &admin_cookie, election_id, 3).await;
+    assert_eq!(response.status(), StatusCode::CREATED);
+    let body: serde_json::Value = response.json().await.unwrap();
+    let polling_station_id = u32::try_from(body.get("id").unwrap().as_u64().unwrap()).unwrap();
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
     assert_eq!(committee_session["status"], "created");
@@ -978,7 +988,13 @@ async fn test_delete_with_result_works(pool: SqlitePool) {
 async fn test_delete_with_investigation_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 5;
-    let polling_station_id = 529;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+
+    // Polling stations from the previous session cannot be deleted, so add a new one
+    let response = create_polling_station(&addr, &coordinator_cookie, election_id, 43).await;
+    assert_eq!(response.status(), StatusCode::CREATED);
+    let body: serde_json::Value = response.json().await.unwrap();
+    let polling_station_id = u32::try_from(body.get("id").unwrap().as_u64().unwrap()).unwrap();
 
     assert_eq!(
         create_investigation(&addr, polling_station_id)

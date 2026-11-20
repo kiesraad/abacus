@@ -161,6 +161,7 @@ impl ElectionWithPoliticalGroups {
             (CSB, Provincial) => "provincie",
             (CSB, WaterAuthority) => "waterschap",
             (CSB, Municipal) | (GSB, _) => "gemeente",
+            (CSB, HouseOfRepresentatives) => "",
         }
     }
 }
@@ -341,6 +342,8 @@ pub enum ElectionCategory {
     Provincial,
     /// Waterschapsverkiezing
     WaterAuthority,
+    /// Tweede Kamerverkiezing
+    HouseOfRepresentatives,
 }
 
 impl ElectionCategory {
@@ -349,6 +352,7 @@ impl ElectionCategory {
             ElectionCategory::Municipal => true,
             ElectionCategory::Provincial => false,
             ElectionCategory::WaterAuthority => false,
+            ElectionCategory::HouseOfRepresentatives => false,
         }
     }
 
@@ -357,6 +361,7 @@ impl ElectionCategory {
             ElectionCategory::Municipal => "GR",
             ElectionCategory::Provincial => "PS",
             ElectionCategory::WaterAuthority => "AB",
+            ElectionCategory::HouseOfRepresentatives => "TK",
         }
     }
 
@@ -366,7 +371,12 @@ impl ElectionCategory {
     /// i.e. the municipality, province or water authority. Country wide elections
     /// do not have an election domain.
     pub fn has_election_domain(&self) -> bool {
-        true
+        match self {
+            ElectionCategory::Municipal => true,
+            ElectionCategory::Provincial => true,
+            ElectionCategory::WaterAuthority => true,
+            ElectionCategory::HouseOfRepresentatives => false,
+        }
     }
 
     /// Get the sub category for test elections, only available for tests and test data generation
@@ -389,6 +399,7 @@ impl ElectionCategory {
                     ElectionSubCategory::AB2
                 }
             }
+            ElectionCategory::HouseOfRepresentatives => ElectionSubCategory::TK,
         }
     }
 }
@@ -490,6 +501,8 @@ pub enum ElectionSubCategory {
     PS1,
     /// Provinciale Statenverkiezing multiple districts
     PS2,
+    /// Tweede Kamerverkiezing
+    TK,
 }
 
 /// Committee category
@@ -695,6 +708,12 @@ pub mod tests {
         political_groups_candidates: &[u32],
         number_of_seats: u32,
     ) -> ElectionWithPoliticalGroups {
+        let domain = |id: Option<&str>| {
+            Some(ElectionDomain {
+                id: id.map(str::to_string),
+                name: "Test".to_string(),
+            })
+        };
         ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
             name: "Gemeenteraad Test 2023".to_string(),
@@ -714,14 +733,14 @@ pub mod tests {
             authority_name: "Test".to_string(),
             authority_region: "Test".to_string(),
             district: CommitteeDistrict::None,
-            domain: Some(ElectionDomain {
-                id: if election_category != ElectionCategory::Provincial {
-                    Some("0000".to_string()) // provincial elections do not have a domain id
-                } else {
-                    None
-                },
-                name: "Test".to_string(),
-            }),
+            domain: match election_category {
+                ElectionCategory::HouseOfRepresentatives => None,
+                ElectionCategory::Municipal | ElectionCategory::WaterAuthority => {
+                    domain(Some("0000"))
+                }
+                // PS elections do not have a domain id
+                ElectionCategory::Provincial => domain(None),
+            },
             category: election_category,
             sub_category: election_category.sub_category(number_of_seats),
             number_of_seats,
@@ -842,9 +861,11 @@ pub mod tests {
             (CSB, Provincial, "provincie"),
             (CSB, WaterAuthority, "waterschap"),
             (CSB, Municipal, "gemeente"),
+            (CSB, HouseOfRepresentatives, ""),
             (GSB, Provincial, "gemeente"),
             (GSB, WaterAuthority, "gemeente"),
             (GSB, Municipal, "gemeente"),
+            (GSB, HouseOfRepresentatives, "gemeente"),
         ];
 
         for (committee_category, election_category, expected) in &test_cases {

@@ -1,7 +1,12 @@
 {
   "form_title": "Verschillen tussen aantal kiezers en uitgebrachte stemmen",
   "short_title": "Verschillen D & H",
+  "form_description": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
   "checkbox_message": "De vinkvraag op deze pagina in het proces-verbaal vul je niet in Abacus in.",
+  "corrigendum_notice": {
+    "content": "Zijn er ook getallen gecorrigeerd? Neem die over in de kolom ‘gecorrigeerd’",
+    "title": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet."
+  },
   "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
   "section_number": {
     "DSOFirstSession": "2.3",

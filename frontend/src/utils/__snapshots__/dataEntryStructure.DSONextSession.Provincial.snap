@@ -83,6 +83,12 @@
     "short_title": "Verschillen D & H",
     "subsections": [
       {
+        "message": "Zijn er ook getallen gecorrigeerd? Neem die over in de kolom ‘gecorrigeerd’",
+        "title": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+        "type": "message",
+        "variant": "notify",
+      },
+      {
         "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
         "error_path": "differences_counts.compare_votes_cast_admitted_voters",
         "options": [

@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { type ReactElement, useEffect } from "react";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
@@ -10,6 +10,12 @@ import { ImportFileForm } from "./ImportFileForm";
 
 export function DataEntryImportPage() {
   const { state, onFileChange, onHashSubmit, onFinalSubmit, onAbort, isValidating, isSaving } = useDataEntryImport();
+
+  useEffect(() => {
+    if (state.status !== "check_and_save" && state.error) {
+      window.scrollTo(0, 0);
+    }
+  }, [state]);
 
   function getContent(): ReactElement {
     switch (state.status) {

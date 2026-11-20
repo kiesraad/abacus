@@ -1,4 +1,5 @@
-/.cargo
+/.cargo/*
+!/.cargo/config.toml
 /target
 /target-docker/
 *.sqlite*

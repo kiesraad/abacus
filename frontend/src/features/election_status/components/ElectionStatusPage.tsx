@@ -146,7 +146,7 @@ export function ElectionStatusPage() {
       statuses.length === statuses.filter((status) => status.status === "empty").length ? (
         <Alert type="notify" onClose={hideDataEntryStartedAlert}>
           <strong className="heading-md">{t("election_status.data_entry_started")}</strong>
-          <p>{t("election_status.data_entry_started_explanation")}</p>
+          <p>{t(`election_status.data_entry_started_explanation.${election.committee_category}`)}</p>
         </Alert>
       ) : isCoordinator &&
         currentCommitteeSession.status !== "completed" &&

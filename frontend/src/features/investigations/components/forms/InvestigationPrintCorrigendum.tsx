@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MissingCommitteeSessionDetailsModal } from "@/components/committee_session/MissingCommitteeSessionDetailsModal";
+import { MissingCommitteeSessionDetailsCorrigendumModal } from "@/components/committee_session/MissingCommitteeSessionDetailsCorrigendumModal";
 import { Button } from "@/components/ui/Button/Button";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { Form } from "@/components/ui/Form/Form";
@@ -30,7 +30,10 @@ export function InvestigationPrintCorrigendum({ pollingStationId }: Investigatio
             <section className="sm">
               <ul className="mt-0">
                 <li>{tx("investigations.print_corrigendum.download_and_print")}</li>
-                <li>{tx("investigations.print_corrigendum.print_recommendation")}</li>
+                <li>
+                  {election.counting_method &&
+                    tx(`investigations.print_corrigendum.print_recommendation.${election.counting_method}`)}
+                </li>
               </ul>
               <DownloadButton
                 id="download-corrigendum-button"
@@ -39,7 +42,7 @@ export function InvestigationPrintCorrigendum({ pollingStationId }: Investigatio
                 title={t("investigations.print_corrigendum.download_corrigendum_link", {
                   number: pollingStation.number,
                 })}
-                subtitle={election.counting_method === "CSO" ? "Na 14-2 Bijlage 1" : "Na 14-1, versie 2"}
+                subtitle={election.counting_method && t(`investigations.corrigendum_model.${election.counting_method}`)}
                 onClick={(event) => {
                   if (election.counting_method === "DSO" && !committeeSessionDetailsPresent(currentCommitteeSession)) {
                     event.preventDefault();
@@ -83,7 +86,7 @@ export function InvestigationPrintCorrigendum({ pollingStationId }: Investigatio
         </FormLayout>
       </Form>
       {showMissingCommitteeSessionDetailsModal && (
-        <MissingCommitteeSessionDetailsModal
+        <MissingCommitteeSessionDetailsCorrigendumModal
           to={`/elections/${election.id}/details`}
           onClose={() => {
             setShowMissingCommitteeSessionDetailsModal(false);

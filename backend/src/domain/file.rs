@@ -5,7 +5,9 @@ use utoipa::ToSchema;
 
 use crate::domain::{
     committee_session::{CommitteeSession, CommitteeSessionId},
-    election::{ElectionWithPoliticalGroups, InvalidElectionError, VoteCountingMethod},
+    election::{
+        ElectionCategory, ElectionWithPoliticalGroups, InvalidElectionError, VoteCountingMethod,
+    },
     file::FileType::{
         CsbAttachmentPdf, CsbCsvCounts, CsbResultsEml, CsbResultsPdf, CsbTotalCountsEml,
         GsbCsvCounts, GsbOverviewPdf, GsbResultsEml, GsbResultsEmlSignature, GsbResultsPdf,
@@ -92,14 +94,19 @@ impl FileType {
             }
             GsbOverviewPdf => "Leeg_Model_P2a.pdf".to_string(),
             CsbResultsEml => format!("Resultaat_{}.eml.xml", election.election_id),
-            CsbTotalCountsEml => {
-                format!(
+            CsbTotalCountsEml => match election.category {
+                ElectionCategory::HouseOfRepresentatives => {
+                    format!("Totaaltelling_{}.eml.xml", election.election_id,)
+                }
+                ElectionCategory::Municipal
+                | ElectionCategory::WaterAuthority
+                | ElectionCategory::Provincial => format!(
                     "Totaaltelling_{}_{}_{}.eml.xml",
                     election.election_id,
                     election.region_category(),
                     slugify(&election.authority_region)
-                )
-            }
+                ),
+            },
             CsbResultsPdf => "Model_P22-2.pdf".to_string(),
             CsbAttachmentPdf => "Model_P22-2_bijlage.pdf".to_string(),
             GsbCsvCounts => {

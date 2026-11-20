@@ -1432,8 +1432,8 @@ mod tests {
             status,
             ..
         } = serde_json::from_slice(&body).unwrap();
-        assert!(matches!(data, Results::CSOFirstSession(_)));
-        assert!(matches!(source, DataEntrySource::PollingStation(_)));
+        assert_matches!(data, Results::CSOFirstSession(_));
+        assert_matches!(source, DataEntrySource::PollingStation(_));
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
     }
 
@@ -1450,8 +1450,8 @@ mod tests {
             status,
             ..
         } = serde_json::from_slice(&body).unwrap();
-        assert!(matches!(data, Results::DSOFirstSession(_)));
-        assert!(matches!(source, DataEntrySource::PollingStation(_)));
+        assert_matches!(data, Results::DSOFirstSession(_));
+        assert_matches!(source, DataEntrySource::PollingStation(_));
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
     }
 
@@ -1476,8 +1476,8 @@ mod tests {
             status,
             ..
         } = serde_json::from_slice(&body).unwrap();
-        assert!(matches!(data, Results::GSB(_)));
-        assert!(matches!(source, DataEntrySource::SubCommittee(_)));
+        assert_matches!(data, Results::GSB(_));
+        assert_matches!(source, DataEntrySource::SubCommittee(_));
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
     }
 
@@ -1563,8 +1563,8 @@ mod tests {
             status,
             ..
         } = serde_json::from_slice(&body).unwrap();
-        assert!(matches!(data, Results::CSONextSession(_)));
-        assert!(matches!(source, DataEntrySource::PollingStation(_)));
+        assert_matches!(data, Results::CSONextSession(_));
+        assert_matches!(source, DataEntrySource::PollingStation(_));
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
 
         // Check that row exists
@@ -1593,8 +1593,8 @@ mod tests {
             status,
             ..
         } = serde_json::from_slice(&body).unwrap();
-        assert!(matches!(data, Results::DSONextSession(_)));
-        assert!(matches!(source, DataEntrySource::PollingStation(_)));
+        assert_matches!(data, Results::DSONextSession(_));
+        assert_matches!(source, DataEntrySource::PollingStation(_));
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
 
         // Check that row exists
@@ -1925,7 +1925,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
+        assert_matches!(status, DataEntryStatus::SecondEntryInProgress(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1963,7 +1963,7 @@ mod tests {
 
         // Check that the status is 'Definitive'
         let status = get_data_entry_status(pool.clone(), data_entry_id).await;
-        assert!(matches!(status, DataEntryStatus::Definitive(_)));
+        assert_matches!(status, DataEntryStatus::Definitive(_));
 
         // Check that we can't save a new data entry after finalising
         let response = save(
@@ -1994,7 +1994,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
+        assert_matches!(status, DataEntryStatus::EntriesDifferent(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2093,7 +2093,7 @@ mod tests {
         // Check that the data entry is in SecondEntryInProgress state
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
+        assert_matches!(status, DataEntryStatus::SecondEntryInProgress(_));
 
         // discard second data entry
         let response = discard(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
@@ -2102,7 +2102,7 @@ mod tests {
         // Check that the second data entry is deleted
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::FirstEntryFinalised(_)));
+        assert_matches!(status, DataEntryStatus::FirstEntryFinalised(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2141,7 +2141,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
+        assert_matches!(status, DataEntryStatus::FirstEntryInProgress(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2185,7 +2185,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
+        assert_matches!(status, DataEntryStatus::FirstEntryInProgress(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2476,7 +2476,7 @@ mod tests {
 
         // Check that the data entry and committee session are not changed
         let status = get_data_entry_status(pool.clone(), data_entry_id).await;
-        assert!(matches!(status, DataEntryStatus::Definitive(_)));
+        assert_matches!(status, DataEntryStatus::Definitive(_));
 
         let mut conn = pool.acquire().await.unwrap();
         let committee_session =
@@ -2830,10 +2830,7 @@ mod tests {
             // The state must be unchanged
             let mut conn = pool.acquire().await.unwrap();
             let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
-            assert!(matches!(
-                data_entry.state.0,
-                DataEntryStatus::EntriesDifferent(_)
-            ));
+            assert_matches!(data_entry.state.0, DataEntryStatus::EntriesDifferent(_));
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2881,10 +2878,7 @@ mod tests {
             // The state must be unchanged
             let mut conn = pool.acquire().await.unwrap();
             let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
-            assert!(matches!(
-                data_entry.state.0,
-                DataEntryStatus::EntriesDifferent(_)
-            ));
+            assert_matches!(data_entry.state.0, DataEntryStatus::EntriesDifferent(_));
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2949,7 +2943,7 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
             let status: DataEntryStatus = data_entry.state.0;
-            assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
+            assert_matches!(status, DataEntryStatus::EntriesDifferent(_));
         }
     }
 
@@ -2970,7 +2964,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
+        assert_matches!(status, DataEntryStatus::FirstEntryInProgress(_));
     }
 
     /// Test that a first entry returned for correction is has is_correction set
@@ -3053,7 +3047,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::FirstEntryHasErrors(_)));
+        assert_matches!(status, DataEntryStatus::FirstEntryHasErrors(_));
     }
 
     async fn claim_previous_results(

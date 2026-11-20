@@ -81,7 +81,7 @@ function renderDeceasedCandidatesTable(
                       handleDeleteDeceasedCandidate(deceasedCandidate.candidate.number, deceasedCandidate.list_number);
                     }}
                   >
-                    {t("delete")}
+                    {t("undo")}
                   </Button>
                 </Table.Cell>
               )}

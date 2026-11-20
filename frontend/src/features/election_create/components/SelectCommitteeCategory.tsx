@@ -21,8 +21,8 @@ export function SelectCommitteeCategory() {
     return <Navigate to="/elections/create" />;
   }
 
-  // PS CSB is not supported yet
-  const csbDisabled = state.election.category === "Provincial";
+  // PS & TK CSB are not supported yet
+  const csbDisabled = state.election.category === "Provincial" || state.election.category === "HouseOfRepresentatives";
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();

@@ -84,6 +84,26 @@ mod tests {
 
         reader = BufReader::new(
             File::open(
+                "templates/inputs/model-na-14-1-versie-1-variations/model-na-14-1-versie-1-TK-GSB.json",
+            )
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa14_1Versie1Input>(reader).expect(
+            "model-na-14-1-versie-1-TK-GSB.json should deserialize to struct ModelNa14_1Versie1Input",
+        );
+
+        reader = BufReader::new(
+            File::open(
+                "templates/inputs/model-na-14-1-versie-1-variations/model-na-14-1-versie-1-TK-SOL.json",
+            )
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa14_1Versie1Input>(reader).expect(
+            "model-na-14-1-versie-1-TK-SOL.json should deserialize to struct ModelNa14_1Versie1Input",
+        );
+
+        reader = BufReader::new(
+            File::open(
                 "templates/inputs/model-na-14-1-versie-1-variations/model-na-14-1-versie-1-WS.json",
             )
             .unwrap(),
@@ -123,6 +143,26 @@ mod tests {
         );
         serde_json::from_reader::<_, ModelNa14_1Versie2Input>(reader).expect(
             "model-na-14-1-versie-2-PS2.json should deserialize to struct ModelNa14_1Versie2Input",
+        );
+
+        reader = BufReader::new(
+            File::open(
+                "templates/inputs/model-na-14-1-versie-2-variations/model-na-14-1-versie-2-TK-GSB.json",
+            )
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa14_1Versie2Input>(reader).expect(
+            "model-na-14-1-versie-2-TK-GSB.json should deserialize to struct ModelNa14_1Versie2Input",
+        );
+
+        reader = BufReader::new(
+            File::open(
+                "templates/inputs/model-na-14-1-versie-2-variations/model-na-14-1-versie-2-TK-SOL.json",
+            )
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa14_1Versie2Input>(reader).expect(
+            "model-na-14-1-versie-2-TK-SOL.json should deserialize to struct ModelNa14_1Versie2Input",
         );
 
         reader = BufReader::new(

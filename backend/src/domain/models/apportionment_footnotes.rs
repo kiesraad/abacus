@@ -188,6 +188,8 @@ impl ApportionmentFootnotes {
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use test_log::test;
 
     use super::*;
@@ -385,10 +387,10 @@ mod tests {
             .drawn_lots
             .expect("drawn lots footnote should be present");
         assert_eq!(drawn_lots.len(), 1);
-        assert!(matches!(
+        assert_matches!(
             &drawn_lots[0],
             FootnoteDrawnLots::HighestAverageResidualSeat { .. }
-        ));
+        );
     }
 
     #[test]
@@ -423,21 +425,21 @@ mod tests {
             .drawn_lots
             .expect("drawn lots footnote should be present");
         assert_eq!(drawn_lots.len(), 3);
-        assert!(matches!(
+        assert_matches!(
             &drawn_lots[0],
             FootnoteDrawnLots::HighestAverageResidualSeat { lists }
                 if lists[0].number == PGNumber::from(3)
-        ));
-        assert!(matches!(
+        );
+        assert_matches!(
             &drawn_lots[1],
             FootnoteDrawnLots::HighestAverageResidualSeat { lists }
                 if lists[0].number == PGNumber::from(1)
-        ));
-        assert!(matches!(
+        );
+        assert_matches!(
             &drawn_lots[2],
             FootnoteDrawnLots::HighestAverageResidualSeat { lists }
                 if lists[0].number == PGNumber::from(2)
-        ));
+        );
     }
 
     #[test]
@@ -453,14 +455,14 @@ mod tests {
             .drawn_lots
             .expect("drawn lots footnote should be present");
         assert_eq!(drawn_lots.len(), 2);
-        assert!(matches!(
+        assert_matches!(
             &drawn_lots[0],
             FootnoteDrawnLots::HighestAverageResidualSeat { .. }
-        ));
-        assert!(matches!(
+        );
+        assert_matches!(
             &drawn_lots[1],
             FootnoteDrawnLots::LargestRemainderResidualSeat { .. }
-        ));
+        );
     }
 
     #[test]

@@ -168,6 +168,9 @@ pub async fn committee_session_create(
     let current_committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
     if current_committee_session.status == CommitteeSessionStatus::Completed {
+        verify_committee_session_details_exist(&current_committee_session)
+            .map_err(|_| CommitteeSessionError::InvalidDetails)?;
+
         let next_committee_session = create_committee_session(&mut tx, &audit_service, {
             CommitteeSessionCreateRequest {
                 election_id,
@@ -411,7 +414,7 @@ mod tests {
         api::tests::{
             assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
         },
-        repository::user_repo::UserId,
+        repository::{committee_session_repo, user_repo::UserId},
     };
 
     async fn call_handlers(
@@ -465,6 +468,34 @@ mod tests {
     async fn test_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers(pool, Role::CoordinatorGSB).await;
         assert_committee_category_authorization_ok(results);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_create_committee_session_without_details_fails(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+
+        committee_session_repo::change_status(
+            &mut conn,
+            CommitteeSessionId::from(6),
+            CommitteeSessionStatus::Completed,
+        )
+        .await
+        .unwrap();
+
+        let response = committee_session_create(
+            user.clone(),
+            State(pool.clone()),
+            AuditService::new(Some(user.clone()), None),
+            Path(ElectionId::from(5)),
+        )
+        .await
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::InvalidData);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_4"))))]

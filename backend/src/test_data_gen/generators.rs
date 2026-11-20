@@ -351,9 +351,7 @@ fn format_election_name(
                 .expect("Missing test data"),
             domain_name,
         ),
-        ElectionCategory::HouseOfRepresentatives => {
-            ("Tweede Kamer der Staten-Generaal", domain_name)
-        }
+        ElectionCategory::HouseOfRepresentatives => ("Tweede Kamer", domain_name),
     };
     if let Some(locality) = election_locality {
         format!("{election_type} {locality} {year}")
@@ -447,7 +445,10 @@ fn generate_election(
     match args.election_category {
         ElectionCategory::Municipal
         | ElectionCategory::Provincial
-        | ElectionCategory::HouseOfRepresentatives => {}
+        | ElectionCategory::HouseOfRepresentatives => {
+            official_name =
+                official_name.replace("Tweede Kamer", "Tweede Kamer der Staten-Generaal");
+        }
         ElectionCategory::WaterAuthority => {
             let mut chars = official_name.chars();
             let lowercased_name = match chars.next() {

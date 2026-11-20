@@ -89,7 +89,7 @@ describe("ElectionInformationTable", () => {
       expect(election_information_table).toHaveTableContent([
         ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-        ["Kiesgebied", "0035 - Heemdamseburg"],
+        ["Gebiedsaanduiding", "0035 - Heemdamseburg"],
         ["Aantal kiesgerechtigden", "0"],
         ["Type stembureau", "Gemeentelijk stembureau"],
         ["Stembureaus", "1 stembureau"],
@@ -112,7 +112,7 @@ describe("ElectionInformationTable", () => {
       expect(election_information_table).toHaveTableContent([
         ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-        ["Kiesgebied", "0035 - Heemdamseburg"],
+        ["Gebiedsaanduiding", "0035 - Heemdamseburg"],
         ["Aantal kiesgerechtigden", "1.234"],
         ["Type stembureau", "Gemeentelijk stembureau"],
         ["Stembureaus", "1 stembureau"],
@@ -135,7 +135,7 @@ describe("ElectionInformationTable", () => {
       expect(election_information_table).toHaveTableContent([
         ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-        ["Kiesgebied", "0035 - Heemdamseburg"],
+        ["Gebiedsaanduiding", "0035 - Heemdamseburg"],
         ["Aantal kiesgerechtigden", "1.234"],
         ["Type stembureau", "Gemeentelijk stembureau"],
         ["Stembureaus", "1 stembureau"],
@@ -158,7 +158,7 @@ describe("ElectionInformationTable", () => {
       expect(election_information_table).toHaveTableContent([
         ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-        ["Kiesgebied", "0035 - Heemdamseburg"],
+        ["Gebiedsaanduiding", "0035 - Heemdamseburg"],
         ["Aantal kiesgerechtigden", "1.234"],
         ["Type stembureau", "Gemeentelijk stembureau"],
         ["Stembureaus", "1 stembureau"],
@@ -181,7 +181,7 @@ describe("ElectionInformationTable", () => {
       expect(election_information_table).toHaveTableContent([
         ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-        ["Kiesgebied", "0035 - Heemdamseburg"],
+        ["Gebiedsaanduiding", "0035 - Heemdamseburg"],
         ["Aantal kiesgerechtigden", "1.234"],
         ["Type stembureau", "Gemeentelijk stembureau"],
         ["Publieke sleutel", "Bekijken en downloaden"],
@@ -211,7 +211,7 @@ describe("ElectionInformationTable", () => {
       expect(election_information_table).toHaveTableContent([
         ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
         ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-        ["Kiesgebied", "0035 - Heemdamseburg"],
+        ["Gebiedsaanduiding", "0035 - Heemdamseburg"],
         ["Aantal kiesgerechtigden", "1.234"],
         ["Type stembureau", "Gemeentelijk stembureau"],
         ["Publieke sleutel", "Nog niet geregistreerd"],
@@ -243,7 +243,7 @@ describe("ElectionInformationTable", () => {
         ["Verkiezing", "Provinciale Staten Oost-Holland 2027, 30 november"],
         ["Kieskring", "II - Juinen"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
-        ["Kiesgebied", "0036 - Juinen"],
+        ["Gebiedsaanduiding", "0036 - Juinen"],
         ["Aantal kiesgerechtigden", "2.000"],
         ["Type stembureau", "Gemeentelijk stembureau"],
         ["Stembureaus", "1 stembureau"],
@@ -261,7 +261,7 @@ describe("ElectionInformationTable", () => {
       expect(election_information_table).toHaveTableContent([
         ["Verkiezing", "Gemeenteraad Heemdamseburg 2026, 30 november"],
         ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
-        ["Kiesgebied", "CSB - Heemdamseburg"],
+        ["Gebiedsaanduiding", "CSB - Heemdamseburg"],
         ["Type stembureau", "Centraal stembureau"],
       ]);
     });

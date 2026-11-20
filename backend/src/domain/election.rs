@@ -161,8 +161,7 @@ impl ElectionWithPoliticalGroups {
             (CSB, Provincial) => "provincie",
             (CSB, WaterAuthority) => "waterschap",
             (CSB, Municipal) | (GSB, _) => "gemeente",
-            (HSB, HouseOfRepresentatives) => "kieskring",
-            (HSB, _) => todo!("https://github.com/kiesraad/abacus/issues/3861"),
+            (HSB, _) => "kieskring",
             (CSB, HouseOfRepresentatives) => "",
         }
     }

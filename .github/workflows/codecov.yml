@@ -45,7 +45,7 @@ jobs:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@v1.26.2
+        uses: cargo-bins/cargo-binstall@v1.27.0
       - name: Install cargo-llvm-cov
         run: cargo binstall --locked cargo-llvm-cov
         env:
@@ -86,7 +86,7 @@ jobs:
           node-version: 24
           package-manager-cache: false
       - name: Install pnpm
-        uses: pnpm/setup@v3.1.2
+        uses: pnpm/setup@v3.2.0
         with:
           working-directory: frontend
           install: false

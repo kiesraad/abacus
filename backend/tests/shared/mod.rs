@@ -704,7 +704,7 @@ impl FixtureUser {
             Self::CoordinatorHSB => ("coordinator2", "Coordinator2Password02"),
             Self::CoordinatorCSB => ("coordinator3", "Coordinator3Password03"),
             Self::TypistGSB => ("typist1", "Typist1Password01"),
-            Self::Typist2GSB => ("typist2", "Typist2Password02"),
+            Self::Typist2GSB => ("typist2", "Typist2Password01"),
             Self::TypistCSB => ("typist3", "Typist3Password03"),
             Self::Typist2CSB => ("typist4", "Typist4Password04"),
             Self::TypistHSB => ("typist5", "Typist5Password05"),

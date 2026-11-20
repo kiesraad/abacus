@@ -5,7 +5,7 @@ import type { Role } from "@/types/generated/openapi";
 export const roleWithoutCommitteeCategoryValues = ["administrator", "coordinator", "typist"] as const;
 export type RoleWithoutCommitteeCategory = (typeof roleWithoutCommitteeCategoryValues)[number];
 
-export type CommitteeCategory = "csb" | "gsb";
+export type CommitteeCategory = "csb" | "hsb" | "gsb";
 export type UserType = "fullname" | "anonymous";
 
 export interface IUserCreateContext {

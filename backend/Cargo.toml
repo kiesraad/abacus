@@ -33,6 +33,7 @@ axum-extra = { version = "0.12", default-features = false, features = [
 chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
 http-body-util = "0.1.3"
 rand = "0.10.1"
+sha1 = "0.11.0"
 strum = { version = "0.28", features = ["derive"] }
 test-log = "0.2.19"
 tokio = { version = "1", features = ["full"] }
@@ -69,7 +70,7 @@ embed-typst = ["pdf_gen/static"]
 dev-database = []
 airgap-detection = []
 storybook = ["dep:memory-serve"]
-tls = ["dep:rcgen", "dep:rustls-pki-types", "dep:if-addrs", "dep:rustls", "dep:axum-server", "reqwest/rustls"]
+tls = ["dep:rcgen", "dep:rustls-pki-types", "dep:if-addrs", "dep:rustls", "dep:axum-server", "dep:sha1", "reqwest/rustls"]
 
 [[bin]]
 name = "gen-openapi"
@@ -111,7 +112,6 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 tracing.workspace = true
 tower-http = { version = "0.7", features = ["set-header", "trace"] }
 sha2 = "0.11.0"
-sha1 = "0.11.0"
 argon2 = { version = "0.5.3", features = ["std"] }
 rand.workspace = true
 cookie = { version = "0.18.1", features = ["percent-encode"] }
@@ -124,6 +124,7 @@ rustls-pki-types = { workspace = true, optional = true }
 if-addrs = { workspace = true, optional = true }
 rustls = { workspace = true, optional = true }
 axum-server = { workspace = true, optional = true }
+sha1 = { workspace = true, optional = true }
 zeroize.workspace = true
 
 [target.'cfg(windows)'.dependencies]

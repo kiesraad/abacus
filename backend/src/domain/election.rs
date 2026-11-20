@@ -161,6 +161,7 @@ impl ElectionWithPoliticalGroups {
             (CSB, Provincial) => "provincie",
             (CSB, WaterAuthority) => "waterschap",
             (CSB, Municipal) | (GSB, _) => "gemeente",
+            (HSB, _) => "kieskring",
             (CSB, HouseOfRepresentatives) => "",
         }
     }
@@ -525,6 +526,8 @@ pub enum ElectionSubCategory {
 pub enum CommitteeCategory {
     /// Gemeentelijk stembureau
     GSB,
+    /// Hoofdstembureau
+    HSB,
     /// Centraal stembureau
     CSB,
 }
@@ -532,8 +535,9 @@ pub enum CommitteeCategory {
 impl CommitteeCategory {
     pub fn supports_signing(&self) -> bool {
         match self {
-            CommitteeCategory::CSB => false,
             CommitteeCategory::GSB => true,
+            CommitteeCategory::HSB => true,
+            CommitteeCategory::CSB => false,
         }
     }
 }
@@ -728,6 +732,7 @@ pub mod tests {
             location: "Test".to_string(),
             authority_id: match committee_category {
                 CommitteeCategory::GSB => "0000".to_string(),
+                CommitteeCategory::HSB => "HSB0".to_string(),
                 CommitteeCategory::CSB => "CSB".to_string(),
             },
             authority_name: "Test".to_string(),

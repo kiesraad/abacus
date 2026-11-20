@@ -1,12 +1,17 @@
 {
-  "CSB": {
-    "abbreviation": "CSB",
-    "short": "Centraal stembureau",
-    "full": "Centraal stembureau (CSB)"
-  },
   "GSB": {
     "abbreviation": "GSB",
     "short": "Gemeentelijk stembureau",
     "full": "Gemeentelijk stembureau (GSB)"
+  },
+  "HSB": {
+    "abbreviation": "HSB",
+    "short": "Hoofdstembureau",
+    "full": "Hoofdstembureau (HSB)"
+  },
+  "CSB": {
+    "abbreviation": "CSB",
+    "short": "Centraal stembureau",
+    "full": "Centraal stembureau (CSB)"
   }
 }

@@ -48,6 +48,12 @@ pub async fn election_statuses(
         (CommitteeCategory::GSB, true) => {
             polling_station_repo::list_next_session_with_status(conn, committee_session.id).await?
         }
+        (CommitteeCategory::HSB, false) => {
+            polling_station_repo::list_first_session_with_status(conn, committee_session.id).await?
+        }
+        (CommitteeCategory::HSB, true) => {
+            unreachable!("HSB elections only have a single session")
+        }
         (CommitteeCategory::CSB, false) => {
             sub_committee_repo::list_first_session_with_status(conn, committee_session.id).await?
         }

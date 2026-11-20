@@ -51,7 +51,7 @@
         }
       },
       "put": {
-        "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
+        "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator_gsb, coordinator_hsb, coordinator_csb, typist_gsb, typist_hsb, typist_csb)",
         "operationId": "account_update",
         "requestBody": {
           "content": {
@@ -110,8 +110,10 @@
             "cookie_auth": [
               "administrator",
               "coordinator_gsb",
+              "coordinator_hsb",
               "coordinator_csb",
               "typist_gsb",
+              "typist_hsb",
               "typist_csb"
             ]
           }
@@ -1066,7 +1068,7 @@
     },
     "/api/elections": {
       "get": {
-        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
+        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election (administrator, coordinator_gsb, coordinator_hsb, coordinator_csb, typist_gsb, typist_hsb, typist_csb)",
         "operationId": "election_list",
         "responses": {
           "200": {
@@ -1105,8 +1107,10 @@
             "cookie_auth": [
               "administrator",
               "coordinator_gsb",
+              "coordinator_hsb",
               "coordinator_csb",
               "typist_gsb",
+              "typist_hsb",
               "typist_csb"
             ]
           }
@@ -1265,7 +1269,7 @@
     },
     "/api/elections/{election_id}": {
       "get": {
-        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
+        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations (administrator, coordinator_gsb, coordinator_hsb, coordinator_csb, typist_gsb, typist_hsb, typist_csb)",
         "operationId": "election_details",
         "parameters": [
           {
@@ -1325,8 +1329,10 @@
             "cookie_auth": [
               "administrator",
               "coordinator_gsb",
+              "coordinator_hsb",
               "coordinator_csb",
               "typist_gsb",
+              "typist_hsb",
               "typist_csb"
             ]
           }
@@ -4836,7 +4842,7 @@
     },
     "/api/elections/{election_id}/status": {
       "get": {
-        "summary": "Get election polling stations data entry statuses (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
+        "summary": "Get election polling stations data entry statuses (administrator, coordinator_gsb, coordinator_hsb, coordinator_csb, typist_gsb, typist_hsb, typist_csb)",
         "operationId": "election_status",
         "parameters": [
           {
@@ -4896,8 +4902,10 @@
             "cookie_auth": [
               "administrator",
               "coordinator_gsb",
+              "coordinator_hsb",
               "coordinator_csb",
               "typist_gsb",
+              "typist_hsb",
               "typist_csb"
             ]
           }
@@ -7674,6 +7682,7 @@
         "description": "Committee category",
         "enum": [
           "GSB",
+          "HSB",
           "CSB"
         ]
       },
@@ -8637,6 +8646,27 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/HSBElectionCreationRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "committee_category"
+                ],
+                "properties": {
+                  "committee_category": {
+                    "type": "string",
+                    "enum": [
+                      "HSB"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/CSBElectionCreationRequest"
               },
               {
@@ -9526,6 +9556,36 @@
             "description": "Include (part of) data entry for this election"
           }
         }
+      },
+      "HSBElectionCreationRequest": {
+        "type": "object",
+        "required": [
+          "election_hash",
+          "election_data",
+          "candidate_hash",
+          "candidate_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "HighestAverageAssignedSeat": {
         "type": "object",
@@ -11000,8 +11060,10 @@
         "enum": [
           "administrator",
           "coordinator_gsb",
+          "coordinator_hsb",
           "coordinator_csb",
           "typist_gsb",
+          "typist_hsb",
           "typist_csb"
         ]
       },

@@ -76,7 +76,6 @@ type TestVariant = {
   regionNumber?: string;
   regionName: string;
   electionName: string;
-  electionDistrict?: string;
   filename: string;
   corrigendumFilename: RegExp;
   dataEntry: Exclude<Results, { model: "GSB" }>;

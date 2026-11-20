@@ -21,7 +21,8 @@ export function CheckAndSave({ electionName, subCommittee, onSubmit, isLoading }
           <strong>{t("election.title.singular")}:</strong> {electionName}
         </li>
         <li id="committee-category">
-          <strong>{t("election.committee_category.title")}:</strong> {t("committee_category.GSB.short")}
+          <strong>{t("election.committee_category.title")}:</strong>{" "}
+          {t(`committee_category.${subCommittee.category}.short`)}
         </li>
         <li id="area-designation">
           <strong>{t("area_designation")}:</strong> {getAreaDesignation(subCommittee)}

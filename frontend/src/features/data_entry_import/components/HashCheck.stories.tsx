@@ -40,7 +40,6 @@ const meta = {
   component: HashCheck,
   args: {
     title: "Gemeenteraad Juinen 2026",
-    subtitle: "GSB 0035 - Juinen",
     fileName: "telling.eml.xml.zip",
     subCommittee,
     hash: redactedHash,

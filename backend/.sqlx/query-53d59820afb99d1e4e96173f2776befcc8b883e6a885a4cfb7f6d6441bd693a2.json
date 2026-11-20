@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n            audit_log.id,\n            time,\n            json(event) as \"event!: serde_json::Value\",\n            event_name,\n            event_level,\n            message,\n            ip,\n            user_id,\n            audit_log.username,\n            user_fullname,\n            user_role\n        FROM audit_log\n        WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))\n            AND (json_array_length($2) = 0 OR event_name IN (SELECT value FROM json_each($2)))\n            AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))\n            AND ($4 IS NULL OR unixepoch(time) >= $4)\n        ORDER BY\n            CASE WHEN $4 IS NULL THEN time ELSE 1 END DESC,\n            CASE WHEN $4 IS NULL THEN 1 ELSE time END ASC\n        LIMIT $5 OFFSET $6\n        ",
+  "query": "SELECT\n            audit_log.id as \"id: AuditLogEventId\",\n            time as \"time: _\",\n            json(event) as \"event!: serde_json::Value\",\n            event_name as \"event_name: AuditEventType\",\n            event_level as \"event_level: _\",\n            message,\n            ip as \"ip: String\",\n            user_id as \"user_id: UserId\",\n            username,\n            user_fullname,\n            user_role as \"user_role: Role\"\n        FROM audit_log\n        ORDER BY time ASC, id ASC\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id",
+        "name": "id: AuditLogEventId",
         "ordinal": 0,
         "type_info": "Integer",
         "origin": {
@@ -15,7 +15,7 @@
         }
       },
       {
-        "name": "time",
+        "name": "time: _",
         "ordinal": 1,
         "type_info": "Text",
         "origin": {
@@ -32,7 +32,7 @@
         "origin": "Expression"
       },
       {
-        "name": "event_name",
+        "name": "event_name: AuditEventType",
         "ordinal": 3,
         "type_info": "Text",
         "origin": {
@@ -43,7 +43,7 @@
         }
       },
       {
-        "name": "event_level",
+        "name": "event_level: _",
         "ordinal": 4,
         "type_info": "Text",
         "origin": {
@@ -65,7 +65,7 @@
         }
       },
       {
-        "name": "ip",
+        "name": "ip: String",
         "ordinal": 6,
         "type_info": "Text",
         "origin": {
@@ -76,7 +76,7 @@
         }
       },
       {
-        "name": "user_id",
+        "name": "user_id: UserId",
         "ordinal": 7,
         "type_info": "Integer",
         "origin": {
@@ -109,7 +109,7 @@
         }
       },
       {
-        "name": "user_role",
+        "name": "user_role: Role",
         "ordinal": 10,
         "type_info": "Text",
         "origin": {
@@ -121,7 +121,7 @@
       }
     ],
     "parameters": {
-      "Right": 6
+      "Right": 0
     },
     "nullable": [
       false,
@@ -137,5 +137,5 @@
       true
     ]
   },
-  "hash": "4d6350361adc8af880e7ed1bd1028988811640857e67127bb2070cd0040de674"
+  "hash": "53d59820afb99d1e4e96173f2776befcc8b883e6a885a4cfb7f6d6441bd693a2"
 }

@@ -37,6 +37,7 @@ multiple-versions = "allow"
 
 [advisories]
 yanked = "deny"
+unmaintained = "all"
 ignore = [
     # Typst
     { id = "RUSTSEC-2024-0320", reason = "yaml-rust is unmaintained, used via syntect; fixed on syntect main (yaml-rust2), not released yet, see https://github.com/trishume/syntect/issues/537" },
@@ -50,4 +51,6 @@ ignore = [
     { id = "RUSTSEC-2026-0192", reason = "ttf-parser is unmaintained, used directly and via Typst; no fix upstream yet, see https://github.com/kiesraad/abacus/issues/3849" },
     # sqlx
     { id = "RUSTSEC-2026-0459", reason = "bundled SQLite <3.54 has a vulnerability, used via libsqlite3-sys 0.37; fixed on sqlx main (allows libsqlite3-sys 0.39), not released yet; Abacus only opens its own database, see https://github.com/kiesraad/abacus/issues/4276" },
+    # Direct and transitive
+    { id = "RUSTSEC-2026-0543", reason = "chrono is unmaintained, used directly and via async_zip, eml-nl and sqlx, see https://github.com/kiesraad/abacus/issues/4395" },
 ]

@@ -1670,7 +1670,7 @@ mod tests {
                 "Tweede Kamer der Staten-Generaal 2025",
                 ElectionCategory::HouseOfRepresentatives
             ),
-            "Tweede Kamer der Staten-Generaal 2025"
+            "Tweede Kamer 2025"
         )
     }
 

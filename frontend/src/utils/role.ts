@@ -5,9 +5,9 @@ export function isAdministrator(role?: Role) {
 }
 
 export function isCoordinator(role?: Role) {
-  return role === "coordinator_gsb" || role === "coordinator_csb";
+  return role === "coordinator_gsb" || role === "coordinator_hsb" || role === "coordinator_csb";
 }
 
 export function isTypist(role?: Role) {
-  return role === "typist_gsb" || role === "typist_csb";
+  return role === "typist_gsb" || role === "typist_hsb" || role === "typist_csb";
 }

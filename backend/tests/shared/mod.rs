@@ -11,66 +11,6 @@ use reqwest::{
 };
 use serde::Serialize;
 
-/// Hash of `src/eml/tests/eml110a_test.eml.xml`
-pub const EML110A_TEST_HASH: [&str; 16] = [
-    "c738", "4baf", "7edc", "13e6", "ede8", "ceb1", "57db", "d48a", "88fc", "771b", "be49", "a7c5",
-    "a5a3", "aca7", "acbe", "ee24",
-];
-
-/// Hash of `src/eml/tests/eml230b_test.eml.xml`
-pub const EML230B_TEST_HASH: [&str; 16] = [
-    "0e5b", "7360", "6c66", "4093", "68e5", "f853", "1470", "b5cf", "5293", "21dd", "f92e", "76b8",
-    "8ed5", "f18e", "81f6", "4fe9",
-];
-
-/// Hash of `src/eml/tests/eml110a_test_AB.eml.xml`
-pub const EML110A_TEST_AB_HASH: [&str; 16] = [
-    "972b", "b30f", "70ae", "5632", "702c", "5b1e", "2d34", "e30e", "16b2", "d9dd", "0a94", "57eb",
-    "0877", "8ed3", "cedf", "0904",
-];
-
-/// Hash of `src/eml/tests/eml230b_test_AB.eml.xml`
-pub const EML230B_TEST_AB_HASH: [&str; 16] = [
-    "9526", "1053", "22c1", "69e1", "abb0", "1b89", "65cc", "5cfd", "49c0", "392a", "161a", "5ba4",
-    "5e96", "77ae", "fe0d", "b775",
-];
-
-/// Hash of `src/eml/tests/eml110a_test_PS1.eml.xml`
-pub const EML110A_TEST_PS1_HASH: [&str; 16] = [
-    "4e34", "9467", "c418", "efcd", "f2c4", "b302", "bafd", "30ba", "b0eb", "5689", "aaeb", "3d5e",
-    "f4c8", "9bd3", "0a51", "e384",
-];
-
-/// Hash of `src/eml/tests/eml230b_test_PS1.eml.xml`
-pub const EML230B_TEST_PS1_HASH: [&str; 16] = [
-    "d464", "56c3", "78b3", "941a", "baff", "1ee2", "eb41", "d88c", "0af8", "465c", "33aa", "6559",
-    "ac15", "5a78", "64b0", "09d4",
-];
-
-/// Hash of `src/eml/tests/eml110a_test_PS2.eml.xml`
-pub const EML110A_TEST_PS2_HASH: [&str; 16] = [
-    "e1a1", "cc6d", "46d0", "2225", "74a4", "8ca9", "ad3e", "e2a5", "d08f", "9cb9", "6a5a", "5a73",
-    "0f6b", "1a97", "ab3e", "80fe",
-];
-
-/// Hash of `src/eml/tests/eml230b_test_PS2.eml.xml`
-pub const EML230B_TEST_PS2_HASH: [&str; 16] = [
-    "bce2", "c279", "6418", "b285", "9620", "9a4d", "69ca", "72e4", "7481", "4cb2", "667c", "53bb",
-    "d97d", "cbc3", "78c9", "d5f9",
-];
-
-/// Hash of `src/eml/tests/eml110a_test_TK.eml.xml`
-pub const EML110A_TEST_TK_HASH: [&str; 16] = [
-    "4b8a", "bb2c", "6b3d", "00c6", "ebc8", "48e7", "d992", "d87b", "07b7", "8914", "d8f0", "fb58",
-    "7ec2", "e907", "0c6a", "0809",
-];
-
-/// Hash of `src/eml/tests/eml230b_test_TK.eml.xml`
-pub const EML230B_TEST_TK_HASH: [&str; 16] = [
-    "3957", "9f74", "eb8c", "4800", "f9db", "dd8c", "8514", "8a55", "d282", "5747", "0666", "8a84",
-    "2478", "2d9b", "599b", "4bf7",
-];
-
 pub fn differences_counts_zero() -> serde_json::Value {
     serde_json::json!({
         "more_ballots_count": 0,

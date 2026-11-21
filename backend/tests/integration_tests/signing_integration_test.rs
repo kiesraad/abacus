@@ -2,6 +2,7 @@
 
 use std::net::SocketAddr;
 
+use abacus::eml::EmlHash;
 use async_zip::{Compression, ZipEntryBuilder, tokio::write::ZipFileWriter};
 use axum::http::{HeaderValue, StatusCode};
 use sqlx::SqlitePool;
@@ -9,7 +10,6 @@ use test_log::test;
 
 use crate::{
     shared::{
-        EML110A_TEST_HASH, EML230B_TEST_HASH,
         FixtureUser::{Admin, CoordinatorCSB},
         change_status_committee_session, get_election_committee_session, get_statuses,
         import_certificate, login, post_election_import, post_multipart,
@@ -18,15 +18,17 @@ use crate::{
 };
 
 async fn import_election(addr: &SocketAddr, admin_cookie: &HeaderValue) -> u32 {
+    let election_data = include_str!("../../src/eml/tests/eml110a_test.eml.xml");
+    let candidate_data = include_str!("../../src/eml/tests/eml230b_test.eml.xml");
     let response = post_election_import(
         addr,
         admin_cookie,
         serde_json::json!({
             "committee_category": "CSB",
-            "election_hash": EML110A_TEST_HASH,
-            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": EML230B_TEST_HASH,
-            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "election_hash": EmlHash::from(election_data.as_bytes()).chunks,
+            "election_data": election_data,
+            "candidate_hash": EmlHash::from(candidate_data.as_bytes()).chunks,
+            "candidate_data": candidate_data,
         }),
     )
     .await;

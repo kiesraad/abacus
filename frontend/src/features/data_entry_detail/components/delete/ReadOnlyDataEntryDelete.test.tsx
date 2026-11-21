@@ -8,6 +8,7 @@ import { render, screen, spyOnHandler } from "@/testing/test-utils";
 import type {
   CommitteeSessionStatus,
   DATA_ENTRY_RESET_REQUEST_PATH,
+  DataEntrySource,
   DataEntryStatusName,
 } from "@/types/generated/openapi";
 
@@ -42,44 +43,36 @@ describe("ReadOnlyDataEntryDelete", () => {
     deleteDataEntry = spyOnHandler(DataEntryResetHandler);
   });
 
-  const oneEntryText =
-    "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Deze actie kan niet worden teruggedraaid.";
-  const twoEntriesText =
-    "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Let op: zowel de eerste als de tweede invoer wordt verwijderd. Deze actie kan niet worden teruggedraaid.";
-  const completedText =
-    "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Let op: het proces-verbaal en andere documenten van deze zitting worden ook verwijderd en kunnen niet meer uit Abacus worden gedownload. Deze actie kan niet worden teruggedraaid.";
-  test.each<[DataEntryStatusName, CommitteeSessionStatus, string]>([
-    ["first_entry_finalised", "data_entry", oneEntryText],
-    ["second_entry_in_progress", "data_entry", twoEntriesText],
-    ["first_entry_correction", "data_entry", twoEntriesText],
-    ["second_entry_correction", "data_entry", twoEntriesText],
-    ["definitive", "data_entry", twoEntriesText],
-    ["definitive", "completed", completedText],
-  ])("delete after confirm for data entry status %s and committee session status %s", async (status, committeeSessionStatus, text) => {
-    const { onDeleted } = renderComponent(status, committeeSessionStatus);
+  describe.each<[string, DataEntrySource]>([
+    ["37", dataEntryValidGetMockResponse.source],
+    ["Juinen", subCommitteeSource],
+  ])("for stembureau %s", (label, source) => {
+    const question = `Weet je zeker dat je de invoer voor stembureau ${label} wilt verwijderen?`;
+    const oneEntryText = `${question} Deze actie kan niet worden teruggedraaid.`;
+    const twoEntriesText = `${question} Let op: zowel de eerste als de tweede invoer wordt verwijderd. Deze actie kan niet worden teruggedraaid.`;
+    const completedText = `${question} Let op: het proces-verbaal en andere documenten van deze zitting worden ook verwijderd en kunnen niet meer uit Abacus worden gedownload. Deze actie kan niet worden teruggedraaid.`;
+    test.each<[DataEntryStatusName, CommitteeSessionStatus, string]>([
+      ["first_entry_finalised", "data_entry", oneEntryText],
+      ["second_entry_in_progress", "data_entry", twoEntriesText],
+      ["first_entry_correction", "data_entry", twoEntriesText],
+      ["second_entry_correction", "data_entry", twoEntriesText],
+      ["definitive", "data_entry", twoEntriesText],
+      ["definitive", "completed", completedText],
+    ])("delete after confirm for data entry status %s and committee session status %s", async (status, committeeSessionStatus, text) => {
+      const { onDeleted } = renderComponent(status, committeeSessionStatus, source);
 
-    const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
+      const user = userEvent.setup();
+      await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
 
-    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+      expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
-    const modal = await screen.findByTestId("modal-dialog");
-    expect(modal).toHaveTextContent(text);
+      const modal = await screen.findByTestId("modal-dialog");
+      expect(modal).toHaveTextContent(text);
 
-    await user.click(screen.getByRole("button", { name: "Verwijder invoer" }));
-    expect(deleteDataEntry).toHaveBeenCalledOnce();
-    expect(onDeleted).toHaveBeenCalledOnce();
-  });
-
-  test("uses the sub committee name in the confirmation text", async () => {
-    renderComponent("first_entry_finalised", "data_entry", subCommitteeSource);
-
-    const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
-
-    expect(await screen.findByTestId("modal-dialog")).toHaveTextContent(
-      "Weet je zeker dat je de invoer voor stembureau Juinen wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
-    );
+      await user.click(screen.getByRole("button", { name: "Verwijder invoer" }));
+      expect(deleteDataEntry).toHaveBeenCalledOnce();
+      expect(onDeleted).toHaveBeenCalledOnce();
+    });
   });
 
   test("cancel delete", async () => {

@@ -122,6 +122,9 @@ describe("DetailLayout", () => {
 
     await user.click(await screen.findByRole("button", { name: "Invoer verwijderen" }));
     const modal = await screen.findByTestId("modal-dialog");
+    expect(modal).toHaveTextContent(
+      "Weet je zeker dat je de invoer voor stembureau Juinen wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
+    );
     await user.click(await within(modal).findByRole("button", { name: "Verwijder invoer" }));
 
     expect(pushMessage).toHaveBeenCalledWith({

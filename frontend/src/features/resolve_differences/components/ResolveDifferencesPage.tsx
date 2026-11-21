@@ -10,7 +10,7 @@ import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
 import type { DataEntryGetDifferencesResponse, DataEntryStatusName } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
+import { getDataEntrySourceLabel, getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { type ResolveOutcome, useDataEntryDifferences } from "../hooks/useDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesForm } from "./ResolveDifferencesForm";
@@ -34,14 +34,14 @@ function resolvedMessageAndPath(
   outcome: ResolveOutcome,
 ): { message: Message; path: string } | null {
   const { differences, electionId, dataEntryId, getName } = navigation;
-  const number = getDataEntrySourceNumber(differences.source);
+  const label = getDataEntrySourceLabel(differences.source);
   const statusPath = `/elections/${electionId}/status`;
 
   switch (status) {
     case "first_entry_has_errors":
       return {
         message: {
-          title: t("data_entry_detail.resolve_errors.differences_resolved", { number }),
+          title: t("data_entry_detail.resolve_errors.differences_resolved", { label }),
           text: t("data_entry_detail.resolve_errors.alert_contains_errors"),
         },
         path: `${statusPath}/${dataEntryId}/detail`,
@@ -53,7 +53,7 @@ function resolvedMessageAndPath(
       }
       return {
         message: {
-          title: t("election_status.success.differences_resolved", { number }),
+          title: t("election_status.success.differences_resolved", { label }),
           text: text,
         },
         path: statusPath,
@@ -63,7 +63,7 @@ function resolvedMessageAndPath(
     case "second_entry_correction":
       return {
         message: {
-          title: t("election_status.success.differences_resolved", { number }),
+          title: t("election_status.success.differences_resolved", { label }),
           text: t("election_status.success.data_entry_corrected", { typist: getName(outcome.wrongUserId) }),
         },
         path: statusPath,
@@ -71,8 +71,8 @@ function resolvedMessageAndPath(
     case "empty":
       return {
         message: {
-          title: t("election_status.success.differences_resolved", { number }),
-          text: t("election_status.success.data_entries_discarded", { number }),
+          title: t("election_status.success.differences_resolved", { label }),
+          text: t("election_status.success.data_entries_discarded", { label }),
         },
         path: statusPath,
       };

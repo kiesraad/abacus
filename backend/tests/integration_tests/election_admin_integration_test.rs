@@ -18,7 +18,7 @@ struct ElectionVariant {
     category: &'static str,
     // TODO #4232: remove when CSB is supported for PS/TK
     csb_supported: bool,
-    csb_sub_committees: Option<usize>,
+    csb_sub_committees: usize,
     gsb_district: DistrictGSB,
     election_data: &'static str,
     candidate_data: &'static str,
@@ -35,7 +35,7 @@ const ELECTIONS: &[ElectionVariant] = &[
         name: "GR",
         category: "Municipal",
         csb_supported: true,
-        csb_sub_committees: Some(1),
+        csb_sub_committees: 1,
         gsb_district: DistrictGSB {
             number: 0,
             authority_id: "0000",
@@ -48,7 +48,7 @@ const ELECTIONS: &[ElectionVariant] = &[
         name: "WS",
         category: "WaterAuthority",
         csb_supported: true,
-        csb_sub_committees: Some(4),
+        csb_sub_committees: 4,
         gsb_district: DistrictGSB {
             number: 123,
             authority_id: "0123",
@@ -60,8 +60,8 @@ const ELECTIONS: &[ElectionVariant] = &[
     ElectionVariant {
         name: "PS1",
         category: "Provincial",
-        csb_supported: true,
-        csb_sub_committees: None,
+        csb_supported: false,
+        csb_sub_committees: 0,
         gsb_district: DistrictGSB {
             number: 123,
             authority_id: "0123",
@@ -74,7 +74,7 @@ const ELECTIONS: &[ElectionVariant] = &[
         name: "PS2",
         category: "Provincial",
         csb_supported: false,
-        csb_sub_committees: None,
+        csb_sub_committees: 0,
         gsb_district: DistrictGSB {
             number: 125,
             authority_id: "0125",
@@ -87,7 +87,7 @@ const ELECTIONS: &[ElectionVariant] = &[
         name: "TK",
         category: "HouseOfRepresentatives",
         csb_supported: false,
-        csb_sub_committees: None,
+        csb_sub_committees: 0,
         gsb_district: DistrictGSB {
             number: 125,
             authority_id: "0125",
@@ -107,9 +107,8 @@ async fn test_election_validate(pool: SqlitePool) {
 
     // TODO #3861: add HSB when election creation is allowed
     for committee_category in ["GSB", "CSB"] {
+        let is_gsb = committee_category == "GSB";
         for variant in ELECTIONS {
-            let is_gsb = committee_category == "GSB";
-
             // Validate the election definition, without and with candidates
             for with_candidates in [false, true] {
                 let case = format!(
@@ -163,9 +162,8 @@ async fn test_election_import(pool: SqlitePool) {
 
     // TODO #3861: add HSB when election creation is allowed
     for committee_category in ["GSB", "CSB"] {
+        let is_gsb = committee_category == "GSB";
         for variant in ELECTIONS {
-            let is_gsb = committee_category == "GSB";
-
             let case = format!("{} {} import", committee_category, variant.name);
             let mut body = serde_json::json!({
                 "committee_category": committee_category,
@@ -182,7 +180,7 @@ async fn test_election_import(pool: SqlitePool) {
             let response = post_election_import(&addr, &admin_cookie, body).await;
 
             // TODO #4232: remove when CSB is supported for PS/TK
-            if !is_gsb && variant.csb_sub_committees.is_none() {
+            if !is_gsb && !variant.csb_supported {
                 assert_eq!(response.status(), StatusCode::BAD_REQUEST, "{case}");
                 let body: serde_json::Value = response.json().await.unwrap();
                 assert_eq!(body["reference"], "EmlImportError", "{case}");
@@ -218,7 +216,7 @@ async fn test_election_import(pool: SqlitePool) {
                 assert_eq!(status, "in_preparation", "{case}");
 
                 let statuses = get_statuses(&addr, &admin_cookie, election_id).await;
-                assert_eq!(Some(statuses.len()), variant.csb_sub_committees, "{case}");
+                assert_eq!(statuses.len(), variant.csb_sub_committees, "{case}");
                 let sub_committee = statuses
                     .values()
                     .map(|s| &s["source"])

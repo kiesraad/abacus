@@ -14,7 +14,7 @@ import type {
   ElectionDefinitionValidateResponse,
   NewElection,
 } from "@/types/generated/openapi";
-import { getDistrictNumber } from "@/utils/election";
+import { getDistrictLabel } from "@/utils/election";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
@@ -23,7 +23,7 @@ function getSubtitle(election: NewElection) {
     switch (election.committee_category) {
       case "GSB":
         if (election.district.district === "Specific") {
-          return `${t("election.district")} ${getDistrictNumber(election.district)} (${election.district.name})`;
+          return getDistrictLabel(election.district, true);
         }
         break;
       case "CSB":

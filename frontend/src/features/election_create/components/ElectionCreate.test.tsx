@@ -547,7 +547,7 @@ describe("Election create pages", () => {
         name: "GSB PS2 DSO",
         election: provincialElectionPS2MockData,
         electionIdentifier: "PS2027 Oost-Holland",
-        electionDistrict: "Kieskring II (Juinen)",
+        electionDistrict: "Kieskring II - Juinen",
         gsbSelected: gsbListMockData[0]!,
         countingMethod: "DSO",
         importHandler: GSBPSElectionImportRequestHandler,

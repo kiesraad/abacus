@@ -97,7 +97,9 @@ test.describe(`data entry import GSB 510b into CSB election`, () => {
 
     // Hash check page.
     await expect(dataEntryImportPage.main).toContainText(eml510b.zipFileName);
-    await expect(dataEntryImportPage.main).toContainText(eml510b.electionDate);
+    await expect(dataEntryImportPage.main).toContainText("Gemeenteraad Test 2022");
+    await expect(dataEntryImportPage.main).toContainText("GSB 0000 - Test");
+    await expect(dataEntryImportPage.main).toContainText("Digitale handtekening klopt");
 
     // Incorrect hash.
     const hashCheckPage = new DataEntryImportHashCheckPgObj(page);
@@ -116,7 +118,7 @@ test.describe(`data entry import GSB 510b into CSB election`, () => {
     await expect(dataEntryImportCheckAndSavePage.electionName).toContainText(election.name);
     await expect(dataEntryImportCheckAndSavePage.committeeCategory).toContainText("Gemeentelijk stembureau");
     await expect(dataEntryImportCheckAndSavePage.areaDesignation).toContainText(
-      `${subCommittee.authority_name} (${subCommittee.authority_id})`,
+      `${subCommittee.authority_id} - ${subCommittee.authority_name}`,
     );
     await expect(dataEntryImportCheckAndSavePage.saveButton).toBeVisible();
     await dataEntryImportCheckAndSavePage.saveButton.click();

@@ -5,10 +5,11 @@ use axum::{
     response::{AppendHeaders, IntoResponse, Json},
 };
 use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
+use chrono::{DateTime, Utc};
 use cookie::{Cookie, SameSite};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
+use sqlx::{SqliteConnection, SqlitePool};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -48,13 +49,44 @@ impl AsAuditEvent for UserLoggedInAuditData {
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
+/// No need to store the session id as only one session is allowed at the same
+/// time.
 #[derive(Serialize)]
 pub struct UserLoggedOutAuditData {
+    /// in seconds
     pub session_duration: u64,
 }
 
 impl AsAuditEvent for UserLoggedOutAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::UserLoggedOut;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+/// Logged when an expired session is cleaned up, which happens on the next
+/// login of any user.
+#[derive(Serialize)]
+pub struct UserSessionExpiredAuditData {
+    /// in seconds
+    pub session_duration: u64,
+    /// when the session expired
+    pub expires_at: DateTime<Utc>,
+}
+
+impl AsAuditEvent for UserSessionExpiredAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserSessionExpired;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+/// Logged when a session is ended by something other than a logout or expiry:
+/// a new login of the same user, or an administrator setting a new password.
+#[derive(Serialize)]
+pub struct UserSessionRemovedAuditData {
+    /// in seconds
+    pub session_duration: u64,
+}
+
+impl AsAuditEvent for UserSessionRemovedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserSessionRemoved;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
@@ -187,6 +219,58 @@ pub(crate) fn set_default_cookie_properties(cookie: &mut Cookie) {
     cookie.set_same_site(SameSite::Strict);
 }
 
+/// Log a session audit event on behalf of the user owning the session
+async fn log_session_event(
+    conn: &mut SqliteConnection,
+    user: User,
+    event: &impl AsAuditEvent,
+) -> Result<(), APIError> {
+    AuditService::new_anon()
+        .with_user(user)
+        .log(conn, event, None)
+        .await
+}
+
+/// Delete the session of this user, if any, and log its removal
+pub(crate) async fn remove_user_session(
+    conn: &mut SqliteConnection,
+    user: &User,
+) -> Result<(), APIError> {
+    if let Some(session) = session_repo::delete_user_session(conn, user.id()).await? {
+        log_session_event(
+            conn,
+            user.clone(),
+            &UserSessionRemovedAuditData {
+                session_duration: session.duration().as_secs(),
+            },
+        )
+        .await?;
+    }
+
+    Ok(())
+}
+
+/// Delete all sessions that have expired and log their expiry
+async fn expire_sessions(conn: &mut SqliteConnection) -> Result<(), APIError> {
+    for session in session_repo::delete_expired_sessions(conn).await? {
+        let user = user_repo::get_by_id(conn, session.user_id())
+            .await?
+            .ok_or(sqlx::Error::RowNotFound)?;
+
+        log_session_event(
+            conn,
+            user,
+            &UserSessionExpiredAuditData {
+                session_duration: session.duration().as_secs(),
+                expires_at: session.expires_at(),
+            },
+        )
+        .await?;
+    }
+
+    Ok(())
+}
+
 /// Login endpoint, authenticates a user and creates a new session + session cookie
 #[utoipa::path(
     post,
@@ -247,10 +331,10 @@ async fn login(
     let mut tx = pool.begin_immediate().await?;
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
-    session_repo::delete_expired_sessions(&mut tx).await?;
+    expire_sessions(&mut tx).await?;
 
-    // Remove possible old session for this user
-    session_repo::delete_user_session(&mut tx, user.id()).await?;
+    // Remove any old session for this user, so there is only ever one active session per user
+    remove_user_session(&mut tx, &user).await?;
 
     // Get the client IP address if available
     let ip = audit_service
@@ -599,6 +683,7 @@ async fn logout(
 mod tests {
     use std::assert_matches;
 
+    use chrono::TimeDelta;
     use http_body_util::BodyExt;
     use test_log::test;
 
@@ -635,6 +720,77 @@ mod tests {
                 "user_agent": "x".repeat(MAX_USER_AGENT_LENGTH),
             })
         );
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_expire_sessions_logs_expired_sessions(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let expired = Session::create(UserId::from(1), "ua", "0.0.0.0", TimeDelta::zero());
+        session_repo::save(&mut conn, &expired).await.unwrap();
+        let active = Session::create(UserId::from(2), "ua", "0.0.0.0", TimeDelta::seconds(60));
+        session_repo::save(&mut conn, &active).await.unwrap();
+
+        expire_sessions(&mut conn).await.unwrap();
+
+        // Only the active session is left
+        assert_eq!(
+            session_repo::delete_user_session(&mut conn, UserId::from(1))
+                .await
+                .unwrap(),
+            None
+        );
+        assert_eq!(session_repo::count(&mut conn).await.unwrap(), 1);
+
+        // The expiry is logged for the user owning the expired session
+        let events = crate::audit_log::list_all(&mut conn).await.unwrap();
+        assert_eq!(events.len(), 1);
+        assert_eq!(*events[0].event_name(), AuditEventType::UserSessionExpired);
+        assert_eq!(events[0].user_id(), Some(UserId::from(1)));
+        assert_eq!(events[0].ip(), None);
+        assert_eq!(
+            *events[0].event(),
+            serde_json::json!({
+                "session_duration": 0,
+                "expires_at": expired.expires_at(),
+            })
+        );
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_remove_user_session_logs_removal(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let user = user_repo::get_by_id(&mut conn, UserId::from(1))
+            .await
+            .unwrap()
+            .unwrap();
+        let session = Session::create(user.id(), "ua", "0.0.0.0", TimeDelta::seconds(60));
+        session_repo::save(&mut conn, &session).await.unwrap();
+
+        remove_user_session(&mut conn, &user).await.unwrap();
+
+        assert_eq!(session_repo::count(&mut conn).await.unwrap(), 0);
+        let events = crate::audit_log::list_all(&mut conn).await.unwrap();
+        assert_eq!(events.len(), 1);
+        assert_eq!(*events[0].event_name(), AuditEventType::UserSessionRemoved);
+        assert_eq!(events[0].user_id(), Some(user.id()));
+        assert_eq!(
+            *events[0].event(),
+            serde_json::json!({ "session_duration": 0 })
+        );
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_remove_user_session_without_session_logs_nothing(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let user = user_repo::get_by_id(&mut conn, UserId::from(1))
+            .await
+            .unwrap()
+            .unwrap();
+
+        remove_user_session(&mut conn, &user).await.unwrap();
+
+        let events = crate::audit_log::list_all(&mut conn).await.unwrap();
+        assert_eq!(events.len(), 0);
     }
 
     #[test(tokio::test)]

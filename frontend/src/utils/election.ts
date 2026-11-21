@@ -1,4 +1,5 @@
-import type { CommitteeDistrict, ElectionCategory } from "@/types/generated/openapi";
+import { t } from "@/i18n/translate";
+import type { CommitteeDistrict, ElectionCategory, SubCommitteeFirstSession } from "@/types/generated/openapi";
 
 export function isLocalElection(electionCategory: ElectionCategory): boolean {
   switch (electionCategory) {
@@ -28,4 +29,27 @@ export function getDistrictNumber(district: Extract<CommitteeDistrict, { distric
   } else {
     return district.key.number;
   }
+}
+
+export function getDistrictLabel(
+  district: Extract<CommitteeDistrict, { district: "Specific" }>,
+  withDistrictPrefix: boolean = false,
+) {
+  let prefix = "";
+  if (withDistrictPrefix) {
+    prefix += `${t("election.district")} `;
+  }
+  const districtNumber = getDistrictNumber(district);
+  if (districtNumber !== "") {
+    prefix += `${districtNumber} - `;
+  }
+  return `${prefix}${district.name}`;
+}
+
+export function getAreaDesignation(subCommittee: SubCommitteeFirstSession, withCategoryPrefix: boolean = false) {
+  let prefix = "";
+  if (withCategoryPrefix) {
+    prefix += `${subCommittee.category} `;
+  }
+  return `${prefix}${subCommittee.authority_id} - ${subCommittee.authority_name}`;
 }

@@ -36,6 +36,7 @@ const source = (id: number): DataEntrySource => {
 
 export const subCommitteeSource: DataEntrySource = {
   type: "SubCommittee",
+  category: "GSB",
   id: 1,
   number: 1,
   name: "Juinen",

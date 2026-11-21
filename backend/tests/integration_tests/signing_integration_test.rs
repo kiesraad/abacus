@@ -2,6 +2,7 @@
 
 use std::net::SocketAddr;
 
+use abacus::eml::EmlHash;
 use async_zip::{Compression, ZipEntryBuilder, tokio::write::ZipFileWriter};
 use axum::http::{HeaderValue, StatusCode};
 use sqlx::SqlitePool;
@@ -11,35 +12,26 @@ use crate::{
     shared::{
         FixtureUser::{Admin, CoordinatorCSB},
         change_status_committee_session, get_election_committee_session, get_statuses,
-        import_certificate, login, post_multipart,
+        import_certificate, login, post_election_import, post_multipart,
     },
     utils::serve_api,
 };
 
 async fn import_election(addr: &SocketAddr, admin_cookie: &HeaderValue) -> u32 {
-    let response = reqwest::Client::new()
-        .post(format!("http://{addr}/api/elections/import"))
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    let election_data = include_str!("../../src/eml/tests/eml110a_test.eml.xml");
+    let candidate_data = include_str!("../../src/eml/tests/eml230b_test.eml.xml");
+    let response = post_election_import(
+        addr,
+        admin_cookie,
+        serde_json::json!({
             "committee_category": "CSB",
-            "election_hash": [
-                "c738", "4baf", "7edc", "13e6",
-                "ede8", "ceb1", "57db", "d48a",
-                "88fc", "771b", "be49", "a7c5",
-                "a5a3", "aca7", "acbe", "ee24",
-            ],
-            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_hash": [
-                "0e5b", "7360", "6c66", "4093",
-                "68e5", "f853", "1470", "b5cf",
-                "5293", "21dd", "f92e", "76b8",
-                "8ed5", "f18e", "81f6", "4fe9",
-            ],
-            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
-        }))
-        .send()
-        .await
-        .unwrap();
+            "election_hash": EmlHash::from(election_data.as_bytes()).chunks,
+            "election_data": election_data,
+            "candidate_hash": EmlHash::from(candidate_data.as_bytes()).chunks,
+            "candidate_data": candidate_data,
+        }),
+    )
+    .await;
     assert_eq!(response.status(), StatusCode::CREATED);
     let body: serde_json::Value = response.json().await.unwrap();
     u32::try_from(body["id"].as_u64().unwrap()).unwrap()

@@ -486,6 +486,34 @@ pub async fn create_gsb_result_with_non_example_data_entry(
     .await;
 }
 
+pub async fn post_election_import(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    body: serde_json::Value,
+) -> Response {
+    reqwest::Client::new()
+        .post(format!("http://{addr}/api/elections/import"))
+        .header("cookie", cookie)
+        .json(&body)
+        .send()
+        .await
+        .unwrap()
+}
+
+pub async fn post_election_import_validate(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    body: serde_json::Value,
+) -> Response {
+    reqwest::Client::new()
+        .post(format!("http://{addr}/api/elections/import/validate"))
+        .header("cookie", cookie)
+        .json(&body)
+        .send()
+        .await
+        .unwrap()
+}
+
 pub async fn get_election_details(
     addr: &SocketAddr,
     cookie: &HeaderValue,

@@ -515,6 +515,13 @@ fn validate_csb_election(
         false,
         edu.candidate_data.as_deref(),
     )?;
+    match election.category {
+        ElectionCategory::Municipal | ElectionCategory::WaterAuthority => {}
+        // PS & TK CSB support will be implemented later
+        ElectionCategory::Provincial | ElectionCategory::HouseOfRepresentatives => {
+            return Err(EMLImportError::CommitteeCategoryForElectionCategoryNotSupported.into());
+        }
+    }
     election.committee_category = CommitteeCategory::CSB;
 
     if let Some(ref data) = edu.candidate_data {

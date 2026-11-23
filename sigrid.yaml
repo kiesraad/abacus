@@ -66,6 +66,8 @@ dependencychecker:
   exclude:
     # Marvin Attack on RSA crate, which we do not use (Cargo weak dependency, https://github.com/rust-lang/cargo/issues/10801)
     - vulnerability: "CVE-2023-49092"
+    # EUPL-1.2 is an approved license and eml-nl is the Kiesraad EML_NL library
+    - license: "^eml-nl$"
 
 component_depth: 1
 

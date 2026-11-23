@@ -131,10 +131,12 @@ impl Results {
                     }
                 }
             }
-            (CommitteeCategory::CSB, _) | (CommitteeCategory::HSB, false) => {
+            (CommitteeCategory::CSB, false) | (CommitteeCategory::HSB, false) => {
                 Results::GSB(GSBResults::empty(election))
             }
-            (CommitteeCategory::HSB, true) => unreachable!("HSB does not have a next session"),
+            (CommitteeCategory::CSB, true) | (CommitteeCategory::HSB, true) => {
+                unreachable!("CSB and HSB cannot have a next session")
+            }
         }
     }
 

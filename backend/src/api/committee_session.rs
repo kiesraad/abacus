@@ -6,7 +6,6 @@ use axum::{
 use chrono::NaiveDateTime;
 use serde::Serialize;
 use sqlx::{SqliteConnection, SqlitePool};
-use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -40,10 +39,6 @@ use crate::{
 };
 
 impl ApiErrorResponse for CommitteeSessionError {
-    fn log(&self) {
-        error!("Committee session status error: {:?}", self);
-    }
-
     fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
         match self {
             CommitteeSessionError::CommitteeSessionPaused => (

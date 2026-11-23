@@ -38,7 +38,7 @@ export const subCommitteeSource: DataEntrySource = {
   type: "SubCommittee",
   category: "GSB",
   id: 1,
-  number: 1,
+  number: 35,
   name: "Juinen",
   committee_session_id: 1,
   data_entry_id: 1,

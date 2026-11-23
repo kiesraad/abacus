@@ -13,7 +13,7 @@ import type {
   DataEntryStatusName,
   PollingStationInvestigation,
 } from "@/types/generated/openapi";
-import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
+import { getDataEntrySourceLabel } from "@/utils/dataEntrySource";
 
 interface ReadOnlyDataEntryDeleteProps {
   dataEntrySource: DataEntrySource;
@@ -59,14 +59,14 @@ export function ReadOnlyDataEntryDelete({
   ];
 
   function getConfirmationText() {
-    const nr = getDataEntrySourceNumber(dataEntrySource);
+    const label = getDataEntrySourceLabel(dataEntrySource);
     if (committeeSessionStatus === "completed") {
-      return t("data_entry_detail.delete_completed_are_you_sure", { nr });
+      return t("data_entry_detail.delete_completed_are_you_sure", { label });
     }
     if (statusWithTwoEntries.includes(status)) {
-      return t("data_entry_detail.delete_all_are_you_sure", { nr });
+      return t("data_entry_detail.delete_all_are_you_sure", { label });
     }
-    return t("data_entry_detail.delete_are_you_sure", { nr });
+    return t("data_entry_detail.delete_are_you_sure", { label });
   }
 
   return (

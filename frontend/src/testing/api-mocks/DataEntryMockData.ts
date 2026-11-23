@@ -34,6 +34,18 @@ const source = (id: number): DataEntrySource => {
   };
 };
 
+export const subCommitteeSource: DataEntrySource = {
+  type: "SubCommittee",
+  category: "GSB",
+  id: 1,
+  number: 35,
+  name: "Juinen",
+  committee_session_id: 1,
+  data_entry_id: 1,
+  authority_id: "0035",
+  authority_name: "Juinen",
+};
+
 export function emptyResults(model: DataEntryModel = "CSOFirstSession"): Results {
   const commonPollingStationResults: CommonPollingStationResults = {
     voters_counts: {

@@ -8,7 +8,7 @@ import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
-import { dataEntryStatusDifferences } from "@/testing/api-mocks/DataEntryMockData";
+import { dataEntryStatusDifferences, subCommitteeSource } from "@/testing/api-mocks/DataEntryMockData";
 import {
   DataEntryGetDifferencesHandler,
   DataEntryResolveDifferencesHandler,
@@ -330,6 +330,24 @@ describe("ResolveDifferencesPage", () => {
       text: "Omdat beide invoeren zijn verwijderd, moet stembureau 35 twee keer opnieuw ingevoerd worden.",
     });
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
+  });
+
+  test("should use the sub committee name in the message", async () => {
+    const user = userEvent.setup();
+    overrideOnce("get", "/api/data_entries/3/resolve_differences", 200, {
+      ...dataEntryStatusDifferences,
+      source: subCommitteeSource,
+    });
+
+    await renderPage();
+    overrideResponseStatus("empty");
+    await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau Juinen",
+      text: "Omdat beide invoeren zijn verwijderd, moet stembureau Juinen twee keer opnieuw ingevoerd worden.",
+    });
   });
 
   test("should navigate to detail/resolve errors page after keeping second entry which has errors", async () => {

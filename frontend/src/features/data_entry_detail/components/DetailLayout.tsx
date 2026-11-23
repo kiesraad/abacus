@@ -14,7 +14,7 @@ import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
-import { getDataEntrySourceNumber } from "@/utils/dataEntrySource";
+import { getDataEntrySourceLabel, getDataEntrySourceNumber } from "@/utils/dataEntrySource";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { useDataEntryErrors } from "../hooks/useDataEntryErrors";
 import { DetailNavigation } from "./DetailNavigation";
@@ -43,7 +43,7 @@ export function DetailLayout() {
     pushMessage({
       title: t("data_entry_detail.data_entry_deleted"),
       text: t("data_entry_detail.data_entry_deleted_details", {
-        nr: dataEntry ? getDataEntrySourceNumber(dataEntry.source) : "-",
+        label: dataEntry ? getDataEntrySourceLabel(dataEntry.source) : "-",
       }),
     });
 

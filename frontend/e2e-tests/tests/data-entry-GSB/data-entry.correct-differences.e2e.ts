@@ -1,5 +1,5 @@
 import { expect, type Page } from "@playwright/test";
-import type { DataEntry } from "e2e-tests/fixtures/gsb-fixtures";
+import type { DataEntryFixture } from "e2e-tests/fixtures/gsb-fixtures";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryBasePage } from "e2e-tests/page-objects/data_entry/DataEntryBasePgObj";
@@ -151,7 +151,7 @@ test.describe("data entry - correct differences", () => {
     }: {
       coordinator: Page;
       typist: Page;
-      dataEntry: DataEntry;
+      dataEntry: DataEntryFixture;
       entry: 1 | 2;
       correction: Results;
       expectResolved: boolean;

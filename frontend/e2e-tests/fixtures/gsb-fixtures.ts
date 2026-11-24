@@ -34,7 +34,7 @@ import type {
 } from "@/types/generated/openapi";
 import { FIXTURE_TYPIST_TEMP_PASSWORD, type UserFixtures } from "./user-fixtures";
 
-export interface DataEntry {
+export interface DataEntryFixture {
   election_id: number;
   id: number;
   name: string;
@@ -53,29 +53,29 @@ type GSBFixtures = UserFixtures & {
   // GSB DSO election with two polling stations
   electionGSBDSO: ElectionDetailsResponse;
   // First data entry of the GSB CSO election
-  dataEntryGSB: DataEntry;
+  dataEntryGSB: DataEntryFixture;
   // First data entry of the GSB DSO election
-  dataEntryGSBDSO: DataEntry;
+  dataEntryGSBDSO: DataEntryFixture;
   // GSB CSO election with one investigation in the second committee session
-  dataEntryNextSession: DataEntry;
+  dataEntryNextSession: DataEntryFixture;
   // First data entry of the GSB CSO election with entry claimed by typist one
-  dataEntryGSBFirstEntryClaimed: DataEntry;
+  dataEntryGSBFirstEntryClaimed: DataEntryFixture;
   // First data entry of the GSB CSO election with first data entry done
-  dataEntryGSBFirstEntryDone: DataEntry;
+  dataEntryGSBFirstEntryDone: DataEntryFixture;
   // First data entry correction of the GSB CSO election after resolve differences
-  dataEntryGSBFirstEntryCorrection: DataEntry;
+  dataEntryGSBFirstEntryCorrection: DataEntryFixture;
   // First data entry correction of the next session of a GSB CSO election after resolve differences
-  dataEntryNextSessionFirstEntryCorrection: DataEntry;
+  dataEntryNextSessionFirstEntryCorrection: DataEntryFixture;
   // Second data entry correction of the GSB CSO election after resolve differences
-  dataEntryGSBSecondEntryCorrection: DataEntry;
+  dataEntryGSBSecondEntryCorrection: DataEntryFixture;
   // First data entry of the GSB CSO election with first data entry with errors
-  dataEntryGSBFirstEntryHasErrors: DataEntry;
+  dataEntryGSBFirstEntryHasErrors: DataEntryFixture;
   // First data entry of the GSB CSO election with first and second data entries done
-  dataEntryGSBDefinitive: DataEntry;
+  dataEntryGSBDefinitive: DataEntryFixture;
   // First data entry of the GSB CSO election with differences between the first and second data entry
-  dataEntryGSBEntriesDifferent: DataEntry;
+  dataEntryGSBEntriesDifferent: DataEntryFixture;
   // First data entry of the GSB CSO election with second data entry that has errors and is therefore different
-  dataEntryGSBEntriesDifferentWithErrors: DataEntry;
+  dataEntryGSBEntriesDifferentWithErrors: DataEntryFixture;
   // GSB CSO election with polling stations and two completed data entries for each
   completedElectionGSB: Election;
   // The current committee session for the GSB CSO election

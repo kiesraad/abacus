@@ -1,5 +1,5 @@
 import { expect, type Page } from "@playwright/test";
-import type { DataEntry } from "e2e-tests/fixtures/gsb-fixtures";
+import type { DataEntryFixture } from "e2e-tests/fixtures/gsb-fixtures";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
@@ -24,7 +24,7 @@ test.use({
 });
 
 test.describe("resume data entry flow", () => {
-  const fillFirstTwoPagesAndAbort = async (page: Page, dataEntry: DataEntry) => {
+  const fillFirstTwoPagesAndAbort = async (page: Page, dataEntry: DataEntryFixture) => {
     await page.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/1`);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);

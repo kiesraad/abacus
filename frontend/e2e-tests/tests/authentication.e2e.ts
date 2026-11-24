@@ -5,7 +5,8 @@ import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
 import { NoAccessPgObj } from "e2e-tests/page-objects/authentication/NoAccessPgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
-import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
+import { test } from "../fixtures";
+import { FIXTURE_TYPIST_TEMP_PASSWORD } from "../fixtures/user-fixtures";
 
 test.describe.configure({ mode: "default", timeout: 90_000 });
 

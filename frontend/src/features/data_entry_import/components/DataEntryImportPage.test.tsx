@@ -120,7 +120,7 @@ describe("DataEntryImportPage", () => {
     expect(screen.getByText("Gemeentelijk stembureau")).toBeVisible();
     expect(screen.getByText("0035 - Heemdamseburg")).toBeVisible();
     expect(screen.getByText("De EML 510b is ondertekend door GSB 0035 - Heemdamseburg")).toBeVisible();
-    expect(screen.getByText("Digitale vingerafdruk is gelijk met het papieren proces-verbaal")).toBeVisible();
+    expect(screen.getByText("Digitale vingerafdruk komt overeen met die op het papieren proces-verbaal")).toBeVisible();
 
     // 3. Check and save.
     overrideOnce("post", importPath, 200, {

@@ -46,7 +46,11 @@ export function getDistrictLabel(
   return `${prefix}${district.name}`;
 }
 
-export function formatAreaDesignation(authority_id: string, authority_name: string, category?: CommitteeCategory) {
+export function formatAreaDesignation(
+  authority_id: string,
+  authority_name: string,
+  category?: CommitteeCategory,
+): string {
   switch (category) {
     case "GSB":
     case "CSB":
@@ -58,7 +62,11 @@ export function formatAreaDesignation(authority_id: string, authority_name: stri
   }
 }
 
-export function formatElectionTypeLabel(authority_id: string, authority_name: string, category: CommitteeCategory) {
+export function formatElectionTypeLabel(
+  authority_id: string,
+  authority_name: string,
+  category: CommitteeCategory,
+): string {
   switch (category) {
     case "GSB":
       return `${category} ${authority_id} ${authority_name}`;

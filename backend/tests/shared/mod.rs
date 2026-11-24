@@ -702,7 +702,7 @@ impl FixtureUser {
             Self::Admin => ("admin1", "Admin1Password01"),
             Self::CoordinatorGSB => ("coordinator1", "Coordinator1Password01"),
             Self::CoordinatorCSB => ("coordinator3", "Coordinator3Password03"),
-            Self::CoordinatorHSB => ("coordinator5", "Coordinator2Password05"),
+            Self::CoordinatorHSB => ("coordinator5", "Coordinator5Password05"),
             Self::TypistGSB => ("typist1", "Typist1Password01"),
             Self::Typist2GSB => ("typist2", "Typist2Password02"),
             Self::TypistCSB => ("typist3", "Typist3Password03"),

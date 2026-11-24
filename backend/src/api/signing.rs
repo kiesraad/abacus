@@ -11,7 +11,6 @@ use chrono::{DateTime, Utc};
 use eml_signature;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
-use tracing::info;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -34,10 +33,6 @@ use crate::{
 };
 
 impl ApiErrorResponse for SubCommitteeCertificateError {
-    fn log(&self) {
-        info!("Sub committee certificate rejected: {:?}", self);
-    }
-
     fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
         let (status, message, reference) = match self {
             SubCommitteeCertificateError::InvalidCertificate(_) => (
@@ -223,13 +218,12 @@ pub async fn certificate(
 
 fn public_key_filename(election: &ElectionWithPoliticalGroups) -> Result<String, APIError> {
     match election.committee_category {
-        CommitteeCategory::GSB => Ok(format!(
+        CommitteeCategory::GSB | CommitteeCategory::HSB => Ok(format!(
             "public_key_abacus_{}_{}_{}.crt",
             election.election_id.to_lowercase(),
             election.region_category(),
             hyphenate(&election.authority_region)
         )),
-
         CommitteeCategory::CSB => Err(APIError::DataIntegrityError(
             "Signing not supported for CSB".to_string(),
         )),

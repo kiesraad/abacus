@@ -10,7 +10,7 @@ export const Default: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Naam", "Woonplaats", "Lijst"],
       ["Bakker, S. (Sophie) (v)", "Test Location", "Lijst 1 – Political Group A"],
       ["Bakker, T. (Tinus) (m)", "Test Location (BE)", "Lijst 2 – Political Group B"],

@@ -46,6 +46,7 @@ describe("OverviewPage", () => {
       ["Waterschap Rivier en Polder 2027", "Juinen", ""],
       ["Waterschap Rivier en Polder 2027", "Rivier en Polder", ""],
       ["Provinciale Staten Oost-Holland 2027", "Juinen", ""],
+      ["Tweede Kamer 2025", "Juinen", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -73,6 +74,7 @@ describe("OverviewPage", () => {
       ["Waterschap Rivier en Polder 2027", "GSB 0037 Juinen", ""],
       ["Waterschap Rivier en Polder 2027", "CSB Rivier en Polder", ""],
       ["Provinciale Staten Oost-Holland 2027", "GSB 0036 Juinen", ""],
+      ["Tweede Kamer 2025", "HSB Juinen", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -100,6 +102,7 @@ describe("OverviewPage", () => {
       ["Waterschap Rivier en Polder 2027", "GSB 0037 Juinen", ""],
       ["Waterschap Rivier en Polder 2027", "CSB Rivier en Polder", ""],
       ["Provinciale Staten Oost-Holland 2027", "GSB 0036 Juinen", ""],
+      ["Tweede Kamer 2025", "HSB Juinen", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");

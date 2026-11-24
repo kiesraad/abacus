@@ -1,14 +1,15 @@
-import "@vitest/expect";
+import "storybook/test";
 import "vitest";
 
 declare module "vitest" {
-  interface Assertion {
-    toHaveTableContent(expected: string[][]): T;
+  interface Matchers<R> {
+    toHaveTableContent(expected: string[][]): R;
   }
 }
 
-declare module "@vitest/expect" {
-  interface JestAssertion {
-    toHaveTableContent(expected: string[][]): T;
+declare module "storybook/test" {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- `T` must match the Storybook declaration
+  interface Assertion<T> {
+    toHaveTableContent(expected: string[][]): Promise<void>;
   }
 }

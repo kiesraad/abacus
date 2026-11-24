@@ -32,6 +32,8 @@ function buildRequest(state: ElectionCreateState): ElectionCreationRequest | und
   };
 
   switch (state.committeeCategory) {
+    case "HSB":
+      return { committee_category: "HSB", ...definitions };
     case "CSB":
       return { committee_category: "CSB", ...definitions };
     case "GSB":

@@ -30,7 +30,7 @@ export const DefaultWithNumberOfVoters: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Kiesgerechtigden", "2.000", ""],
       ["Getelde stembiljetten", "1.205", "Opkomst: 60,25%"],
       ["Blanco stemmen", "2", "0,17%"],
@@ -66,7 +66,7 @@ export const DefaultWithoutNumberOfVoters: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Kiesgerechtigden", "", ""],
       ["Getelde stembiljetten", "1.205", ""],
       ["Blanco stemmen", "2", "0,17%"],
@@ -112,7 +112,7 @@ export const DefaultWithoutVotes: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Kiesgerechtigden", "2.000", ""],
       ["Getelde stembiljetten", "0", ""],
       ["Blanco stemmen", "0", ""],

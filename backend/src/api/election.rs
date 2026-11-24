@@ -515,6 +515,13 @@ fn validate_csb_election(
         false,
         edu.candidate_data.as_deref(),
     )?;
+    match election.category {
+        ElectionCategory::Municipal | ElectionCategory::WaterAuthority => {}
+        // PS & TK CSB support will be implemented later
+        ElectionCategory::Provincial | ElectionCategory::HouseOfRepresentatives => {
+            return Err(EMLImportError::CommitteeCategoryForElectionCategoryNotSupported.into());
+        }
+    }
     election.committee_category = CommitteeCategory::CSB;
 
     if let Some(ref data) = edu.candidate_data {
@@ -530,6 +537,7 @@ fn validate_csb_election(
 #[serde(tag = "committee_category")]
 pub enum ElectionCreationRequest {
     GSB(GSBElectionCreationRequest),
+    HSB(HSBElectionCreationRequest),
     CSB(CSBElectionCreationRequest),
 }
 
@@ -551,6 +559,15 @@ pub struct GSBElectionCreationRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     selected_region: Option<RegionKey>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct HSBElectionCreationRequest {
+    election_hash: [String; crate::eml::hash::CHUNK_COUNT],
+    election_data: String,
+    candidate_hash: [String; crate::eml::hash::CHUNK_COUNT],
+    candidate_data: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -605,6 +622,9 @@ pub async fn election_import(
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
     match request {
         ElectionCreationRequest::GSB(edu) => import_gsb_election(edu, &pool, &audit_service).await,
+        ElectionCreationRequest::HSB(_) => {
+            todo!("https://github.com/kiesraad/abacus/issues/3861")
+        }
         ElectionCreationRequest::CSB(edu) => import_csb_election(edu, &pool, &audit_service).await,
     }
 }

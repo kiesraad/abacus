@@ -294,6 +294,9 @@ pub async fn create_test_election(
             generate_gsb_election_data(&mut rng, &mut tx, args, &mut committee_session, &election)
                 .await?
         }
+        CommitteeCategory::HSB => {
+            todo!("https://github.com/kiesraad/abacus/issues/4377");
+        }
         CommitteeCategory::CSB => {
             generate_csb_election_data(
                 &mut rng,
@@ -474,7 +477,7 @@ fn generate_election(
 
     let counting_method = match args.committee_category {
         CommitteeCategory::GSB => Some(args.counting_method.unwrap_or(VoteCountingMethod::CSO)),
-        CommitteeCategory::CSB => {
+        CommitteeCategory::CSB | CommitteeCategory::HSB => {
             if args.counting_method.is_some() {
                 warn!("ignoring counting method: only applies to committee category GSB");
             }
@@ -510,6 +513,7 @@ fn generate_election(
         counting_method,
         authority_id: match args.committee_category {
             CommitteeCategory::CSB => "CSB".to_string(),
+            CommitteeCategory::HSB => format!("HSB{}", super::data::domain_id(rng)),
             CommitteeCategory::GSB => {
                 if is_municipal {
                     domain

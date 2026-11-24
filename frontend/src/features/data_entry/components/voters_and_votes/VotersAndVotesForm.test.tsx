@@ -441,7 +441,9 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.getByTestId(votesFieldIds.blankVotesCount), "100").toHaveValue("100");
       await user.clear(screen.getByTestId(votesFieldIds.blankVotesCount));
 
-      await waitFor(() => expect(acceptFeedbackCheckbox).not.toBeInTheDocument());
+      await waitFor(() => {
+        expect(acceptFeedbackCheckbox).not.toBeInTheDocument();
+      });
 
       overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {

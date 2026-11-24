@@ -6,7 +6,6 @@ use axum::{
 use chrono::{DateTime, Local};
 use pdf_gen::zip::{ZipResponse, ZipResponseError, zip_files, zip_single_file};
 use sqlx::{SqliteConnection, SqlitePool};
-use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -34,10 +33,6 @@ pub enum ReportApiError {
 }
 
 impl ApiErrorResponse for ReportApiError {
-    fn log(&self) {
-        error!("Report error: {:?}", self);
-    }
-
     fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
         match self {
             ReportApiError::ApportionmentStateNotFinalised => (
@@ -49,12 +44,6 @@ impl ApiErrorResponse for ReportApiError {
                 ),
             ),
         }
-    }
-}
-
-impl From<ReportApiError> for APIError {
-    fn from(err: ReportApiError) -> Self {
-        APIError::Delegated(Box::new(err))
     }
 }
 

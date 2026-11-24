@@ -14,12 +14,14 @@ import { isOneOf } from "@/utils/typeChecks";
 import { type CommitteeCategory, roleWithoutCommitteeCategoryValues } from "../../hooks/UserCreateContext";
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
-function committeeCategoryFromRole(role: "coordinator_csb" | "coordinator_gsb"): CommitteeCategory {
+function committeeCategoryFromRole(role: "coordinator_csb" | "coordinator_hsb" | "coordinator_gsb"): CommitteeCategory {
   switch (role) {
-    case "coordinator_csb":
-      return "csb";
     case "coordinator_gsb":
       return "gsb";
+    case "coordinator_hsb":
+      return "hsb";
+    case "coordinator_csb":
+      return "csb";
   }
 }
 

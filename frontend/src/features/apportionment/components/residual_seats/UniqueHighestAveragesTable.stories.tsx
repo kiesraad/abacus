@@ -22,7 +22,7 @@ export const Default: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Reeds toegewezen", "Gemiddelde", "Aantal restzetels"],
       ["1", "Political Group A", "11", "67", "4/12", "1"],
       ["2", "Political Group B", "1", "30", "", "0"],
@@ -56,7 +56,7 @@ export const P10: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Reeds toegewezen", "Gemiddelde", "Aantal restzetels"],
       ["1", "Political Group A", "11", "67", "4/12", "2 0"],
       ["2", "Political Group B", "0", "59", "", "1"],

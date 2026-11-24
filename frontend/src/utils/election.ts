@@ -48,10 +48,11 @@ export function getDistrictLabel(
 
 export function formatAreaDesignation(authority_id: string, authority_name: string, category?: CommitteeCategory) {
   switch (category) {
-    // TODO: For HSB, add switch case and make sure prefix is `${category} Kieskring `
     case "GSB":
     case "CSB":
       return `${category} ${authority_id} - ${authority_name}`;
+    case "HSB":
+      return `${category} ${t("election.district")} ${authority_id} - ${authority_name}`;
     default:
       return `${authority_id} - ${authority_name}`;
   }
@@ -59,10 +60,10 @@ export function formatAreaDesignation(authority_id: string, authority_name: stri
 
 export function formatElectionTypeLabel(authority_id: string, authority_name: string, category: CommitteeCategory) {
   switch (category) {
-    // TODO: For HSB, add switch case with same formatting as CSB`
     case "GSB":
       return `${category} ${authority_id} ${authority_name}`;
     case "CSB":
+    case "HSB":
       return `${category} ${authority_name}`;
   }
 }

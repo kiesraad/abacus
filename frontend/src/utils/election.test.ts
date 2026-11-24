@@ -129,11 +129,14 @@ describe("Election util", () => {
 
   test("Election formatAreaDesignation", () => {
     expect(formatAreaDesignation("0035", "Juinen", "GSB")).toBe("GSB 0035 - Juinen");
+    expect(formatAreaDesignation("10", "Juinen", "HSB")).toBe("HSB Kieskring 10 - Juinen");
+    expect(formatAreaDesignation("0035", "Juinen", "CSB")).toBe("CSB 0035 - Juinen");
     expect(formatAreaDesignation("0035", "Juinen")).toBe("0035 - Juinen");
   });
 
   test("Election formatElectionTypeLabel", () => {
     expect(formatElectionTypeLabel("0035", "Heemdamseburg", "GSB")).toBe("GSB 0035 Heemdamseburg");
+    expect(formatElectionTypeLabel("HSB0", "Heemdamseburg", "HSB")).toBe("HSB Heemdamseburg");
     expect(formatElectionTypeLabel("CSB", "Heemdamseburg", "CSB")).toBe("CSB Heemdamseburg");
   });
 });

@@ -413,6 +413,22 @@ export const getElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
   investigations: PollingStationInvestigation[] = mockInvestigations,
+  category: CommitteeCategory = "GSB",
+): ElectionDetailsResponse => {
+  switch (category) {
+    case "GSB":
+      return getGSBElectionMockData(election, committeeSession, investigations);
+    case "HSB":
+      return getHSBElectionMockData(election, committeeSession);
+    case "CSB":
+      return getCSBElectionMockData(election, committeeSession);
+  }
+};
+
+export const getGSBElectionMockData = (
+  election: Partial<ElectionWithPoliticalGroups> = {},
+  committeeSession: Partial<CommitteeSession> = {},
+  investigations: PollingStationInvestigation[] = mockInvestigations,
 ): ElectionDetailsResponse => {
   const updatedCommitteeSession = getCommitteeSessionMockData(committeeSession);
 
@@ -462,7 +478,6 @@ export const getHSBElectionMockData = (
   committeeSession: Partial<CommitteeSession> = {},
 ): ElectionDetailsResponse => {
   const updatedCommitteeSession = getHSBCommitteeSessionMockData(committeeSession);
-
   return {
     current_committee_session: updatedCommitteeSession,
     committee_sessions: [updatedCommitteeSession],

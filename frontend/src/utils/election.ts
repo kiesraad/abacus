@@ -47,16 +47,14 @@ export function getDistrictLabel(
 }
 
 export function formatAreaDesignation(authority_id: string, authority_name: string, category?: CommitteeCategory) {
-  let prefix = "";
-  if (category) {
-    switch (category) {
-      // TODO: For HSB, add switch case and make sure prefix is `${category} Kieskring `
-      case "GSB":
-      case "CSB":
-        prefix += `${category} `;
-    }
+  switch (category) {
+    // TODO: For HSB, add switch case and make sure prefix is `${category} Kieskring `
+    case "GSB":
+    case "CSB":
+      return `${category} ${authority_id} - ${authority_name}`;
+    default:
+      return `${authority_id} - ${authority_name}`;
   }
-  return `${prefix}${authority_id} - ${authority_name}`;
 }
 
 export function getCommitteeTypeLabel(election: Election) {

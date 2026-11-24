@@ -153,7 +153,7 @@ const users: Record<string, [string, string, string][]> = {
     ["coordinator1", "Coordinator1Password01", `${t("coordinator_gsb")} 1`],
     ["coordinator2", "Coordinator2Password01", `${t("coordinator_gsb")} 2`],
     ["typist1", "Typist1Password01", `${t("typist_gsb")} 1`],
-    ["typist2", "Typist2Password01", `${t("typist_gsb")} 2`],
+    ["typist2", "Typist2Password02", `${t("typist_gsb")} 2`],
   ],
   CSB: [
     ["coordinator3", "Coordinator3Password03", `${t("coordinator_csb")} 3`],

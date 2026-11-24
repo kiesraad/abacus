@@ -8,7 +8,6 @@ import {
   createInvestigation,
   resolveDifferences,
 } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
-import { createRandomUsername } from "e2e-tests/helpers-utils/e2e-test-utils";
 import { type Eml230b, eml110a, eml230b } from "e2e-tests/test-data/eml-files";
 import {
   dataEntryRequest,
@@ -28,11 +27,8 @@ import type {
   ElectionDetailsResponse,
   ElectionStatusResponse,
   POLLING_STATION_CREATE_REQUEST_PATH,
-  USER_CREATE_REQUEST_BODY,
-  USER_CREATE_REQUEST_PATH,
-  User,
 } from "@/types/generated/openapi";
-import { FIXTURE_TYPIST_TEMP_PASSWORD, userFixtures } from "./user-fixtures";
+import { userFixtures } from "./user-fixtures";
 
 export interface DataEntryFixture {
   election_id: number;
@@ -80,8 +76,6 @@ type GSBFixtures = {
   completedElectionGSB: Election;
   // The current committee session for the GSB CSO election
   currentCommitteeSessionElectionGSB: CommitteeSession;
-  // Newly created GSB User
-  newTypistGSB: User;
 };
 
 export const gsbFixtures = userFixtures.extend<GSBFixtures>({
@@ -304,20 +298,5 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
   },
   currentCommitteeSessionElectionGSB: async ({ electionGSB }, use) => {
     await use(electionGSB.current_committee_session);
-  },
-  newTypistGSB: async ({ adminOne }, use) => {
-    const { request } = adminOne;
-    // create a new user
-    const url: USER_CREATE_REQUEST_PATH = "/api/users";
-    const data: USER_CREATE_REQUEST_BODY = {
-      role: "typist_gsb",
-      username: createRandomUsername(),
-      fullname: "Gebruiker met Achternaam",
-      temp_password: FIXTURE_TYPIST_TEMP_PASSWORD,
-    };
-    const userResponse = await request.post(url, { data });
-    expect(userResponse.ok()).toBeTruthy();
-
-    await use((await userResponse.json()) as User);
   },
 });

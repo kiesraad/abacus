@@ -4,15 +4,11 @@ use utoipa::ToSchema;
 use super::count::Count;
 #[cfg(test)]
 use crate::domain::election::PoliticalGroup;
-use crate::{
-    APIError,
-    domain::{
-        compare::Compare,
-        election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
-        field_path::FieldPath,
-        validate::{DataError, Validate, ValidationResults},
-    },
-    error::ErrorReference,
+use crate::domain::{
+    compare::Compare,
+    election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
+    field_path::FieldPath,
+    validate::{DataError, Validate, ValidationResults},
 };
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
@@ -26,39 +22,6 @@ pub struct PoliticalGroupCandidateVotes {
 }
 
 impl PoliticalGroupCandidateVotes {
-    pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
-        if self.number != other.number {
-            return Err(APIError::AddError(
-                format!(
-                    "Attempted to add votes of group '{}' to '{}'",
-                    other.number, self.number
-                ),
-                ErrorReference::InvalidVoteGroup,
-            ));
-        }
-
-        self.total += other.total;
-
-        for cv in &other.candidate_votes {
-            let Some(found_can) = self
-                .candidate_votes
-                .iter_mut()
-                .find(|c| c.number == cv.number)
-            else {
-                return Err(APIError::AddError(
-                    format!(
-                        "Attempted to add candidate '{}' votes in group '{}', but no such candidate exists",
-                        cv.number, self.number
-                    ),
-                    ErrorReference::InvalidVoteCandidate,
-                ));
-            };
-            found_can.votes += cv.votes;
-        }
-
-        Ok(())
-    }
-
     /// Create `PoliticalGroupCandidateVotes` from test data with candidate numbers automatically generated starting from 1.
     #[cfg(test)]
     pub fn from_test_data_auto(number: PGNumber, candidate_votes: &[Count]) -> Self {

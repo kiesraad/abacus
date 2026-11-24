@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -7,17 +5,11 @@ use super::{
     count::Count,
     political_group_total_votes::{EnrichedPoliticalGroupTotalVotes, PoliticalGroupTotalVotes},
 };
-use crate::{
-    APIError,
-    domain::{
-        compare::Compare,
-        election::{CommitteeCategory, ElectionWithPoliticalGroups},
-        field_path::FieldPath,
-        validate::{
-            DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
-        },
-    },
-    error::ErrorReference,
+use crate::domain::{
+    compare::Compare,
+    election::{CommitteeCategory, ElectionWithPoliticalGroups},
+    field_path::FieldPath,
+    validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
 /// Votes counts, part of the results.
@@ -97,61 +89,6 @@ impl Compare for VotesCounts {
 }
 
 impl VotesCounts {
-    pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
-        // Get sets of political group numbers from both collections
-        let self_numbers: HashSet<_> = self
-            .political_group_total_votes
-            .iter()
-            .map(|pg| pg.number)
-            .collect();
-        let other_numbers: HashSet<_> = other
-            .political_group_total_votes
-            .iter()
-            .map(|pg| pg.number)
-            .collect();
-
-        // Check that both have exactly the same political groups
-        if self_numbers != other_numbers {
-            let missing_in_self: Vec<_> = other_numbers.difference(&self_numbers).collect();
-            let missing_in_other: Vec<_> = self_numbers.difference(&other_numbers).collect();
-
-            if !missing_in_self.is_empty() {
-                return Err(APIError::AddError(
-                    format!(
-                        "Political group(s) {missing_in_self:?} exist in source but not in target",
-                    ),
-                    ErrorReference::InvalidVoteGroup,
-                ));
-            }
-            if !missing_in_other.is_empty() {
-                return Err(APIError::AddError(
-                    format!(
-                        "Political group(s) {missing_in_other:?} exist in target but not in source",
-                    ),
-                    ErrorReference::InvalidVoteGroup,
-                ));
-            }
-        }
-
-        // Add totals of political groups with the same number
-        for pg in &other.political_group_total_votes {
-            if let Some(existing) = self
-                .political_group_total_votes
-                .iter_mut()
-                .find(|e| e.number == pg.number)
-            {
-                existing.total += pg.total;
-            }
-        }
-
-        self.total_votes_candidates_count += other.total_votes_candidates_count;
-        self.blank_votes_count += other.blank_votes_count;
-        self.invalid_votes_count += other.invalid_votes_count;
-        self.total_votes_cast_count += other.total_votes_cast_count;
-
-        Ok(())
-    }
-
     fn validate_votes_counts_errors(
         &self,
         validation_results: &mut ValidationResults,
@@ -295,99 +232,12 @@ impl Validate for VotesCounts {
 
 #[cfg(test)]
 mod tests {
-    use std::assert_matches;
-
     use test_log::test;
 
     use super::*;
     use crate::domain::election::{
         CommitteeCategory::*, ElectionCategory, PGNumber, tests::election_fixture,
     };
-
-    #[test]
-    fn test_votes_addition() {
-        let mut curr_votes = VotesCounts {
-            political_group_total_votes: vec![
-                PoliticalGroupTotalVotes {
-                    number: PGNumber::from(1),
-                    total: 10,
-                },
-                PoliticalGroupTotalVotes {
-                    number: PGNumber::from(2),
-                    total: 20,
-                },
-            ],
-            total_votes_candidates_count: 2,
-            blank_votes_count: 3,
-            invalid_votes_count: 4,
-            total_votes_cast_count: 9,
-        };
-
-        curr_votes
-            .add(&VotesCounts {
-                political_group_total_votes: vec![
-                    PoliticalGroupTotalVotes {
-                        number: PGNumber::from(1),
-                        total: 11,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: PGNumber::from(2),
-                        total: 12,
-                    },
-                ],
-                total_votes_candidates_count: 1,
-                blank_votes_count: 2,
-                invalid_votes_count: 3,
-                total_votes_cast_count: 5,
-            })
-            .unwrap();
-
-        assert_eq!(curr_votes.political_group_total_votes.len(), 2);
-        assert_eq!(curr_votes.political_group_total_votes[0].total, 21);
-        assert_eq!(curr_votes.political_group_total_votes[1].total, 32);
-
-        assert_eq!(curr_votes.total_votes_candidates_count, 3);
-        assert_eq!(curr_votes.blank_votes_count, 5);
-        assert_eq!(curr_votes.invalid_votes_count, 7);
-        assert_eq!(curr_votes.total_votes_cast_count, 14);
-    }
-
-    #[test]
-    fn test_votes_addition_error() {
-        let mut curr_votes = VotesCounts {
-            political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                number: PGNumber::from(1),
-                total: 10,
-            }],
-            total_votes_candidates_count: 2,
-            blank_votes_count: 3,
-            invalid_votes_count: 4,
-            total_votes_cast_count: 9,
-        };
-
-        let mut other = VotesCounts {
-            political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                number: PGNumber::from(2),
-                total: 20,
-            }],
-            total_votes_candidates_count: 1,
-            blank_votes_count: 2,
-            invalid_votes_count: 3,
-            total_votes_cast_count: 5,
-        };
-
-        let result = curr_votes.add(&other);
-        assert_matches!(
-            result,
-            Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-        );
-
-        let result = other.add(&curr_votes);
-        assert_matches!(
-            result,
-            Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-        );
-    }
 
     fn validate(
         committee_category: CommitteeCategory,

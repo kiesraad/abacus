@@ -19,7 +19,7 @@ export const DefaultWithVotes: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
       ["1", "Kok, K. (Karin) (v)", "Test Location", "200"],
       ["2", "Oud, L. (Lidewij) (v)", "Test Location", "138"],
@@ -50,7 +50,7 @@ export const DefaultWithPositionAndStartSeatNumber: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Zetel", "Naam", "Woonplaats", "Positie op lijst"],
       ["5", "Kok, K. (Karin) (v)", "Test Location", "12"],
       ["6", "Oud, L. (Lidewij) (v)", "Test Location", "1"],
@@ -93,7 +93,7 @@ export const LargeVoteCount: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
       ["1", "Test, T. (Test) (v)", "Test Location", "1.234"],
     ]);

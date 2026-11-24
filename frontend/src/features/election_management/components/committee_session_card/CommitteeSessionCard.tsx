@@ -14,7 +14,7 @@ import type {
 } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatDateTimeFullWithoutWeekday } from "@/utils/dateTime";
-import { ButtonLinksCSB, ButtonLinksGSB, type ButtonLinksProps } from "./ButtonLinks";
+import { ButtonLinksCSB, ButtonLinksGSB, ButtonLinksHSB, type ButtonLinksProps } from "./ButtonLinks";
 import cls from "./CommitteeSessionCard.module.css";
 
 export interface CommitteeSessionCardProps {
@@ -53,10 +53,12 @@ export function CommitteeSessionCard({
   );
 }
 
-function renderButtonLinks(committeeCategory: CommitteeCategory, props: ButtonLinksProps) {
+function renderButtonLinks(committeeCategory: CommitteeCategory, props: ButtonLinksProps): ReactElement {
   switch (committeeCategory) {
     case "CSB":
       return <ButtonLinksCSB {...props} />;
+    case "HSB":
+      return <ButtonLinksHSB {...props} />;
     case "GSB":
       return <ButtonLinksGSB {...props} />;
   }

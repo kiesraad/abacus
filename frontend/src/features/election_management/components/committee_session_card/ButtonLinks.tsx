@@ -54,6 +54,47 @@ export function ButtonLinksGSB({ committeeSession, isCurrentSession }: ButtonLin
   return <ButtonLinkList links={buttonLinks} firstRowBold={isCurrentSession} />;
 }
 
+export function ButtonLinksHSB({ committeeSession, isCurrentSession }: ButtonLinksProps) {
+  const buttonLinks: ButtonLink[] = [];
+  const { isCoordinator } = useUserRole();
+
+  const showSubCommitteeKeys = isCurrentSession && !isCoordinator;
+
+  const addIf = (item: ButtonLink, condition: boolean) => {
+    if (condition) {
+      buttonLinks.push(item);
+    }
+  };
+
+  switch (committeeSession.status) {
+    case "created":
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
+      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      break;
+    case "in_preparation":
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
+      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      break;
+    case "data_entry":
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
+      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      break;
+    case "paused":
+      addIf(resumeButtonLink(committeeSession.id, isCoordinator), isCurrentSession);
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
+      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      break;
+    case "completed":
+      addIf(downloadButtonLink(committeeSession.id), isCoordinator);
+      addIf(viewDataEntryButtonLink(committeeSession.id), isCurrentSession);
+      break;
+  }
+
+  if (buttonLinks.length === 0) return undefined;
+
+  return <ButtonLinkList links={buttonLinks} firstRowBold={isCurrentSession} />;
+}
+
 export function ButtonLinksCSB({ committeeSession, isCurrentSession }: ButtonLinksProps) {
   const buttonLinks: ButtonLink[] = [];
   const { isCoordinator } = useUserRole();

@@ -46,6 +46,39 @@ export const GSBCommitteeSessionCard: StoryObj<Props> = {
   },
 };
 
+export const HSBCommitteeSessionCard: StoryObj<Props> = {
+  argTypes: {
+    number: {
+      options: [1],
+      control: false,
+    },
+    userRole: {
+      options: ["admin", "coordinator_hsb"],
+      control: { type: "radio" },
+    },
+  },
+  args: {
+    userRole: "coordinator_hsb",
+  },
+  render: ({ number, userRole, status, startDateTime, isCurrentSession }) => {
+    const committeeSession = getCommitteeSessionMockData({
+      number: number,
+      status: status,
+      start_date_time: startDateTime,
+      location: "Juinen",
+    });
+    return (
+      <TestUserProvider userRole={userRole}>
+        <CommitteeSessionCard
+          committeeSession={committeeSession}
+          committeeCategory="HSB"
+          isCurrentSession={isCurrentSession}
+        />
+      </TestUserProvider>
+    );
+  },
+};
+
 export const CSBCommitteeSessionCard: StoryObj<Props> = {
   argTypes: {
     number: {

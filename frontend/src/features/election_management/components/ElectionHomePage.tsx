@@ -27,7 +27,7 @@ import { cn } from "@/utils/classnames";
 import { committeeSessionDetailsPresent, committeeSessionLabel } from "@/utils/committeeSession";
 import { directDownload } from "@/utils/download";
 import { hasBooleanProperty } from "@/utils/typeChecks";
-import { CommitteeSessionCard } from "./CommitteeSessionCard";
+import { CommitteeSessionCard } from "./committee_session_card/CommitteeSessionCard";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
 import { MissingPollingStationsModal } from "./MissingPollingStationsModal";

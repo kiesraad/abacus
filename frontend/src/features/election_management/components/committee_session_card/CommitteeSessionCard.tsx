@@ -30,7 +30,7 @@ export interface CardProps {
   children?: ReactNode;
 }
 
-function Card({ icon, label, status, date, button, children, ...props }: CardProps & DivProps) {
+export function Card({ icon, label, status, date, button, children, ...props }: CardProps & DivProps) {
   return (
     <div className={cls.card} {...props}>
       {icon}
@@ -62,7 +62,7 @@ export interface ButtonLinkListProps {
   firstRowBold: boolean;
 }
 
-function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
+export function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
   const navigate = useNavigate();
   return (
     <div className={cls.buttonLinks}>

@@ -17,6 +17,8 @@ export type UserFixtures = {
   typistTwoCSB: { page: Page; request: APIRequestContext };
 };
 
+export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
+
 export const userFixtures = base.extend<UserFixtures>({
   adminOne: async ({ browser }, use) => {
     const context = await browser.newContext({ storageState: "e2e-tests/state/admin1.json" });

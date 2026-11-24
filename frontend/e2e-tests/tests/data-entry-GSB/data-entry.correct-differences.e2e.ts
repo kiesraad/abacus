@@ -1,4 +1,5 @@
 import { expect, type Page } from "@playwright/test";
+import type { DataEntry } from "e2e-tests/fixtures/gsb-fixtures";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryBasePage } from "e2e-tests/page-objects/data_entry/DataEntryBasePgObj";
@@ -12,7 +13,7 @@ import {
   nextSessionResultsWithDifferences,
 } from "e2e-tests/test-data/request-response-templates";
 import type { Results } from "@/types/generated/openapi";
-import { type DataEntry, test } from "../../fixtures";
+import { test } from "../../fixtures";
 
 test.describe("data entry - correct differences", () => {
   test("show warnings and empty fields for first entry correction", async ({

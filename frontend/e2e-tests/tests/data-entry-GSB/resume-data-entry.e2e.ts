@@ -1,4 +1,5 @@
 import { expect, type Page } from "@playwright/test";
+import type { DataEntry } from "e2e-tests/fixtures/gsb-fixtures";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
@@ -16,7 +17,7 @@ import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndV
 import { emptyCSOFirstSessionResults } from "e2e-tests/test-data/request-response-templates";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import type { ClaimDataEntryResponse, VotersCounts, VotesCounts } from "@/types/generated/openapi";
-import { type DataEntry, test } from "../../fixtures";
+import { test } from "../../fixtures";
 
 test.use({
   storageState: "e2e-tests/state/typist1-GSB.json",

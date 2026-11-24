@@ -1,6 +1,5 @@
 import { readFile } from "node:fs/promises";
 import { test as base, expect } from "@playwright/test";
-import { type DataEntry, FIXTURE_TYPIST_TEMP_PASSWORD } from "e2e-tests/fixtures";
 import { DataEntryApiClient } from "e2e-tests/helpers-utils/api-clients";
 import {
   changeCommitteeSessionStatus,
@@ -33,7 +32,14 @@ import type {
   USER_CREATE_REQUEST_PATH,
   User,
 } from "@/types/generated/openapi";
-import type { UserFixtures } from "./user-fixtures";
+import { FIXTURE_TYPIST_TEMP_PASSWORD, type UserFixtures } from "./user-fixtures";
+
+export interface DataEntry {
+  election_id: number;
+  id: number;
+  name: string;
+  number: string;
+}
 
 type GSBFixtures = UserFixtures & {
   // candidate list file (EML 230b) for a GR election

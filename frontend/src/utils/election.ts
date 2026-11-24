@@ -1,5 +1,5 @@
 import { t } from "@/i18n/translate";
-import type { CommitteeCategory, CommitteeDistrict, Election, ElectionCategory } from "@/types/generated/openapi";
+import type { CommitteeCategory, CommitteeDistrict, ElectionCategory } from "@/types/generated/openapi";
 
 export function isLocalElection(electionCategory: ElectionCategory): boolean {
   switch (electionCategory) {
@@ -57,12 +57,12 @@ export function formatAreaDesignation(authority_id: string, authority_name: stri
   }
 }
 
-export function getCommitteeTypeLabel(election: Election) {
-  switch (election.committee_category) {
+export function formatElectionTypeLabel(authority_id: string, authority_name: string, category: CommitteeCategory) {
+  switch (category) {
     // TODO: For HSB, add switch case with same formatting as CSB`
     case "GSB":
-      return `${election.committee_category} ${election.authority_id} ${election.authority_name}`;
+      return `${category} ${authority_id} ${authority_name}`;
     case "CSB":
-      return `${election.committee_category} ${election.authority_name}`;
+      return `${category} ${authority_name}`;
   }
 }

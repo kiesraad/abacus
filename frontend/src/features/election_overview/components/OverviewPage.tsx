@@ -18,7 +18,7 @@ import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import type { ELECTION_LIST_REQUEST_PATH, Election, ElectionListResponse } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-import { getCommitteeTypeLabel } from "@/utils/election";
+import { formatElectionTypeLabel } from "@/utils/election";
 import { AddFirstElection } from "./AddFirstElection";
 import cls from "./OverviewPage.module.css";
 
@@ -56,7 +56,11 @@ export function OverviewPage() {
       return (
         <>
           <Table.Cell>{election.name}</Table.Cell>
-          <Table.Cell>{isTypist ? election.authority_region : getCommitteeTypeLabel(election)}</Table.Cell>
+          <Table.Cell>
+            {isTypist
+              ? election.authority_region
+              : formatElectionTypeLabel(election.authority_id, election.authority_name, election.committee_category)}
+          </Table.Cell>
           <Table.Cell>
             {isTypist ? (
               committeeSessionStatus

@@ -1,16 +1,8 @@
 import { describe, expect, test } from "vitest";
-import type { CommitteeDistrict, Election, ElectionCategory } from "@/types/generated/openapi";
-import {
-  csbElectionMockData,
-  csbWaterAuthorityElectionMockData,
-  electionMockData,
-  provincialElectionMockData,
-  provincialElectionPS2MockData,
-  waterAuthorityElectionMockData,
-} from "../testing/api-mocks/ElectionMockData";
+import type { CommitteeDistrict, ElectionCategory } from "@/types/generated/openapi";
 import {
   formatAreaDesignation,
-  getCommitteeTypeLabel,
+  formatElectionTypeLabel,
   getDistrictLabel,
   getDistrictNumber,
   isLocalElection,
@@ -140,14 +132,8 @@ describe("Election util", () => {
     expect(formatAreaDesignation("0035", "Juinen")).toBe("0035 - Juinen");
   });
 
-  test.each([
-    [electionMockData, "GSB 0035 Heemdamseburg"],
-    [provincialElectionMockData, "GSB 0036 Juinen"],
-    [provincialElectionPS2MockData, "GSB 0036 Juinen"],
-    [waterAuthorityElectionMockData, "GSB 0037 Juinen"],
-    [csbElectionMockData, "CSB Heemdamseburg"],
-    [csbWaterAuthorityElectionMockData, "CSB Rivier en Polder"],
-  ] satisfies Array<[Election, string]>)("Election getElectionTypeLabel election %s as %s", (input, expected) => {
-    expect(getCommitteeTypeLabel(input)).toBe(expected);
+  test("Election formatElectionTypeLabel", () => {
+    expect(formatElectionTypeLabel("0035", "Heemdamseburg", "GSB")).toBe("GSB 0035 Heemdamseburg");
+    expect(formatElectionTypeLabel("CSB", "Heemdamseburg", "CSB")).toBe("CSB Heemdamseburg");
   });
 });

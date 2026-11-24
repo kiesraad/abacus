@@ -1,4 +1,4 @@
-import type { ExpectationResult } from "@vitest/expect";
+import type { MatcherResult } from "vitest";
 
 function isTextNode(node: Node): boolean {
   return node.nodeType === Node.TEXT_NODE;
@@ -17,7 +17,7 @@ function getTextContent(node: Node): string {
   return childNodes.map(getTextContent).filter(Boolean).join(" ").trim();
 }
 
-function toHaveTableContent(htmlElement: unknown, expected: string[][]): ExpectationResult {
+function toHaveTableContent(htmlElement: unknown, expected: string[][]): MatcherResult {
   if (!(htmlElement instanceof HTMLTableElement)) {
     return {
       pass: false,

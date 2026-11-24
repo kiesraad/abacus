@@ -151,15 +151,21 @@ const users: Record<string, [string, string, string][]> = {
   ],
   GSB: [
     ["coordinator1", "Coordinator1Password01", `${t("coordinator_gsb")} 1`],
-    ["coordinator2", "Coordinator2Password01", `${t("coordinator_gsb")} 2`],
+    ["coordinator2", "Coordinator2Password02", `${t("coordinator_gsb")} 2`],
     ["typist1", "Typist1Password01", `${t("typist_gsb")} 1`],
-    ["typist2", "Typist2Password01", `${t("typist_gsb")} 2`],
+    ["typist2", "Typist2Password02", `${t("typist_gsb")} 2`],
   ],
   CSB: [
     ["coordinator3", "Coordinator3Password03", `${t("coordinator_csb")} 3`],
     ["coordinator4", "Coordinator4Password04", `${t("coordinator_csb")} 4`],
     ["typist3", "Typist3Password03", `${t("typist_csb")} 3`],
     ["typist4", "Typist4Password04", `${t("typist_csb")} 4`],
+  ],
+  HSB: [
+    ["coordinator5", "Coordinator5Password05", `${t("coordinator_hsb")} 5`],
+    ["coordinator6", "Coordinator6Password06", `${t("coordinator_hsb")} 6`],
+    ["typist5", "Typist5Password05", `${t("typist_hsb")} 5`],
+    ["typist6", "Typist6Password06", `${t("typist_hsb")} 6`],
   ],
 };
 

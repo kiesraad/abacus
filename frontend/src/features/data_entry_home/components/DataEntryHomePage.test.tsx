@@ -8,11 +8,7 @@ import type { Message } from "@/hooks/messages/MessagesContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import * as useUser from "@/hooks/user/useUser";
-import {
-  electionDetailsMockResponse,
-  getCSBElectionMockData,
-  getElectionMockData,
-} from "@/testing/api-mocks/ElectionMockData";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CSBStatusResponseMock,
   getElectionStatusMockData,
@@ -26,7 +22,6 @@ import {
   type CommitteeCategory,
   type CommitteeSession,
   committeeCategoryValues,
-  type ElectionDetailsResponse,
   type ElectionStatusResponse,
 } from "@/types/generated/openapi";
 import { DataEntryHomePage } from "./DataEntryHomePage";
@@ -36,15 +31,7 @@ async function renderDataEntryHomePage(
   session: Partial<CommitteeSession> = {},
   { statuses }: ElectionStatusResponse = statusResponseMock,
 ) {
-  let electionResponse: ElectionDetailsResponse;
-  switch (category) {
-    case "GSB":
-      electionResponse = getElectionMockData({}, session);
-      break;
-    case "CSB":
-      electionResponse = getCSBElectionMockData({}, session);
-      break;
-  }
+  const electionResponse = getElectionMockData({}, session, [], category);
   server.use(http.get("/api/elections/1", () => HttpResponse.json(electionResponse, { status: 200 })));
 
   const refetch = vi.fn();
@@ -73,12 +60,12 @@ describe("DataEntryHomePage", () => {
 
   test.each(committeeCategoryValues)("Alert not visible when unfinished (%s)", async (cat: CommitteeCategory) => {
     await renderDataEntryHomePage(cat);
-
+    const electionMockData = getElectionMockData({}, {}, [], cat);
     // Wait for the page to be loaded
     expect(
       await screen.findByRole("heading", {
         level: 1,
-        name: electionDetailsMockResponse.election.name,
+        name: electionMockData.election.name,
       }),
     ).toBeVisible();
 

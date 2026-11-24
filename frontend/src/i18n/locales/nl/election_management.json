@@ -33,6 +33,7 @@
     "about_to_stop_data_entry": "Je staat op het punt het invoeren van stemmen te stoppen.",
     "explanation": {
       "GSB": "<ul><li>In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële telbestanden downloaden.</li><li>Zolang er geen volgende zitting is gestart, kan je nog terug naar de invoer.</li></ul>",
+      "HSB": "<ul><li>In de volgende stap kan je het proces-verbaal voor de zitting van het hoofdstembureau opmaken en de officiële bestanden downloaden.</li></ul>",
       "CSB": "<ul><li>In de volgende stap ga je verder met de zetelverdeling. Daarna kan je het proces-verbaal voor de zitting van het centraal stembureau opmaken en de officiële bestanden downloaden.</li></ul>"
     }
   },

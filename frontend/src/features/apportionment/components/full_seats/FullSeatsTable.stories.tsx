@@ -18,7 +18,7 @@ export const Default: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal stemmen", ":", "Kiesdeler", "=", "Aantal volle zetels"],
       ["1", "Political Group A", "600", ":", "52", "4/23", "=", "11"],
       ["2", "Political Group B", "302", ":", "52", "4/23", "=", "5"],
@@ -57,7 +57,7 @@ export const LargeVoteCount: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal stemmen", ":", "Kiesdeler", "=", "Aantal volle zetels"],
       ["1", "Political Group A", "1.000", ":", "1.000", "", "=", "1"],
     ]);

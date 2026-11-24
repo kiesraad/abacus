@@ -218,13 +218,12 @@ pub async fn certificate(
 
 fn public_key_filename(election: &ElectionWithPoliticalGroups) -> Result<String, APIError> {
     match election.committee_category {
-        CommitteeCategory::GSB => Ok(format!(
+        CommitteeCategory::GSB | CommitteeCategory::HSB => Ok(format!(
             "public_key_abacus_{}_{}_{}.crt",
             election.election_id.to_lowercase(),
             election.region_category(),
             hyphenate(&election.authority_region)
         )),
-
         CommitteeCategory::CSB => Err(APIError::DataIntegrityError(
             "Signing not supported for CSB".to_string(),
         )),

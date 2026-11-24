@@ -56,6 +56,16 @@ describe("Custom matchers", () => {
       ]);
     });
 
+    test("Expect a resolved table to have content", async () => {
+      const table = await screen.findByRole("table");
+      await expect(Promise.resolve(table)).resolves.toHaveTableContent([
+        ["Column One", "Column Two"],
+        ["Cell One", "Cell Two"],
+        ["Big Cell"],
+        ["Text badge", "52 4/23"],
+      ]);
+    });
+
     test("Expect to have table content to fail", async () => {
       const table = await screen.findByRole("table");
       expect(() => {

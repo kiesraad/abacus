@@ -36,7 +36,7 @@ use libfuzzer_sys::{
 fn valid_empty_result(committee_category: CommitteeCategory) -> Results {
     match committee_category {
         CommitteeCategory::GSB => Results::CSOFirstSession(valid_empty_cso_result()),
-        CommitteeCategory::CSB => Results::GSB(valid_empty_gsb_result()),
+        CommitteeCategory::CSB | CommitteeCategory::HSB => Results::GSB(valid_empty_gsb_result()),
     }
 }
 
@@ -102,7 +102,7 @@ fn valid_counted_result(committee_category: CommitteeCategory) -> Results {
             votes_counts,
             ..valid_empty_cso_result()
         }),
-        CommitteeCategory::CSB => Results::GSB(GSBResults {
+        CommitteeCategory::CSB | CommitteeCategory::HSB => Results::GSB(GSBResults {
             voters_counts,
             votes_counts,
             ..valid_empty_gsb_result()
@@ -140,7 +140,7 @@ fn invalid_result(committee_category: CommitteeCategory) -> Results {
             },
             political_group_votes: vec![],
         }),
-        CommitteeCategory::CSB => Results::GSB(GSBResults {
+        CommitteeCategory::CSB | CommitteeCategory::HSB => Results::GSB(GSBResults {
             voters_counts,
             votes_counts,
             ..valid_empty_gsb_result()
@@ -191,12 +191,13 @@ fn election(committee_category: CommitteeCategory) -> ElectionWithPoliticalGroup
         committee_category,
         counting_method: match committee_category {
             CommitteeCategory::GSB => Some(VoteCountingMethod::CSO),
-            CommitteeCategory::CSB => None,
+            CommitteeCategory::CSB | CommitteeCategory::HSB => None,
         },
         election_id: "GR2025_TestLocation".to_string(),
         location: "Test Location".to_string(),
         authority_id: match committee_category {
             CommitteeCategory::GSB => "0000".to_string(),
+            CommitteeCategory::HSB => "HSB0".to_string(),
             CommitteeCategory::CSB => "CSB".to_string(),
         },
         authority_name: "Test".to_string(),

@@ -771,6 +771,7 @@ impl ElectionWithPoliticalGroups {
             )
             .count_type(match self.committee_category {
                 CommitteeCategory::GSB => CountType::Municipal,
+                CommitteeCategory::HSB => CountType::District,
                 CommitteeCategory::CSB => CountType::Central,
             })
             .phase(if committee_session.is_next_session() {

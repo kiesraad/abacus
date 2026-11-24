@@ -25,7 +25,7 @@ async function renderPage() {
     </MessagesProvider>,
   );
 
-  return expect(await screen.findByRole("heading", { level: 1, name: "Publieke sleutel" })).toBeVisible();
+  expect(await screen.findByRole("heading", { level: 1, name: "Publieke sleutel" })).toBeVisible();
 }
 
 describe("ElectionCertificatePage", () => {

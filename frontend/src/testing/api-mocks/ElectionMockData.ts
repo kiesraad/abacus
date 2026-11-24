@@ -20,6 +20,7 @@ import {
   committeeSessionMockData,
   getCommitteeSessionMockData,
   getCSBCommitteeSessionMockData,
+  getHSBCommitteeSessionMockData,
 } from "./CommitteeSessionMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
 
@@ -373,6 +374,7 @@ export const electionListMockResponse: ElectionListResponse = {
     { ...baseElectionABGSB, id: 3, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
     { ...baseElectionABCSB, id: 4, committee_category: "CSB", authority_id: "CSB", number_of_voters: 0 },
     { ...baseElectionPS1, id: 5, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
+    { ...baseElectionTK, id: 6, committee_category: "HSB", authority_id: "HSB0", number_of_voters: 2000 },
   ],
 };
 
@@ -408,6 +410,22 @@ export const mockInvestigations: PollingStationInvestigation[] = [
 ];
 
 export const getElectionMockData = (
+  election: Partial<ElectionWithPoliticalGroups> = {},
+  committeeSession: Partial<CommitteeSession> = {},
+  investigations: PollingStationInvestigation[] = mockInvestigations,
+  category: CommitteeCategory = "GSB",
+): ElectionDetailsResponse => {
+  switch (category) {
+    case "GSB":
+      return getGSBElectionMockData(election, committeeSession, investigations);
+    case "HSB":
+      return getHSBElectionMockData(election, committeeSession);
+    case "CSB":
+      return getCSBElectionMockData(election, committeeSession);
+  }
+};
+
+export const getGSBElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
   investigations: PollingStationInvestigation[] = mockInvestigations,
@@ -447,6 +465,24 @@ export const getCSBElectionMockData = (
     committee_sessions: [updatedCommitteeSession],
     election: {
       ...electionListMockResponse.elections[1]!,
+      political_groups: politicalGroupsMockData,
+      ...election,
+    },
+    polling_stations: [],
+    investigations: [],
+  };
+};
+
+export const getHSBElectionMockData = (
+  election: Partial<ElectionWithPoliticalGroups> = {},
+  committeeSession: Partial<CommitteeSession> = {},
+): ElectionDetailsResponse => {
+  const updatedCommitteeSession = getHSBCommitteeSessionMockData(committeeSession);
+  return {
+    current_committee_session: updatedCommitteeSession,
+    committee_sessions: [updatedCommitteeSession],
+    election: {
+      ...electionListMockResponse.elections[5]!,
       political_groups: politicalGroupsMockData,
       ...election,
     },

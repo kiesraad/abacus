@@ -18,6 +18,15 @@ export const csbCommitteeSessionMockData: CommitteeSession = {
   start_date_time: "",
 };
 
+export const hsbCommitteeSessionMockData: CommitteeSession = {
+  id: 3,
+  number: 1,
+  election_id: 3,
+  status: "data_entry",
+  location: "",
+  start_date_time: "",
+};
+
 export const getCommitteeSessionMockData = (committeeSession: Partial<CommitteeSession> = {}): CommitteeSession => {
   return {
     ...committeeSessionMockData,
@@ -28,6 +37,13 @@ export const getCommitteeSessionMockData = (committeeSession: Partial<CommitteeS
 export const getCSBCommitteeSessionMockData = (committeeSession: Partial<CommitteeSession> = {}): CommitteeSession => {
   return {
     ...csbCommitteeSessionMockData,
+    ...committeeSession,
+  };
+};
+
+export const getHSBCommitteeSessionMockData = (committeeSession: Partial<CommitteeSession> = {}): CommitteeSession => {
+  return {
+    ...hsbCommitteeSessionMockData,
     ...committeeSession,
   };
 };

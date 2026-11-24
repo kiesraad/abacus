@@ -456,8 +456,8 @@ export function ElectionHomePage() {
               {committeeSessions.map((committeeSession, index) => (
                 <CommitteeSessionCard
                   key={committeeSession.id}
-                  committeeSession={committeeSession}
                   committeeCategory={election.committee_category}
+                  committeeSession={committeeSession}
                   isCurrentSession={index === 0}
                 />
               ))}

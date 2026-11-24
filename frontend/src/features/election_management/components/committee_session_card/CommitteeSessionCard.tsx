@@ -1,6 +1,5 @@
-import { Fragment, type HTMLAttributes, type ReactElement, type ReactNode } from "react";
-import { type NavigateOptions, type To, useNavigate } from "react-router";
-
+import type { ReactElement } from "react";
+import { useNavigate } from "react-router";
 import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
@@ -13,30 +12,34 @@ import type {
   CommitteeCategory,
   CommitteeSession,
 } from "@/types/generated/openapi";
-import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatDateTimeFullWithoutWeekday } from "@/utils/dateTime";
-
+import { ButtonLinksCSB, ButtonLinksGSB, type ButtonLinksProps } from "./ButtonLinks";
 import cls from "./CommitteeSessionCard.module.css";
 
-export type DivProps = HTMLAttributes<HTMLDivElement>;
-
-export interface CardProps {
-  icon: ReactNode;
-  label: string;
-  status: string;
-  date?: string;
-  button?: ReactNode;
-  children?: ReactNode;
+export interface CommitteeSessionCardProps {
+  committeeCategory: CommitteeCategory;
+  committeeSession: CommitteeSession;
+  isCurrentSession: boolean;
 }
 
-export function Card({ icon, label, status, date, button, children, ...props }: CardProps & DivProps) {
+export function CommitteeSessionCard({
+  committeeSession,
+  committeeCategory,
+  isCurrentSession,
+}: CommitteeSessionCardProps) {
+  const date = committeeSession.start_date_time
+    ? formatDateTimeFullWithoutWeekday(new Date(committeeSession.start_date_time))
+    : undefined;
+  const props: ButtonLinksProps = { committeeSession, isCurrentSession };
+
   return (
-    <div className={cls.card} {...props}>
-      {icon}
+    <div className={cls.card} id={`session-${committeeSession.number}`}>
+      {CommitteeSessionStatusIcon({ status: committeeSession.status, size: "xl" })}
       <div className={cls.labelStatusDateSection}>
         <p>
-          <b>{label}</b> — {status}
+          <b>{committeeSessionLabel(committeeCategory, committeeSession.number)}</b> —{" "}
+          {t(`committee_session_status.coordinator.${committeeSession.status}`)}
         </p>
         {date && (
           <span className={cls.date}>
@@ -44,61 +47,31 @@ export function Card({ icon, label, status, date, button, children, ...props }: 
           </span>
         )}
       </div>
-      {children}
-      {button}
+      {renderButtonLinks(committeeCategory, props)}
+      <CardButton committeeSession={committeeSession} isCurrentSession={isCurrentSession} />
     </div>
   );
 }
 
-export interface ButtonLink {
-  id: number;
-  label: string;
-  to: To;
-  options?: NavigateOptions;
+function renderButtonLinks(committeeCategory: CommitteeCategory, props: ButtonLinksProps) {
+  switch (committeeCategory) {
+    case "CSB":
+      return <ButtonLinksCSB {...props} />;
+    case "GSB":
+      return <ButtonLinksGSB {...props} />;
+  }
 }
 
-export interface ButtonLinkListProps {
-  buttonLinks: ButtonLink[];
-  firstRowBold: boolean;
-}
-
-export function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
-  const navigate = useNavigate();
-  return (
-    <div className={cls.buttonLinks}>
-      {buttonLinks.map((buttonLink, index) => (
-        <Fragment key={`${buttonLink.id}-${buttonLink.label}`}>
-          {index !== 0 && <div className={cls.border}></div>}
-          <button
-            type="button"
-            onClick={() => {
-              void navigate(buttonLink.to, buttonLink.options || {});
-            }}
-          >
-            <span className={cn(firstRowBold && index === 0 && "bold")}>{buttonLink.label}</span>
-          </button>
-        </Fragment>
-      ))}
-    </div>
-  );
-}
-
-export interface CommitteeSessionCardProps {
-  committeeSession: CommitteeSession;
-  isCurrentSession: boolean;
-  committeeCategory: CommitteeCategory;
-}
-
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
-export function CommitteeSessionCard({
+function CardButton({
   committeeSession,
   isCurrentSession,
-  committeeCategory,
-  ...props
-}: CommitteeSessionCardProps & DivProps) {
+}: {
+  committeeSession: CommitteeSession;
+  isCurrentSession: boolean;
+}): ReactElement | undefined {
+  const { isCoordinator } = useUserRole();
   const navigate = useNavigate();
-  const { isAdministrator, isCoordinator } = useUserRole();
+
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${committeeSession.election_id}/committee_sessions/${committeeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
@@ -111,138 +84,18 @@ export function CommitteeSessionCard({
     });
   }
 
-  const icon = CommitteeSessionStatusIcon({ status: committeeSession.status, size: "xl" });
-  const label = committeeSessionLabel(committeeCategory, committeeSession.number);
-  const status = t(`committee_session_status.coordinator.${committeeSession.status}`);
-  const date = committeeSession.start_date_time
-    ? formatDateTimeFullWithoutWeekday(new Date(committeeSession.start_date_time))
-    : undefined;
-  const buttonLinks: ButtonLink[] = [];
-  let cardButton: ReactElement | undefined;
-
-  const addIf = (item: ButtonLink, condition: boolean) => {
-    if (condition) {
-      buttonLinks.push(item);
-    }
-  };
-
-  const isNextSession = committeeSession.number > 1;
-
-  const detailsButtonLink: ButtonLink = {
-    id: committeeSession.id,
-    label: t("election_management.committee_session_details"),
-    to: "details",
-  };
-
-  const investigationsButtonLink: ButtonLink = {
-    id: committeeSession.id,
-    label: t("election_management.requested_investigations"),
-    to: "investigations",
-  };
-
-  const subCommitteeKeysButtonLink: ButtonLink = {
-    id: committeeSession.id,
-    label: t("election_management.import_sub_committee_keys"),
-    to: "sub-committees",
-  };
-  const showSubCommitteeKeys = isCurrentSession && committeeCategory === "CSB" && isAdministrator;
-
-  const deleteButtonLink: ButtonLink = {
-    id: committeeSession.id,
-    label: t("election_management.delete_session"),
-    to: ".",
-    options: { state: { showDeleteModal: true } },
-  };
-
-  switch (committeeSession.status) {
-    case "created":
-      addIf(subCommitteeKeysButtonLink, showSubCommitteeKeys);
-      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
-      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
-      addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
-      break;
-    case "in_preparation":
-      addIf(subCommitteeKeysButtonLink, showSubCommitteeKeys);
-      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
-      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
-      addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
-
-      if (isCurrentSession && isCoordinator) {
-        cardButton = (
-          <Button size="sm" onClick={handleStart}>
-            {t("election_management.start_data_entry")}
-          </Button>
-        );
-      }
-      break;
-    case "data_entry":
-      addIf(subCommitteeKeysButtonLink, showSubCommitteeKeys);
-      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
-      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
-
-      if (isCurrentSession) {
-        cardButton = (
-          <Button.Link size="sm" to="status">
-            {t("view_progress")}
-          </Button.Link>
-        );
-      }
-      break;
-    case "paused":
-      addIf(
-        {
-          id: committeeSession.id,
-          label: isCoordinator ? t("election_management.resume_or_check_progress") : t("view_progress"),
-          to: "status",
-        },
-        isCurrentSession,
-      );
-      addIf(subCommitteeKeysButtonLink, showSubCommitteeKeys);
-      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
-      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
-      break;
-    case "completed":
-      addIf(
-        {
-          id: committeeSession.id,
-          label: t("election_management.results_and_documents"),
-          to: `report/committee-session/${committeeSession.id}/download`,
-        },
-        isCoordinator,
-      );
-      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
-      addIf(
-        {
-          id: committeeSession.id,
-          label: t("apportionment.title"),
-          to: "apportionment",
-        },
-        isCurrentSession && isCoordinator && committeeCategory === "CSB",
-      );
-      addIf(
-        {
-          id: committeeSession.id,
-          label: t("election_management.view_data_entry"),
-          to: "status",
-        },
-        isCurrentSession,
-      );
-      break;
+  if (committeeSession.status === "in_preparation" && isCurrentSession && isCoordinator) {
+    return (
+      <Button size="sm" onClick={handleStart}>
+        {t("election_management.start_data_entry")}
+      </Button>
+    );
+  } else if (committeeSession.status === "data_entry" && isCurrentSession) {
+    return (
+      <Button.Link size="sm" to="status">
+        {t("view_progress")}
+      </Button.Link>
+    );
   }
-
-  return (
-    <Card
-      icon={icon}
-      label={label}
-      status={status}
-      date={date}
-      button={cardButton}
-      id={`session-${committeeSession.number}`}
-      {...props}
-    >
-      {buttonLinks.length > 0 && (
-        <ButtonLinkList buttonLinks={buttonLinks} firstRowBold={isCurrentSession && cardButton === undefined} />
-      )}
-    </Card>
-  );
+  return undefined;
 }

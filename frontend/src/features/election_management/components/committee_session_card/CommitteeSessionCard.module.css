@@ -52,4 +52,14 @@
       background-color: var(--color-hover);
     }
   }
+
+  /* Undo bold rendering of first link if other button on card */
+  &:has(+ button),
+  &:has(+ a) {
+    button:first-of-type {
+      span {
+        font-weight: normal;
+      }
+    }
+  }
 }

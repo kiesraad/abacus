@@ -27,6 +27,7 @@ translations
 *.sw?
 test-results
 coverage
+.vitest/
 mock
 *.junit.xml
 playwright-report/

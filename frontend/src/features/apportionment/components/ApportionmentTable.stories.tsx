@@ -22,7 +22,7 @@ export const Default: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
       ["1", "Political Group A", "11", "1", "12"],
       ["2", "Political Group B", "5", "1", "6"],
@@ -50,7 +50,7 @@ export const NotAssignedSeats: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
       ["", "Nog niet toegewezen", "-", "3", "3"],
       ["1", "Partij voor de Stemmer", "9", "1", "10"],
@@ -80,7 +80,7 @@ export const NotAllSeatsAssigned: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
       ["1", "Political Group A", "-", "1", "1"],
       ["2", "Political Group B", "-", "2", "2"],

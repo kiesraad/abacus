@@ -23,7 +23,7 @@ export const Default: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
       ["1", "Political Group A", "10", "8", "", "1"],
       ["2", "Political Group B", "0", "60", "", "1"],
@@ -47,7 +47,7 @@ export const P9AndP10: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
       ["1", "Political Group A", "1 5", "189", "2/15", "2 , 3 0"],
       ["2", "Political Group B", "2", "296", "7/15", "1"],
@@ -77,7 +77,7 @@ export const P9BeforeDrawingLots: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
       ["1", "De partijdigen", "7", "170", "9/15", "1 0"],
       ["2", "Kiezers nu!", "1", "170", "12/15", "1 1"],
@@ -108,7 +108,7 @@ export const P9AfterDrawingLots: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
       ["1", "De partijdigen", "7", "170", "9/15", "1 1"],
       ["2", "Kiezers nu!", "1", "170", "12/15", "1"],
@@ -139,7 +139,7 @@ export const P10: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
       ["1", "Political Group A", "10", "8", "", "1 0"],
     ]);

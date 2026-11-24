@@ -16,7 +16,7 @@ export const Default: StoryObj = {
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
-    expect(table).toHaveTableContent([
+    await expect(table).toHaveTableContent([
       ["Totaal aantal zetels", "23", ""],
       ["Totaal aantal toegewezen volle zetels", "19", "— (min)"],
       ["Restzetels", "4", ""],

@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { test as base, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { changeCommitteeSessionStatus, completeDataEntries } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
   type Eml230b,
@@ -29,9 +29,9 @@ import type {
   SUB_COMMITTEE_CERTIFICATES_REQUEST_PATH,
   SubCommittee,
 } from "@/types/generated/openapi";
-import type { UserFixtures } from "./user-fixtures";
+import { userFixtures } from "./user-fixtures";
 
-type CSBFixtures = UserFixtures & {
+type CSBFixtures = {
   // candidate list file (EML 230b) for a GR election
   eml230b_more_than_45_candidates: Eml230b;
   // CSB election with >= 19 seats
@@ -54,7 +54,7 @@ type CSBFixtures = UserFixtures & {
   completedElectionCSBWithDrawingLotsForP9: Election;
 };
 
-export const csbFixtures = base.extend<CSBFixtures>({
+export const csbFixtures = userFixtures.extend<CSBFixtures>({
   eml230b_more_than_45_candidates: [eml230b_more_than_45_candidates, { option: true }],
   emptyElectionCSBLargeCouncil: async ({ adminOne, eml230b_more_than_45_candidates }, use) => {
     const { request } = adminOne;

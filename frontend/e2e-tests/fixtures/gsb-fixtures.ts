@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { test as base, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { DataEntryApiClient } from "e2e-tests/helpers-utils/api-clients";
 import {
   changeCommitteeSessionStatus,
@@ -32,7 +32,7 @@ import type {
   USER_CREATE_REQUEST_PATH,
   User,
 } from "@/types/generated/openapi";
-import { FIXTURE_TYPIST_TEMP_PASSWORD, type UserFixtures } from "./user-fixtures";
+import { FIXTURE_TYPIST_TEMP_PASSWORD, userFixtures } from "./user-fixtures";
 
 export interface DataEntryFixture {
   election_id: number;
@@ -41,7 +41,7 @@ export interface DataEntryFixture {
   number: string;
 }
 
-type GSBFixtures = UserFixtures & {
+type GSBFixtures = {
   // candidate list file (EML 230b) for a GR election
   eml230b: Eml230b;
   // GSB CSO election without polling stations
@@ -84,7 +84,7 @@ type GSBFixtures = UserFixtures & {
   newTypistGSB: User;
 };
 
-export const gsbFixtures = base.extend<GSBFixtures>({
+export const gsbFixtures = userFixtures.extend<GSBFixtures>({
   eml230b: [eml230b, { option: true }],
   emptyElectionGSB: async ({ adminOne, eml230b }, use) => {
     const { request } = adminOne;

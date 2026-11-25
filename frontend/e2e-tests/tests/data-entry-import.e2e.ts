@@ -5,7 +5,7 @@ import { DataEntryImportCheckAndSavePgObj } from "e2e-tests/page-objects/data_en
 import { DataEntryImportHashCheckPgObj } from "e2e-tests/page-objects/data_entry_import/DataEntryImportHashCheckPgObj";
 import { DataEntryImportPgObj } from "e2e-tests/page-objects/data_entry_import/DataEntryImportPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
-import { eml230b, eml510b } from "e2e-tests/test-data/eml-files";
+import { eml510b } from "e2e-tests/test-data/eml-files";
 import { zipSync } from "fflate";
 
 const [emlData, signatureData] = await Promise.all([readFile(eml510b.emlPath), readFile(eml510b.signaturePath)]);
@@ -67,10 +67,6 @@ async function openImportPage(page: Page, electionId: number): Promise<DataEntry
   await expect(dataEntryImportPage.header).toBeVisible();
   return dataEntryImportPage;
 }
-
-// Override the candidate list to match it with the lists in the 510b
-// (otherwise the import fails with 'Invalid data').
-test.use({ eml230b_more_than_45_candidates: eml230b });
 
 test.describe(`data entry import GSB 510b into CSB election`, () => {
   test("imports a GSB count file, shows it as imported and refuses a second import", async ({

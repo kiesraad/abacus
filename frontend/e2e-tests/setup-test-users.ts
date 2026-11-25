@@ -1,5 +1,5 @@
 import { expect, request, test } from "@playwright/test";
-import { apiLoginAs, createUser, firstLogin } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { apiLoginAs, createUser, firstLogin } from "e2e-tests/helpers-utils/api-helpers/e2e-test-api-helpers";
 import { testUsers, testUsersCSB } from "e2e-tests/test-data/users";
 
 test.describe("setup test users", () => {

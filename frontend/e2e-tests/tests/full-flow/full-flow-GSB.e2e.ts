@@ -1,7 +1,12 @@
 /* eslint-disable playwright/no-conditional-in-test, playwright/no-conditional-expect */
 import { stat } from "node:fs/promises";
 import { expect, request } from "@playwright/test";
-import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import {
+  apiLogout,
+  createUser,
+  firstLogin,
+  getTestPassword,
+} from "e2e-tests/helpers-utils/api-helpers/e2e-test-api-helpers";
 import {
   createInvestigation,
   fillCandidatesListPages,

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { getTestPassword } from "e2e-tests/helpers-utils/api-helpers/e2e-test-api-helpers";
 import { CreateFirstAdminPgObj } from "e2e-tests/page-objects/authentication/CreateFirstAdminPgObj";
 import { FirstLoginPgObj } from "e2e-tests/page-objects/authentication/FirstLoginPgObj";
 import { InitialiseWelcomePgObj } from "e2e-tests/page-objects/authentication/InitialiseWelcomePgObj";

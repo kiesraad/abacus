@@ -1,6 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { expect } from "@playwright/test";
-import { changeCommitteeSessionStatus, completeDataEntries } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import {
+  changeCommitteeSessionStatus,
+  completeDataEntries,
+} from "e2e-tests/helpers-utils/api-helpers/e2e-test-api-helpers";
 import {
   type Eml230b,
   eml110a,

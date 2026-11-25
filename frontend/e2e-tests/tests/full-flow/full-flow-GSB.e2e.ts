@@ -6,7 +6,7 @@ import {
   createUser,
   firstLogin,
   getTestPassword,
-} from "e2e-tests/helpers-utils/api-helpers/e2e-test-api-helpers";
+} from "e2e-tests/helpers-utils/api-helpers/user-api-helpers";
 import {
   createInvestigation,
   fillCandidatesListPages,

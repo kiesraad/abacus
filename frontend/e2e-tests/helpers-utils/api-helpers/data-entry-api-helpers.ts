@@ -1,5 +1,5 @@
 import { type APIRequestContext, expect } from "@playwright/test";
-
+import { dataEntryRequest } from "e2e-tests/test-data/request-response-templates";
 import type {
   DATA_ENTRY_CLAIM_REQUEST_PATH,
   DATA_ENTRY_FINALISE_REQUEST_PATH,
@@ -32,4 +32,22 @@ export class DataEntryApiClient {
     const finaliseResponse = await this.session.post(finaliseUrl);
     expect(finaliseResponse.ok()).toBeTruthy();
   }
+}
+
+export async function completeDataEntries(
+  dataEntryId: number,
+  typistOneRequest: APIRequestContext,
+  typistTwoRequest: APIRequestContext,
+  firstRequest = dataEntryRequest,
+  secondRequest = dataEntryRequest,
+) {
+  const firstDataEntry = new DataEntryApiClient(typistOneRequest, dataEntryId, 1);
+  await firstDataEntry.claim();
+  await firstDataEntry.save(firstRequest);
+  await firstDataEntry.finalise();
+
+  const secondDataEntry = new DataEntryApiClient(typistTwoRequest, dataEntryId, 2);
+  await secondDataEntry.claim();
+  await secondDataEntry.save(secondRequest);
+  await secondDataEntry.finalise();
 }

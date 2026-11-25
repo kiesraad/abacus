@@ -54,11 +54,9 @@ export function ButtonLinksGSB({ committeeSession, isCurrentSession }: ButtonLin
   return <ButtonLinkList links={buttonLinks} firstRowBold={isCurrentSession} />;
 }
 
-export function ButtonLinksHSB({ committeeSession, isCurrentSession }: ButtonLinksProps) {
+export function ButtonLinksHSB({ committeeSession }: ButtonLinksProps) {
   const buttonLinks: ButtonLink[] = [];
-  const { isCoordinator } = useUserRole();
-
-  const showSubCommitteeKeys = isCurrentSession && !isCoordinator;
+  const { isCoordinator, isAdministrator } = useUserRole();
 
   const addIf = (item: ButtonLink, condition: boolean) => {
     if (condition) {
@@ -68,38 +66,36 @@ export function ButtonLinksHSB({ committeeSession, isCurrentSession }: ButtonLin
 
   switch (committeeSession.status) {
     case "created":
-      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
-      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), isAdministrator);
+      addIf(detailsButtonLink(committeeSession.id), isCoordinator);
       break;
     case "in_preparation":
-      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
-      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), isAdministrator);
+      addIf(detailsButtonLink(committeeSession.id), isCoordinator);
       break;
     case "data_entry":
-      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
-      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), isAdministrator);
+      addIf(detailsButtonLink(committeeSession.id), isCoordinator);
       break;
     case "paused":
-      addIf(resumeButtonLink(committeeSession.id, isCoordinator), isCurrentSession);
-      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
-      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      addIf(resumeButtonLink(committeeSession.id, isCoordinator), true);
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), isAdministrator);
+      addIf(detailsButtonLink(committeeSession.id), isCoordinator);
       break;
     case "completed":
       addIf(downloadButtonLink(committeeSession.id), isCoordinator);
-      addIf(viewDataEntryButtonLink(committeeSession.id), isCurrentSession);
+      addIf(viewDataEntryButtonLink(committeeSession.id), true);
       break;
   }
 
   if (buttonLinks.length === 0) return undefined;
 
-  return <ButtonLinkList links={buttonLinks} firstRowBold={isCurrentSession} />;
+  return <ButtonLinkList links={buttonLinks} firstRowBold={true} />;
 }
 
-export function ButtonLinksCSB({ committeeSession, isCurrentSession }: ButtonLinksProps) {
+export function ButtonLinksCSB({ committeeSession }: ButtonLinksProps) {
   const buttonLinks: ButtonLink[] = [];
-  const { isCoordinator } = useUserRole();
-
-  const showSubCommitteeKeys = isCurrentSession && !isCoordinator;
+  const { isCoordinator, isAdministrator } = useUserRole();
 
   const addIf = (item: ButtonLink, condition: boolean) => {
     if (condition) {
@@ -109,32 +105,32 @@ export function ButtonLinksCSB({ committeeSession, isCurrentSession }: ButtonLin
 
   switch (committeeSession.status) {
     case "created":
-      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
-      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), isAdministrator);
+      addIf(detailsButtonLink(committeeSession.id), isCoordinator);
       break;
     case "in_preparation":
-      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
-      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), isAdministrator);
+      addIf(detailsButtonLink(committeeSession.id), isCoordinator);
       break;
     case "data_entry":
-      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
-      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), isAdministrator);
+      addIf(detailsButtonLink(committeeSession.id), isCoordinator);
       break;
     case "paused":
-      addIf(resumeButtonLink(committeeSession.id, isCoordinator), isCurrentSession);
-      addIf(subCommitteeKeysButtonLink(committeeSession.id), showSubCommitteeKeys);
-      addIf(detailsButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
+      addIf(resumeButtonLink(committeeSession.id, isCoordinator), true);
+      addIf(subCommitteeKeysButtonLink(committeeSession.id), isAdministrator);
+      addIf(detailsButtonLink(committeeSession.id), isCoordinator);
       break;
     case "completed":
       addIf(downloadButtonLink(committeeSession.id), isCoordinator);
-      addIf(apportionmentButtonLink(committeeSession.id), isCurrentSession && isCoordinator);
-      addIf(viewDataEntryButtonLink(committeeSession.id), isCurrentSession);
+      addIf(apportionmentButtonLink(committeeSession.id), isCoordinator);
+      addIf(viewDataEntryButtonLink(committeeSession.id), true);
       break;
   }
 
   if (buttonLinks.length === 0) return undefined;
 
-  return <ButtonLinkList links={buttonLinks} firstRowBold={isCurrentSession} />;
+  return <ButtonLinkList links={buttonLinks} firstRowBold={true} />;
 }
 
 export interface ButtonLink {

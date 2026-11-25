@@ -13,9 +13,13 @@
     "4": "Vierde",
     "5": "Vijfde"
   },
-  "session": "Zitting",
-  "session_CSB": "Zitting CSB",
-  "session_CSB_lowercase": "zitting CSB",
+  "session": {
+    "CSB": "Zitting CSB",
+    "CSB_lowercase": "zitting CSB",
+    "HSB": "Zitting HSB",
+    "HSB_lowercase": "zitting HSB",
+    "title": "Zitting"
+  },
   "the": "de",
   "typist": {
     "created": "Nog niet gestart",

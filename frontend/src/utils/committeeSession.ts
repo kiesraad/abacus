@@ -7,20 +7,20 @@ export function committeeSessionLabel(
   addArticle = false,
   lowerCase = false,
 ): string {
-  if (committeeCategory === "CSB") {
+  if (committeeCategory === "CSB" || committeeCategory === "HSB") {
     if (lowerCase) {
-      return t("committee_session_status.session_CSB_lowercase");
+      return t(`committee_session_status.session.${committeeCategory}_lowercase`);
     }
 
-    return t("committee_session_status.session_CSB");
+    return t(`committee_session_status.session.${committeeCategory}`);
   }
 
   const numberTranslation = `committee_session_status.number.${sessionNumber}`;
   let label: string;
   if (hasTranslation(numberTranslation)) {
-    label = `${addArticle ? `${t("committee_session_status.the")} ` : ""}${t(numberTranslation)} ${t(`committee_session_status.session`).toLowerCase()}`;
+    label = `${addArticle ? `${t("committee_session_status.the")} ` : ""}${t(numberTranslation)} ${t(`committee_session_status.session.title`).toLowerCase()}`;
   } else {
-    label = `${t("committee_session_status.session")} ${sessionNumber}`;
+    label = `${t("committee_session_status.session.title")} ${sessionNumber}`;
   }
 
   if (lowerCase) {

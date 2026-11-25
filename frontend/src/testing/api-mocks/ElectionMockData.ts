@@ -493,6 +493,7 @@ export const getHSBElectionMockData = (
 
 export const investigationListMockResponse: InvestigationListResponse = { investigations: mockInvestigations };
 export const electionDetailsMockResponse = getElectionMockData();
+export const hsbElectionDetailsMockResponse = getHSBElectionMockData();
 export const csbElectionDetailsMockResponse = getCSBElectionMockData();
 
 export const electionMockData = electionDetailsMockResponse.election;
@@ -508,6 +509,7 @@ export const waterAuthorityElectionMockData = getElectionMockData(electionListMo
 
 export const csbElectionMockData = csbElectionDetailsMockResponse.election;
 export const csbWaterAuthorityElectionMockData = getCSBElectionMockData(electionListMockResponse.elections[3]).election;
+export const hsbElectionMockData = hsbElectionDetailsMockResponse.election;
 
 export function getNewElectionMockData(election: Election = electionMockData): NewElection {
   return {

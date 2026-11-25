@@ -233,6 +233,14 @@ export const CommitteeSessionStatusChangeRequestHandler = http.put<
 );
 
 // committee session status change handler
+export const HSBCommitteeSessionStatusChangeRequestHandler = http.put<
+  ParamsToString<COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS>,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY
+>("/api/elections/6/committee_sessions/3/status" satisfies COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH, () =>
+  HttpResponse.json(null, { status: 200 }),
+);
+
+// committee session status change handler
 export const CSBCommitteeSessionStatusChangeRequestHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY
@@ -712,6 +720,7 @@ export const handlers: HttpHandler[] = [
   LogRequestHandler,
   LogUsersRequestHandler,
   CommitteeSessionStatusChangeRequestHandler,
+  HSBCommitteeSessionStatusChangeRequestHandler,
   CSBCommitteeSessionStatusChangeRequestHandler,
   CommitteeSessionUpdateHandler,
   CommitteeSessionCreateHandler,

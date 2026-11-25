@@ -20,7 +20,11 @@ export const GSBCommitteeSessionCard: StoryObj<Props> = {
       control: { type: "radio" },
     },
     userRole: {
-      options: ["admin", "coordinator_gsb"],
+      options: ["administrator", "coordinator_gsb"],
+      control: { type: "radio" },
+    },
+    isCurrentSession: {
+      options: [true, false],
       control: { type: "radio" },
     },
   },
@@ -53,7 +57,11 @@ export const HSBCommitteeSessionCard: StoryObj<Props> = {
       control: false,
     },
     userRole: {
-      options: ["admin", "coordinator_hsb"],
+      options: ["administrator", "coordinator_hsb"],
+      control: { type: "radio" },
+    },
+    isCurrentSession: {
+      options: [true],
       control: { type: "radio" },
     },
   },
@@ -86,7 +94,11 @@ export const CSBCommitteeSessionCard: StoryObj<Props> = {
       control: false,
     },
     userRole: {
-      options: ["admin", "coordinator_csb"],
+      options: ["administrator", "coordinator_csb"],
+      control: { type: "radio" },
+    },
+    isCurrentSession: {
+      options: [true],
       control: { type: "radio" },
     },
   },
@@ -126,10 +138,6 @@ export default {
     },
     startDateTime: {
       control: { type: "text" },
-    },
-    isCurrentSession: {
-      options: [true, false],
-      control: { type: "radio" },
     },
   },
   parameters: {

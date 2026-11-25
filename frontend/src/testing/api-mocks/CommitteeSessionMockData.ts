@@ -21,7 +21,7 @@ export const csbCommitteeSessionMockData: CommitteeSession = {
 export const hsbCommitteeSessionMockData: CommitteeSession = {
   id: 3,
   number: 1,
-  election_id: 3,
+  election_id: 6,
   status: "data_entry",
   location: "",
   start_date_time: "",

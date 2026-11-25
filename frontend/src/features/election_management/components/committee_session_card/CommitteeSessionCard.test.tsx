@@ -6,11 +6,13 @@ import * as useUser from "@/hooks/user/useUser";
 import {
   getCommitteeSessionMockData,
   getCSBCommitteeSessionMockData,
+  getHSBCommitteeSessionMockData,
 } from "@/testing/api-mocks/CommitteeSessionMockData";
-import { csbElectionMockData, electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { csbElectionMockData, electionMockData, hsbElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
   CSBCommitteeSessionStatusChangeRequestHandler,
+  HSBCommitteeSessionStatusChangeRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
@@ -29,6 +31,10 @@ interface Buttons {
 
 type TestCasesGSB = {
   [role in "administrator" | "coordinator_gsb"]: Record<CommitteeSessionStatus, Buttons>[];
+};
+
+type TestCasesHSB = {
+  [role in "administrator" | "coordinator_hsb"]: Record<CommitteeSessionStatus, Buttons>;
 };
 
 type TestCasesCSB = {
@@ -128,6 +134,51 @@ const testCasesGSB: TestCasesGSB = {
       },
     },
   ],
+};
+
+/**
+ * Test cases for first committee session for HSB election.
+ * - buttonsCurrentSession: buttons if card represents the current session
+ * - buttonsNotCurrentSession: buttons if card represents not the current session
+ * - actionButton: link button of card
+ */
+const testCasesHSB: TestCasesHSB = {
+  coordinator_hsb: {
+    created: {
+      buttonsCurrentSession: ["Details van de zitting"],
+    },
+    in_preparation: {
+      buttonsCurrentSession: ["Details van de zitting", "Start invoer"],
+    },
+    data_entry: {
+      buttonsCurrentSession: ["Details van de zitting"],
+      actionButton: "Bekijk voortgang",
+    },
+    paused: {
+      buttonsCurrentSession: ["Hervatten of voortgang bekijken", "Details van de zitting"],
+    },
+    completed: {
+      buttonsCurrentSession: ["Resultaten en documenten", "Invoer bekijken"],
+    },
+  },
+  administrator: {
+    created: {
+      buttonsCurrentSession: ["Publieke sleutels GSB's importeren"],
+    },
+    in_preparation: {
+      buttonsCurrentSession: ["Publieke sleutels GSB's importeren"],
+    },
+    data_entry: {
+      buttonsCurrentSession: ["Publieke sleutels GSB's importeren"],
+      actionButton: "Bekijk voortgang",
+    },
+    paused: {
+      buttonsCurrentSession: ["Bekijk voortgang", "Publieke sleutels GSB's importeren"],
+    },
+    completed: {
+      buttonsCurrentSession: ["Invoer bekijken"],
+    },
+  },
 };
 
 /**
@@ -314,6 +365,120 @@ describe("UI component: CommitteeSessionCard for GSB election", () => {
     await user.click(deleteButton);
     expect(statusChange).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith(".", { state: { showDeleteModal: true } });
+  });
+});
+
+describe("UI component: CommitteeSessionCard for HSB election", () => {
+  beforeEach(() => {
+    server.use(HSBCommitteeSessionStatusChangeRequestHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+  });
+
+  const createTest = (
+    role: string,
+    sessionNumber: number,
+    status: CommitteeSessionStatus,
+    expectedButtons: string[] = [],
+    actionButton?: string,
+  ) => {
+    const testName = `${role} - session ${sessionNumber} - ${status}"}`;
+
+    test(testName, () => {
+      const user = role === "coordinator_hsb" ? getCoordinatorUser("hsb") : getAdminUser();
+      vi.spyOn(useUser, "useUser").mockReturnValue(user);
+
+      const expectedTitle = "Zitting HSB";
+      const expectedSubtitle =
+        {
+          created: "— Zitting voorbereiden",
+          in_preparation: "— Klaar voor invoer",
+          data_entry: "— Invoer bezig",
+          paused: "— Invoer gepauzeerd",
+          completed: "— Invoer afgerond",
+        }[status] || "";
+
+      const committeeSession = getHSBCommitteeSessionMockData({
+        number: sessionNumber,
+        status,
+        start_date_time: undefined,
+        location: "Juinen",
+      });
+
+      const committeeCategory = hsbElectionMockData.committee_category;
+
+      render(
+        <CommitteeSessionCard
+          committeeSession={committeeSession}
+          committeeCategory={committeeCategory}
+          isCurrentSession={true}
+        />,
+      );
+
+      expect(screen.getByText(expectedTitle)).toBeVisible();
+      expect(screen.getByText(expectedSubtitle)).toBeVisible();
+      expect(screen.queryByText("zondag 9 november 2025 om 09:15")).not.toBeInTheDocument();
+
+      const buttons = screen.queryAllByRole("button");
+      expect(buttons).toHaveLength(expectedButtons.length);
+      expectedButtons.forEach((buttonName: string, index: number) => {
+        expect(buttons[index]).toHaveAccessibleName(buttonName);
+      });
+
+      if (actionButton) {
+        const linkElement = screen.getByRole("link", { name: actionButton });
+        expect(linkElement).toBeVisible();
+      } else {
+        expect(screen.queryByRole("link")).not.toBeInTheDocument();
+      }
+    });
+  };
+
+  // Run tests per role/session number/status combination
+  Object.entries(testCasesHSB).forEach(([role, session]) => {
+    Object.entries(session).forEach(([status, testCase]) => {
+      createTest(role, 1, status as CommitteeSessionStatus, testCase.buttonsCurrentSession, testCase.actionButton);
+    });
+  });
+
+  test("Validate start data entry status change", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser("hsb"));
+    const statusChange = spyOnHandler(HSBCommitteeSessionStatusChangeRequestHandler);
+
+    const user = userEvent.setup();
+    const committeeSession = getHSBCommitteeSessionMockData({
+      status: "in_preparation",
+      start_date_time: "",
+      location: "Juinen",
+    });
+    const committeeCategory = hsbElectionMockData.committee_category;
+    render(
+      <CommitteeSessionCard
+        committeeSession={committeeSession}
+        committeeCategory={committeeCategory}
+        isCurrentSession={true}
+      />,
+    );
+
+    const dataEntryButton = await screen.findByRole("button", { name: "Start invoer" });
+    await user.click(dataEntryButton);
+    expect(statusChange).toHaveBeenCalledWith({ status: "data_entry" });
+    expect(navigate).toHaveBeenCalledWith("status");
+  });
+
+  test("Navigate to the sub committee keys overview", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
+
+    render(
+      <CommitteeSessionCard
+        committeeSession={getHSBCommitteeSessionMockData({ status: "in_preparation" })}
+        committeeCategory={hsbElectionMockData.committee_category}
+        isCurrentSession={true}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Publieke sleutels GSB's importeren" }));
+    expect(navigate).toHaveBeenCalledWith("sub-committees", {});
   });
 });
 

@@ -1425,8 +1425,8 @@ mod tests {
         let dso_result = || {
             dso_results_fixture(
                 AboutReport {
-                    corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
-                    checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
+                    corrigendum_present: Some(CorrigendumPresent::OneDocument),
+                    checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PageMissing),
                 },
                 ChecksAndCorrections::default(),
             )
@@ -1438,9 +1438,9 @@ mod tests {
 
         // a DSO result in a CSO election
         let totals = ElectionTotals::tabulate(&cso_election, &[(source(), dso_result())]);
-        assert_matches!(totals, Err(TabulationError::ValidationErrors(..)));
+        assert_matches!(totals, Err(TabulationError::ResultsModelMismatch(_)));
 
-        // a GSB result in a GSB election
+        // a GSB result in a CSO election
         let totals =
             ElectionTotals::tabulate(&cso_election, &[(source(), gsb_results_fixture_a())]);
         assert_matches!(totals, Err(TabulationError::ResultsModelMismatch(_)));
@@ -1451,7 +1451,7 @@ mod tests {
 
         // a DSO result in a CSB election
         let totals = ElectionTotals::tabulate(&csb_election, &[(source(), dso_result())]);
-        assert_matches!(totals, Err(TabulationError::ValidationErrors(..)));
+        assert_matches!(totals, Err(TabulationError::ResultsModelMismatch(_)));
     }
 
     #[test]

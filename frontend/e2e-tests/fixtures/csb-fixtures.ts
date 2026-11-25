@@ -1,6 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { expect } from "@playwright/test";
-import { changeCommitteeSessionStatus } from "e2e-tests/helpers-utils/api-helpers/coordinator-api-helpers";
+import {
+  changeCommitteeSessionStatus,
+  fillInCommiteeSessionDetails,
+} from "e2e-tests/helpers-utils/api-helpers/coordinator-api-helpers";
 import { completeDataEntries } from "e2e-tests/helpers-utils/api-helpers/data-entry-api-helpers";
 import { createCSBElection } from "e2e-tests/helpers-utils/api-helpers/election-api-helpers";
 import {
@@ -19,8 +22,6 @@ import {
 } from "e2e-tests/test-data/request-response-templates";
 import type {
   AddSubCommitteeCertificateResponse,
-  COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
-  COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   ELECTION_STATUS_REQUEST_PATH,
   Election,
   ElectionDetailsResponse,
@@ -61,15 +62,8 @@ export const csbFixtures = userFixtures.extend<CSBFixtures>({
     // Set committee session status to DataEntry
     const electionDetails = await changeCommitteeSessionStatus(coordinatorOneCSB, electionId, "data_entry");
 
-    // Fill in committee session details
-    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${electionId}/committee_sessions/${electionDetails.current_committee_session.id}`;
-    const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
-      location: "Den Haag",
-      start_date: "2026-03-18",
-      start_time: "21:45",
-    };
-    const detailsUpdateResponse = await coordinatorOneCSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
-    expect(detailsUpdateResponse.ok()).toBeTruthy();
+    // Fill in committee session details with default values
+    await fillInCommiteeSessionDetails(coordinatorOneCSB, electionId, electionDetails.current_committee_session.id);
 
     await use(electionDetails);
   },
@@ -80,15 +74,8 @@ export const csbFixtures = userFixtures.extend<CSBFixtures>({
     // Set committee session status to DataEntry
     const electionDetails = await changeCommitteeSessionStatus(coordinatorOneCSB, electionId, "data_entry");
 
-    // Fill in committee session details
-    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${electionId}/committee_sessions/${electionDetails.current_committee_session.id}`;
-    const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
-      location: "Den Haag",
-      start_date: "2026-03-18",
-      start_time: "21:45",
-    };
-    const detailsUpdateResponse = await coordinatorOneCSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
-    expect(detailsUpdateResponse.ok()).toBeTruthy();
+    // Fill in committee session details with default values
+    await fillInCommiteeSessionDetails(coordinatorOneCSB, electionId, electionDetails.current_committee_session.id);
 
     // Admin: add the certificate of the sub committee.
     const certificate = await readFile(eml510b.certificatePath, "utf8");
@@ -116,15 +103,8 @@ export const csbFixtures = userFixtures.extend<CSBFixtures>({
     // Set committee session status to DataEntry
     const electionDetails = await changeCommitteeSessionStatus(coordinatorOneCSB, electionId, "data_entry");
 
-    // Fill in committee session details
-    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${electionId}/committee_sessions/${electionDetails.current_committee_session.id}`;
-    const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
-      location: "Den Haag",
-      start_date: "2026-03-18",
-      start_time: "21:45",
-    };
-    const detailsUpdateResponse = await coordinatorOneCSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
-    expect(detailsUpdateResponse.ok()).toBeTruthy();
+    // Fill in committee session details with default values
+    await fillInCommiteeSessionDetails(coordinatorOneCSB, electionId, electionDetails.current_committee_session.id);
 
     await use(electionDetails);
   },

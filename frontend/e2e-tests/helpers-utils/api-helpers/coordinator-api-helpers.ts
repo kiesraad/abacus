@@ -3,6 +3,9 @@ import type {
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
+  COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
+  COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
+  CommitteeSessionId,
   CommitteeSessionStatus,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
@@ -54,6 +57,21 @@ export async function changeCommitteeSessionStatus(
   expect(statusChangeResponse.ok()).toBeTruthy();
 
   return electionDetails;
+}
+
+export async function fillInCommiteeSessionDetails(
+  user: { request: APIRequestContext },
+  electionId: ElectionId,
+  commiteeSessionId: CommitteeSessionId,
+) {
+  const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${electionId}/committee_sessions/${commiteeSessionId}`;
+  const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
+    location: "Den Haag",
+    start_date: "2026-03-18",
+    start_time: "21:45",
+  };
+  const detailsUpdateResponse = await user.request.put(detailsUpdateUrl, { data: detailsUpdateData });
+  expect(detailsUpdateResponse.ok()).toBeTruthy();
 }
 
 /**

@@ -13,6 +13,8 @@ import {
   formatTimeToGo,
   isValidNLDate,
   isValidTime,
+  validateNLDate,
+  validateTime,
 } from "./dateTime";
 
 describe("DateTime util", () => {
@@ -119,6 +121,43 @@ describe("DateTime util", () => {
     ["", false],
   ])("NL date %s is valid %s", (input: string, expected: boolean) => {
     expect(isValidNLDate(input)).toEqual(expected);
+  });
+
+  test.each([
+    ["31-12-2025", "valid"],
+    ["29-02-2024", "valid"],
+    ["01-01-2000", "valid"],
+    ["31-12-2099", "valid"],
+    ["2025-12-31", "invalid_format"],
+    ["1-1-2025", "invalid_format"],
+    ["31 januari 2025", "invalid_format"],
+    ["", "invalid_format"],
+    ["12-31-2025", "invalid_date"],
+    ["00-01-2025", "invalid_date"],
+    ["32-01-2025", "invalid_date"],
+    ["31-04-2025", "invalid_date"],
+    ["29-02-2025", "invalid_date"],
+    ["12-05-1875", "invalid_year"],
+    ["31-12-1999", "invalid_year"],
+    ["01-01-2100", "invalid_year"],
+  ])("validateNLDate(%s) returns %s", (input: string, expected: string) => {
+    expect(validateNLDate(input)).toEqual(expected);
+  });
+
+  test.each([
+    ["09:15", "valid"],
+    ["9:15", "valid"],
+    ["0:00", "valid"],
+    ["23:59", "valid"],
+    ["9 uur", "invalid_format"],
+    ["915", "invalid_format"],
+    ["9:5", "invalid_format"],
+    ["", "invalid_format"],
+    ["24:15", "invalid_time"],
+    ["11:99", "invalid_time"],
+    ["11:60", "invalid_time"],
+  ])("validateTime(%s) returns %s", (input: string, expected: string) => {
+    expect(validateTime(input)).toEqual(expected);
   });
 
   test.each([

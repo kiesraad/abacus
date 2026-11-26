@@ -105,17 +105,39 @@ describe("CommitteeSessionDetailsPage", () => {
 
     await user.type(location, "Amsterdam");
     await user.type(date, "2025-12-31");
-    await user.type(time, "24:15");
+    await user.type(time, "9 uur");
 
-    // Submit with invalid date and time
+    // Submit with wrongly formatted date and time
     await user.click(saveButton);
 
-    // Check for invalid date and time field validation
+    // Check for date and time format validation
     expect(location).toBeValid();
     expect(date).toBeInvalid();
     expect(date).toHaveAccessibleErrorMessage("Vul de datum in als: dd-mm-jjjj");
     expect(time).toBeInvalid();
     expect(time).toHaveAccessibleErrorMessage("Vul de tijd in als: uu:mm");
+
+    await user.clear(date);
+    await user.type(date, "31-02-2025");
+    await user.clear(time);
+    await user.type(time, "11:99");
+
+    // Submit with correctly formatted but non-existent date and time
+    await user.click(saveButton);
+
+    expect(date).toBeInvalid();
+    expect(date).toHaveAccessibleErrorMessage("Deze datum bestaat niet");
+    expect(time).toBeInvalid();
+    expect(time).toHaveAccessibleErrorMessage("Deze tijd bestaat niet");
+
+    await user.clear(date);
+    await user.type(date, "12-05-1875");
+
+    // Submit with a date outside the allowed year range
+    await user.click(saveButton);
+
+    expect(date).toBeInvalid();
+    expect(date).toHaveAccessibleErrorMessage("Vul een jaartal in tussen 2000 en 2099");
 
     await user.clear(date);
     await user.type(date, "31-12-2025");

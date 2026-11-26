@@ -695,7 +695,7 @@ async fn import_csb_election(
     let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
     let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
 
-    let (mut new_election, election_tree_details) = parse_election_candidates_eml(
+    let (new_election, election_tree_details) = parse_election_candidates_eml(
         &edu.election_data,
         Some((CommitteeCategory::CSB, None)),
         false,
@@ -708,7 +708,6 @@ async fn import_csb_election(
             return Err(EMLImportError::CommitteeCategoryForElectionCategoryNotSupported.into());
         }
     }
-    new_election.committee_category = CommitteeCategory::CSB;
 
     let mut tx = pool.begin_immediate().await?;
     let election = create_election_with_committee_session(

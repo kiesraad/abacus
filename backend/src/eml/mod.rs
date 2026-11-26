@@ -254,7 +254,7 @@ impl NewElection {
             Self {
                 name: format_election_name(&identifier.name, category),
                 official_name: identifier.name.to_string(),
-                committee_category: CommitteeCategory::GSB,
+                committee_category: selected_committee.category,
                 counting_method: None,
                 election_id: identifier.id.raw().into_owned(),
                 location: selected_committee.location(),

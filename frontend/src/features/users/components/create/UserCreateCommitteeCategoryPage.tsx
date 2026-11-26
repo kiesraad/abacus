@@ -24,7 +24,7 @@ export function UserCreateCommitteeCategoryPage() {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
     const committeeCategoryValue = formData.getString("committee-category");
-    if (committeeCategoryValue !== "csb" && committeeCategoryValue !== "gsb") {
+    if (committeeCategoryValue !== "csb" && committeeCategoryValue !== "hsb" && committeeCategoryValue !== "gsb") {
       setError(t("users.mandatory"));
       return;
     }
@@ -64,6 +64,13 @@ export function UserCreateCommitteeCategoryPage() {
                   defaultValue="gsb"
                   defaultChecked={committeeCategory === "gsb"}
                   label={t("committee_category.GSB.full")}
+                />
+                <ChoiceList.Radio
+                  id="committee-category-hsb"
+                  name="committee-category"
+                  defaultValue="hsb"
+                  defaultChecked={committeeCategory === "hsb"}
+                  label={t("committee_category.HSB.full")}
                 />
                 <ChoiceList.Radio
                   id="committee-category-csb"

@@ -323,15 +323,6 @@ mod tests {
     }
 
     #[test]
-    fn rejects_unsupported_uid_prefix() {
-        // HSB subject, not supported by Abacus yet.
-        assert!(matches!(
-            Certificate::from_der(&rejection_test_certificate(Some("HSB1"))),
-            Err(EmlSignatureError::InvalidSubject(_))
-        ));
-    }
-
-    #[test]
     fn rejects_key_not_rsa() {
         // Valid subject, but an ECDSA P-256 key.
         assert!(matches!(

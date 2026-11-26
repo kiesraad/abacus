@@ -338,7 +338,10 @@ async fn generate_keypair(
             authority_id: election.authority_id.clone(),
             authority_name: election.authority_name.clone(),
         },
-        CommitteeCategory::HSB => todo!("https://github.com/kiesraad/abacus/issues/3861"),
+        CommitteeCategory::HSB => Committee::Hsb {
+            authority_id: election.authority_id.clone(),
+            authority_name: election.authority_name.clone(),
+        },
         CommitteeCategory::CSB => Err(SigningServiceError::InvalidElectionError(format!(
             "Cannot generate keypair for {}",
             election.committee_category

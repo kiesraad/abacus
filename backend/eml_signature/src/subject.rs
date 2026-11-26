@@ -10,6 +10,8 @@ const COUNTRY: &str = "NL";
 /// for the GSB that OSV2020-U still uses.
 const GSB_UID_PREFIX: &str = "PSB";
 
+const HSB_UID_PREFIX: &str = "HSB";
+
 /// The software name written into `OU`, followed by the version.
 const ORGANIZATIONAL_UNIT: &str = "Abacus";
 
@@ -58,7 +60,13 @@ pub enum Committee {
         /// The municipality name, e.g. `Juinen`.
         authority_name: String,
     },
-    // Hoofdstembureau (HSB) support will be added later.
+    /// Hoofdstembureau (HSB), e.g. `UID=HSB1` and `L=Nijmegen`
+    Hsb {
+        /// The numeric `AuthorityIdentifier` `Id`, e.g. `1`.
+        authority_id: String,
+        /// The 'kieskring' name, e.g. `Nijmegen`
+        authority_name: String,
+    },
 }
 
 /// Regions that are `Openbaar lichaam` rather than `Gemeente`.
@@ -72,6 +80,7 @@ impl Committee {
     pub fn uid(&self) -> String {
         match self {
             Self::Gsb { authority_id, .. } => format!("{GSB_UID_PREFIX}{authority_id}"),
+            Self::Hsb { authority_id, .. } => format!("{HSB_UID_PREFIX}{authority_id}"),
         }
     }
 
@@ -86,13 +95,14 @@ impl Committee {
                 };
                 format!("{kind} {authority_name}")
             }
+            Self::Hsb { authority_name, .. } => format!("Kieskring {authority_name}"),
         }
     }
 
     /// `L`: the name of the region the committee is responsible for.
     pub fn locality(&self) -> &str {
         match self {
-            Self::Gsb { authority_name, .. } => authority_name,
+            Self::Gsb { authority_name, .. } | Self::Hsb { authority_name, .. } => authority_name,
         }
     }
 
@@ -101,12 +111,16 @@ impl Committee {
         uid: &str,
         locality: &str,
     ) -> Result<Self, EmlSignatureError> {
-        match uid.strip_prefix(GSB_UID_PREFIX) {
-            Some(authority_id) => Ok(Self::Gsb {
+        match uid.split_at_checked(3) {
+            Some((GSB_UID_PREFIX, authority_id)) => Ok(Self::Gsb {
                 authority_id: authority_id.to_owned(),
                 authority_name: locality.to_owned(),
             }),
-            None => Err(EmlSignatureError::InvalidSubject(format!(
+            Some((HSB_UID_PREFIX, authority_id)) => Ok(Self::Hsb {
+                authority_id: authority_id.to_owned(),
+                authority_name: locality.to_owned(),
+            }),
+            None | Some((_, _)) => Err(EmlSignatureError::InvalidSubject(format!(
                 "unsupported UID {uid}"
             ))),
         }

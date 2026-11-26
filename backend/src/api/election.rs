@@ -568,6 +568,9 @@ pub struct HSBElectionCreationRequest {
     election_data: String,
     candidate_hash: [String; crate::eml::hash::CHUNK_COUNT],
     candidate_data: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    selected_region: Option<RegionKey>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -622,9 +625,7 @@ pub async fn election_import(
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
     match request {
         ElectionCreationRequest::GSB(edu) => import_gsb_election(edu, &pool, &audit_service).await,
-        ElectionCreationRequest::HSB(_) => {
-            todo!("https://github.com/kiesraad/abacus/issues/3861")
-        }
+        ElectionCreationRequest::HSB(edu) => import_hsb_election(edu, &pool, &audit_service).await,
         ElectionCreationRequest::CSB(edu) => import_csb_election(edu, &pool, &audit_service).await,
     }
 }
@@ -682,6 +683,36 @@ async fn import_gsb_election(
         .await?;
     }
 
+    tx.commit().await?;
+
+    Ok((StatusCode::CREATED, Json(election)))
+}
+
+async fn import_hsb_election(
+    edu: HSBElectionCreationRequest,
+    pool: &SqlitePool,
+    audit_service: &AuditService,
+) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
+    let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
+    let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
+
+    let (new_election, election_tree_details) = parse_election_candidates_eml(
+        &edu.election_data,
+        Some((CommitteeCategory::HSB, edu.selected_region)),
+        false,
+        Some(&edu.candidate_data),
+    )?;
+
+    let mut tx = pool.begin_immediate().await?;
+    let election = create_election_with_committee_session(
+        &mut tx,
+        audit_service,
+        new_election,
+        election_tree_details.get_committees(CommitteeCategory::GSB),
+        election_data_hash,
+        candidate_data_hash,
+    )
+    .await?;
     tx.commit().await?;
 
     Ok((StatusCode::CREATED, Json(election)))

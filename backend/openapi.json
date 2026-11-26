@@ -9583,6 +9583,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "selected_region": {
+            "$ref": "#/components/schemas/RegionKey"
           }
         },
         "additionalProperties": false

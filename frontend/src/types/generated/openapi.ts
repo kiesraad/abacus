@@ -1589,6 +1589,7 @@ export interface HSBElectionCreationRequest {
   candidate_hash: string[];
   election_data: string;
   election_hash: string[];
+  selected_region?: RegionKey;
 }
 
 export interface HighestAverageAssignedSeat {

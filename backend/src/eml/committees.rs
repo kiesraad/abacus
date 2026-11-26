@@ -663,7 +663,7 @@ mod tests {
         assert_eq!(details.get_committees(CommitteeCategory::HSB).len(), 2);
         let hsb_arnhem = details
             .get_committees(CommitteeCategory::HSB)
-            .get(0)
+            .first()
             .expect("Missing HSB");
         assert_eq!(hsb_arnhem.responsible_region.name, "Arnhem");
         assert_eq!(hsb_arnhem.managing_authority_id, "HSB1");

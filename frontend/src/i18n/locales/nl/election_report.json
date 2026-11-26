@@ -1,8 +1,6 @@
 {
   "committee_session_started": "De zitting begon op {date_time}",
   "counting_results": "Telresultaten",
-  "download_report": "Download los proces-verbaal",
-  "download_zip": "Download proces-verbaal met telbestand",
   "resume_data_entry": "Invoer hervatten",
   "there_was_counting_method": "Er was sprake van een {method}",
   "report": "Proces-verbaal"

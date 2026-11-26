@@ -655,7 +655,7 @@ describe("ElectionStatusPage", () => {
       const alert = await screen.findByRole("alert");
       expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase gestart");
       expect(within(alert).getByRole("paragraph")).toHaveTextContent(
-        "Importeer de tellingbestanden van de GSB's. Invoerders kunnen daarna processen-verbaal invoeren. Hieronder zie je de voortgang.",
+        "Importeer de tellingsbestanden van de GSB's. Invoerders kunnen daarna processen-verbaal invoeren. Hieronder zie je de voortgang.",
       );
     });
 

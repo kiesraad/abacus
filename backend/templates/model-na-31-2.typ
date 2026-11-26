@@ -14,7 +14,7 @@
   doc,
   header-right: location_name,
   footer: [
-    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-tellingsbestand bij dit PV: \
     #input.hash
 
     Proces-verbaal van een #location_type \

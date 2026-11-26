@@ -11,7 +11,7 @@
   ],
   header-right: [Centraal stembureau #input.election.authority_region],
   footer: [
-    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-resultaatbestand bij dit PV: \
     #input.hash
 
     Proces-verbaal van het #location_type \

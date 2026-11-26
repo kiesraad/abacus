@@ -105,8 +105,7 @@ async fn test_election_validate(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
 
-    // TODO #3861: add HSB when election creation is allowed
-    for committee_category in ["GSB", "CSB"] {
+    for committee_category in ["GSB", "HSB", "CSB"] {
         let is_gsb = committee_category == "GSB";
         for variant in ELECTIONS {
             // Validate the election definition, without and with candidates
@@ -160,8 +159,7 @@ async fn test_election_import(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
 
-    // TODO #3861: add HSB when election creation is allowed
-    for committee_category in ["GSB", "CSB"] {
+    for committee_category in ["GSB", "HSB", "CSB"] {
         let is_gsb = committee_category == "GSB";
         for variant in ELECTIONS {
             let case = format!("{} {} import", committee_category, variant.name);
@@ -349,8 +347,7 @@ async fn test_election_import_wrong_hash(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
 
-    // TODO #3861: add HSB when election creation is allowed
-    for committee_category in ["GSB", "CSB"] {
+    for committee_category in ["GSB", "HSB", "CSB"] {
         for endpoint in ["validate", "import"] {
             for (field, valid_hash) in [
                 (

@@ -420,16 +420,15 @@ fn committees_multiple_electoral_districts(
 
         let hsb_region_details: RegionDetails = hsb_region.region().try_into()?;
         let district = CommitteeDistrict::Specific(hsb_region_details.clone());
-        // TODO: rest of Abacus needs to support HSB first, see https://github.com/kiesraad/abacus/issues/3861
-        // let (hsb_seat_region, hsb_name) =
-        //     find_committee(hsb_region, eml_nl::utils::CommitteeCategory::HSB);
-        // committees.push(CommitteeDetails::new(
-        //     hsb_region.region(),
-        //     hsb_seat_region,
-        //     district,
-        //     CommitteeCategory::HSB,
-        //     hsb_name,
-        // )?);
+        let (hsb_seat_region, hsb_name) =
+            find_committee(hsb_region, eml_nl::utils::CommitteeCategory::HSB);
+        committees.push(CommitteeDetails::new(
+            hsb_region.region(),
+            hsb_seat_region,
+            district.clone(),
+            CommitteeCategory::HSB,
+            hsb_name,
+        )?);
 
         for gsb_region in hsb_region.children() {
             if gsb_region.key.category != eml_nl::utils::RegionCategory::Municipality {
@@ -661,16 +660,16 @@ mod tests {
         assert_eq!(details.csb.location(), "Arnhem");
         assert_eq!(details.csb.district, CommitteeDistrict::All);
 
-        // assert_eq!(details.get_committees(CommitteeCategory::HSB).len(), 2);
-        // let hsb_arnhem = details
-        //     .get_committees(CommitteeCategory::HSB)
-        //     .get(0)
-        //     .expect("Missing HSB");
-        // assert_eq!(hsb_arnhem.responsible_region.name, "Arnhem");
-        // assert_eq!(hsb_arnhem.managing_authority_id, "HSB1");
-        // assert_eq!(hsb_arnhem.managing_authority_name(), "Arnhem");
-        // assert_eq!(hsb_arnhem.location(), "Arnhem");
-        // assert_eq!(hsb_arnhem.district.region_details().unwrap().name, "Arnhem");
+        assert_eq!(details.get_committees(CommitteeCategory::HSB).len(), 2);
+        let hsb_arnhem = details
+            .get_committees(CommitteeCategory::HSB)
+            .get(0)
+            .expect("Missing HSB");
+        assert_eq!(hsb_arnhem.responsible_region.name, "Arnhem");
+        assert_eq!(hsb_arnhem.managing_authority_id, "HSB1");
+        assert_eq!(hsb_arnhem.managing_authority_name(), "Arnhem");
+        assert_eq!(hsb_arnhem.location(), "Arnhem");
+        assert_eq!(hsb_arnhem.district.region_details().unwrap().name, "Arnhem");
 
         assert_eq!(details.get_committees(CommitteeCategory::GSB).len(), 51);
 
@@ -699,26 +698,26 @@ mod tests {
         assert_eq!(details.csb.location(), "Maastricht");
         assert_eq!(details.csb.district, CommitteeDistrict::All);
 
-        // assert_eq!(details.get_committees(CommitteeCategory::HSB).len(), 2);
-        // let hsb_venlo = details
-        //     .get_committees(CommitteeCategory::HSB)
-        //     .get(1)
-        //     .expect("Missing HSB");
-        // assert_eq!(hsb_venlo.responsible_region.name, "Venlo");
-        // assert_eq!(hsb_venlo.managing_authority_id, "HSB2");
-        // assert_eq!(hsb_venlo.managing_authority_name(), "Venlo");
-        // assert_eq!(hsb_venlo.location(), "Venlo");
-        // assert_eq!(hsb_venlo.district.region_details().unwrap().name, "Venlo");
-        // assert_eq!(
-        //     hsb_venlo
-        //         .district
-        //         .as_contest_identifier()
-        //         .unwrap()
-        //         .id
-        //         .raw()
-        //         .to_string(),
-        //     "II"
-        // );
+        assert_eq!(details.get_committees(CommitteeCategory::HSB).len(), 2);
+        let hsb_venlo = details
+            .get_committees(CommitteeCategory::HSB)
+            .get(1)
+            .expect("Missing HSB");
+        assert_eq!(hsb_venlo.responsible_region.name, "Venlo");
+        assert_eq!(hsb_venlo.managing_authority_id, "HSB2");
+        assert_eq!(hsb_venlo.managing_authority_name(), "Venlo");
+        assert_eq!(hsb_venlo.location(), "Venlo");
+        assert_eq!(hsb_venlo.district.region_details().unwrap().name, "Venlo");
+        assert_eq!(
+            hsb_venlo
+                .district
+                .as_contest_identifier()
+                .unwrap()
+                .id
+                .raw()
+                .to_string(),
+            "II"
+        );
         assert_eq!(details.get_committees(CommitteeCategory::GSB).len(), 31);
     }
 }

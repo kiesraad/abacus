@@ -1,5 +1,5 @@
 import { t } from "@/i18n/translate";
-import type { CommitteeDistrict, ElectionCategory, SubCommitteeFirstSession } from "@/types/generated/openapi";
+import type { CommitteeCategory, CommitteeDistrict, ElectionCategory } from "@/types/generated/openapi";
 
 export function isLocalElection(electionCategory: ElectionCategory): boolean {
   switch (electionCategory) {
@@ -46,10 +46,32 @@ export function getDistrictLabel(
   return `${prefix}${district.name}`;
 }
 
-export function getAreaDesignation(subCommittee: SubCommitteeFirstSession, withCategoryPrefix: boolean = false) {
-  let prefix = "";
-  if (withCategoryPrefix) {
-    prefix += `${subCommittee.category} `;
+export function formatAreaDesignation(
+  authority_id: string,
+  authority_name: string,
+  category?: CommitteeCategory,
+): string {
+  switch (category) {
+    case "GSB":
+    case "CSB":
+      return `${category} ${authority_id} - ${authority_name}`;
+    case "HSB":
+      return `${category} ${t("election.district")} ${authority_id} - ${authority_name}`;
+    default:
+      return `${authority_id} - ${authority_name}`;
   }
-  return `${prefix}${subCommittee.authority_id} - ${subCommittee.authority_name}`;
+}
+
+export function formatElectionTypeLabel(
+  authority_id: string,
+  authority_name: string,
+  category: CommitteeCategory,
+): string {
+  switch (category) {
+    case "GSB":
+      return `${category} ${authority_id} ${authority_name}`;
+    case "CSB":
+    case "HSB":
+      return `${category} ${authority_name}`;
+  }
 }

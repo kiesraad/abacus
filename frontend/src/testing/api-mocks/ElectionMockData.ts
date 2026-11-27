@@ -334,7 +334,7 @@ const baseElectionABCSB = {
 } satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
 
 const baseElectionTK = {
-  name: "Tweede Kamer der Staten-Generaal 2025",
+  name: "Tweede Kamer 2025",
   official_name: "Tweede Kamer der Staten-Generaal 2025",
   election_id: "TK2025",
   location: "Juinen",

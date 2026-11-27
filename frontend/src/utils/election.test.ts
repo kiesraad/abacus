@@ -1,6 +1,12 @@
 import { describe, expect, test } from "vitest";
-import type { CommitteeDistrict, ElectionCategory, SubCommitteeFirstSession } from "@/types/generated/openapi";
-import { getAreaDesignation, getDistrictLabel, getDistrictNumber, isLocalElection } from "./election";
+import type { CommitteeDistrict, ElectionCategory } from "@/types/generated/openapi";
+import {
+  formatAreaDesignation,
+  formatElectionTypeLabel,
+  getDistrictLabel,
+  getDistrictNumber,
+  isLocalElection,
+} from "./election";
 
 describe("Election util", () => {
   test.each([
@@ -121,22 +127,16 @@ describe("Election util", () => {
     expect(getDistrictLabel(input, withDistrictPrefix)).toBe(expected);
   });
 
-  test.each([
-    [true, "GSB 0035 - Juinen"],
-    [false, "0035 - Juinen"],
-  ] satisfies Array<
-    [boolean, string]
-  >)("Election getAreaDesignation withCategoryPrefix %s as %s", (withCategoryPrefix, expected) => {
-    const input = {
-      committee_session_id: 801,
-      id: 811,
-      number: 35,
-      name: "Juinen",
-      category: "GSB",
-      authority_id: "0035",
-      authority_name: "Juinen",
-      data_entry_id: 801,
-    } satisfies SubCommitteeFirstSession;
-    expect(getAreaDesignation(input, withCategoryPrefix)).toBe(expected);
+  test("Election formatAreaDesignation", () => {
+    expect(formatAreaDesignation("0035", "Juinen", "GSB")).toBe("GSB 0035 - Juinen");
+    expect(formatAreaDesignation("10", "Juinen", "HSB")).toBe("HSB Kieskring 10 - Juinen");
+    expect(formatAreaDesignation("0035", "Juinen", "CSB")).toBe("CSB 0035 - Juinen");
+    expect(formatAreaDesignation("0035", "Juinen")).toBe("0035 - Juinen");
+  });
+
+  test("Election formatElectionTypeLabel", () => {
+    expect(formatElectionTypeLabel("0035", "Heemdamseburg", "GSB")).toBe("GSB 0035 Heemdamseburg");
+    expect(formatElectionTypeLabel("HSB0", "Heemdamseburg", "HSB")).toBe("HSB Heemdamseburg");
+    expect(formatElectionTypeLabel("CSB", "Heemdamseburg", "CSB")).toBe("CSB Heemdamseburg");
   });
 });

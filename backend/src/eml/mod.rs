@@ -57,6 +57,7 @@ use crate::{
 };
 
 const WATER_AUTHORITY_PREFIX: &str = "Algemeen bestuur van het ";
+const HOUSE_OF_REPRESENTATIVES_POSTFIX: &str = "der Staten-Generaal ";
 
 /// Return exactly one contest.
 fn single_contest<T>(contests: &[T]) -> Result<&T, EMLImportError> {
@@ -80,24 +81,30 @@ fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
 /// Format the EML election name for Abacus
 ///
 /// For water authority, the prefix is removed and the first letter capitalized
+/// For house of representatives, the postfix is removed
 fn format_election_name(name: &str, category: crate::domain::election::ElectionCategory) -> String {
     let name = name.trim();
 
-    if category != crate::domain::election::ElectionCategory::WaterAuthority {
-        return name.to_string();
-    }
-
-    let mut chars = match name.get(..WATER_AUTHORITY_PREFIX.len()) {
-        Some(start) if start.eq_ignore_ascii_case(WATER_AUTHORITY_PREFIX) => {
-            &name[WATER_AUTHORITY_PREFIX.len()..]
+    match category {
+        crate::domain::election::ElectionCategory::Municipal
+        | crate::domain::election::ElectionCategory::Provincial => name.to_string(),
+        crate::domain::election::ElectionCategory::WaterAuthority => {
+            let mut chars = match name.get(..WATER_AUTHORITY_PREFIX.len()) {
+                Some(start) if start.eq_ignore_ascii_case(WATER_AUTHORITY_PREFIX) => {
+                    &name[WATER_AUTHORITY_PREFIX.len()..]
+                }
+                _ => name,
+            }
+            .chars();
+            match chars.next() {
+                Some(first) => first.to_uppercase().chain(chars).collect(),
+                None => String::new(),
+            }
         }
-        _ => name,
-    }
-    .chars();
-
-    match chars.next() {
-        Some(first) => first.to_uppercase().chain(chars).collect(),
-        None => String::new(),
+        crate::domain::election::ElectionCategory::HouseOfRepresentatives => {
+            let updated_name = name.replace(HOUSE_OF_REPRESENTATIVES_POSTFIX, "");
+            updated_name.to_string()
+        }
     }
 }
 
@@ -1664,7 +1671,7 @@ mod tests {
                 "Tweede Kamer der Staten-Generaal 2025",
                 ElectionCategory::HouseOfRepresentatives
             ),
-            "Tweede Kamer der Staten-Generaal 2025"
+            "Tweede Kamer 2025"
         )
     }
 

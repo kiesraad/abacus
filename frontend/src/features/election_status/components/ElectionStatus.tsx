@@ -85,8 +85,9 @@ export function ElectionStatus({ statuses, election, committeeSession, addLinks,
                 {t("investigations.title")}
               </Button>
             ))}
-
-          <DataEntryImportButton election={election} committeeSession={committeeSession} navigate={navigate} />
+          {statusEntriesWithTypist.filter((se) => se.entry.status === "empty").length > 0 && (
+            <DataEntryImportButton election={election} committeeSession={committeeSession} navigate={navigate} />
+          )}
         </div>
       </div>
       <div className={cls.statusSection}>

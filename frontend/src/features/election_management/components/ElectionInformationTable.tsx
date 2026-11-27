@@ -65,7 +65,7 @@ export function ElectionInformationTable({
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
-            {t("election_management.electoral_area")}
+            {t("area_designation")}
           </Table.HeaderCell>
           <Table.Cell>
             {election.authority_id} - {election.authority_region}

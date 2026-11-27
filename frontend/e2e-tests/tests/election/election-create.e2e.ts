@@ -113,7 +113,7 @@ test.describe("Election creation", () => {
       const electionRow = overviewPage.findElectionRowById(election.id);
       await expect(electionRow).toBeVisible();
       await expect(electionRow).toContainText("Gemeenteraad Test 2022");
-      await expect(electionRow).toContainText("GSB - Test (0000)");
+      await expect(electionRow).toContainText("GSB 0000 Test");
       await expect(electionRow).toContainText("Klaar voor invoer");
     });
 
@@ -267,7 +267,7 @@ test.describe("Election creation", () => {
       const electionRow = overviewPage.findElectionRowById(election.id);
       await expect(electionRow).toBeVisible();
       await expect(electionRow).toContainText("Gemeenteraad Test 2022");
-      await expect(electionRow).toContainText("GSB - Test (0000)");
+      await expect(electionRow).toContainText("GSB 0000 Test");
       await expect(electionRow).toContainText("Klaar voor invoer");
     });
 
@@ -361,7 +361,7 @@ test.describe("Election creation", () => {
       electionDefinition: eml110a,
       candidateDefinition: eml230b,
       regionName: "Test",
-      committeeLabel: "CSB - Test (0000)",
+      committeeLabel: "CSB Test",
       subCommittees: ["Test"],
     },
     {
@@ -369,7 +369,7 @@ test.describe("Election creation", () => {
       electionDefinition: eml110a_AB,
       candidateDefinition: eml230b_AB,
       regionName: "Rivier en Polder",
-      committeeLabel: "CSB - Rivier en Polder (10)",
+      committeeLabel: "CSB Rivier en Polder",
       subCommittees: ["'s-Gravenveen", "Heemdamseburg", "Juinen", "Middelgein"],
     },
   ];

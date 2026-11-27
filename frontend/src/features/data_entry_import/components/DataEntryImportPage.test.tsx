@@ -119,6 +119,8 @@ describe("DataEntryImportPage", () => {
     expect(screen.getByText(electionName)).toBeVisible();
     expect(screen.getByText("Gemeentelijk stembureau")).toBeVisible();
     expect(screen.getByText("0035 - Heemdamseburg")).toBeVisible();
+    expect(screen.getByText("De EML 510b is ondertekend door GSB 0035 - Heemdamseburg")).toBeVisible();
+    expect(screen.getByText("Digitale vingerafdruk komt overeen met die op het papieren proces-verbaal")).toBeVisible();
 
     // 3. Check and save.
     overrideOnce("post", importPath, 200, {
@@ -127,7 +129,10 @@ describe("DataEntryImportPage", () => {
       sub_committee: subCommittee,
     });
     await user.click(screen.getByRole("button", { name: "Opslaan" }));
-    expect(pushMessage).toHaveBeenCalledWith({ title: "Tellingsbestand GSB Heemdamseburg geïmporteerd" });
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Tellingsbestand GSB Heemdamseburg geïmporteerd",
+      text: "Geef het papieren proces-verbaal aan een invoerder om ter controle een handmatige invoer te doen.",
+    });
     expect(router.state.location.pathname).toEqual(`/elections/${electionId}/status`);
   });
 

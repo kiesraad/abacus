@@ -68,9 +68,6 @@ export async function fillDataEntryPages(page: Page, results: Results) {
       await gsbDifferencesPage.fillInPageAndClickNext(results.differences_counts);
       break;
     }
-    default:
-      // Exhaustive check
-      results satisfies never;
   }
 
   await fillCandidatesListPages(page, results);

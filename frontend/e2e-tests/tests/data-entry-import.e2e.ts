@@ -119,8 +119,8 @@ test.describe(`data entry import GSB 510b into CSB election`, () => {
     await expect(dataEntryImportCheckAndSavePage.saveButton).toBeVisible();
     await dataEntryImportCheckAndSavePage.saveButton.click();
 
-    // Back at the status page.
-    await expect(electionStatusPage.buttonImportCount).toBeVisible();
+    // Back at the status page, import button should now be hidden
+    await expect(electionStatusPage.buttonImportCount).toBeHidden();
 
     // Confirmation alert.
     await expect(electionStatusPage.alertDataEntryImportSuccess).toBeVisible();
@@ -130,7 +130,7 @@ test.describe(`data entry import GSB 510b into CSB election`, () => {
     await expect(row).toContainText("Geïmporteerd");
 
     // Start import flow again.
-    await electionStatusPage.buttonImportCount.click();
+    await page.goBack();
     await expect(dataEntryImportPage.header).toBeVisible();
 
     // Upload same zip again (error `DataEntryAlreadyImported`).

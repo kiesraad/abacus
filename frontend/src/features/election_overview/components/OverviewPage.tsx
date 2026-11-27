@@ -18,6 +18,7 @@ import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import type { ELECTION_LIST_REQUEST_PATH, Election, ElectionListResponse } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
+import { formatElectionTypeLabel } from "@/utils/election";
 import { AddFirstElection } from "./AddFirstElection";
 import cls from "./OverviewPage.module.css";
 
@@ -50,28 +51,16 @@ export function OverviewPage() {
     election: Election;
   }
 
-  function committeeTypeLabel(election: Election): string {
-    const label = `${t(`committee_category.${election.committee_category}.abbreviation`)} - ${election.authority_region}`;
-
-    switch (election.committee_category) {
-      case "GSB":
-        return `${label} (${election.authority_id})`;
-      case "HSB":
-      case "CSB":
-        if (!election.domain) return label;
-        return `${label} (${election.domain.id})`;
-      default:
-        // Exhaustive check
-        return election.committee_category satisfies never;
-    }
-  }
-
   function ElectionRow({ election }: ElectionRowProps): ReactNode {
     function ElectionRowContent() {
       return (
         <>
           <Table.Cell>{election.name}</Table.Cell>
-          <Table.Cell>{isTypist ? election.authority_region : committeeTypeLabel(election)}</Table.Cell>
+          <Table.Cell>
+            {isTypist
+              ? election.authority_region
+              : formatElectionTypeLabel(election.authority_id, election.authority_name, election.committee_category)}
+          </Table.Cell>
           <Table.Cell>
             {isTypist ? (
               committeeSessionStatus

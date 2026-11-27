@@ -51,8 +51,6 @@ type GSBFixtures = {
   dataEntryGSBFirstEntryDone: DataEntryFixture;
   // First data entry correction of the GSB CSO election after resolve differences
   dataEntryGSBFirstEntryCorrection: DataEntryFixture;
-  // First data entry correction of the next session of a GSB CSO election after resolve differences
-  dataEntryNextSessionFirstEntryCorrection: DataEntryFixture;
   // Second data entry correction of the GSB CSO election after resolve differences
   dataEntryGSBSecondEntryCorrection: DataEntryFixture;
   // First data entry of the GSB CSO election with first data entry with errors
@@ -67,6 +65,8 @@ type GSBFixtures = {
   completedElectionGSB: ElectionDetailsResponse;
   // GSB CSO election with one investigation in the second committee session
   dataEntryNextSession: DataEntryFixture;
+  // First data entry correction of the next session of a GSB CSO election after resolve differences
+  dataEntryNextSessionFirstEntryCorrection: DataEntryFixture;
 };
 
 export const gsbFixtures = userFixtures.extend<GSBFixtures>({
@@ -150,21 +150,6 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
     await resolveDifferences(coordinatorOneGSB, dataEntryGSBEntriesDifferent.id, "keep_second_and_correct_first");
     await use(dataEntryGSBEntriesDifferent);
   },
-  dataEntryNextSessionFirstEntryCorrection: async (
-    { typistOneGSB, typistTwoGSB, coordinatorOneGSB, dataEntryNextSession },
-    use,
-  ) => {
-    await completeDataEntries(
-      dataEntryNextSession.id,
-      typistOneGSB.request,
-      typistTwoGSB.request,
-      { data: nextSessionResults, progress: 100, client_state: {} },
-      { data: nextSessionResultsWithDifferences, progress: 100, client_state: {} },
-    );
-
-    await resolveDifferences(coordinatorOneGSB, dataEntryNextSession.id, "keep_second_and_correct_first");
-    await use(dataEntryNextSession);
-  },
   dataEntryGSBSecondEntryCorrection: async ({ coordinatorOneGSB, dataEntryGSBEntriesDifferent }, use) => {
     await resolveDifferences(coordinatorOneGSB, dataEntryGSBEntriesDifferent.id, "keep_first_and_correct_second");
     await use(dataEntryGSBEntriesDifferent);
@@ -227,5 +212,20 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
       name: pollingStation.name,
       number: String(pollingStation.number),
     });
+  },
+  dataEntryNextSessionFirstEntryCorrection: async (
+    { typistOneGSB, typistTwoGSB, coordinatorOneGSB, dataEntryNextSession },
+    use,
+  ) => {
+    await completeDataEntries(
+      dataEntryNextSession.id,
+      typistOneGSB.request,
+      typistTwoGSB.request,
+      { data: nextSessionResults, progress: 100, client_state: {} },
+      { data: nextSessionResultsWithDifferences, progress: 100, client_state: {} },
+    );
+
+    await resolveDifferences(coordinatorOneGSB, dataEntryNextSession.id, "keep_second_and_correct_first");
+    await use(dataEntryNextSession);
   },
 });

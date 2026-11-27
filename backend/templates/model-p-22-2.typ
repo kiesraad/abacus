@@ -6,7 +6,7 @@
 #let subcommittee_type = [gemeentelijk stembureau]
 #let LARGE_COUNCIL_THRESHOLD = 19
 
-#let header-right = [Centraal stembureau #input.election.location]
+#let header-right = [Centraal stembureau #input.election.authority_region]
 
 #show: doc => conf(
   doc,

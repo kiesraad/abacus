@@ -337,8 +337,8 @@ export const CSBElectionStatusImportDone: StoryObj<StoryProps> = {
       });
     });
 
-    await step("Import button not visible", async () => {
-      await expect(canvas.queryByRole("button", { name: "Tellingsbestand GSB importeren" })).not.toBeInTheDocument();
+    await step("Import button still visible", async () => {
+      await expect(canvas.getByRole("button", { name: "Tellingsbestand GSB importeren" })).toBeVisible();
     });
   },
 };

@@ -1,3 +1,9 @@
+.all_files_imported {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .confirmations {
   display: flex;
   flex-direction: column;

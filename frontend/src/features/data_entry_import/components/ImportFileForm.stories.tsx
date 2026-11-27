@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, within } from "storybook/test";
+import { CSBStatusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { type FileErrorCase, fileError } from "../hooks/useDataEntryImport";
 import { ImportFileForm } from "./ImportFileForm";
 
@@ -24,6 +25,10 @@ const meta = {
     onFileChange: fn(),
     isLoading: false,
   },
+  parameters: {
+    needsElectionStatus: true,
+    statuses: CSBStatusResponseMock.statuses,
+  },
 } satisfies Meta<typeof ImportFileForm>;
 
 export default meta;
@@ -33,6 +38,17 @@ export const Default: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByText("Geen bestand gekozen")).toBeVisible();
     await expect(canvas.getByText("Bestand kiezen")).toBeVisible();
+    await expect(canvas.getByRole("heading", { name: "Nog te importeren:" })).toBeVisible();
+    const table = canvas.getByRole("table");
+    await expect(table).toBeVisible();
+    await expect(table).toHaveTableContent([
+      ["Nummer", "Gemeentelijk stembureau"],
+      ["0001", "Juinen"],
+      ["0002", "'s-Gravenveen"],
+      ["0003", "Eksterlo"],
+      ["0004", "Hovenerwoud"],
+      ["0005", "Bloemstede"],
+    ]);
   },
 };
 
@@ -58,5 +74,23 @@ export const WithErrors: Story = {
       const alert = within(canvas.getByTestId(name)).getByRole("alert");
       await expect(alert).toHaveTextContent(title);
     }
+  },
+};
+
+export const Finished: Story = {
+  parameters: {
+    statuses: [],
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.queryByText("Geen bestand gekozen")).not.toBeInTheDocument();
+    await expect(canvas.queryByText("Bestand kiezen")).not.toBeInTheDocument();
+    await expect(canvas.queryByRole("heading", { name: "Nog te importeren:" })).not.toBeInTheDocument();
+    await expect(canvas.queryByRole("table")).not.toBeInTheDocument();
+    await expect(
+      canvas.getByRole("heading", { name: "Alle gemeentelijk stembureaus zijn geïmporteerd" }),
+    ).toBeVisible();
+    const link = canvas.getByRole("link", { name: "Naar statusoverzicht steminvoer" });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", "/status");
   },
 };

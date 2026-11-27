@@ -2,8 +2,10 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { getCSBElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { CSBStatusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { overrideOnce } from "@/testing/server";
 import { renderReturningRouter, screen, within } from "@/testing/test-utils";
 import type {
@@ -13,12 +15,12 @@ import type {
   RedactedEmlHash,
   SubCommitteeFirstSession,
 } from "@/types/generated/openapi";
-
 import { DataEntryImportPage } from "./DataEntryImportPage";
 
 const electionId = 2;
 const electionName = "Gemeenteraad Heemdamseburg 2026";
 const electionPath = `/api/elections/${electionId}`;
+const electionStatusPath = `/api/elections/${electionId}/status`;
 const validatePath = `${electionPath}/data_entry/import/validate`;
 const importPath = `${electionPath}/data_entry/import`;
 
@@ -71,7 +73,9 @@ const pushMessage = vi.fn();
 function renderPage() {
   return renderReturningRouter(
     <ElectionProvider electionId={electionId}>
-      <DataEntryImportPage />
+      <ElectionStatusProvider electionId={electionId}>
+        <DataEntryImportPage />
+      </ElectionStatusProvider>
     </ElectionProvider>,
   );
 }
@@ -95,6 +99,7 @@ describe("DataEntryImportPage", () => {
       hasMessages: vi.fn(() => false),
     });
     overrideOnce("get", electionPath, 200, getCSBElectionMockData());
+    overrideOnce("get", electionStatusPath, 200, CSBStatusResponseMock);
   });
 
   test("imports a GSB count file (510b) from start to finish", async () => {
@@ -134,6 +139,21 @@ describe("DataEntryImportPage", () => {
       text: "Geef het papieren proces-verbaal aan een invoerder om ter controle een handmatige invoer te doen.",
     });
     expect(router.state.location.pathname).toEqual(`/elections/${electionId}/status`);
+  });
+
+  test("no import possible when all imports done", async () => {
+    overrideOnce("get", electionStatusPath, 200, { statuses: [] });
+    const user = userEvent.setup();
+    const router = renderPage();
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Importeer tellingsbestand" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Alle gemeentelijk stembureaus zijn geïmporteerd" }),
+    ).toBeVisible();
+    const link = await screen.findByRole("link", { name: "Naar statusoverzicht steminvoer" });
+    expect(link).toBeVisible();
+    await user.click(link);
+    expect(router.state.location.pathname).toEqual(`/status`);
   });
 
   describe("import validation errors", () => {

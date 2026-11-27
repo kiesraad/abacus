@@ -23,6 +23,7 @@ export async function apiLoginAs(request: APIRequestContext, username: string, p
 export async function apiLogout(request: APIRequestContext) {
   return await request.post("/api/logout");
 }
+
 export async function createUser(adminContext: APIRequestContext, user: TestUser) {
   const response = await adminContext.post("/api/users", {
     data: {

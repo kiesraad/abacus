@@ -11,7 +11,6 @@ import type {
 } from "@/types/generated/openapi";
 
 export async function getFirstDataEntryForElection(admin: { request: APIRequestContext }, electionId: ElectionId) {
-  // get the first polling station of the existing election
   const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${electionId}/status`;
   const response = await admin.request.get(url);
   expect(response.ok()).toBeTruthy();

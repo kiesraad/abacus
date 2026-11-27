@@ -68,6 +68,7 @@ async function openImportPage(page: Page, electionId: number): Promise<DataEntry
   return dataEntryImportPage;
 }
 
+// TODO: Need to update this test to use an election with 2 subcommittees to be able to upload the same file twice
 test.describe(`data entry import GSB 510b into CSB election`, () => {
   test("imports a GSB count file, shows it as imported and refuses a second import", async ({
     coordinatorOneCSB,
@@ -119,8 +120,8 @@ test.describe(`data entry import GSB 510b into CSB election`, () => {
     await expect(dataEntryImportCheckAndSavePage.saveButton).toBeVisible();
     await dataEntryImportCheckAndSavePage.saveButton.click();
 
-    // Back at the status page, import button should now be hidden
-    await expect(electionStatusPage.buttonImportCount).toBeHidden();
+    // Back at the status page, import button should still be visible
+    await expect(electionStatusPage.buttonImportCount).toBeVisible();
 
     // Confirmation alert.
     await expect(electionStatusPage.alertDataEntryImportSuccess).toBeVisible();
@@ -130,7 +131,7 @@ test.describe(`data entry import GSB 510b into CSB election`, () => {
     await expect(row).toContainText("Geïmporteerd");
 
     // Start import flow again.
-    await page.goBack();
+    await electionStatusPage.buttonImportCount.click();
     await expect(dataEntryImportPage.header).toBeVisible();
 
     // Upload same zip again (error `DataEntryAlreadyImported`).

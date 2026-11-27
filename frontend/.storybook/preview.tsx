@@ -18,7 +18,7 @@ import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { matchers } from "@/testing/matchers";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import type { Role, VoteCountingMethod } from "@/types/generated/openapi";
+import type { ElectionStatusResponseEntry, Role, VoteCountingMethod } from "@/types/generated/openapi";
 
 sb.mock("react-router", { spy: true });
 
@@ -62,6 +62,9 @@ const preview: Preview = {
       const needsElectionStatus = (parameters.needsElectionStatus as boolean) || false;
       const committeeSessionNumber = (parameters.committeeSessionNumber as number) || 1;
       const countingMethod = parameters.countingMethod ? (parameters.countingMethod as VoteCountingMethod) : "CSO";
+      const statuses = parameters.statuses
+        ? (parameters.statuses as ElectionStatusResponseEntry[])
+        : statusResponseMock.statuses;
 
       let component = <Story />;
 
@@ -69,7 +72,7 @@ const preview: Preview = {
         component = (
           <ElectionStatusProviderContext.Provider
             value={{
-              statuses: statusResponseMock.statuses,
+              statuses,
               refetch: () =>
                 Promise.resolve({ status: ApiResponseStatus.Success, code: 200, data: statusResponseMock }),
             }}

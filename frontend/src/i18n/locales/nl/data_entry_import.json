@@ -1,5 +1,10 @@
 {
   "abort": "Importeren afbreken",
+  "all_files_imported": {
+    "description": "Er kunnen geen nieuwe tellingsbestanden meer worden geïmporteerd. Wil je de digitale invoer van een gemeentelijk stembureau opnieuw doen? Verwijder dan de eerder geïmporteerde telresultaten via het statusoverzicht.",
+    "title": "Alle gemeentelijk stembureaus zijn geïmporteerd",
+    "to_status_overview": "Naar statusoverzicht steminvoer"
+  },
   "button_title": "Tellingsbestand GSB importeren",
   "check_and_save": {
     "description": "Je gaat de volgende telresultaten importeren:",
@@ -64,6 +69,7 @@
   },
   "import_for_entry": "Importeer tellingsbestand voor {entry}",
   "instructions": "<p>Je hebt van het centraal stembureau instructies gekregen waarmee je het EML-tellingsbestand (510b) van het gemeentelijk stembureau kunt downloaden. Zet het bestand op deze computer en importeer het.</p><p><strong>Let op:</strong> Upload het volledige ZIP-bestand. Dit bevat het EML-bestand met telresultaten, en de digitale handtekening.</p>",
+  "still_to_import": "Nog te importeren",
   "success_alert": {
     "description": "Geef het papieren proces-verbaal aan een invoerder om ter controle een handmatige invoer te doen.",
     "title": "Tellingsbestand GSB {fileAuthorityName} geïmporteerd"

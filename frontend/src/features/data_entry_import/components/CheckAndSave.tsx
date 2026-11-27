@@ -4,7 +4,7 @@ import { Icon } from "@/components/ui/Icon/Icon";
 import { t } from "@/i18n/translate";
 import type { SubCommitteeFirstSession } from "@/types/generated/openapi";
 import { formatAreaDesignation } from "@/utils/election";
-import cls from "./CheckAndSave.module.css";
+import cls from "./DataEntryImport.module.css";
 
 export interface CheckAndSaveProps {
   electionName: string;

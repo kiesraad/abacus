@@ -1,13 +1,12 @@
 import { readFile } from "node:fs/promises";
 import { expect } from "@playwright/test";
-import { DataEntryApiClient } from "e2e-tests/helpers-utils/api-clients";
 import {
   changeCommitteeSessionStatus,
-  completeDataEntries,
   createCommitteeSession,
   createInvestigation,
   resolveDifferences,
-} from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+} from "e2e-tests/helpers-utils/api-helpers/coordinator-api-helpers";
+import { completeDataEntries, DataEntryApiClient } from "e2e-tests/helpers-utils/api-helpers/data-entry-api-helpers";
 import { type Eml230b, eml110a, eml230b } from "e2e-tests/test-data/eml-files";
 import {
   dataEntryRequest,

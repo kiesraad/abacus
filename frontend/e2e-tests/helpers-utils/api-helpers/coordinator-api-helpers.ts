@@ -1,11 +1,11 @@
-import { setTimeout } from "node:timers/promises";
 import { type APIRequestContext, expect } from "@playwright/test";
-import { dataEntryRequest } from "e2e-tests/test-data/request-response-templates";
-import type { TestUser } from "e2e-tests/test-data/users";
 import type {
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
+  COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
+  COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
+  CommitteeSessionId,
   CommitteeSessionStatus,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
@@ -21,71 +21,6 @@ import type {
   PollingStationInvestigation,
   ResolveDifferencesAction,
 } from "@/types/generated/openapi";
-import { DataEntryApiClient } from "./api-clients";
-
-export function getTestPassword(username: string, prefix = ""): string {
-  const capitalizedUsername = username.charAt(0).toUpperCase() + username.slice(1);
-  return `${prefix}${capitalizedUsername}Password01`;
-}
-
-export async function apiLoginAs(request: APIRequestContext, username: string, passwordPrefix = "") {
-  const password = getTestPassword(username, passwordPrefix);
-  // Parallel tests log in from the same IP; retry until another test's successful login releases the rate limit
-  const deadline = Date.now() + 60_000;
-  for (;;) {
-    const response = await request.post("/api/login", { data: { username, password } });
-    if (response.status() !== 429 || Date.now() >= deadline) {
-      return response;
-    }
-    await setTimeout(250);
-  }
-}
-
-export async function apiLogout(request: APIRequestContext) {
-  return await request.post("/api/logout");
-}
-
-export async function completeDataEntries(
-  dataEntryId: number,
-  typistOneRequest: APIRequestContext,
-  typistTwoRequest: APIRequestContext,
-  firstRequest = dataEntryRequest,
-  secondRequest = dataEntryRequest,
-) {
-  const firstDataEntry = new DataEntryApiClient(typistOneRequest, dataEntryId, 1);
-  await firstDataEntry.claim();
-  await firstDataEntry.save(firstRequest);
-  await firstDataEntry.finalise();
-
-  const secondDataEntry = new DataEntryApiClient(typistTwoRequest, dataEntryId, 2);
-  await secondDataEntry.claim();
-  await secondDataEntry.save(secondRequest);
-  await secondDataEntry.finalise();
-}
-
-export async function createUser(adminContext: APIRequestContext, user: TestUser) {
-  const response = await adminContext.post("/api/users", {
-    data: {
-      ...user,
-      temp_password: getTestPassword(user.username, "Temp"),
-    },
-  });
-  expect(response.status(), `response status not 201: ${await response.json()}`).toBe(201);
-}
-
-export async function firstLogin(userContext: APIRequestContext, user: TestUser) {
-  const loginResponse = await apiLoginAs(userContext, user.username, "Temp");
-  expect(loginResponse.status(), `response status not 200: ${await loginResponse.json()}`).toBe(200);
-
-  const response = await userContext.put("/api/account", {
-    data: {
-      username: user.username,
-      fullname: user.fullname,
-      password: getTestPassword(user.username),
-    },
-  });
-  expect(response.status(), `response status not 200: ${await response.json()}`).toBe(200);
-}
 
 export async function resolveDifferences(
   coordinator: { request: APIRequestContext },
@@ -99,7 +34,7 @@ export async function resolveDifferences(
   return response.status();
 }
 
-export async function getElectionDetails(user: { request: APIRequestContext }, electionId: ElectionId) {
+async function getElectionDetails(user: { request: APIRequestContext }, electionId: ElectionId) {
   const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${electionId}`;
   const electionResponse = await user.request.get(electionUrl);
   expect(electionResponse.ok()).toBeTruthy();
@@ -122,6 +57,21 @@ export async function changeCommitteeSessionStatus(
   expect(statusChangeResponse.ok()).toBeTruthy();
 
   return electionDetails;
+}
+
+export async function fillInCommiteeSessionDetails(
+  user: { request: APIRequestContext },
+  electionId: ElectionId,
+  commiteeSessionId: CommitteeSessionId,
+) {
+  const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${electionId}/committee_sessions/${commiteeSessionId}`;
+  const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
+    location: "Den Haag",
+    start_date: "2026-03-18",
+    start_time: "21:45",
+  };
+  const detailsUpdateResponse = await user.request.put(detailsUpdateUrl, { data: detailsUpdateData });
+  expect(detailsUpdateResponse.ok()).toBeTruthy();
 }
 
 /**

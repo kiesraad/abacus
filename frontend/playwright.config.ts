@@ -92,8 +92,7 @@ const config: PlaywrightTestConfig = defineConfig({
     },
     {
       name: "chrome",
-      testMatch: /.*\.e2e\.ts/,
-      testIgnore: /initialisation\.e2e\.ts/,
+      testIgnore: [/initialisation\.e2e\.ts/, /full-flow.*\.e2e\.ts/],
       use: {
         contextOptions: {
           permissions: ["clipboard-read", "clipboard-write"],
@@ -104,7 +103,27 @@ const config: PlaywrightTestConfig = defineConfig({
     },
     {
       name: "firefox",
-      testIgnore: /initialisation\.e2e\.ts/,
+      testIgnore: [/initialisation\.e2e\.ts/, /full-flow.*\.e2e\.ts/],
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: ["setup-test-users"],
+    },
+    {
+      name: "chrome-full-flow",
+      testMatch: /full-flow.*\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...chromiumUseOptions(),
+      },
+      dependencies: ["setup-test-users"],
+    },
+    {
+      name: "firefox-full-flow",
+      testMatch: /full-flow.*\.e2e\.ts/,
       use: {
         ...devices["Desktop Firefox"],
         userAgent: "Abacus-User-Agent/1",

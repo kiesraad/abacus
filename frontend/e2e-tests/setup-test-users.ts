@@ -1,6 +1,6 @@
 import { expect, request, test } from "@playwright/test";
-import { apiLoginAs, createUser, firstLogin } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { testUsers, testUsersCSB } from "e2e-tests/test-data/users";
+import { apiLoginAs, createUser, firstLogin } from "./helpers-utils/api-helpers/user-api-helpers";
 
 test.describe("setup test users", () => {
   test("create test user accounts GSB", async () => {

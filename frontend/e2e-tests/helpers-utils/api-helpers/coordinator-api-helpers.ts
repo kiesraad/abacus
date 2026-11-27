@@ -34,9 +34,9 @@ export async function resolveDifferences(
   return response.status();
 }
 
-async function getElectionDetails(user: { request: APIRequestContext }, electionId: ElectionId) {
+async function getElectionDetails(coordinator: { request: APIRequestContext }, electionId: ElectionId) {
   const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${electionId}`;
-  const electionResponse = await user.request.get(electionUrl);
+  const electionResponse = await coordinator.request.get(electionUrl);
   expect(electionResponse.ok()).toBeTruthy();
   return (await electionResponse.json()) as ElectionDetailsResponse;
 }
@@ -45,22 +45,22 @@ async function getElectionDetails(user: { request: APIRequestContext }, election
  * Change the election's current committee session status and return the election details.
  */
 export async function changeCommitteeSessionStatus(
-  user: { request: APIRequestContext },
+  coordinator: { request: APIRequestContext },
   electionId: ElectionId,
   status: CommitteeSessionStatus,
 ) {
-  const electionDetails = await getElectionDetails(user, electionId);
+  const electionDetails = await getElectionDetails(coordinator, electionId);
 
   const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${electionId}/committee_sessions/${electionDetails.current_committee_session.id}/status`;
   const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status };
-  const statusChangeResponse = await user.request.put(statusChangeUrl, { data: statusChangeData });
+  const statusChangeResponse = await coordinator.request.put(statusChangeUrl, { data: statusChangeData });
   expect(statusChangeResponse.ok()).toBeTruthy();
 
   return electionDetails;
 }
 
 export async function fillInCommiteeSessionDetails(
-  user: { request: APIRequestContext },
+  coordinator: { request: APIRequestContext },
   electionId: ElectionId,
   commiteeSessionId: CommitteeSessionId,
 ) {
@@ -70,28 +70,31 @@ export async function fillInCommiteeSessionDetails(
     start_date: "2026-03-18",
     start_time: "21:45",
   };
-  const detailsUpdateResponse = await user.request.put(detailsUpdateUrl, { data: detailsUpdateData });
+  const detailsUpdateResponse = await coordinator.request.put(detailsUpdateUrl, { data: detailsUpdateData });
   expect(detailsUpdateResponse.ok()).toBeTruthy();
 }
 
 /**
  * Create a new committee session and return election details.
  */
-export async function createCommitteeSession(user: { request: APIRequestContext }, electionId: ElectionId) {
+export async function createCommitteeSession(coordinator: { request: APIRequestContext }, electionId: ElectionId) {
   const createSessionUrl: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${electionId}/committee_sessions`;
-  const createSessionResponse = await user.request.post(createSessionUrl);
+  const createSessionResponse = await coordinator.request.post(createSessionUrl);
   expect(createSessionResponse.ok()).toBeTruthy();
 
-  return await getElectionDetails(user, electionId);
+  return await getElectionDetails(coordinator, electionId);
 }
 
 /**
  * Create and conclude an investigation with corrected results.
  */
-export async function createInvestigation(user: { request: APIRequestContext }, pollingStationId: PollingStationId) {
+export async function createInvestigation(
+  coordinator: { request: APIRequestContext },
+  pollingStationId: PollingStationId,
+) {
   const createUrl: POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/investigation`;
   const createData: POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY = { reason: "Een aanleiding" };
-  const createResponse = await user.request.post(createUrl, { data: createData });
+  const createResponse = await coordinator.request.post(createUrl, { data: createData });
   expect(createResponse.ok()).toBeTruthy();
 
   const concludeUrl: POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `${createUrl}/conclude`;
@@ -99,7 +102,7 @@ export async function createInvestigation(user: { request: APIRequestContext }, 
     findings: "Foutje bedankt",
     corrected_results: true,
   };
-  const concludeResponse = await user.request.post(concludeUrl, { data: concludeData });
+  const concludeResponse = await coordinator.request.post(concludeUrl, { data: concludeData });
   expect(concludeResponse.ok()).toBeTruthy();
   return (await concludeResponse.json()) as PollingStationInvestigation;
 }

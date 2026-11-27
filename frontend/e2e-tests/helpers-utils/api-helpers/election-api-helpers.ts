@@ -56,13 +56,13 @@ async function createElection(
 }
 
 export async function createPollingStations(
-  user: { request: APIRequestContext },
+  adminOrCoordinator: { request: APIRequestContext },
   electionId: ElectionId,
   pollingStationRequests: PollingStationRequest[],
 ) {
   const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${electionId}/polling_stations`;
   for (const pollingStationRequest of pollingStationRequests) {
-    const pollingStationResponse = await user.request.post(url, { data: pollingStationRequest });
+    const pollingStationResponse = await adminOrCoordinator.request.post(url, { data: pollingStationRequest });
     expect(pollingStationResponse.ok()).toBeTruthy();
   }
 }

@@ -24,6 +24,7 @@ test.use({
 
 test.describe("full data entry flow with gaps in party/candidate numbers", () => {
   test("no recount, no differences", async ({ page, dataEntryGSB }) => {
+    // TODO: fix this test after creating a fixture to provide an election with eml230b_with_gaps
     await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);

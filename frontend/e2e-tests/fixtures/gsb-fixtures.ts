@@ -1,4 +1,3 @@
-import { readFile } from "node:fs/promises";
 import { expect } from "@playwright/test";
 import {
   changeCommitteeSessionStatus,
@@ -7,6 +6,7 @@ import {
   resolveDifferences,
 } from "e2e-tests/helpers-utils/api-helpers/coordinator-api-helpers";
 import { completeDataEntries, DataEntryApiClient } from "e2e-tests/helpers-utils/api-helpers/data-entry-api-helpers";
+import { createGSBElection } from "e2e-tests/helpers-utils/api-helpers/election-api-helpers";
 import { type Eml230b, eml110a, eml230b } from "e2e-tests/test-data/eml-files";
 import {
   dataEntryRequest,
@@ -20,7 +20,6 @@ import type {
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
   COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   CommitteeSession,
-  ELECTION_IMPORT_REQUEST_PATH,
   ELECTION_STATUS_REQUEST_PATH,
   Election,
   ElectionDetailsResponse,
@@ -79,61 +78,29 @@ type GSBFixtures = {
 
 export const gsbFixtures = userFixtures.extend<GSBFixtures>({
   eml230b: [eml230b, { option: true }],
-  emptyElectionGSB: async ({ adminOne, eml230b }, use) => {
-    const { request } = adminOne;
-    const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
-    const election_data = await readFile(eml110a.path, "utf8");
-    const candidate_data = await readFile(eml230b.path, "utf8");
-    const electionResponse = await request.post(url, {
-      data: {
-        committee_category: "GSB",
-        election_data,
-        election_hash: eml110a.fullHash,
-        candidate_data,
-        candidate_hash: eml230b.fullHash,
-        number_of_voters: 1234,
-        counting_method: "CSO",
-      },
-    });
-    expect(electionResponse.ok()).toBeTruthy();
-    const election = (await electionResponse.json()) as Election;
-
+  emptyElectionGSB: async ({ adminOne }, use) => {
+    const election = await createGSBElection(adminOne, eml110a, eml230b, "CSO");
     await use(election);
   },
-  emptyElectionGSBDSO: async ({ adminOne, eml230b }, use) => {
-    const { request } = adminOne;
-    const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
-    const election_data = await readFile(eml110a.path, "utf8");
-    const candidate_data = await readFile(eml230b.path, "utf8");
-    const electionResponse = await request.post(url, {
-      data: {
-        committee_category: "GSB",
-        election_data,
-        election_hash: eml110a.fullHash,
-        candidate_data,
-        candidate_hash: eml230b.fullHash,
-        number_of_voters: 1234,
-        counting_method: "DSO",
-      },
-    });
-    expect(electionResponse.ok()).toBeTruthy();
-    const election = (await electionResponse.json()) as Election;
-
+  emptyElectionGSBDSO: async ({ adminOne }, use) => {
+    const election = await createGSBElection(adminOne, eml110a, eml230b, "DSO");
     await use(election);
   },
-  electionGSB: async ({ adminOne, coordinatorOneGSB, emptyElectionGSB }, use) => {
+  electionGSB: async ({ adminOne, coordinatorOneGSB }, use) => {
+    const election = await createGSBElection(adminOne, eml110a, eml230b, "CSO");
+
     // create polling stations in the existing emptyElection
-    const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElectionGSB.id}/polling_stations`;
+    const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${election.id}/polling_stations`;
     for (const pollingStationRequest of pollingStationRequests) {
       const pollingStationResponse = await adminOne.request.post(url, { data: pollingStationRequest });
       expect(pollingStationResponse.ok()).toBeTruthy();
     }
 
     // Set committee session status to DataEntry
-    const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, emptyElectionGSB.id, "data_entry");
+    const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, election.id, "data_entry");
 
     // Fill in committee session details
-    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${emptyElectionGSB.id}/committee_sessions/${electionDetails.current_committee_session.id}`;
+    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${election.id}/committee_sessions/${electionDetails.current_committee_session.id}`;
     const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
       location: "Den Haag",
       start_date: "2026-03-18",

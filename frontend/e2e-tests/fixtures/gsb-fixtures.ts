@@ -11,7 +11,7 @@ import {
   getFirstDataEntryForElection,
 } from "e2e-tests/helpers-utils/api-helpers/data-entry-api-helpers";
 import { createGSBElection, createPollingStations } from "e2e-tests/helpers-utils/api-helpers/election-api-helpers";
-import { type Eml230b, eml110a, eml230b, eml230b_with_gaps } from "e2e-tests/test-data/eml-files";
+import { eml110a, eml230b, eml230b_with_gaps } from "e2e-tests/test-data/eml-files";
 import {
   dataEntryRequest,
   dataEntryWithDifferencesRequest,
@@ -31,8 +31,6 @@ export interface DataEntryFixture {
 }
 
 type GSBFixtures = {
-  // candidate list file (EML 230b) for a GR election
-  eml230b: Eml230b;
   // GSB CSO election without polling stations
   emptyElectionGSB: Election;
   // GSB CSO election with two polling stations
@@ -70,7 +68,6 @@ type GSBFixtures = {
 };
 
 export const gsbFixtures = userFixtures.extend<GSBFixtures>({
-  eml230b: [eml230b, { option: true }],
   emptyElectionGSB: async ({ adminOne }, use) => {
     const election = await createGSBElection(adminOne, eml110a, eml230b, "CSO");
     await use(election);

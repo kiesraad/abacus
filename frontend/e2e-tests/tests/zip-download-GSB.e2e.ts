@@ -11,12 +11,11 @@ test.use({
 });
 
 test.describe("GSB election results zip", () => {
-  test("it downloads the GSB election results zip", async ({
-    page,
-    completedElectionGSB,
-    currentCommitteeSessionElectionGSB,
-  }) => {
-    await page.goto(`/elections/${completedElectionGSB.id}/status`);
+  test("it downloads the GSB election results zip", async ({ page, completedElectionGSB }) => {
+    const election = completedElectionGSB.election;
+    const currentCommiteeSession = completedElectionGSB.current_committee_session;
+
+    await page.goto(`/elections/${election.id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
     await electionStatusPage.finish.click();
@@ -26,7 +25,7 @@ test.describe("GSB election results zip", () => {
 
     const electionReportPage = new ElectionReport(page);
     const responsePromise = page.waitForResponse(
-      `/api/elections/${completedElectionGSB.id}/committee_sessions/${currentCommitteeSessionElectionGSB.id}/download_zip_results`,
+      `/api/elections/${election.id}/committee_sessions/${currentCommiteeSession.id}/download_zip_results`,
     );
     const downloadPromise = page.waitForEvent("download");
     await electionReportPage.downloadFirstSessionZip.click();

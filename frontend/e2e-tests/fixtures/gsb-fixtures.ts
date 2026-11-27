@@ -3,6 +3,7 @@ import {
   changeCommitteeSessionStatus,
   createCommitteeSession,
   createInvestigation,
+  fillInCommiteeSessionDetails,
   resolveDifferences,
 } from "e2e-tests/helpers-utils/api-helpers/coordinator-api-helpers";
 import { completeDataEntries, DataEntryApiClient } from "e2e-tests/helpers-utils/api-helpers/data-entry-api-helpers";
@@ -17,8 +18,6 @@ import {
   pollingStationRequests,
 } from "e2e-tests/test-data/request-response-templates";
 import type {
-  COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
-  COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   CommitteeSession,
   ELECTION_STATUS_REQUEST_PATH,
   Election,
@@ -100,14 +99,7 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
     const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, election.id, "data_entry");
 
     // Fill in committee session details
-    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${election.id}/committee_sessions/${electionDetails.current_committee_session.id}`;
-    const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
-      location: "Den Haag",
-      start_date: "2026-03-18",
-      start_time: "21:45",
-    };
-    const detailsUpdateResponse = await coordinatorOneGSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
-    expect(detailsUpdateResponse.ok()).toBeTruthy();
+    await fillInCommiteeSessionDetails(coordinatorOneGSB, election.id, electionDetails.current_committee_session.id);
 
     await use(electionDetails);
   },
@@ -123,14 +115,11 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
     const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, emptyElectionGSBDSO.id, "data_entry");
 
     // Fill in committee session details
-    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${emptyElectionGSBDSO.id}/committee_sessions/${electionDetails.current_committee_session.id}`;
-    const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
-      location: "Den Haag",
-      start_date: "2026-03-18",
-      start_time: "21:45",
-    };
-    const detailsUpdateResponse = await coordinatorOneGSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
-    expect(detailsUpdateResponse.ok()).toBeTruthy();
+    await fillInCommiteeSessionDetails(
+      coordinatorOneGSB,
+      emptyElectionGSBDSO.id,
+      electionDetails.current_committee_session.id,
+    );
 
     await use(electionDetails);
   },

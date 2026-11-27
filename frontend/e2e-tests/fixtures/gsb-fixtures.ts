@@ -7,7 +7,7 @@ import {
   resolveDifferences,
 } from "e2e-tests/helpers-utils/api-helpers/coordinator-api-helpers";
 import { completeDataEntries, DataEntryApiClient } from "e2e-tests/helpers-utils/api-helpers/data-entry-api-helpers";
-import { createGSBElection } from "e2e-tests/helpers-utils/api-helpers/election-api-helpers";
+import { createGSBElection, createPollingStations } from "e2e-tests/helpers-utils/api-helpers/election-api-helpers";
 import { type Eml230b, eml110a, eml230b } from "e2e-tests/test-data/eml-files";
 import {
   dataEntryRequest,
@@ -23,7 +23,6 @@ import type {
   Election,
   ElectionDetailsResponse,
   ElectionStatusResponse,
-  POLLING_STATION_CREATE_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { userFixtures } from "./user-fixtures";
 
@@ -82,17 +81,11 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
   electionGSB: async ({ adminOne, coordinatorOneGSB }, use) => {
     const election = await createGSBElection(adminOne, eml110a, eml230b, "CSO");
 
-    // create polling stations in the existing emptyElection
-    const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${election.id}/polling_stations`;
-    for (const pollingStationRequest of pollingStationRequests) {
-      const pollingStationResponse = await adminOne.request.post(url, { data: pollingStationRequest });
-      expect(pollingStationResponse.ok()).toBeTruthy();
-    }
+    await createPollingStations(adminOne, election.id, pollingStationRequests);
 
     // Set committee session status to DataEntry
     const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, election.id, "data_entry");
 
-    // Fill in committee session details
     await fillInCommiteeSessionDetails(coordinatorOneGSB, election.id, electionDetails.current_committee_session.id);
 
     await use(electionDetails);
@@ -100,17 +93,11 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
   electionGSBDSO: async ({ adminOne, coordinatorOneGSB }, use) => {
     const election = await createGSBElection(adminOne, eml110a, eml230b, "DSO");
 
-    // create polling stations in the existing emptyElection
-    const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${election.id}/polling_stations`;
-    for (const pollingStationRequest of pollingStationRequests) {
-      const pollingStationResponse = await adminOne.request.post(url, { data: pollingStationRequest });
-      expect(pollingStationResponse.ok()).toBeTruthy();
-    }
+    await createPollingStations(adminOne, election.id, pollingStationRequests);
 
     // Set committee session status to DataEntry
     const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, election.id, "data_entry");
 
-    // Fill in committee session details
     await fillInCommiteeSessionDetails(coordinatorOneGSB, election.id, electionDetails.current_committee_session.id);
 
     await use(electionDetails);

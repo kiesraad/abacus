@@ -1,7 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { type APIRequestContext, expect } from "@playwright/test";
 import type { Eml110a, Eml230b } from "e2e-tests/test-data/eml-files";
-import type { ELECTION_IMPORT_REQUEST_PATH, Election, VoteCountingMethod } from "@/types/generated/openapi";
+import type {
+  ELECTION_IMPORT_REQUEST_PATH,
+  Election,
+  ElectionId,
+  POLLING_STATION_CREATE_REQUEST_PATH,
+  PollingStationRequest,
+  VoteCountingMethod,
+} from "@/types/generated/openapi";
 
 export async function createGSBElection(
   admin: { request: APIRequestContext },
@@ -26,6 +33,18 @@ export async function createGSBElection(
   expect(electionResponse.ok()).toBeTruthy();
   const election = (await electionResponse.json()) as Election;
   return election;
+}
+
+export async function createPollingStations(
+  user: { request: APIRequestContext },
+  electionId: ElectionId,
+  pollingStationRequests: PollingStationRequest[],
+) {
+  const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${electionId}/polling_stations`;
+  for (const pollingStationRequest of pollingStationRequests) {
+    const pollingStationResponse = await user.request.post(url, { data: pollingStationRequest });
+    expect(pollingStationResponse.ok()).toBeTruthy();
+  }
 }
 
 export async function createCSBElection(

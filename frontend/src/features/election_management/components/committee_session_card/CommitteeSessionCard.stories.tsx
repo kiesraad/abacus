@@ -87,7 +87,11 @@ export const HSBCommitteeSessionCard: StoryObj<Props> = {
   },
 };
 
-export const CSBCommitteeSessionCard: StoryObj<Props> = {
+type CSBProps = Props & {
+  apportionmentFinalised: boolean;
+};
+
+export const CSBCommitteeSessionCard: StoryObj<CSBProps> = {
   argTypes: {
     number: {
       options: [1],
@@ -101,17 +105,33 @@ export const CSBCommitteeSessionCard: StoryObj<Props> = {
       options: [true],
       control: { type: "radio" },
     },
+    apportionmentFinalised: {
+      options: [true, false],
+      control: { type: "radio" },
+    },
   },
   args: {
     userRole: "coordinator_csb",
   },
-  render: ({ number, userRole, status, startDateTime, isCurrentSession }) => {
+  render: ({ number, userRole, status, startDateTime, isCurrentSession, apportionmentFinalised }) => {
     const committeeSession = getCommitteeSessionMockData({
       number: number,
       status: status,
       start_date_time: startDateTime,
       location: "Juinen",
     });
+    if (apportionmentFinalised) {
+      // overrideOnce("get", "/api/elections/2/apportionment/state", 200, {
+      //   type: "Finalised",
+      //   deceased_candidates: [],
+      //   lists_drawn: [],
+      //   candidates_drawn: [],
+      // } satisfies ApportionmentState);
+    } else {
+      // overrideOnce("get", "/api/elections/2/apportionment/state", 200, {
+      //   type: "Uninitialised",
+      // } satisfies ApportionmentState);
+    }
     return (
       <TestUserProvider userRole={userRole}>
         <CommitteeSessionCard

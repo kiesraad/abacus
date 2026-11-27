@@ -630,6 +630,22 @@ export const UserDeleteRequestHandler = http.delete<ParamsToString<USER_DELETE_R
   () => new HttpResponse(null, { status: 200 }),
 );
 
+export const GetApportionmentStateFinalisedRequestHandler = http.get<
+  ParamsToString<GET_APPORTIONMENT_STATE_REQUEST_PARAMS>
+>("/api/elections/2/apportionment/state" satisfies GET_APPORTIONMENT_STATE_REQUEST_PATH, () =>
+  HttpResponse.json(
+    {
+      type: "Finalised",
+      deceased_candidates: [],
+      lists_drawn: [],
+      candidates_drawn: [],
+    } satisfies ApportionmentState,
+    {
+      status: 200,
+    },
+  ),
+);
+
 export const GetApportionmentStateRequestHandler = http.get<ParamsToString<GET_APPORTIONMENT_STATE_REQUEST_PARAMS>>(
   "/api/elections/3/apportionment/state" satisfies GET_APPORTIONMENT_STATE_REQUEST_PATH,
   () =>
@@ -769,6 +785,7 @@ export const handlers: HttpHandler[] = [
   UserListRequestHandler,
   UserUpdateRequestHandler,
   UserDeleteRequestHandler,
+  GetApportionmentStateFinalisedRequestHandler,
   GetApportionmentStateRequestHandler,
   ResetApportionmentStateRequestHandler,
   RegisterDeceasedCandidatesRequestHandler,

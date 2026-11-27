@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { type NavigateOptions, type To, useNavigate } from "react-router";
+import { useApportionmentStateRequest } from "@/hooks/apportionment/useApportionmentStateRequest";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import type { CommitteeSession, CommitteeSessionId } from "@/types/generated/openapi";
@@ -97,6 +98,9 @@ export function ButtonLinksCSB({ committeeSession }: ButtonLinksProps) {
   const buttonLinks: ButtonLink[] = [];
   const { isCoordinator, isAdministrator } = useUserRole();
 
+  const { requestState } = useApportionmentStateRequest(committeeSession.election_id);
+  const apportionmentFinalised = requestState.status === "success" && requestState.data.type === "Finalised";
+
   const addIf = (item: ButtonLink, condition: boolean) => {
     if (condition) {
       buttonLinks.push(item);
@@ -122,7 +126,7 @@ export function ButtonLinksCSB({ committeeSession }: ButtonLinksProps) {
       addIf(detailsButtonLink(committeeSession.id), isCoordinator);
       break;
     case "completed":
-      addIf(downloadButtonLink(committeeSession.id), isCoordinator);
+      addIf(downloadButtonLink(committeeSession.id), isCoordinator && apportionmentFinalised);
       addIf(apportionmentButtonLink(committeeSession.id), isCoordinator);
       addIf(viewDataEntryButtonLink(committeeSession.id), true);
       break;

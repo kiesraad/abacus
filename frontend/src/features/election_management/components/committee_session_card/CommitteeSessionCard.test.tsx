@@ -1,7 +1,8 @@
+import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import { HttpResponse, http } from "msw";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import * as useUser from "@/hooks/user/useUser";
 import {
   getCommitteeSessionMockData,
@@ -12,13 +13,13 @@ import { csbElectionMockData, electionMockData, hsbElectionMockData } from "@/te
 import {
   CommitteeSessionStatusChangeRequestHandler,
   CSBCommitteeSessionStatusChangeRequestHandler,
+  GetApportionmentStateFinalisedRequestHandler,
   HSBCommitteeSessionStatusChangeRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser } from "@/testing/user-mock-data";
-import type { CommitteeSessionStatus } from "@/types/generated/openapi";
-
+import type { ApportionmentState, CommitteeSessionStatus } from "@/types/generated/openapi";
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 
 const navigate = vi.fn();
@@ -139,7 +140,6 @@ const testCasesGSB: TestCasesGSB = {
 /**
  * Test cases for first committee session for HSB election.
  * - buttonsCurrentSession: buttons if card represents the current session
- * - buttonsNotCurrentSession: buttons if card represents not the current session
  * - actionButton: link button of card
  */
 const testCasesHSB: TestCasesHSB = {
@@ -184,7 +184,6 @@ const testCasesHSB: TestCasesHSB = {
 /**
  * Test cases for first committee session for CSB election.
  * - buttonsCurrentSession: buttons if card represents the current session
- * - buttonsNotCurrentSession: buttons if card represents not the current session
  * - actionButton: link button of card
  */
 const testCasesCSB: TestCasesCSB = {
@@ -484,7 +483,7 @@ describe("UI component: CommitteeSessionCard for HSB election", () => {
 
 describe("UI component: CommitteeSessionCard for CSB election", () => {
   beforeEach(() => {
-    server.use(CSBCommitteeSessionStatusChangeRequestHandler);
+    server.use(CSBCommitteeSessionStatusChangeRequestHandler, GetApportionmentStateFinalisedRequestHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
@@ -497,8 +496,9 @@ describe("UI component: CommitteeSessionCard for CSB election", () => {
   ) => {
     const testName = `${role} - session ${sessionNumber} - ${status}"}`;
 
-    test(testName, () => {
+    test(testName, async () => {
       const user = role === "coordinator_csb" ? getCoordinatorUser("csb") : getAdminUser();
+      const apportionmentStatus = spyOnHandler(GetApportionmentStateFinalisedRequestHandler);
       vi.spyOn(useUser, "useUser").mockReturnValue(user);
 
       const expectedTitle = "Zitting CSB";
@@ -532,6 +532,9 @@ describe("UI component: CommitteeSessionCard for CSB election", () => {
       expect(screen.getByText(expectedSubtitle)).toBeVisible();
       expect(screen.queryByText("zondag 9 november 2025 om 09:15")).not.toBeInTheDocument();
 
+      await waitFor(() => {
+        expect(apportionmentStatus).toHaveBeenCalledOnce();
+      });
       const buttons = screen.queryAllByRole("button");
       expect(buttons).toHaveLength(expectedButtons.length);
       expectedButtons.forEach((buttonName: string, index: number) => {
@@ -594,5 +597,36 @@ describe("UI component: CommitteeSessionCard for CSB election", () => {
 
     await user.click(screen.getByRole("button", { name: "Publieke sleutels GSB's importeren" }));
     expect(navigate).toHaveBeenCalledWith("sub-committees", {});
+  });
+
+  test("Resultaten en documenten link not shown when apportionment not finalised", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser("csb"));
+    const apportionmentStatusHandler = http.get("/api/elections/2/apportionment/state", () =>
+      HttpResponse.json({ type: "Uninitialised" } satisfies ApportionmentState, {
+        status: 200,
+      }),
+    );
+    server.use(apportionmentStatusHandler);
+    const apportionmentStatus = spyOnHandler(apportionmentStatusHandler);
+
+    render(
+      <CommitteeSessionCard
+        committeeSession={getCSBCommitteeSessionMockData({ status: "completed" })}
+        committeeCategory={csbElectionMockData.committee_category}
+        isCurrentSession={true}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(apportionmentStatus).toHaveBeenCalledOnce();
+    });
+    expect(screen.getByText("Zitting CSB")).toBeVisible();
+    expect(screen.getByText("— Invoer afgerond")).toBeVisible();
+    expect(screen.queryByText("zondag 9 november 2025 om 09:15")).not.toBeInTheDocument();
+
+    const buttons = await screen.findAllByRole("button");
+    expect(buttons).toHaveLength(2);
+    expect(buttons[0]).toHaveAccessibleName("Zetelverdeling");
+    expect(buttons[1]).toHaveAccessibleName("Invoer bekijken");
   });
 });

@@ -39,8 +39,6 @@ type GSBFixtures = {
   eml230b: Eml230b;
   // GSB CSO election without polling stations
   emptyElectionGSB: Election;
-  // GSB DSO election without polling stations
-  emptyElectionGSBDSO: Election;
   // GSB CSO election with two polling stations
   electionGSB: ElectionDetailsResponse;
   // GSB DSO election with two polling stations
@@ -81,10 +79,6 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
     const election = await createGSBElection(adminOne, eml110a, eml230b, "CSO");
     await use(election);
   },
-  emptyElectionGSBDSO: async ({ adminOne }, use) => {
-    const election = await createGSBElection(adminOne, eml110a, eml230b, "DSO");
-    await use(election);
-  },
   electionGSB: async ({ adminOne, coordinatorOneGSB }, use) => {
     const election = await createGSBElection(adminOne, eml110a, eml230b, "CSO");
 
@@ -103,23 +97,21 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
 
     await use(electionDetails);
   },
-  electionGSBDSO: async ({ adminOne, coordinatorOneGSB, emptyElectionGSBDSO }, use) => {
+  electionGSBDSO: async ({ adminOne, coordinatorOneGSB }, use) => {
+    const election = await createGSBElection(adminOne, eml110a, eml230b, "DSO");
+
     // create polling stations in the existing emptyElection
-    const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElectionGSBDSO.id}/polling_stations`;
+    const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${election.id}/polling_stations`;
     for (const pollingStationRequest of pollingStationRequests) {
       const pollingStationResponse = await adminOne.request.post(url, { data: pollingStationRequest });
       expect(pollingStationResponse.ok()).toBeTruthy();
     }
 
     // Set committee session status to DataEntry
-    const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, emptyElectionGSBDSO.id, "data_entry");
+    const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, election.id, "data_entry");
 
     // Fill in committee session details
-    await fillInCommiteeSessionDetails(
-      coordinatorOneGSB,
-      emptyElectionGSBDSO.id,
-      electionDetails.current_committee_session.id,
-    );
+    await fillInCommiteeSessionDetails(coordinatorOneGSB, election.id, electionDetails.current_committee_session.id);
 
     await use(electionDetails);
   },

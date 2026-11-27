@@ -1,7 +1,10 @@
 import { t } from "@/i18n/translate";
 
-const NL_DATE_REGEX = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-(20\d{2})$/;
-const TIME_REGEX = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
+const NL_DATE_FORMAT_REGEX = /^(\d{2})-(\d{2})-(\d{4})$/;
+const TIME_FORMAT_REGEX = /^(\d{1,2}):(\d{2})$/;
+
+export type DateValidationResult = "valid" | "invalid_format" | "invalid_date" | "invalid_year";
+export type TimeValidationResult = "valid" | "invalid_format" | "invalid_time";
 
 function isToday(date: Date): boolean {
   const today = new Date();
@@ -130,20 +133,60 @@ export function formatTimeToGo(seconds: number) {
   return minutesFormatted;
 }
 
+/** Validate a date in dd-mm-yyyy format: first the format, then whether the date exists, then the year (2000-2099) */
+export function validateNLDate(date: string): DateValidationResult {
+  const match = NL_DATE_FORMAT_REGEX.exec(date);
+  if (!match) {
+    return "invalid_format";
+  }
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+
+  // Use a UTC date to check that the day exists in the given month (e.g. no 31-02 or 29-02 in non-leap years)
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (parsed.getUTCFullYear() !== year || parsed.getUTCMonth() !== month - 1 || parsed.getUTCDate() !== day) {
+    return "invalid_date";
+  }
+
+  if (year < 2000 || year > 2099) {
+    return "invalid_year";
+  }
+
+  return "valid";
+}
+
 export function isValidNLDate(date: string) {
-  return NL_DATE_REGEX.test(date);
+  return validateNLDate(date) === "valid";
+}
+
+/** Validate a time in hh:mm (or h:mm) format: first the format, then whether the hours and minutes are in range */
+export function validateTime(time: string): TimeValidationResult {
+  const match = TIME_FORMAT_REGEX.exec(time);
+  if (!match) {
+    return "invalid_format";
+  }
+
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (hours > 23 || minutes > 59) {
+    return "invalid_time";
+  }
+
+  return "valid";
 }
 
 export function isValidTime(time: string) {
-  return TIME_REGEX.test(time);
+  return validateTime(time) === "valid";
 }
 
 /** Convert date from dd-mm-yyyy to yyyy-mm-dd */
 export function convertNLDateToISODate(date: string) {
-  if (isValidNLDate(date)) {
-    const dateParts = NL_DATE_REGEX.exec(date);
-    return `${dateParts?.[3]}-${dateParts?.[2]}-${dateParts?.[1]}`;
-  } else {
+  const result = validateNLDate(date);
+  if (result !== "valid") {
     throw new Error(`Error: ${date} has an invalid date format, should be: dd-mm-yyyy`);
   }
+  const [day, month, year] = date.split("-");
+  return `${year}-${month}-${day}`;
 }

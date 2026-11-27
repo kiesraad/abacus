@@ -10,10 +10,17 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { useElection } from "@/hooks/election/useElection";
+import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import type { COMMITTEE_SESSION_UPDATE_REQUEST_PATH, CommitteeSessionUpdateRequest } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-import { convertNLDateToISODate, isValidNLDate, isValidTime } from "@/utils/dateTime";
+import {
+  convertNLDateToISODate,
+  type DateValidationResult,
+  type TimeValidationResult,
+  validateNLDate,
+  validateTime,
+} from "@/utils/dateTime";
 
 import cls from "../ElectionManagement.module.css";
 
@@ -21,6 +28,17 @@ type ValidationErrors = {
   location?: string;
   start_date?: string;
   start_time?: string;
+};
+
+const DATE_ERRORS: Record<Exclude<DateValidationResult, "valid">, TranslationPath> = {
+  invalid_format: "election_management.date_error",
+  invalid_date: "election_management.date_error_invalid",
+  invalid_year: "election_management.date_error_year",
+};
+
+const TIME_ERRORS: Record<Exclude<TimeValidationResult, "valid">, TranslationPath> = {
+  invalid_format: "election_management.time_error",
+  invalid_time: "election_management.time_error_invalid",
 };
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
@@ -101,14 +119,20 @@ export function CommitteeSessionDetailsPage() {
 
     if (start_date.length === 0) {
       errors.start_date = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
-    } else if (!isValidNLDate(start_date)) {
-      errors.start_date = t("election_management.date_error");
+    } else {
+      const dateResult = validateNLDate(start_date);
+      if (dateResult !== "valid") {
+        errors.start_date = t(DATE_ERRORS[dateResult]);
+      }
     }
 
     if (start_time.length === 0) {
       errors.start_time = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
-    } else if (!isValidTime(start_time)) {
-      errors.start_time = t("election_management.time_error");
+    } else {
+      const timeResult = validateTime(start_time);
+      if (timeResult !== "valid") {
+        errors.start_time = t(TIME_ERRORS[timeResult]);
+      }
     }
 
     const isValid = Object.keys(errors).length === 0;

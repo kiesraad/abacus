@@ -886,7 +886,7 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
 
             // Should be election_8!
-            FixtureBuilder::new()
+            FixtureBuilder::default()
                 .user_fixtures()
                 .election(|b| b.fixture(&ElectionFixture::Election6NoPollingStations))
                 .build(&mut conn)

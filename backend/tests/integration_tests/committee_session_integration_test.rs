@@ -258,7 +258,7 @@ async fn test_committee_session_delete_current_committee_session_but_its_the_fir
 ) {
     let mut conn = pool.acquire().await.unwrap();
 
-    FixtureBuilder::new()
+    FixtureBuilder::default()
         .user_fixtures()
         .election(|b| b.fixture(&ElectionFixture::Election6NoPollingStations))
         .build(&mut conn)
@@ -266,10 +266,8 @@ async fn test_committee_session_delete_current_committee_session_but_its_the_fir
 
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
-    // let election_id = 6;
-    // let committee_session_id = 7;
-    let election_id = 1;
-    let committee_session_id = 1;
+    let election_id = 6;
+    let committee_session_id = 7;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;

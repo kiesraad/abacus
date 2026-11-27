@@ -15,6 +15,7 @@ pub mod committee_session;
 pub mod election;
 pub mod user;
 
+#[derive(Default)]
 pub struct FixtureBuilder {
     elections: Vec<election::ElectionBuilder>,
     users: Vec<user::UserBuilder>,
@@ -26,20 +27,13 @@ pub struct FixtureContext {
 }
 
 impl FixtureBuilder {
-    pub fn new() -> Self {
-        Self {
-            elections: Vec::new(),
-            users: Vec::new(),
-        }
-    }
-
     pub fn election(mut self, f: impl FnOnce(ElectionBuilder) -> ElectionBuilder) -> Self {
-        self.elections.push(f(ElectionBuilder::new()));
+        self.elections.push(f(ElectionBuilder::default()));
         self
     }
 
     pub fn user(mut self, f: impl FnOnce(UserBuilder) -> UserBuilder) -> Self {
-        self.users.push(f(UserBuilder::new()));
+        self.users.push(f(UserBuilder::default()));
         self
     }
 
@@ -57,11 +51,15 @@ impl FixtureBuilder {
         };
 
         for user_builder in self.users {
-            user_builder.build(conn, &mut context).await;
+            let user_context = user_builder.build(conn, &context).await;
+            context.users.insert(user_context.user.id(), user_context);
         }
 
         for election_builder in self.elections {
-            election_builder.build(conn, &mut context).await;
+            let election_context = election_builder.build(conn, &context).await;
+            context
+                .elections
+                .insert(election_context.election.id, election_context);
         }
 
         context

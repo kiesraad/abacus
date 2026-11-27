@@ -14,7 +14,7 @@ use crate::shared;
 
 #[test(sqlx::test)]
 async fn test_user_login(pool: SqlitePool) {
-    FixtureBuilder::new()
+    FixtureBuilder::default()
         .user_fixtures()
         .build(&mut pool.acquire().await.unwrap())
         .await;
@@ -29,7 +29,10 @@ async fn test_user_login(pool: SqlitePool) {
 #[test(sqlx::test)]
 async fn test_user_login_invalidates_old_session(pool: SqlitePool) {
     let mut conn = pool.acquire().await.unwrap();
-    FixtureBuilder::new().user_fixtures().build(&mut conn).await;
+    FixtureBuilder::default()
+        .user_fixtures()
+        .build(&mut conn)
+        .await;
 
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/account");
@@ -116,7 +119,10 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
 #[test(sqlx::test)]
 async fn test_user_listing(pool: SqlitePool) {
     let mut conn = pool.acquire().await.unwrap();
-    FixtureBuilder::new().user_fixtures().build(&mut conn).await;
+    FixtureBuilder::default()
+        .user_fixtures()
+        .build(&mut conn)
+        .await;
 
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;

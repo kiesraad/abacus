@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use chrono::NaiveDate;
 use sqlx::SqliteConnection;
 
 use crate::{
@@ -8,8 +7,8 @@ use crate::{
         committee_session::CommitteeSessionId,
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
-            ElectionCategory, ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber,
-            RegisteredPoliticalGroup, VoteCountingMethod,
+            ElectionCategory, ElectionDomain, ElectionId, ElectionWithPoliticalGroups, NewElection,
+            PGNumber, RegisteredPoliticalGroup, VoteCountingMethod,
         },
     },
     fixtures::builders::{
@@ -19,7 +18,9 @@ use crate::{
     repository::election_repo,
 };
 
+#[derive(Default)]
 pub struct ElectionBuilder {
+    override_id: Option<u32>,
     name: Option<String>,
     committee_category: Option<CommitteeCategory>,
     counting_method: Option<VoteCountingMethod>,
@@ -35,24 +36,19 @@ pub struct ElectionContext {
 }
 
 impl ElectionBuilder {
-    pub fn new() -> Self {
-        Self {
-            name: None,
-            committee_category: None,
-            counting_method: None,
-            election_category: None,
-            number_of_seats: None,
-            political_groups: vec![],
-            committee_sessions: vec![],
-        }
+    #[deprecated = "will be removed once old tests are updated"]
+    pub fn override_id(mut self, id: u32) -> Self {
+        self.override_id = Some(id);
+        self
     }
 
     pub fn committee_session(
         mut self,
         f: impl FnOnce(CommitteeSessionBuilder) -> CommitteeSessionBuilder,
     ) -> Self {
+        let number = u32::try_from(self.committee_sessions.len()).unwrap() + 1;
         self.committee_sessions
-            .push(f(CommitteeSessionBuilder::new()));
+            .push(f(CommitteeSessionBuilder::default().number(number)));
         self
     }
 
@@ -87,7 +83,9 @@ impl ElectionBuilder {
                     ],
                 };
 
-                self.name("Gemeenteraad Klein Dorp 2024")
+                #[expect(deprecated)]
+                self.override_id(6)
+                    .name("Gemeenteraad Klein Dorp 2024")
                     .committee_category(CommitteeCategory::GSB)
                     .counting_method(VoteCountingMethod::CSO)
                     .election_category(ElectionCategory::Municipal)
@@ -108,7 +106,7 @@ impl ElectionBuilder {
                         political_group(1, "Political Group A"),
                         political_group(2, "Political Group B"),
                     ])
-                    .committee_session(|b| b)
+                    .committee_session(|b| b.override_id(7))
             }
         }
     }
@@ -144,12 +142,15 @@ impl ElectionBuilder {
         self
     }
 
-
-    pub async fn build(self, conn: &mut SqliteConnection, context: &mut FixtureContext) {
+    pub async fn build(
+        self,
+        conn: &mut SqliteConnection,
+        fixture_context: &FixtureContext,
+    ) -> ElectionContext {
         // TODO: Add check if combination of properties like categories/counting method are correct
         let name = self.name.unwrap();
 
-        let election = election_repo::create(
+        let mut election = election_repo::create(
             conn,
             NewElection {
                 name: name.clone(),
@@ -182,17 +183,25 @@ impl ElectionBuilder {
         .await
         .unwrap();
 
-        context.elections.insert(
-            election.id,
-            ElectionContext {
-                election: election.clone(),
-                committee_sessions: HashMap::new(),
-            },
-        );
+        if let Some(id) = self.override_id {
+            #[expect(deprecated)]
+            election_repo::update_id(conn, election.id, ElectionId::from(id)).await;
+            election.id = ElectionId::from(id);
+        }
+
+        let mut context = ElectionContext {
+            election: election.clone(),
+            committee_sessions: HashMap::new(),
+        };
 
         for builder in self.committee_sessions {
-            builder.build(conn, context, &election.id).await;
+            let session_context = builder.build(conn, fixture_context, election.id).await;
+            context
+                .committee_sessions
+                .insert(session_context.committee_session.id, session_context);
         }
+
+        context
     }
 }
 

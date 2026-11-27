@@ -292,3 +292,14 @@ pub async fn change_number_of_voters(
     .fetch_one(conn)
     .await
 }
+
+#[cfg(any(test, feature = "dev-database"))]
+#[deprecated = "will be removed once old tests are updated"]
+pub async fn update_id(conn: &mut SqliteConnection, old_id: ElectionId, new_id: ElectionId) {
+    use sqlx::query;
+
+    query!("UPDATE elections SET id = ? WHERE id = ?", new_id, old_id)
+        .execute(conn)
+        .await
+        .expect("should update id");
+}

@@ -316,3 +316,22 @@ pub async fn get_current_id_for_election(
     .await
     .map(|record| record.map(|r| r.id))
 }
+
+#[cfg(any(test, feature = "dev-database"))]
+#[deprecated = "will be removed once old tests are updated"]
+pub async fn update_id(
+    conn: &mut SqliteConnection,
+    old_id: CommitteeSessionId,
+    new_id: CommitteeSessionId,
+) {
+    use sqlx::query;
+
+    query!(
+        "UPDATE committee_sessions SET id = ? WHERE id = ?",
+        new_id,
+        old_id
+    )
+    .execute(conn)
+    .await
+    .expect("should update id");
+}

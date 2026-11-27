@@ -10,6 +10,7 @@ use crate::{
     repository::user_repo::{self, User},
 };
 
+#[derive(Default)]
 pub struct UserBuilder {
     username: Option<String>,
     role: Option<Role>,
@@ -23,17 +24,8 @@ pub struct UserContext {
     pub plain_password: String,
 }
 
+#[expect(clippy::too_many_lines)]
 impl UserBuilder {
-    pub fn new() -> Self {
-        Self {
-            username: None,
-            fullname: None,
-            hashed_password: None,
-            role: None,
-            is_active: false,
-        }
-    }
-
     pub fn fixture(self, user_fixture: &UserFixture) -> Self {
         use UserFixture::*;
         match user_fixture {
@@ -137,7 +129,11 @@ impl UserBuilder {
         self
     }
 
-    pub async fn build(self, conn: &mut SqliteConnection, context: &mut FixtureContext) {
+    pub async fn build(
+        self,
+        conn: &mut SqliteConnection,
+        _fixture_context: &FixtureContext,
+    ) -> UserContext {
         // TODO: Move validations to domain level
         // TODO: Full name should be validated if it is required or not
         let username = self.username.unwrap();
@@ -168,13 +164,10 @@ impl UserBuilder {
                 .unwrap();
         }
 
-        context.users.insert(
-            user.id(),
-            UserContext {
-                user,
-                plain_password: String::new(), // TODO: set the actual plain password if needed
-            },
-        );
+        UserContext {
+            user,
+            plain_password: String::new(), // TODO: set the actual plain password if needed
+        }
     }
 }
 

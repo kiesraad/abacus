@@ -1,4 +1,3 @@
-import { expect } from "@playwright/test";
 import {
   changeCommitteeSessionStatus,
   createCommitteeSession,
@@ -6,7 +5,11 @@ import {
   fillInCommiteeSessionDetails,
   resolveDifferences,
 } from "e2e-tests/helpers-utils/api-helpers/coordinator-api-helpers";
-import { completeDataEntries, DataEntryApiClient } from "e2e-tests/helpers-utils/api-helpers/data-entry-api-helpers";
+import {
+  completeDataEntries,
+  DataEntryApiClient,
+  getFirstDataEntryForElection,
+} from "e2e-tests/helpers-utils/api-helpers/data-entry-api-helpers";
 import { createGSBElection, createPollingStations } from "e2e-tests/helpers-utils/api-helpers/election-api-helpers";
 import { type Eml230b, eml110a, eml230b, eml230b_with_gaps } from "e2e-tests/test-data/eml-files";
 import {
@@ -17,12 +20,7 @@ import {
   nextSessionResultsWithDifferences,
   pollingStationRequests,
 } from "e2e-tests/test-data/request-response-templates";
-import type {
-  ELECTION_STATUS_REQUEST_PATH,
-  Election,
-  ElectionDetailsResponse,
-  ElectionStatusResponse,
-} from "@/types/generated/openapi";
+import type { Election, ElectionDetailsResponse } from "@/types/generated/openapi";
 import { userFixtures } from "./user-fixtures";
 
 export interface DataEntryFixture {
@@ -102,35 +100,23 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
     await use(electionDetails);
   },
   dataEntryGSB: async ({ adminOne, electionGSB }, use) => {
-    const { request } = adminOne;
-    // get the first polling station of the existing election
-    const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${electionGSB.election.id}/status`;
-    const response = await request.get(url);
-    expect(response.ok()).toBeTruthy();
-    const electionStatuses = (await response.json()) as ElectionStatusResponse;
-    const electionStatus = electionStatuses.statuses[0]!;
+    const firstDataEntry = await getFirstDataEntryForElection(adminOne, electionGSB.election.id);
 
     await use({
       election_id: electionGSB.election.id,
-      id: electionStatus.data_entry_id,
-      name: electionStatus.source.name,
-      number: electionStatus.source.number.toString(),
+      id: firstDataEntry.data_entry_id,
+      name: firstDataEntry.source.name,
+      number: firstDataEntry.source.number.toString(),
     });
   },
   dataEntryGSBDSO: async ({ adminOne, electionGSBDSO }, use) => {
-    const { request } = adminOne;
-    // get the first polling station of the existing election
-    const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${electionGSBDSO.election.id}/status`;
-    const response = await request.get(url);
-    expect(response.ok()).toBeTruthy();
-    const electionStatuses = (await response.json()) as ElectionStatusResponse;
-    const electionStatus = electionStatuses.statuses[0]!;
+    const firstDataEntry = await getFirstDataEntryForElection(adminOne, electionGSBDSO.election.id);
 
     await use({
       election_id: electionGSBDSO.election.id,
-      id: electionStatus.data_entry_id,
-      name: electionStatus.source.name,
-      number: electionStatus.source.number.toString(),
+      id: firstDataEntry.data_entry_id,
+      name: firstDataEntry.source.name,
+      number: firstDataEntry.source.number.toString(),
     });
   },
   dataEntryGSBWithGapsInEML230b: async ({ adminOne, coordinatorOneGSB }, use) => {
@@ -143,18 +129,13 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
 
     await fillInCommiteeSessionDetails(coordinatorOneGSB, election.id, electionDetails.current_committee_session.id);
 
-    // get the first polling station of the existing election
-    const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${election.id}/status`;
-    const response = await adminOne.request.get(url);
-    expect(response.ok()).toBeTruthy();
-    const electionStatuses = (await response.json()) as ElectionStatusResponse;
-    const electionStatus = electionStatuses.statuses[0]!;
+    const firstDataEntry = await getFirstDataEntryForElection(adminOne, election.id);
 
     await use({
       election_id: election.id,
-      id: electionStatus.data_entry_id,
-      name: electionStatus.source.name,
-      number: electionStatus.source.number.toString(),
+      id: firstDataEntry.data_entry_id,
+      name: firstDataEntry.source.name,
+      number: firstDataEntry.source.number.toString(),
     });
   },
   dataEntryGSBFirstEntryClaimed: async ({ typistOneGSB, dataEntryGSB }, use) => {

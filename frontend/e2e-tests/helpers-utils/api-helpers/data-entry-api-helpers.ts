@@ -5,7 +5,19 @@ import type {
   DATA_ENTRY_FINALISE_REQUEST_PATH,
   DATA_ENTRY_SAVE_REQUEST_PATH,
   DataEntry,
+  ELECTION_STATUS_REQUEST_PATH,
+  ElectionId,
+  ElectionStatusResponse,
 } from "@/types/generated/openapi";
+
+export async function getFirstDataEntryForElection(admin: { request: APIRequestContext }, electionId: ElectionId) {
+  // get the first polling station of the existing election
+  const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${electionId}/status`;
+  const response = await admin.request.get(url);
+  expect(response.ok()).toBeTruthy();
+  const electionStatuses = (await response.json()) as ElectionStatusResponse;
+  return electionStatuses.statuses[0]!;
+}
 
 export class DataEntryApiClient {
   private session: APIRequestContext;

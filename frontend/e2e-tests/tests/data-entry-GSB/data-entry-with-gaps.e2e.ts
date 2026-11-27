@@ -23,14 +23,13 @@ test.use({
 });
 
 test.describe("full data entry flow with gaps in party/candidate numbers", () => {
-  test("no recount, no differences", async ({ page, dataEntryGSB }) => {
-    // TODO: fix this test after creating a fixture to provide an election with eml230b_with_gaps
-    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry`);
+  test("no recount, no differences", async ({ page, dataEntryGSBWithGapsInEML230b }) => {
+    await page.goto(`/elections/${dataEntryGSBWithGapsInEML230b.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.number.fill(dataEntryGSB.number);
-    await expect(dataEntryHomePage.feedback).toContainText(dataEntryGSB.name);
+    await dataEntryHomePage.number.fill(dataEntryGSBWithGapsInEML230b.number);
+    await expect(dataEntryHomePage.feedback).toContainText(dataEntryGSBWithGapsInEML230b.name);
     await dataEntryHomePage.start.click();
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);

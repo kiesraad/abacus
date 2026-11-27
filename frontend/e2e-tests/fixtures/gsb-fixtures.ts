@@ -8,7 +8,7 @@ import {
 } from "e2e-tests/helpers-utils/api-helpers/coordinator-api-helpers";
 import { completeDataEntries, DataEntryApiClient } from "e2e-tests/helpers-utils/api-helpers/data-entry-api-helpers";
 import { createGSBElection, createPollingStations } from "e2e-tests/helpers-utils/api-helpers/election-api-helpers";
-import { type Eml230b, eml110a, eml230b } from "e2e-tests/test-data/eml-files";
+import { type Eml230b, eml110a, eml230b, eml230b_with_gaps } from "e2e-tests/test-data/eml-files";
 import {
   dataEntryRequest,
   dataEntryWithDifferencesRequest,
@@ -45,6 +45,8 @@ type GSBFixtures = {
   dataEntryGSB: DataEntryFixture;
   // First data entry of the GSB DSO election
   dataEntryGSBDSO: DataEntryFixture;
+  // First data entry of a GSB CSO election with gaps in the party/candidate numbers
+  dataEntryGSBWithGapsInEML230b: DataEntryFixture;
   // First data entry of the GSB CSO election with entry claimed by typist one
   dataEntryGSBFirstEntryClaimed: DataEntryFixture;
   // First data entry of the GSB CSO election with first data entry done
@@ -126,6 +128,30 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
 
     await use({
       election_id: electionGSBDSO.election.id,
+      id: electionStatus.data_entry_id,
+      name: electionStatus.source.name,
+      number: electionStatus.source.number.toString(),
+    });
+  },
+  dataEntryGSBWithGapsInEML230b: async ({ adminOne, coordinatorOneGSB }, use) => {
+    const election = await createGSBElection(adminOne, eml110a, eml230b_with_gaps, "CSO");
+
+    await createPollingStations(adminOne, election.id, pollingStationRequests);
+
+    // Set committee session status to DataEntry
+    const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, election.id, "data_entry");
+
+    await fillInCommiteeSessionDetails(coordinatorOneGSB, election.id, electionDetails.current_committee_session.id);
+
+    // get the first polling station of the existing election
+    const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${election.id}/status`;
+    const response = await adminOne.request.get(url);
+    expect(response.ok()).toBeTruthy();
+    const electionStatuses = (await response.json()) as ElectionStatusResponse;
+    const electionStatus = electionStatuses.statuses[0]!;
+
+    await use({
+      election_id: election.id,
       id: electionStatus.data_entry_id,
       name: electionStatus.source.name,
       number: electionStatus.source.number.toString(),

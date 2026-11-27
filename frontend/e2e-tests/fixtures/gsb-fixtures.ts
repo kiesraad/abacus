@@ -18,7 +18,6 @@ import {
   pollingStationRequests,
 } from "e2e-tests/test-data/request-response-templates";
 import type {
-  CommitteeSession,
   ELECTION_STATUS_REQUEST_PATH,
   Election,
   ElectionDetailsResponse,
@@ -40,8 +39,6 @@ type GSBFixtures = {
   emptyElectionGSB: Election;
   // GSB CSO election with two polling stations
   electionGSB: ElectionDetailsResponse;
-  // The current committee session for the GSB CSO election
-  currentCommitteeSessionElectionGSB: CommitteeSession;
   // GSB DSO election with two polling stations
   electionGSBDSO: ElectionDetailsResponse;
   // First data entry of the GSB CSO election
@@ -67,7 +64,7 @@ type GSBFixtures = {
   // First data entry of the GSB CSO election with second data entry that has errors and is therefore different
   dataEntryGSBEntriesDifferentWithErrors: DataEntryFixture;
   // GSB CSO election with polling stations and two completed data entries for each
-  completedElectionGSB: Election;
+  completedElectionGSB: ElectionDetailsResponse;
   // GSB CSO election with one investigation in the second committee session
   dataEntryNextSession: DataEntryFixture;
 };
@@ -89,9 +86,6 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
     await fillInCommiteeSessionDetails(coordinatorOneGSB, election.id, electionDetails.current_committee_session.id);
 
     await use(electionDetails);
-  },
-  currentCommitteeSessionElectionGSB: async ({ electionGSB }, use) => {
-    await use(electionGSB.current_committee_session);
   },
   electionGSBDSO: async ({ adminOne, coordinatorOneGSB }, use) => {
     const election = await createGSBElection(adminOne, eml110a, eml230b, "DSO");
@@ -217,17 +211,18 @@ export const gsbFixtures = userFixtures.extend<GSBFixtures>({
       await completeDataEntries(ps.data_entry_id!, typistOneGSB.request, typistTwoGSB.request);
     }
 
-    await use(electionGSB.election);
+    await use(electionGSB);
   },
   dataEntryNextSession: async ({ coordinatorOneGSB, completedElectionGSB }, use) => {
-    await changeCommitteeSessionStatus(coordinatorOneGSB, completedElectionGSB.id, "completed");
-    const electionDetails = await createCommitteeSession(coordinatorOneGSB, completedElectionGSB.id);
+    const election = completedElectionGSB.election;
+    await changeCommitteeSessionStatus(coordinatorOneGSB, election.id, "completed");
+    const electionDetails = await createCommitteeSession(coordinatorOneGSB, election.id);
 
     const pollingStation = electionDetails.polling_stations[0]!;
     const investigation = await createInvestigation(coordinatorOneGSB, pollingStation.id);
 
     await use({
-      election_id: electionDetails.election.id,
+      election_id: election.id,
       id: investigation.data_entry_id!,
       name: pollingStation.name,
       number: String(pollingStation.number),

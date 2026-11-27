@@ -1,11 +1,6 @@
 use sqlx::SqliteConnection;
 
-use crate::{
-    domain::election::ElectionId,
-    fixtures::builders::{election::ElectionBuilder, user::UserBuilder},
-    repository::user_repo::UserId,
-};
-use std::collections::HashMap;
+use crate::fixtures::builders::{election::ElectionBuilder, user::UserBuilder};
 
 pub mod committee_session;
 pub mod data_entry;
@@ -22,8 +17,8 @@ pub struct FixtureBuilder {
 }
 
 pub struct FixtureContext {
-    elections: HashMap<ElectionId, election::ElectionContext>,
-    users: HashMap<UserId, user::UserContext>,
+    elections: Vec<election::ElectionContext>,
+    users: Vec<user::UserContext>,
 }
 
 impl FixtureBuilder {
@@ -46,20 +41,18 @@ impl FixtureBuilder {
 
     pub async fn build(self, conn: &mut SqliteConnection) -> FixtureContext {
         let mut context = FixtureContext {
-            users: HashMap::new(),
-            elections: HashMap::new(),
+            users: Vec::new(),
+            elections: Vec::new(),
         };
 
         for user_builder in self.users {
             let user_context = user_builder.build(conn, &context).await;
-            context.users.insert(user_context.user.id(), user_context);
+            context.users.push(user_context);
         }
 
         for election_builder in self.elections {
             let election_context = election_builder.build(conn, &context).await;
-            context
-                .elections
-                .insert(election_context.election.id, election_context);
+            context.elections.push(election_context);
         }
 
         context
@@ -69,60 +62,51 @@ impl FixtureBuilder {
 impl FixtureContext {
     pub fn get_user(&self, username: &str) -> &user::UserContext {
         self.users
-            .values()
+            .iter()
             .find(|u| u.user.username() == username)
-            .unwrap()
+            .unwrap_or_else(|| panic!("fixture user {username:?} not found"))
     }
 
-    // // Only 1, otherwise error
-    // let election = context.single::<Election>();
+    /// Elections in declaration order
+    pub fn elections(&self) -> impl Iterator<Item = &election::ElectionContext> {
+        self.elections.iter()
+    }
+}
 
-    // // Only 1 result, otherwise error
-    // let specific_election =
-    //     context.find::<Election>(|e| e.committee_category == CommitteeCategory::CSB);
+/// Use with the context accessors, e.g. `ctx.elections().single().committee_sessions().single()`.
+/// For several items use the standard `Iterator::find` / `Iterator::filter`.
+pub trait Single: Iterator + Sized {
+    /// Returns the only item; panics if there are none or more than one
+    fn single(mut self) -> Self::Item {
+        let item = self.next().expect("expected exactly one item, found none");
+        assert!(
+            self.next().is_none(),
+            "expected exactly one item, found more"
+        );
+        item
+    }
+}
 
-    // // List of multiple results
-    // let specific_election =
-    //     context.filter::<Election>(|e| e.committee_category == CommitteeCategory::CSB);
+impl<I: Iterator> Single for I {}
 
-    // // Bonus: wrapper type
-    // // Returns ElectionContext
-    // let election = context.single::<Election>();
-    // let session = election.single::<CommitteeSession>();
-    // let entries = session.filter::<DataEntry>(|e| e);
+#[cfg(test)]
+mod tests {
+    use super::Single;
 
-    // // Scratchpad
-    // trait WrapperContext<T> {
-    //     fn single(&self) -> T;
-    //     fn find<F>(&self, f: F) -> Option<T>
-    //     where
-    //         F: Fn(&T) -> bool;
-    //     fn filter<F>(&self, f: F) -> Vec<T>
-    //     where
-    //         F: Fn(&T) -> bool;
-    // }
+    #[test]
+    fn single_returns_only_item() {
+        assert_eq!([1].iter().single(), &1);
+    }
 
-    // struct ElectionContext {
-    //     context: FixtureContext,
-    // }
+    #[test]
+    #[should_panic(expected = "found none")]
+    fn single_panics_on_empty() {
+        std::iter::empty::<u32>().single();
+    }
 
-    // impl<T> WrapperContext<T> for ElectionContext {
-    //     fn single(&self) -> T {
-    //         self.context.single::<T>().unwrap()
-    //     }
-
-    //     fn find<F>(&self, f: F) -> Option<T>
-    //     where
-    //         F: Fn(&T) -> bool,
-    //     {
-    //         self.context.find::<T>(f)
-    //     }
-
-    //     fn filter<F>(&self, f: F) -> Vec<T>
-    //     where
-    //         F: Fn(&T) -> bool,
-    //     {
-    //         self.context.filter::<T>(f)
-    //     }
-    // }
+    #[test]
+    #[should_panic(expected = "found more")]
+    fn single_panics_on_multiple() {
+        [1, 2].iter().single();
+    }
 }

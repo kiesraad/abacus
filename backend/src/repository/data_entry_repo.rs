@@ -493,11 +493,8 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::{
-                data_entry::{self, DataEntryOrigin, DataEntrySourceId},
-                sub_committee::SubCommitteeId,
-            },
-            fixtures::builders::{FixtureBuilder, predefined::election_8_csb_with_results},
+            domain::data_entry::{self, DataEntryOrigin, DataEntrySourceId},
+            fixtures::builders::{FixtureBuilder, Single, predefined::election_8_csb_with_results},
             repository::{
                 polling_station_repo::{self, insert_test_polling_station},
                 user_repo::UserId,
@@ -885,22 +882,24 @@ mod tests {
         async fn test_csb_committee_session_results(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
 
-            FixtureBuilder::default()
+            let ctx = FixtureBuilder::default()
                 .user_fixtures()
                 .election(election_8_csb_with_results)
                 .build(&mut conn)
                 .await;
 
-            let committee_session_id = CommitteeSessionId::from(801);
+            let session = ctx.elections().single().committee_sessions().single();
+            let sub_committee = session.sub_committees().single();
 
-            let results = list_results_for_committee_session(&mut conn, committee_session_id)
-                .await
-                .unwrap();
+            let results =
+                list_results_for_committee_session(&mut conn, session.committee_session.id)
+                    .await
+                    .unwrap();
             assert_eq!(results.len(), 1);
 
             assert_eq!(
                 results[0].0.id(),
-                DataEntrySourceId::SubCommittee(SubCommitteeId::from(811))
+                DataEntrySourceId::SubCommittee(sub_committee.sub_committee.id)
             );
             assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 4);
         }

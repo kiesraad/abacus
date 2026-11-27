@@ -1,14 +1,9 @@
-use std::collections::HashMap;
-
 use sqlx::SqliteConnection;
 
 use crate::{
-    domain::{
-        committee_session::CommitteeSessionId,
-        election::{
-            CommitteeCategory, CommitteeDistrict, ElectionCategory, ElectionDomain, ElectionId,
-            ElectionWithPoliticalGroups, NewElection, RegisteredPoliticalGroup, VoteCountingMethod,
-        },
+    domain::election::{
+        CommitteeCategory, CommitteeDistrict, ElectionCategory, ElectionDomain, ElectionId,
+        ElectionWithPoliticalGroups, NewElection, RegisteredPoliticalGroup, VoteCountingMethod,
     },
     fixtures::builders::{
         FixtureContext,
@@ -31,7 +26,13 @@ pub struct ElectionBuilder {
 
 pub struct ElectionContext {
     pub election: ElectionWithPoliticalGroups,
-    pub committee_sessions: HashMap<CommitteeSessionId, CommitteeSessionContext>,
+    committee_sessions: Vec<CommitteeSessionContext>,
+}
+
+impl ElectionContext {
+    pub fn committee_sessions(&self) -> impl Iterator<Item = &CommitteeSessionContext> {
+        self.committee_sessions.iter()
+    }
 }
 
 pub struct ElectionScope<'a> {
@@ -138,10 +139,9 @@ impl ElectionBuilder {
             parent: fixture_context,
             election: &election,
         };
-        let mut committee_sessions = HashMap::new();
+        let mut committee_sessions = Vec::new();
         for builder in self.committee_sessions {
-            let session_context = builder.build(conn, &scope).await;
-            committee_sessions.insert(session_context.committee_session.id, session_context);
+            committee_sessions.push(builder.build(conn, &scope).await);
         }
 
         ElectionContext {

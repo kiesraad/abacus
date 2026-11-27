@@ -1,13 +1,9 @@
-use std::collections::HashMap;
-
 use sqlx::SqliteConnection;
 
 use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
-        polling_station::PollingStationId,
-        sub_committee::SubCommitteeId,
     },
     fixtures::builders::{
         election::ElectionScope,
@@ -30,8 +26,18 @@ pub struct CommitteeSessionBuilder {
 
 pub struct CommitteeSessionContext {
     pub committee_session: CommitteeSession,
-    pub polling_stations: HashMap<PollingStationId, PollingStationContext>,
-    pub sub_committees: HashMap<SubCommitteeId, SubCommitteeContext>,
+    polling_stations: Vec<PollingStationContext>,
+    sub_committees: Vec<SubCommitteeContext>,
+}
+
+impl CommitteeSessionContext {
+    pub fn polling_stations(&self) -> impl Iterator<Item = &PollingStationContext> {
+        self.polling_stations.iter()
+    }
+
+    pub fn sub_committees(&self) -> impl Iterator<Item = &SubCommitteeContext> {
+        self.sub_committees.iter()
+    }
 }
 
 pub struct CommitteeSessionScope<'a> {
@@ -105,16 +111,14 @@ impl CommitteeSessionBuilder {
             committee_session: &session,
         };
 
-        let mut polling_stations = HashMap::new();
+        let mut polling_stations = Vec::new();
         for builder in self.polling_stations {
-            let ps = builder.build(conn, &scope).await;
-            polling_stations.insert(ps.polling_station.id, ps);
+            polling_stations.push(builder.build(conn, &scope).await);
         }
 
-        let mut sub_committees = HashMap::new();
+        let mut sub_committees = Vec::new();
         for builder in self.sub_committees {
-            let sc = builder.build(conn, &scope).await;
-            sub_committees.insert(sc.sub_committee.id, sc);
+            sub_committees.push(builder.build(conn, &scope).await);
         }
 
         if status > CommitteeSessionStatus::Created {

@@ -86,7 +86,7 @@ describe("FinishDataEntryPage", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
     expect(
       await screen.findByText(
-        "In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële telbestanden downloaden.",
+        "In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële tellingsbestanden downloaden.",
       ),
     ).toBeVisible();
     expect(

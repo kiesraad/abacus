@@ -32,7 +32,7 @@
   "finish_data_entry": {
     "about_to_stop_data_entry": "Je staat op het punt het invoeren van stemmen te stoppen.",
     "explanation": {
-      "GSB": "<ul><li>In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële telbestanden downloaden.</li><li>Zolang er geen volgende zitting is gestart, kan je nog terug naar de invoer.</li></ul>",
+      "GSB": "<ul><li>In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële tellingsbestanden downloaden.</li><li>Zolang er geen volgende zitting is gestart, kan je nog terug naar de invoer.</li></ul>",
       "HSB": "<ul><li>In de volgende stap kan je het proces-verbaal voor de zitting van het hoofdstembureau opmaken en de officiële bestanden downloaden.</li></ul>",
       "CSB": "<ul><li>In de volgende stap ga je verder met de zetelverdeling. Daarna kan je het proces-verbaal voor de zitting van het centraal stembureau opmaken en de officiële bestanden downloaden.</li></ul>"
     }
@@ -59,7 +59,7 @@
     "download_explanation": "Hierin zitten de volgende documenten:",
     "determination_election_results": {
       "download": "Vaststelling uitslag",
-      "explanation_text": "<li>Proces-verbaal model P 22-2</li><li>EML_NL-telbestand 520 met zetelverdeling</li>"
+      "explanation_text": "<li>Proces-verbaal model P 22-2</li><li>EML_NL-resultaatbestand 520 met zetelverdeling</li>"
     },
     "p_22_2_attachment": {
       "download": "Model P 22-2 Bijlage 1",
@@ -67,7 +67,7 @@
     },
     "definitive_documents": {
       "download": "Definitieve documenten",
-      "explanation_text": "<li>EML_NL-telbestand 510d met totaaltelling van de gemeente</li><li>CSV met totaaltelling</li>"
+      "explanation_text": "<li>EML_NL-tellingsbestand 510d met totaaltelling van de gemeente</li><li>CSV met totaaltelling</li>"
     },
     "upload_the_zip": "Upload alle ZIP-bestanden naar het overdrachtsplatform."
   },

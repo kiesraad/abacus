@@ -370,7 +370,7 @@ pub async fn list(
     Ok(users)
 }
 
-/// Fetch the first admin user ever created
+/// Returns if there are any active users
 pub async fn has_active_users(conn: &mut SqliteConnection) -> Result<bool, AuthenticationError> {
     let result = sqlx::query!(
         r#"SELECT 1 AS 'exists' FROM users WHERE last_activity_at IS NOT NULL LIMIT 1"#,

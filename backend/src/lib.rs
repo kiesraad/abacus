@@ -17,6 +17,8 @@ pub mod app_error;
 pub mod domain;
 pub mod eml;
 mod error;
+#[cfg(any(test, feature = "dev-database"))]
+pub mod fixtures;
 pub mod infra;
 pub mod repository;
 pub mod service;

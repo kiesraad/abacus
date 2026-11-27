@@ -497,6 +497,7 @@ mod tests {
                 data_entry::{self, DataEntryOrigin, DataEntrySourceId},
                 sub_committee::SubCommitteeId,
             },
+            fixtures::builders::{FixtureBuilder, election::ElectionFixture},
             repository::{
                 polling_station_repo::{self, insert_test_polling_station},
                 user_repo::UserId,
@@ -880,12 +881,17 @@ mod tests {
             assert_eq!(results[2].1.voters_counts().proxy_certificate_count, 10);
         }
 
-        #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
-            scripts("election_8_csb_with_results")
-        )))]
+        #[test(sqlx::test)]
         async fn test_csb_committee_session_results(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
+
+            // Should be election_8!
+            FixtureBuilder::new()
+                .user_fixtures()
+                .election(|b| b.fixture(&ElectionFixture::Election6NoPollingStations))
+                .build(&mut conn)
+                .await;
+
             let committee_session_id = CommitteeSessionId::from(801);
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id)
@@ -898,6 +904,58 @@ mod tests {
                 DataEntrySourceId::SubCommittee(SubCommitteeId::from(811))
             );
             assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 4);
+
+            // // Only 1, otherwise error
+            // let election = context.single::<Election>();
+
+            // // Only 1 result, otherwise error
+            // let specific_election =
+            //     context.find::<Election>(|e| e.committee_category == CommitteeCategory::CSB);
+
+            // // List of multiple results
+            // let specific_election =
+            //     context.filter::<Election>(|e| e.committee_category == CommitteeCategory::CSB);
+
+            // // Bonus: wrapper type
+            // // Returns ElectionContext
+            // let election = context.single::<Election>();
+            // let session = election.single::<CommitteeSession>();
+            // let entries = session.filter::<DataEntry>(|e| e);
+
+            // // Scratchpad
+            // trait WrapperContext<T> {
+            //     fn single(&self) -> T;
+            //     fn find<F>(&self, f: F) -> Option<T>
+            //     where
+            //         F: Fn(&T) -> bool;
+            //     fn filter<F>(&self, f: F) -> Vec<T>
+            //     where
+            //         F: Fn(&T) -> bool;
+            // }
+
+            // struct ElectionContext {
+            //     context: FixtureContext,
+            // }
+
+            // impl<T> WrapperContext<T> for ElectionContext {
+            //     fn single(&self) -> T {
+            //         self.context.single::<T>().unwrap()
+            //     }
+
+            //     fn find<F>(&self, f: F) -> Option<T>
+            //     where
+            //         F: Fn(&T) -> bool,
+            //     {
+            //         self.context.find::<T>(f)
+            //     }
+
+            //     fn filter<F>(&self, f: F) -> Vec<T>
+            //     where
+            //         F: Fn(&T) -> bool,
+            //     {
+            //         self.context.filter::<T>(f)
+            //     }
+            // }
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]

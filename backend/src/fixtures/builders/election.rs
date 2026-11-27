@@ -6,9 +6,8 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         election::{
-            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
-            ElectionCategory, ElectionDomain, ElectionId, ElectionWithPoliticalGroups, NewElection,
-            PGNumber, RegisteredPoliticalGroup, VoteCountingMethod,
+            CommitteeCategory, CommitteeDistrict, ElectionCategory, ElectionDomain, ElectionId,
+            ElectionWithPoliticalGroups, NewElection, RegisteredPoliticalGroup, VoteCountingMethod,
         },
     },
     fixtures::builders::{
@@ -50,65 +49,6 @@ impl ElectionBuilder {
         self.committee_sessions
             .push(f(CommitteeSessionBuilder::default().number(number)));
         self
-    }
-
-    pub fn fixture(self, election_fixture: &ElectionFixture) -> Self {
-        use ElectionFixture::*;
-        match election_fixture {
-            Election6NoPollingStations => {
-                let political_group = |number: u32, name: &str| RegisteredPoliticalGroup {
-                    number: PGNumber::from(number),
-                    registered_name: name.to_string(),
-                    candidates: vec![
-                        Candidate {
-                            number: CandidateNumber::from(1),
-                            initials: "A.".to_string(),
-                            first_name: Some("Alice".to_string()),
-                            last_name_prefix: None,
-                            last_name: "Foo".to_string(),
-                            locality: "Klein Dorp".to_string(),
-                            country_code: None,
-                            gender: Some(CandidateGender::Female),
-                        },
-                        Candidate {
-                            number: CandidateNumber::from(2),
-                            initials: "C.".to_string(),
-                            first_name: Some("Charlie".to_string()),
-                            last_name_prefix: None,
-                            last_name: "Doe".to_string(),
-                            locality: "Klein Dorp".to_string(),
-                            country_code: None,
-                            gender: None,
-                        },
-                    ],
-                };
-
-                #[expect(deprecated)]
-                self.override_id(6)
-                    .name("Gemeenteraad Klein Dorp 2024")
-                    .committee_category(CommitteeCategory::GSB)
-                    .counting_method(VoteCountingMethod::CSO)
-                    .election_category(ElectionCategory::Municipal)
-                    .number_of_seats(29)
-                    // .election_id("GR2024_KleinDorp")
-                    // .location("Klein Dorp")
-                    // .authority_id("0123")
-                    // .authority_name("Klein Dorp")
-                    // .authority_region("Klein Dorp")
-                    // .domain(Some(ElectionDomain {
-                    //     id: Some("0123".to_string()),
-                    //     name: "Klein Dorp".to_string(),
-                    // }))
-                    // .number_of_voters(2500)
-                    // .election_date(NaiveDate::from_ymd_opt(2024, 12, 31).unwrap())
-                    // .nomination_date(NaiveDate::from_ymd_opt(2024, 12, 1).unwrap())
-                    .political_groups(vec![
-                        political_group(1, "Political Group A"),
-                        political_group(2, "Political Group B"),
-                    ])
-                    .committee_session(|b| b.override_id(7))
-            }
-        }
     }
 
     pub fn name(mut self, name: &str) -> Self {
@@ -190,12 +130,14 @@ impl ElectionBuilder {
         }
 
         let mut context = ElectionContext {
-            election: election.clone(),
+            election,
             committee_sessions: HashMap::new(),
         };
 
         for builder in self.committee_sessions {
-            let session_context = builder.build(conn, fixture_context, election.id).await;
+            let session_context = builder
+                .build(conn, fixture_context, context.election.id)
+                .await;
             context
                 .committee_sessions
                 .insert(session_context.committee_session.id, session_context);
@@ -203,8 +145,4 @@ impl ElectionBuilder {
 
         context
     }
-}
-
-pub enum ElectionFixture {
-    Election6NoPollingStations,
 }

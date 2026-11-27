@@ -2,7 +2,7 @@
 
 use std::net::SocketAddr;
 
-use abacus::fixtures::builders::{FixtureBuilder, election::ElectionFixture};
+use abacus::fixtures::builders::{FixtureBuilder, predefined::election_6_no_polling_stations};
 use axum::http::{HeaderValue, StatusCode};
 use reqwest::Response;
 use sqlx::SqlitePool;
@@ -260,7 +260,7 @@ async fn test_committee_session_delete_current_committee_session_but_its_the_fir
 
     FixtureBuilder::default()
         .user_fixtures()
-        .election(|b| b.fixture(&ElectionFixture::Election6NoPollingStations))
+        .election(election_6_no_polling_stations)
         .build(&mut conn)
         .await;
 

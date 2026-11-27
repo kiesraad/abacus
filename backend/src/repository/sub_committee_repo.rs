@@ -185,3 +185,22 @@ pub async fn list_first_session_with_status(
     .fetch_all(conn)
     .await
 }
+
+#[cfg(any(test, feature = "dev-database"))]
+#[deprecated = "will be removed once old tests are updated"]
+pub async fn update_id(
+    conn: &mut SqliteConnection,
+    old_id: SubCommitteeId,
+    new_id: SubCommitteeId,
+) {
+    use sqlx::query;
+
+    query!(
+        "UPDATE sub_committees SET id = ? WHERE id = ?",
+        new_id,
+        old_id
+    )
+    .execute(conn)
+    .await
+    .expect("should update id");
+}

@@ -203,9 +203,8 @@ pub enum DataEntryOrigin {
     Typist(UserId),
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields, tag = "status", content = "state")]
-#[derive(Default)]
 pub enum DataEntryStatus {
     #[default]
     Empty, // First entry has not started yet

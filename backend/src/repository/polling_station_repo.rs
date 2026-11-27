@@ -677,3 +677,22 @@ pub async fn exists(
 
     Ok(exists != 0)
 }
+
+#[cfg(any(test, feature = "dev-database"))]
+#[deprecated = "will be removed once old tests are updated"]
+pub async fn update_id(
+    conn: &mut SqliteConnection,
+    old_id: PollingStationId,
+    new_id: PollingStationId,
+) {
+    use sqlx::query;
+
+    query!(
+        "UPDATE polling_stations SET id = ? WHERE id = ?",
+        new_id,
+        old_id
+    )
+    .execute(conn)
+    .await
+    .expect("should update id");
+}

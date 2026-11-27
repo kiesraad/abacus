@@ -16,7 +16,9 @@ use crate::domain::committee_session::{
     Clone,
     Copy,
     Debug,
+    Default,
     PartialEq,
+    PartialOrd,
     Eq,
     Hash,
     ToSchema,
@@ -26,7 +28,6 @@ use crate::domain::committee_session::{
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 #[sqlx(rename_all = "snake_case")]
-#[derive(Default)]
 pub enum CommitteeSessionStatus {
     #[default]
     Created,

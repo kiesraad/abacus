@@ -1,18 +1,18 @@
 use sqlx::SqliteConnection;
-use strum::VariantArray;
 
 use crate::{
     domain::election::ElectionId,
-    fixtures::builders::{
-        election::ElectionBuilder,
-        user::{UserBuilder, UserFixture},
-    },
+    fixtures::builders::{election::ElectionBuilder, user::UserBuilder},
     repository::user_repo::UserId,
 };
 use std::collections::HashMap;
 
 pub mod committee_session;
+pub mod data_entry;
 pub mod election;
+pub mod polling_station;
+pub mod predefined;
+pub mod sub_committee;
 pub mod user;
 
 #[derive(Default)]
@@ -38,8 +38,8 @@ impl FixtureBuilder {
     }
 
     pub fn user_fixtures(mut self) -> Self {
-        for fixture in UserFixture::VARIANTS {
-            self = self.user(|b| b.fixture(fixture));
+        for user in predefined::ALL_USERS {
+            self = self.user(user);
         }
         self
     }
@@ -64,4 +64,65 @@ impl FixtureBuilder {
 
         context
     }
+}
+
+impl FixtureContext {
+    pub fn get_user(&self, username: &str) -> &user::UserContext {
+        self.users
+            .values()
+            .find(|u| u.user.username() == username)
+            .unwrap()
+    }
+
+    // // Only 1, otherwise error
+    // let election = context.single::<Election>();
+
+    // // Only 1 result, otherwise error
+    // let specific_election =
+    //     context.find::<Election>(|e| e.committee_category == CommitteeCategory::CSB);
+
+    // // List of multiple results
+    // let specific_election =
+    //     context.filter::<Election>(|e| e.committee_category == CommitteeCategory::CSB);
+
+    // // Bonus: wrapper type
+    // // Returns ElectionContext
+    // let election = context.single::<Election>();
+    // let session = election.single::<CommitteeSession>();
+    // let entries = session.filter::<DataEntry>(|e| e);
+
+    // // Scratchpad
+    // trait WrapperContext<T> {
+    //     fn single(&self) -> T;
+    //     fn find<F>(&self, f: F) -> Option<T>
+    //     where
+    //         F: Fn(&T) -> bool;
+    //     fn filter<F>(&self, f: F) -> Vec<T>
+    //     where
+    //         F: Fn(&T) -> bool;
+    // }
+
+    // struct ElectionContext {
+    //     context: FixtureContext,
+    // }
+
+    // impl<T> WrapperContext<T> for ElectionContext {
+    //     fn single(&self) -> T {
+    //         self.context.single::<T>().unwrap()
+    //     }
+
+    //     fn find<F>(&self, f: F) -> Option<T>
+    //     where
+    //         F: Fn(&T) -> bool,
+    //     {
+    //         self.context.find::<T>(f)
+    //     }
+
+    //     fn filter<F>(&self, f: F) -> Vec<T>
+    //     where
+    //         F: Fn(&T) -> bool,
+    //     {
+    //         self.context.filter::<T>(f)
+    //     }
+    // }
 }

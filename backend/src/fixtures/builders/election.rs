@@ -34,6 +34,11 @@ pub struct ElectionContext {
     pub committee_sessions: HashMap<CommitteeSessionId, CommitteeSessionContext>,
 }
 
+pub struct ElectionScope<'a> {
+    pub parent: &'a FixtureContext,
+    pub election: &'a ElectionWithPoliticalGroups,
+}
+
 impl ElectionBuilder {
     #[deprecated = "will be removed once old tests are updated"]
     pub fn override_id(mut self, id: u32) -> Self {
@@ -117,7 +122,7 @@ impl ElectionBuilder {
                 number_of_voters: 1337,
                 election_date: chrono::NaiveDate::from_ymd_opt(2024, 6, 1).unwrap(),
                 nomination_date: chrono::NaiveDate::from_ymd_opt(2024, 5, 1).unwrap(),
-                political_groups: vec![],
+                political_groups: self.political_groups,
             },
         )
         .await
@@ -129,20 +134,19 @@ impl ElectionBuilder {
             election.id = ElectionId::from(id);
         }
 
-        let mut context = ElectionContext {
-            election,
-            committee_sessions: HashMap::new(),
+        let scope = ElectionScope {
+            parent: fixture_context,
+            election: &election,
         };
-
+        let mut committee_sessions = HashMap::new();
         for builder in self.committee_sessions {
-            let session_context = builder
-                .build(conn, fixture_context, context.election.id)
-                .await;
-            context
-                .committee_sessions
-                .insert(session_context.committee_session.id, session_context);
+            let session_context = builder.build(conn, &scope).await;
+            committee_sessions.insert(session_context.committee_session.id, session_context);
         }
 
-        context
+        ElectionContext {
+            election,
+            committee_sessions,
+        }
     }
 }

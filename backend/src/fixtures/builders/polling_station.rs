@@ -1,14 +1,11 @@
 use sqlx::SqliteConnection;
 
 use crate::{
-    domain::{
-        election::ElectionId,
-        polling_station::{
-            PollingStation, PollingStationId, PollingStationNumber, PollingStationRequest,
-        },
+    domain::polling_station::{
+        PollingStation, PollingStationId, PollingStationNumber, PollingStationRequest,
     },
     fixtures::builders::{
-        FixtureContext,
+        committee_session::CommitteeSessionScope,
         data_entry::{DataEntryBuilder, DataEntryContext},
     },
     repository::polling_station_repo,
@@ -52,12 +49,11 @@ impl PollingStationBuilder {
     pub async fn build(
         self,
         conn: &mut SqliteConnection,
-        fixture_context: &FixtureContext,
-        election_id: ElectionId,
+        parent: &CommitteeSessionScope<'_>,
     ) -> PollingStationContext {
         let id = polling_station_repo::create(
             conn,
-            election_id,
+            parent.parent.election.id,
             PollingStationRequest {
                 name: self.name.unwrap(),
                 number: Some(self.number.unwrap()),
@@ -88,9 +84,7 @@ impl PollingStationBuilder {
             .await
             .unwrap();
         let data_entry = if let Some(data_entry_builder) = self.data_entry {
-            data_entry_builder
-                .build(conn, fixture_context, data_entry_id)
-                .await
+            data_entry_builder.build(conn, parent, data_entry_id).await
         } else {
             DataEntryContext { data_entry_id }
         };

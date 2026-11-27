@@ -2,14 +2,13 @@ use sqlx::SqliteConnection;
 
 use crate::{
     domain::{
-        committee_session::CommitteeSessionId,
         election::CommitteeCategory,
         sub_committee::{
             NewSubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber,
         },
     },
     fixtures::builders::{
-        FixtureContext,
+        committee_session::CommitteeSessionScope,
         data_entry::{DataEntryBuilder, DataEntryContext},
     },
     repository::sub_committee_repo,
@@ -60,12 +59,11 @@ impl SubCommitteeBuilder {
     pub async fn build(
         self,
         conn: &mut SqliteConnection,
-        fixture_context: &FixtureContext,
-        committee_session_id: CommitteeSessionId,
+        parent: &CommitteeSessionScope<'_>,
     ) -> SubCommitteeContext {
         let mut sub_committee = service::create_sub_committee(
             conn,
-            committee_session_id,
+            parent.committee_session.id,
             NewSubCommittee {
                 number: self.number.unwrap(),
                 name: self.name.unwrap(),
@@ -85,9 +83,7 @@ impl SubCommitteeBuilder {
 
         let data_entry_id = sub_committee.data_entry_id;
         let data_entry = if let Some(data_entry_builder) = self.data_entry {
-            data_entry_builder
-                .build(conn, fixture_context, data_entry_id)
-                .await
+            data_entry_builder.build(conn, parent, data_entry_id).await
         } else {
             DataEntryContext { data_entry_id }
         };

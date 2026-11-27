@@ -1,6 +1,7 @@
 use crate::{
     domain::{
         committee_session_status::CommitteeSessionStatus,
+        data_entry::DataEntryStatusName,
         election::{
             Candidate,
             CandidateGender::{self, *},
@@ -169,7 +170,8 @@ pub fn election_8_csb_with_results(b: ElectionBuilder) -> ElectionBuilder {
                         // .authority_id("0035")
                         // .authority_name("Juinen")
                         .data_entry(|b| {
-                            b.first_entry_user("typist3")
+                            b.state(DataEntryStatusName::Definitive)
+                                .first_entry_user("typist3")
                                 .second_entry_user("typist4")
                                 .results(results)
                         })

@@ -6,12 +6,11 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
-        election::ElectionId,
         polling_station::PollingStationId,
         sub_committee::SubCommitteeId,
     },
     fixtures::builders::{
-        FixtureContext,
+        election::ElectionScope,
         polling_station::{PollingStationBuilder, PollingStationContext},
         sub_committee::{SubCommitteeBuilder, SubCommitteeContext},
     },
@@ -33,6 +32,11 @@ pub struct CommitteeSessionContext {
     pub committee_session: CommitteeSession,
     pub polling_stations: HashMap<PollingStationId, PollingStationContext>,
     pub sub_committees: HashMap<SubCommitteeId, SubCommitteeContext>,
+}
+
+pub struct CommitteeSessionScope<'a> {
+    pub parent: &'a ElectionScope<'a>,
+    pub committee_session: &'a CommitteeSession,
 }
 
 impl CommitteeSessionBuilder {
@@ -75,13 +79,12 @@ impl CommitteeSessionBuilder {
     pub async fn build(
         self,
         conn: &mut SqliteConnection,
-        fixture_context: &FixtureContext,
-        election_id: ElectionId,
+        parent: &ElectionScope<'_>,
     ) -> CommitteeSessionContext {
         let status = self.status.unwrap();
 
         let request = CommitteeSessionCreateRequest {
-            election_id,
+            election_id: parent.election.id,
             number: self.number.unwrap(),
         };
         let mut session = committee_session_repo::create(conn, request).await.unwrap();
@@ -97,15 +100,20 @@ impl CommitteeSessionBuilder {
             panic!("Should have either polling stations or sub committees, not both");
         }
 
+        let scope = CommitteeSessionScope {
+            parent,
+            committee_session: &session,
+        };
+
         let mut polling_stations = HashMap::new();
         for builder in self.polling_stations {
-            let ps = builder.build(conn, fixture_context, election_id).await;
+            let ps = builder.build(conn, &scope).await;
             polling_stations.insert(ps.polling_station.id, ps);
         }
 
         let mut sub_committees = HashMap::new();
         for builder in self.sub_committees {
-            let sc = builder.build(conn, fixture_context, session.id).await;
+            let sc = builder.build(conn, &scope).await;
             sub_committees.insert(sc.sub_committee.id, sc);
         }
 

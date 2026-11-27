@@ -2,14 +2,14 @@ use sqlx::SqliteConnection;
 
 use crate::{
     domain::{
+        committee_session::CommitteeSession,
         data_entry::{
             ClientState, DataEntryId, DataEntryStatus, DataEntryStatusName, DataEntryUpdate,
         },
+        election::ElectionWithPoliticalGroups,
         results::Results,
     },
-    fixtures::builders::{
-        FixtureContext, committee_session::CommitteeSessionContext, election::ElectionContext,
-    },
+    fixtures::builders::committee_session::CommitteeSessionScope,
     repository::{data_entry_repo, user_repo::UserId},
 };
 
@@ -61,9 +61,10 @@ impl DataEntryBuilder {
     pub async fn build(
         self,
         conn: &mut SqliteConnection,
-        fixture_context: &FixtureContext,
+        parent: &CommitteeSessionScope<'_>,
         data_entry_id: DataEntryId,
     ) -> DataEntryContext {
+        let fixture_context = parent.parent.parent;
         let first_user_id = fixture_context
             .get_user(&self.first_entry_username.unwrap())
             .user
@@ -73,12 +74,9 @@ impl DataEntryBuilder {
             .user
             .id();
 
-        // This doesn't work, data entry does not exist in context yet
-        let (election_context, session_context) =
-            fixture_context.get_parent_context_for_data_entry(data_entry_id);
         let state = get_state(
-            &election_context,
-            &session_context,
+            parent.parent.election,
+            parent.committee_session,
             self.state.unwrap(),
             first_user_id,
             second_user_id,
@@ -95,8 +93,8 @@ impl DataEntryBuilder {
 }
 
 fn get_state(
-    election_context: &ElectionContext,
-    session_context: &CommitteeSessionContext,
+    election: &ElectionWithPoliticalGroups,
+    committee_session: &CommitteeSession,
     requested_state: DataEntryStatusName,
     first_user_id: UserId,
     second_user_id: UserId,
@@ -105,11 +103,7 @@ fn get_state(
 ) -> DataEntryStatus {
     let state = DataEntryStatus::Empty;
 
-    let initial_results = Results::new(
-        &election_context.election,
-        &session_context.committee_session,
-        None,
-    );
+    let initial_results = Results::new(election, committee_session, None);
 
     match requested_state {
         DataEntryStatusName::Empty => state,
@@ -123,7 +117,7 @@ fn get_state(
                 user_id: first_user_id,
             })
             .unwrap()
-            .finalise_first_entry(&election_context.election, first_user_id)
+            .finalise_first_entry(election, first_user_id)
             .unwrap()
             .claim_second_entry(second_user_id, initial_results)
             .unwrap()
@@ -134,7 +128,7 @@ fn get_state(
                 user_id: second_user_id,
             })
             .unwrap()
-            .finalise_second_entry(&election_context.election, second_user_id)
+            .finalise_second_entry(election, second_user_id)
             .unwrap(),
         _ => unimplemented!("Requested state {:?} is not implemented", requested_state),
     }

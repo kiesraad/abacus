@@ -84,14 +84,10 @@ pub enum ErrorReference {
     InvalidHash,
     InvalidJson,
     InvalidPassword,
-    InvalidPoliticalGroup,
-    InvalidDataEntrySource,
     InvalidSession,
     InvalidStateTransition,
     InvalidUsername,
     InvalidUsernameOrPassword,
-    InvalidVoteCandidate,
-    InvalidVoteGroup,
     InvestigationHasDataEntryOrResult,
     InvestigationRequiresCorrectedResults,
     LoginRateLimited,
@@ -101,7 +97,6 @@ pub enum ErrorReference {
     PasswordRejectionSameAsUsername,
     PasswordRejectionTooShort,
     PdfGenerationError,
-    PollingStationRepeated,
     RequestPayloadTooLarge,
     SignatureMissing,
     SignatureUnknown,
@@ -142,7 +137,6 @@ impl IntoResponse for ErrorResponse {
 /// trait implementation
 #[derive(Debug)]
 pub enum APIError {
-    AddError(String, ErrorReference),
     AirgapViolation(String),
     BadRequest(String, ErrorReference),
     Conflict(String, ErrorReference),
@@ -237,10 +231,6 @@ impl APIError {
                     ErrorReference::PdfGenerationError,
                     false,
                 ),
-            ),
-            APIError::AddError(_, reference) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                ErrorResponse::new("Internal server error", *reference, false),
             ),
             APIError::InvalidHashError => (
                 StatusCode::BAD_REQUEST,

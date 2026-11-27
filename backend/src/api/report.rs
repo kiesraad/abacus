@@ -17,6 +17,7 @@ use crate::{
         filename::{format_datetime, hyphenate},
         report::files::{get_files_csb_election, get_files_gsb_election},
         role::Role,
+        tabulation::TabulationError,
     },
     error::{ApiErrorResponse, ErrorReference},
     infra::audit_log::AuditService,
@@ -44,6 +45,21 @@ impl ApiErrorResponse for ReportApiError {
                 ),
             ),
         }
+    }
+}
+
+impl ApiErrorResponse for TabulationError {
+    /// Tabulation only reads stored results, so any failure is an internal
+    /// server error and not a user error.
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            ErrorResponse::new(
+                "Internal server error",
+                ErrorReference::InternalServerError,
+                false,
+            ),
+        )
     }
 }
 
@@ -401,7 +417,13 @@ mod tests {
         api::tests::{
             assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
         },
-        domain::{committee_session_status::CommitteeSessionStatus, role::Role},
+        domain::{
+            committee_session_status::CommitteeSessionStatus,
+            data_entry::DataEntrySourceNumber,
+            election::{CandidateNumber, PGNumber},
+            role::Role,
+            validate::DataError,
+        },
         repository::{
             committee_session_repo::{self, change_status},
             user_repo::{User, UserId},
@@ -511,6 +533,28 @@ mod tests {
                 error.error, "Committee session does not match election",
                 "handler '{handler}'"
             );
+        }
+    }
+
+    #[test]
+    fn tabulation_error_response_parts() {
+        let errors = [
+            TabulationError::DataEntrySourceRepeated(DataEntrySourceNumber::PollingStation(1)),
+            TabulationError::InvalidData(
+                DataEntrySourceNumber::PollingStation(1),
+                DataError::new("invalid"),
+            ),
+            TabulationError::CandidateNotFound {
+                political_group: PGNumber::from(1),
+                candidate: CandidateNumber::from(3),
+            },
+        ];
+        for error in errors {
+            let (status, response) = error.to_response_parts();
+            assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR, "{error:?}");
+            assert_eq!(response.reference, ErrorReference::InternalServerError);
+            assert_eq!(response.error, "Internal server error");
+            assert!(!response.fatal);
         }
     }
 }

@@ -7,7 +7,10 @@ use crate::{
     APIError,
     domain::{
         data_entry::{DataEntrySource, DataEntrySourceNumber},
-        election::{CommitteeCategory, ElectionWithPoliticalGroups, VoteCountingMethod},
+        election::{
+            CandidateNumber, CommitteeCategory, ElectionWithPoliticalGroups, PGNumber,
+            VoteCountingMethod,
+        },
         polling_station::PollingStationForSession,
         results::{
             CommonDifferencesCounts, Results,
@@ -19,10 +22,38 @@ use crate::{
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
         },
-        validate::Validate,
+        validate::{DataError, Validate, ValidationResults},
     },
-    error::ErrorReference,
 };
+
+/// Error while tabulating the results of all data entry sources into election totals.
+#[derive(Debug, PartialEq, Eq)]
+pub enum TabulationError {
+    /// The same data entry source occurs more than once
+    DataEntrySourceRepeated(DataEntrySourceNumber),
+    /// The results of a data entry source could not be validated against the election
+    InvalidData(DataEntrySourceNumber, DataError),
+    /// The results of a data entry source have validation errors
+    ValidationErrors(DataEntrySourceNumber, ValidationResults),
+    /// The results model of a data entry source does not match the election
+    ResultsModelMismatch(DataEntrySourceNumber),
+    /// The data entry source is expected to be a polling station
+    NotAPollingStation(DataEntrySourceNumber),
+    /// The political groups in the votes counts of the totals and the results differ
+    PoliticalGroupsMismatch {
+        missing_in_totals: Vec<PGNumber>,
+        missing_in_results: Vec<PGNumber>,
+    },
+    /// A political group in the results does not exist in the totals
+    PoliticalGroupNotFound(PGNumber),
+    /// Attempted to add the votes of one political group to those of another
+    DifferentPoliticalGroup { totals: PGNumber, results: PGNumber },
+    /// A candidate in the results does not exist in the political group of the totals
+    CandidateNotFound {
+        political_group: PGNumber,
+        candidate: CandidateNumber,
+    },
+}
 
 /// Contains the totals of the election results, added up from the votes of all polling stations.
 #[derive(Serialize, Deserialize, Debug, ToSchema, Clone, PartialEq)]
@@ -67,7 +98,7 @@ impl ElectionTotals {
         election: &ElectionWithPoliticalGroups,
         results: &[(DataEntrySource, Results)],
         totals: &mut ElectionTotals,
-    ) -> Result<ElectionTotals, APIError> {
+    ) -> Result<ElectionTotals, TabulationError> {
         // list of polling stations for which we processed results
         let mut touched_data_sources: Vec<DataEntrySourceNumber> = vec![];
 
@@ -75,22 +106,19 @@ impl ElectionTotals {
         for (data_source, result) in results {
             // Check that we didn't previously touch this polling station
             if touched_data_sources.contains(&data_source.number()) {
-                return Err(APIError::AddError(
-                    format!("Data entry source {} is repeated", data_source.number()),
-                    ErrorReference::PollingStationRepeated,
+                return Err(TabulationError::DataEntrySourceRepeated(
+                    data_source.number(),
                 ));
             }
 
             // validate result and make sure that there are no errors
-            let validation_results = result.validate(election, &"data".into())?;
+            let validation_results = result
+                .validate(election, &"data".into())
+                .map_err(|err| TabulationError::InvalidData(data_source.number(), err))?;
             if validation_results.has_errors() {
-                return Err(APIError::AddError(
-                    format!(
-                        "Data entry source {} has validation errors: {:?}",
-                        data_source.number(),
-                        validation_results
-                    ),
-                    ErrorReference::DataEntryValidationErrors,
+                return Err(TabulationError::ValidationErrors(
+                    data_source.number(),
+                    validation_results,
                 ));
             }
 
@@ -109,10 +137,7 @@ impl ElectionTotals {
                     .political_group_votes
                     .iter_mut()
                     .find(|pgv| pgv.number == pg.number)
-                    .ok_or(APIError::AddError(
-                        format!("Could not find political group '{}'", pg.number),
-                        ErrorReference::InvalidPoliticalGroup,
-                    ))?;
+                    .ok_or(TabulationError::PoliticalGroupNotFound(pg.number))?;
                 pg_total.add(pg)?;
             }
 
@@ -130,7 +155,7 @@ impl ElectionTotals {
     pub fn tabulate(
         election: &ElectionWithPoliticalGroups,
         results: &[(DataEntrySource, Results)],
-    ) -> Result<ElectionTotals, APIError> {
+    ) -> Result<ElectionTotals, TabulationError> {
         // running totals
         let mut totals = ElectionTotals::zero(election);
 
@@ -196,15 +221,9 @@ impl ElectionTotals {
 /// returning an error for other kinds of data entry sources.
 fn polling_station_source(
     data_source: &DataEntrySource,
-) -> Result<&PollingStationForSession, APIError> {
+) -> Result<&PollingStationForSession, TabulationError> {
     let DataEntrySource::PollingStation(polling_station_source) = data_source else {
-        return Err(APIError::AddError(
-            format!(
-                "Expected polling station data entry source, got {:?}",
-                data_source
-            ),
-            ErrorReference::InvalidDataEntrySource,
-        ));
+        return Err(TabulationError::NotAPollingStation(data_source.number()));
     };
 
     Ok(polling_station_source)
@@ -212,7 +231,7 @@ fn polling_station_source(
 
 impl VotesCounts {
     /// Add the votes counts of the results of a data entry source to these totals.
-    fn add(&mut self, other: &Self) -> Result<(), APIError> {
+    fn add(&mut self, other: &Self) -> Result<(), TabulationError> {
         // Get sets of political group numbers from both collections
         let self_numbers: HashSet<_> = self
             .political_group_total_votes
@@ -227,25 +246,16 @@ impl VotesCounts {
 
         // Check that both have exactly the same political groups
         if self_numbers != other_numbers {
-            let missing_in_self: Vec<_> = other_numbers.difference(&self_numbers).collect();
-            let missing_in_other: Vec<_> = self_numbers.difference(&other_numbers).collect();
-
-            if !missing_in_self.is_empty() {
-                return Err(APIError::AddError(
-                    format!(
-                        "Political group(s) {missing_in_self:?} exist in source but not in target",
-                    ),
-                    ErrorReference::InvalidVoteGroup,
-                ));
-            }
-            if !missing_in_other.is_empty() {
-                return Err(APIError::AddError(
-                    format!(
-                        "Political group(s) {missing_in_other:?} exist in target but not in source",
-                    ),
-                    ErrorReference::InvalidVoteGroup,
-                ));
-            }
+            let mut missing_in_totals: Vec<_> =
+                other_numbers.difference(&self_numbers).copied().collect();
+            let mut missing_in_results: Vec<_> =
+                self_numbers.difference(&other_numbers).copied().collect();
+            missing_in_totals.sort();
+            missing_in_results.sort();
+            return Err(TabulationError::PoliticalGroupsMismatch {
+                missing_in_totals,
+                missing_in_results,
+            });
         }
 
         // Add totals of political groups with the same number
@@ -270,15 +280,12 @@ impl VotesCounts {
 
 impl PoliticalGroupCandidateVotes {
     /// Add the candidate votes of the results of a data entry source to these totals.
-    fn add(&mut self, other: &Self) -> Result<(), APIError> {
+    fn add(&mut self, other: &Self) -> Result<(), TabulationError> {
         if self.number != other.number {
-            return Err(APIError::AddError(
-                format!(
-                    "Attempted to add votes of group '{}' to '{}'",
-                    other.number, self.number
-                ),
-                ErrorReference::InvalidVoteGroup,
-            ));
+            return Err(TabulationError::DifferentPoliticalGroup {
+                totals: self.number,
+                results: other.number,
+            });
         }
 
         self.total += other.total;
@@ -289,13 +296,10 @@ impl PoliticalGroupCandidateVotes {
                 .iter_mut()
                 .find(|c| c.number == cv.number)
             else {
-                return Err(APIError::AddError(
-                    format!(
-                        "Attempted to add candidate '{}' votes in group '{}', but no such candidate exists",
-                        cv.number, self.number
-                    ),
-                    ErrorReference::InvalidVoteCandidate,
-                ));
+                return Err(TabulationError::CandidateNotFound {
+                    political_group: self.number,
+                    candidate: cv.number,
+                });
             };
             found_can.votes += cv.votes;
         }
@@ -343,7 +347,7 @@ impl CommitteeSpecificTotals {
         &mut self,
         data_source: &DataEntrySource,
         result: &Results,
-    ) -> Result<(), APIError> {
+    ) -> Result<(), TabulationError> {
         match (self, result) {
             // for the first session results, we need to add investigation status information to the totals
             (
@@ -369,13 +373,7 @@ impl CommitteeSpecificTotals {
             }
             // any other combination means the result model does not match the election
             _ => {
-                return Err(APIError::AddError(
-                    format!(
-                        "Result model of data entry source {} does not match the election",
-                        data_source.number()
-                    ),
-                    ErrorReference::InvalidData,
-                ));
+                return Err(TabulationError::ResultsModelMismatch(data_source.number()));
             }
         }
 
@@ -836,16 +834,10 @@ mod tests {
         };
 
         let result = curr_votes.add(&other);
-        assert_matches!(
-            result,
-            Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-        );
+        assert_matches!(result, Err(TabulationError::PoliticalGroupsMismatch { .. }));
 
         let result = other.add(&curr_votes);
-        assert_matches!(
-            result,
-            Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-        );
+        assert_matches!(result, Err(TabulationError::PoliticalGroupsMismatch { .. }));
     }
 
     #[test]
@@ -1030,7 +1022,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::ValidationErrors(..)));
     }
 
     #[test]
@@ -1046,7 +1038,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::DataEntrySourceRepeated(_)));
     }
 
     #[test]
@@ -1067,7 +1059,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::InvalidData(..)));
     }
 
     #[test]
@@ -1091,7 +1083,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::InvalidData(..)));
     }
 
     #[test]
@@ -1113,7 +1105,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::InvalidData(..)));
     }
 
     #[test]
@@ -1134,7 +1126,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::InvalidData(..)));
     }
 
     #[test]
@@ -1152,7 +1144,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::InvalidData(..)));
     }
 
     #[test]
@@ -1172,7 +1164,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::InvalidData(..)));
     }
 
     #[test]
@@ -1193,7 +1185,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::InvalidData(..)));
     }
 
     #[test]
@@ -1212,7 +1204,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::InvalidData(..)));
     }
 
     #[test]
@@ -1232,7 +1224,7 @@ mod tests {
             ],
         );
 
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::InvalidData(..)));
     }
 
     #[test]
@@ -1434,8 +1426,8 @@ mod tests {
         let dso_result = || {
             dso_results_fixture(
                 AboutReport {
-                    corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
-                    checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
+                    corrigendum_present: Some(CorrigendumPresent::OneDocument),
+                    checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PageMissing),
                 },
                 ChecksAndCorrections::default(),
             )
@@ -1443,24 +1435,24 @@ mod tests {
 
         // a CSO result in a DSO election
         let totals = ElectionTotals::tabulate(&dso_election, &[(source(), results_fixture_a())]);
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::ResultsModelMismatch(_)));
 
         // a DSO result in a CSO election
         let totals = ElectionTotals::tabulate(&cso_election, &[(source(), dso_result())]);
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::ResultsModelMismatch(_)));
 
-        // a GSB result in a GSB election
+        // a GSB result in a CSO election
         let totals =
             ElectionTotals::tabulate(&cso_election, &[(source(), gsb_results_fixture_a())]);
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::ResultsModelMismatch(_)));
 
         // a CSO result in a CSB election
         let totals = ElectionTotals::tabulate(&csb_election, &[(source(), results_fixture_a())]);
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::ResultsModelMismatch(_)));
 
         // a DSO result in a CSB election
         let totals = ElectionTotals::tabulate(&csb_election, &[(source(), dso_result())]);
-        assert!(totals.is_err());
+        assert_matches!(totals, Err(TabulationError::ResultsModelMismatch(_)));
     }
 
     #[test]
